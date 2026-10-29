@@ -1,0 +1,9 @@
+/* Pack build: the library comes from the installed npm tarball. Keep in sync with styles.css.
+   Same imports as the docs. theme.css already imports tailwindcss and tw-animate-css. */
+@import "@ivorie/ui/styles/theme.css";
+@import "@ivorie/ui/styles/style-maia.css";
+/* Prove the package alone feeds Tailwind: never scan the library source. */
+@source not "../../../projects/ui";
+@source not "../../../docs";
+@source not "../../../tools";
+@source not "../../../.superpowers";

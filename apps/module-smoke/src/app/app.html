@@ -1,0 +1,199 @@
+<main class="mx-auto flex max-w-3xl flex-col gap-8 p-8">
+  <h1 class="text-2xl font-semibold">Ivorie NgModule smoke</h1>
+
+  <iv-accordion type="single">
+    <iv-accordion-item value="a">
+      <iv-accordion-trigger>Profile</iv-accordion-trigger>
+      <iv-accordion-content>Name and email.</iv-accordion-content>
+    </iv-accordion-item>
+  </iv-accordion>
+
+  <iv-alert>
+    <iv-alert-title>Heads up</iv-alert-title>
+    <iv-alert-description>Module apps work too.</iv-alert-description>
+  </iv-alert>
+
+  <button ivButton variant="outline" [ivAlertDialogTrigger]="confirmTpl">Delete account</button>
+  <ng-template #confirmTpl>
+    <iv-alert-dialog-header>
+      <iv-alert-dialog-title>Delete account?</iv-alert-dialog-title>
+      <iv-alert-dialog-description>This cannot be undone.</iv-alert-dialog-description>
+    </iv-alert-dialog-header>
+    <iv-alert-dialog-footer>
+      <button ivAlertDialogCancel>Cancel</button>
+      <button ivAlertDialogAction variant="destructive">Delete</button>
+    </iv-alert-dialog-footer>
+  </ng-template>
+
+  <iv-avatar><iv-avatar-fallback>AL</iv-avatar-fallback></iv-avatar>
+
+  <iv-badge variant="secondary">New</iv-badge>
+
+  <nav ivBreadcrumb>
+    <ol ivBreadcrumbList>
+      <li ivBreadcrumbItem><a ivBreadcrumbLink href="#">Home</a></li>
+      <li ivBreadcrumbSeparator></li>
+      <li ivBreadcrumbItem><span ivBreadcrumbPage>Profile</span></li>
+    </ol>
+  </nav>
+
+  <iv-button-group aria-label="Text style">
+    <button ivButton variant="outline">Bold</button>
+    <button ivButton variant="outline">Italic</button>
+  </iv-button-group>
+
+  <iv-calendar [(ngModel)]="date" />
+
+  <iv-card>
+    <iv-card-header>
+      <iv-card-title>Account</iv-card-title>
+      <iv-card-description>Manage your preferences.</iv-card-description>
+    </iv-card-header>
+    <iv-card-content><p class="text-sm">Card content.</p></iv-card-content>
+  </iv-card>
+
+  <iv-checkbox [(ngModel)]="agree" aria-label="Agree" />
+
+  <iv-collapsible>
+    <button ivCollapsibleTrigger>Advanced</button>
+    <iv-collapsible-content><p class="text-sm">Hidden content.</p></iv-collapsible-content>
+  </iv-collapsible>
+
+  <iv-combobox [(ngModel)]="combo" placeholder="Search fruit…" class="w-56">
+    <iv-combobox-input aria-label="Fruit search" />
+    <iv-combobox-content>
+      <iv-combobox-list>
+        <iv-combobox-item value="apple" label="Apple">Apple</iv-combobox-item>
+        <iv-combobox-item value="banana" label="Banana">Banana</iv-combobox-item>
+        <iv-combobox-empty>No fruit found.</iv-combobox-empty>
+      </iv-combobox-list>
+    </iv-combobox-content>
+  </iv-combobox>
+
+  <button ivButton variant="outline" [ivDialogTrigger]="dialogTpl">Open dialog</button>
+  <ng-template #dialogTpl>
+    <iv-dialog-header>
+      <iv-dialog-title>Hello</iv-dialog-title>
+      <iv-dialog-description>Opened from an NgModule app.</iv-dialog-description>
+    </iv-dialog-header>
+    <iv-dialog-footer><button ivButton ivDialogClose>Close</button></iv-dialog-footer>
+  </ng-template>
+
+  <iv-dropdown-menu>
+    <button ivButton ivDropdownMenuTrigger variant="outline" size="sm">Menu</button>
+    <iv-dropdown-menu-content>
+      <iv-dropdown-menu-item>Profile</iv-dropdown-menu-item>
+      <iv-dropdown-menu-item>Billing</iv-dropdown-menu-item>
+    </iv-dropdown-menu-content>
+  </iv-dropdown-menu>
+
+  <iv-field>
+    <label ivLabel for="email">Email</label>
+    <input ivInput id="email" type="email" />
+    <p ivFieldDescription>We never share this address.</p>
+  </iv-field>
+
+  <iv-hover-card>
+    <a ivHoverCardTrigger href="#">&#64;ivorie</a>
+    <iv-hover-card-content><p class="text-sm">Angular components.</p></iv-hover-card-content>
+  </iv-hover-card>
+
+  <iv-item-group>
+    <iv-item variant="outline">
+      <iv-item-content>
+        <iv-item-title>Profile</iv-item-title>
+        <p ivItemDescription>Account details.</p>
+      </iv-item-content>
+    </iv-item>
+  </iv-item-group>
+
+  <nav ivPagination>
+    <ul ivPaginationContent>
+      <li ivPaginationItem><a ivPaginationPrevious href="#"></a></li>
+      <li ivPaginationItem><a ivPaginationLink href="#" [isActive]="true">1</a></li>
+      <li ivPaginationItem><a ivPaginationNext href="#"></a></li>
+    </ul>
+  </nav>
+
+  <iv-progress [value]="40" />
+
+  <iv-radio-group [(ngModel)]="plan">
+    <iv-radio-group-item value="starter" aria-label="Starter" />
+    <iv-radio-group-item value="pro" aria-label="Pro" />
+  </iv-radio-group>
+
+  <iv-scroll-area maxHeight="120px" class="w-64 rounded-md border">
+    <div class="h-64 p-2 text-sm">Long content</div>
+  </iv-scroll-area>
+
+  <iv-select [(ngModel)]="fruit" placeholder="Pick a fruit">
+    <iv-select-trigger class="w-48" aria-label="Fruit" />
+    <iv-select-content>
+      <iv-select-item value="apple">Apple</iv-select-item>
+      <iv-select-item value="banana">Banana</iv-select-item>
+    </iv-select-content>
+  </iv-select>
+
+  <iv-separator />
+
+  <div class="relative h-64 overflow-hidden rounded-xl border">
+    <iv-sidebar-provider class="h-full min-h-0">
+      <iv-sidebar collapsible="none" class="h-full">
+        <iv-sidebar-content>
+          <iv-sidebar-group>
+            <iv-sidebar-group-label>Navigation</iv-sidebar-group-label>
+            <iv-sidebar-group-content>
+              <ul ivSidebarMenu>
+                <li ivSidebarMenuItem>
+                  <iv-sidebar-menu-button [isActive]="true"><span>Home</span></iv-sidebar-menu-button>
+                </li>
+              </ul>
+            </iv-sidebar-group-content>
+          </iv-sidebar-group>
+        </iv-sidebar-content>
+      </iv-sidebar>
+      <main ivSidebarInset class="min-w-0"><iv-sidebar-trigger /></main>
+    </iv-sidebar-provider>
+  </div>
+
+  <iv-skeleton class="h-4 w-48" />
+
+  <iv-spinner />
+
+  <iv-switch [(ngModel)]="notify" aria-label="Notifications" />
+
+  <iv-table>
+    <thead ivTableHeader>
+      <tr ivTableRow><th ivTableHead>Name</th><th ivTableHead>Role</th></tr>
+    </thead>
+    <tbody ivTableBody>
+      <tr ivTableRow><td ivTableCell>Ada</td><td ivTableCell>Admin</td></tr>
+    </tbody>
+  </iv-table>
+
+  <iv-tabs defaultValue="account">
+    <iv-tabs-list>
+      <iv-tabs-trigger value="account">Account</iv-tabs-trigger>
+      <iv-tabs-trigger value="password">Password</iv-tabs-trigger>
+    </iv-tabs-list>
+    <iv-tabs-content value="account">Account settings.</iv-tabs-content>
+    <iv-tabs-content value="password">Password settings.</iv-tabs-content>
+  </iv-tabs>
+
+  <button ivButton (click)="notifySaved()">Save</button>
+  <iv-toast-container />
+
+  <iv-tooltip>
+    <button ivButton ivTooltipTrigger variant="outline">Hover me</button>
+    <iv-tooltip-content>Add to library</iv-tooltip-content>
+  </iv-tooltip>
+
+  <iv-select-picker
+    [items]="fruits"
+    [(ngModel)]="picked"
+    placeholder="Select fruits"
+    dialogTitle="Select fruits"
+    searchPlaceholder="Search fruits"
+    valueColumnHeader="Fruit"
+  />
+</main>

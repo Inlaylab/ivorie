@@ -1,0 +1,38 @@
+# Decisions
+
+One line per decision. Newest at the bottom. Format: `date — decision — why`.
+
+- 2026-10-23 — Name **Ivorie**: npm `@ivorie/ui` + `ivorie`, GitHub org `ivorie-ui` — names are free (`ivorie` GitHub user is taken). Still to check by hand: npm org `@ivorie`, trademark.
+- 2026-10-23 — Ship both npm package and copy-in CLI from one source — users choose.
+- 2026-10-23 — Signals API (`input()`, `model()`, `output()`) in v1.0 — modern Angular; no breaking change later.
+- 2026-10-23 — Tailwind v4 required — components use v4 syntax (`data-[state]`, `rounded-4xl`).
+- 2026-10-23 — Build for latest: Angular 22 (`>=22.0.0 <23.0.0`), Tailwind `^4.0.0` (dev on 4.3). Raise range per new Angular major after CI green. Details: [COMPAT.md](COMPAT.md).
+- 2026-10-23 — Workspace upgrades 20 → 21 → 22 in Phase 1 (`ng update`, one major at a time).
+- 2026-10-23 — Icons: `@lucide/angular` instead of `lucide-angular` — old package allows Angular ≤21 only.
+- 2026-10-23 — Zoneless by default (Angular 21+). No `@angular/animations` (deprecated) — CSS animations via `tw-animate-css`.
+- 2026-10-23 — Docs app (`apps/docs`) is also the playground, SSR on from Phase 1 — find SSR bugs early, no throwaway app.
+- 2026-10-23 — Class names drop `Component`/`Directive` suffix (`UiButtonComponent` → `IvButton`) — Angular style guide (v20+).
+- 2026-10-23 — Services: `UiDialogService` → `IvDialog`, `UiAlertDialogService` → `IvAlertDialog`. `UiSidebarService` → `IvSidebarService`, `UiToastService` → `IvToastService` (keep suffix: else they clash with `IvSidebar`/`IvToast`).
+- 2026-10-23 — Import arrays get `_IMPORTS` (`UI_CARD` → `IV_CARD_IMPORTS`). Injection tokens do not (`UI_DIALOG_DATA` → `IV_DIALOG_DATA`).
+- 2026-10-23 — All attribute selectors become camelCase in Phase 2 (`tr[ui-table-row]` → `tr[ivTableRow]`) — one rename, one codemod map.
+- 2026-10-23 — File names: drop `ui-` and `.component`/`.directive` (`ui-button/ui-button.component.ts` → `button/button.ts`). Keep `.service`, `.model`, `.spec`.
+- 2026-10-23 — Rename script uses plain word-boundary replace with an explicit map (no ts-morph) — names are unique and prefixed; simple is enough. The map is reused by the codemod.
+- 2026-10-23 — Test runner: Vitest (`@angular/build:unit-test`, Angular 21+ default). Karma removed in Phase 1.
+- 2026-10-23 — shadcn/ui repo (`github.com/shadcn-ui/ui`, `new-york-v4` style) is the reference for classes, variants, a11y and the registry format. Local sparse clone in `.ref/shadcn` (gitignored) — fast grep, no web fetch per file.
+- 2026-10-23 — Node 24 runs `tools/*.ts` scripts directly (type stripping). No `tsx`/`ts-node`.
+- 2026-10-27 — Specs that measure layout stay on jsdom. They mock sizes (`offsetWidth`/`scrollWidth`, `ResizeObserver`). No Vitest browser mode, no Playwright. The 7 skipped specs are fixed in Batches C (truncate-tooltip) and E (select-picker).
+- 2026-10-27 — Phase 6 registry = shadcn registry JSON, universal items (`type: registry:item`, files `type: registry:file` + `target`) — works with `npx shadcn add` and our own `ivorie add`. Registry build rewrites `@ivorie/ui/<name>` imports to `../<name>/public-api`: shadcn CLI does not rewrite imports for universal items.
+- 2026-10-28 — Theming = shadcn base + style split. Components carry shadcn's `cn-*` hook classes verbatim. Each look is `projects/ui/styles/style-<name>.css` (rules copied from shadcn `registry/styles/`), in `@layer components` under `.style-<name>`, so user classes win. Maia first; 5–8 styles later. Replaces `new-york-v4` as the reference.
+- 2026-10-28 — Docs content is markdown compiled at build time (marked + shiki) into lazy page modules. HTML is trusted (`bypassSecurityTrustHtml`) because it is build output from repo files.
+- 2026-10-28 — Docs demos are one-file default-export components. The same demos feed the docs pages and the SSR route `/all`.
+- 2026-10-28 — Docs deploy is a static prerender. `/all` renders on the Node server, only for the SSR smoke test.
+- 2026-10-28 — The SSR smoke test uses `playwright-core` with system Chrome (`SMOKE_BROWSER`), with no browser download. Unit specs stay on jsdom.
+- 2026-10-28 — Dependabot, not Renovate: it is built into GitHub. Angular majors are ignored there and done with `ng update`.
+- 2026-10-28 — Docs initial bundle budget errors at 500 kB.
+- 2026-10-28 — The CLI has no runtime deps. Tests run the TS source on Node 24; npm gets JS from `tsc`.
+- 2026-10-28 — The CLI prefix rewrite is 4 regexes (`iv-x`, `ivX`, `IvX`, `IV_`), not a map: the `iv` prefix is unique.
+- 2026-10-28 — The CLI uses its bundled registry by default. `--registry <url>` points at the hosted copy (`/r/` on the docs site).
+- 2026-10-28 — Presets are data: `{ style, baseColor, font, radius }`. The share code is `ivp1_<base64url JSON>`, and `components.json` stores the fields. Only one value each exists until v1.x.
+- 2026-10-29 — Ivorie ships the shadcn styles vega, nova, maia, luma and rhea, generated by `tools/styles/sync.ts`. `theme.css` carries shadcn's `tailwind.css` verbatim plus its base layer and the neutral base color. Fonts and icon sets per style are not copied (theme sets no font).
+- 2026-10-29 — `IV_*_IMPORTS` stay `as const`: the Angular compiler reads their tuple type from `.d.ts` across entries (NG1010 without it). NgModule `imports` rejects readonly arrays (TS2322), so NgModule apps spread them: `...IV_X_IMPORTS`.
+- 2026-10-29 — `shadcn add` of a registry item is checked by the ubuntu `cli-e2e` CI job only. On Windows the shadcn CLI reads a local `D:\` path as a URL scheme and fails.

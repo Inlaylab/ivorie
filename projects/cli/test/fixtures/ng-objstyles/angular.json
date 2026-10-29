@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "projects": {
+    "obj": {
+      "projectType": "application",
+      "architect": {
+        "build": {
+          "options": {
+            "index": { "input": "src/main.html", "output": "index.html" },
+            "styles": [{ "input": "src/global.css", "bundleName": "global" }]
+          }
+        }
+      }
+    }
+  }
+}

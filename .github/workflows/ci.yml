@@ -1,0 +1,90 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '0 5 * * 1'
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        deps: [lock, tailwind-latest]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - if: matrix.deps == 'tailwind-latest'
+        run: npm i --no-save tailwindcss@latest @tailwindcss/postcss@latest tw-animate-css@latest
+      - run: npm run check
+        env:
+          SMOKE_BROWSER: chrome
+      - if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: check-logs-${{ matrix.deps }}
+          path: .check/
+
+  pack:
+    needs: check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run smoke:pack
+        env:
+          SMOKE_BROWSER: chrome
+
+  # Fresh ng new apps: ivorie init + add vs the npm package. Network-heavy, so main only.
+  cli-e2e:
+    needs: check
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run smoke:cli
+
+  # Early warning for the next Angular release. Allowed to fail.
+  angular-next:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: >-
+          npm i --no-save --legacy-peer-deps
+          @angular/core@next @angular/common@next @angular/compiler@next @angular/forms@next
+          @angular/platform-browser@next @angular/platform-server@next @angular/router@next
+          @angular/cdk@next @angular/build@next @angular/cli@next @angular/compiler-cli@next
+          @angular/ssr@next
+      - run: npm run check
+        env:
+          SMOKE_BROWSER: chrome

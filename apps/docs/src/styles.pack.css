@@ -1,0 +1,129 @@
+/* Pack build (ng build docs -c production,pack): same as styles.css, but the library comes from the
+   installed npm tarball. Its theme.css @source scans the package. Keep in sync with styles.css. */
+/* theme.css already imports tailwindcss and tw-animate-css. */
+@import "@ivorie/ui/styles/theme.css";
+/* Default style. The others are separate bundles: src/styles/style-*.css. */
+@import "@ivorie/ui/styles/style-maia.css";
+@plugin "@tailwindcss/typography";
+/* Tailwind scans from the repo root; plans, tools and markdown are not UI. */
+/* Prove the package alone feeds Tailwind: never scan the library source. */
+@source not "../../../projects/ui";
+@source not "../../../docs";
+@source not "../../../tools";
+@source not "../../../.superpowers";
+@source not "../content";
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "ss01", "cv11";
+  }
+  :focus-visible {
+    @apply outline-ring;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      transition-duration: 0.01ms !important;
+      animation-duration: 0.01ms !important;
+    }
+  }
+}
+
+/* Shiki: colors come from CSS vars (defaultColor: false). */
+.shiki,
+.shiki span {
+  color: var(--shiki-light);
+  background-color: var(--shiki-light-bg);
+}
+.dark .shiki,
+.dark .shiki span {
+  color: var(--shiki-dark);
+  background-color: var(--shiki-dark-bg);
+}
+.shiki {
+  @apply overflow-x-auto rounded-xl border p-4 font-mono text-[0.8125rem] leading-relaxed;
+}
+.docs-code .shiki {
+  @apply max-h-[32rem] pr-12;
+}
+
+/* Prose in theme tokens, so a preset re-skins it. */
+.docs-prose {
+  --tw-prose-body: var(--foreground);
+  --tw-prose-headings: var(--foreground);
+  --tw-prose-lead: var(--muted-foreground);
+  --tw-prose-links: var(--foreground);
+  --tw-prose-bold: var(--foreground);
+  --tw-prose-counters: var(--muted-foreground);
+  --tw-prose-bullets: var(--border);
+  --tw-prose-hr: var(--border);
+  --tw-prose-quotes: var(--foreground);
+  --tw-prose-quote-borders: var(--border);
+  --tw-prose-captions: var(--muted-foreground);
+  --tw-prose-code: var(--foreground);
+  --tw-prose-pre-code: var(--foreground);
+  --tw-prose-pre-bg: var(--muted);
+  --tw-prose-th-borders: var(--border);
+  --tw-prose-td-borders: var(--border);
+  --tw-prose-invert-body: var(--foreground);
+  --tw-prose-invert-headings: var(--foreground);
+  --tw-prose-invert-lead: var(--muted-foreground);
+  --tw-prose-invert-links: var(--foreground);
+  --tw-prose-invert-bold: var(--foreground);
+  --tw-prose-invert-counters: var(--muted-foreground);
+  --tw-prose-invert-bullets: var(--border);
+  --tw-prose-invert-hr: var(--border);
+  --tw-prose-invert-quotes: var(--foreground);
+  --tw-prose-invert-quote-borders: var(--border);
+  --tw-prose-invert-captions: var(--muted-foreground);
+  --tw-prose-invert-code: var(--foreground);
+  --tw-prose-invert-pre-code: var(--foreground);
+  --tw-prose-invert-pre-bg: var(--muted);
+  --tw-prose-invert-th-borders: var(--border);
+  --tw-prose-invert-td-borders: var(--border);
+
+  & h2 {
+    @apply mt-14 mb-4 scroll-mt-20 border-b pb-2 text-2xl font-semibold tracking-[-0.025em];
+  }
+  & h3 {
+    @apply mt-10 mb-3 scroll-mt-20 text-lg font-semibold tracking-[-0.015em];
+  }
+  & > :first-child {
+    @apply mt-0;
+  }
+  & pre.shiki {
+    @apply my-5 rounded-xl p-4;
+  }
+  & :not(pre) > code {
+    @apply bg-muted rounded-md px-1.5 py-0.5 font-mono text-[0.85em] font-medium;
+  }
+  & :not(pre) > code::before,
+  & :not(pre) > code::after {
+    content: none;
+  }
+  & a {
+    @apply decoration-muted-foreground/50 underline-offset-4 hover:decoration-foreground;
+  }
+}
+
+.docs-table {
+  @apply my-6 w-full overflow-x-auto rounded-xl border;
+  & table {
+    @apply my-0 w-full text-sm;
+  }
+  & th {
+    @apply bg-muted/50 px-3 py-2 text-left font-medium;
+  }
+  & td {
+    @apply border-t px-3 py-2 align-top;
+  }
+  & td:first-child code {
+    @apply whitespace-nowrap;
+  }
+}
