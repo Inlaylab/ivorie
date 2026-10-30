@@ -1,0 +1,25 @@
+{
+  "name": "ivorie",
+  "version": "1.0.0",
+  "description": "Copy Ivorie Angular components into your app.",
+  "type": "module",
+  "license": "MIT",
+  "bin": {
+    "ivorie": "./index.js"
+  },
+  "engines": {
+    "node": "^22.22.3 || >=24.15.0"
+  },
+  "files": [
+    "**/*.js",
+    "registry",
+    "schema",
+    "migrate",
+    "README.md"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Inlaylab/ivorie.git",
+    "directory": "projects/cli"
+  }
+}

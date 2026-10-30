@@ -1,0 +1,81 @@
+<iv-dialog-header>
+  <iv-dialog-title class="pr-8">{{ title }}</iv-dialog-title>
+  @if (description) {
+    <iv-dialog-description>{{ description }}</iv-dialog-description>
+  }
+</iv-dialog-header>
+
+<iv-input-group>
+  <iv-input-group-addon align="inline-start">
+    <svg lucideSearch [size]="14"></svg>
+  </iv-input-group-addon>
+  <input
+    #searchBox
+    ivInputGroupInput
+    type="search"
+    autocomplete="off"
+    [placeholder]="searchPlaceholder"
+    [attr.aria-label]="searchPlaceholder"
+    [value]="search()"
+    (input)="search.set(searchBox.value)"
+  />
+</iv-input-group>
+
+<iv-card size="sm" class="p-0!">
+  <div class="max-h-[35vh] overflow-hidden overflow-y-auto rounded-xl">
+    <iv-table class="[&_tr]:border-border">
+      <thead ivTableHeader class="bg-muted">
+        <tr ivTableRow class="hover:bg-transparent">
+          <th ivTableHead class="w-12">
+            <iv-checkbox
+              aria-label="Select all"
+              [checked]="allFilteredSelected()"
+              [indeterminate]="someFilteredSelected()"
+              [disabled]="!filteredRows().length"
+              (checkedChange)="toggleAllFiltered($event)"
+            />
+          </th>
+          <th ivTableHead>{{ valueColumnHeader }}</th>
+          @if (showDescriptionColumn) {
+            <th ivTableHead>{{ descriptionColumnHeader }}</th>
+          }
+        </tr>
+      </thead>
+      <tbody ivTableBody>
+        @for (row of filteredRows(); track row.value) {
+          <tr ivTableRow [attr.data-state]="isSelected(row.value) ? 'selected' : null">
+            <td ivTableCell class="w-12">
+              <iv-checkbox
+                [aria-label]="row.label"
+                [checked]="isSelected(row.value)"
+                (checkedChange)="toggleRow(row.value, $event)"
+              />
+            </td>
+            <td ivTableCell class="max-w-0">
+              <div class="truncate font-medium" [title]="row.label">{{ row.label }}</div>
+            </td>
+            @if (showDescriptionColumn) {
+              <td ivTableCell class="max-w-0">
+                <div class="truncate text-muted-foreground" [title]="row.description ?? ''">{{ row.description }}</div>
+              </td>
+            }
+          </tr>
+        } @empty {
+          <tr ivTableRow class="hover:bg-transparent">
+            <td ivTableCell [attr.colspan]="columnCount" class="py-6 text-center text-muted-foreground">
+              {{ emptyMessage }}
+            </td>
+          </tr>
+        }
+      </tbody>
+    </iv-table>
+  </div>
+</iv-card>
+
+<div class="flex items-center justify-between gap-2">
+  <p class="text-xs text-muted-foreground" aria-live="polite">{{ selectedCount() }} selected</p>
+  <div class="flex gap-2">
+    <button ivButton type="button" variant="outline" (click)="onDismiss()">Cancel</button>
+    <button ivButton type="button" (click)="onSave()" [disabled]="!canSave()">Save</button>
+  </div>
+</div>

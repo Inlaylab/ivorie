@@ -1,0 +1,8 @@
+{
+  "version": 1,
+  "projects": {
+    "a": { "projectType": "application", "root": "projects/a", "sourceRoot": "projects/a/src", "architect": { "build": { "options": { "styles": ["projects/a/src/styles.css"] } } } },
+    "b": { "projectType": "application", "root": "projects/b", "sourceRoot": "projects/b/src", "architect": { "build": { "options": { "styles": ["projects/b/src/styles.css"] } } } },
+    "lib": { "projectType": "library", "root": "projects/lib" }
+  }
+}

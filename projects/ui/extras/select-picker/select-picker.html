@@ -1,0 +1,52 @@
+<!--
+  One fixed-height row (h-9, no flex-wrap) so the field never grows as the selection does.
+  The whole control is a button, so a click anywhere opens the picker.
+-->
+<button
+  #trigger
+  type="button"
+  data-size="default"
+  [attr.id]="id()"
+  [class]="triggerClasses()"
+  [disabled]="isDisabled()"
+  aria-haspopup="dialog"
+  [attr.aria-expanded]="isOpen()"
+  [attr.aria-label]="ariaLabel() || null"
+  (click)="openPicker()"
+>
+  <span #chipRow data-slot="select-picker-chips" class="flex min-w-0 flex-1 items-center gap-1 overflow-hidden">
+    @if (chipLabels().length) {
+      @for (label of chipLabels(); track $index) {
+        @if ($index < visibleChipCount()) {
+          <span data-slot="select-picker-chip" class="cn-combobox-chip min-w-0">
+            <!-- truncate only bites when a single chip is wider than the whole field -->
+            <span class="truncate" [title]="label">{{ label }}</span>
+          </span>
+        }
+      }
+      @if (hiddenChipCount()) {
+        <span data-slot="select-picker-more" class="cn-combobox-chip shrink-0">+{{ hiddenChipCount() }} more</span>
+      }
+    } @else {
+      <span class="truncate text-muted-foreground">{{ placeholder() }}</span>
+    }
+  </span>
+
+  <svg lucideChevronDown class="ml-auto size-4 shrink-0 text-muted-foreground"></svg>
+
+  <!--
+    Offscreen measuring row: every chip at its natural width, plus a worst-case overflow chip.
+    Same classes as the real chips, so widths match. Visibility-hidden rather than display-none
+    so the widths stay real, and out of the a11y tree.
+  -->
+  <span
+    #measureRow
+    aria-hidden="true"
+    class="pointer-events-none invisible absolute top-0 -left-[9999px] flex items-center gap-1 whitespace-nowrap"
+  >
+    @for (label of chipLabels(); track $index) {
+      <span data-measure-chip class="cn-combobox-chip">{{ label }}</span>
+    }
+    <span data-measure-overflow class="cn-combobox-chip">+{{ chipLabels().length }} more</span>
+  </span>
+</button>
