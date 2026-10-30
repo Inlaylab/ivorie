@@ -145,7 +145,7 @@ export function build(out: string): void {
     json({
       $schema: REGISTRY_SCHEMA,
       name: 'ivorie',
-      homepage: 'https://github.com/marvelousdev99/ivorie-ui',
+      homepage: 'https://github.com/Inlaylab/ivorie',
       items: items.map(({ $schema: _, files, ...rest }) => ({
         ...rest,
         ...(files && { files: files.map(({ content: _c, ...f }) => f) }),

@@ -27,10 +27,10 @@ import { ActiveDescendantKeyManager, Highlightable } from '@angular/cdk/a11y'
 import { Overlay, OverlayRef } from '@angular/cdk/overlay'
 import { TemplatePortal } from '@angular/cdk/portal'
 import { Subscription } from 'rxjs'
-import { IvTruncateTooltip } from '@ivorie/ui/tooltip'
-import { IvButton } from '@ivorie/ui/button'
-import { IvInputGroupAddon, IvInputGroupButton, IvInputGroupInput } from '@ivorie/ui/input'
-import { IvIdGenerator, cn, connectedPositions } from '@ivorie/ui/core'
+import { IvTruncateTooltip } from '@inlaylab/ivorie/tooltip'
+import { IvButton } from '@inlaylab/ivorie/button'
+import { IvInputGroupAddon, IvInputGroupButton, IvInputGroupInput } from '@inlaylab/ivorie/input'
+import { IvIdGenerator, cn, connectedPositions } from '@inlaylab/ivorie/core'
 
 // ─── Root ────────────────────────────────────────────────────────────────────
 

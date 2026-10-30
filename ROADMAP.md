@@ -4,7 +4,7 @@ Single source for plan, status and next work. Updated 2026-10-30.
 
 ## Goal
 Ship the Ivorie Angular components as open source.
-- **`@ivorie/ui`** is the npm package: 34 components, one entry point each (`@ivorie/ui/button`). It works in standalone, NgModule, SSR and zoneless apps.
+- **`@inlaylab/ivorie`** is the npm package: 34 components, one entry point each (`@inlaylab/ivorie/button`). It works in standalone, NgModule, SSR and zoneless apps.
 - **`ivorie`** is a CLI that copies component source into an app, like shadcn.
 - The library source is the only source of truth. The CLI copies from it.
 
@@ -26,8 +26,8 @@ Both packages are at `1.0.0` and are not published yet. Docs initial bundle is ~
 
 ## Must do (before v1.0)
 Owner in brackets. Items marked "user" need a person, not code.
-1. **[user] Name and legal checks (start now, slow):** npm org `@ivorie` free or owned, trademark, company legal OK.
-2. **[user] GitHub home.** The plan said org `ivorie-ui`; the repo is `marvelousdev99/ivorie-ui`. Pick one. Then fix the docs header link, `--registry` URL, package `repository` fields and README.
+1. **[user] Name and legal checks (start now, slow):** npm org `@inlaylab` done. Left: unscoped `ivorie` CLI name free on npm, trademark, company legal OK.
+2. **GitHub home:** done. Repo `Inlaylab/ivorie`, npm `@inlaylab/ivorie` + `ivorie` (CLI).
 3. **[user] CI green on GitHub.** Check the Actions tab: `check` (lock + tailwind-latest), `pack`, `cli-e2e`. Phase 7 needs it.
 4. Never touch the source app the components came from (`D:\idemeum\adminportal`).
 
@@ -67,11 +67,11 @@ It also runs these grep rules:
 Branch `phase-7-release`. Expand into tasks and get an OK before starting.
 **Publishing is public and cannot be undone. Ask the user before every publish.**
 
-**Goal:** `@ivorie/ui` and `ivorie` v1.0.0 on npm, published from CI with provenance.
+**Goal:** `@inlaylab/ivorie` and `ivorie` v1.0.0 on npm, published from CI with provenance.
 
 Scope:
 1. **Manual checks:**
-   - The npm org `@ivorie` is free or owned.
+   - The npm org `@inlaylab` is owned (done). The CLI name `ivorie` is free on npm.
    - Trademark is checked.
    - Company legal is OK.
 2. **Repo files:**

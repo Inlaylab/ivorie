@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { IvBadge } from '@ivorie/ui/badge';
-import { IV_CARD_IMPORTS } from '@ivorie/ui/card';
+import { IvBadge } from '@inlaylab/ivorie/badge';
+import { IV_CARD_IMPORTS } from '@inlaylab/ivorie/card';
 
 @Component({
   selector: 'demo-badge-card-action',

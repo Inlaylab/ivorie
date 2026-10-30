@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { IvSwitch } from '@ivorie/ui/switch';
+import { IvSwitch } from '@inlaylab/ivorie/switch';
 
 @Component({
   selector: 'demo-switch-ngmodel',

@@ -1,7 +1,7 @@
 import { Component, signal } from '@angular/core'
 import { TestBed } from '@angular/core/testing'
 import { describe, expect, it } from 'vitest'
-import { IvSeparator } from '@ivorie/ui/separator'
+import { IvSeparator } from '@inlaylab/ivorie/separator'
 
 @Component({
   imports: [IvSeparator],

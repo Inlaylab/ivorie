@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { IV_ITEM_IMPORTS } from '@ivorie/ui/item';
-import { IvButton } from '@ivorie/ui/button';
+import { IV_ITEM_IMPORTS } from '@inlaylab/ivorie/item';
+import { IvButton } from '@inlaylab/ivorie/button';
 import { LucideUser } from '@lucide/angular';
 import { LucideChevronRight } from '@lucide/angular';
 

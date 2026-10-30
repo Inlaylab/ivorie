@@ -1,6 +1,6 @@
 import { Component, ChangeDetectionStrategy, ElementRef, computed, inject, input } from '@angular/core'
 import { cva, VariantProps } from 'class-variance-authority'
-import { cn } from '@ivorie/ui/core'
+import { cn } from '@inlaylab/ivorie/core'
 
 @Component({
   selector: 'iv-item-group',

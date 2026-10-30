@@ -2,7 +2,7 @@ import { Component, signal } from '@angular/core'
 import { TestBed } from '@angular/core/testing'
 import { Overlay } from '@angular/cdk/overlay'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { provideIvorie } from '@ivorie/ui/core'
+import { provideIvorie } from '@inlaylab/ivorie/core'
 import { IV_TOOLTIP_DELAY, IV_TOOLTIP_IMPORTS } from './tooltip'
 
 describe('IV_TOOLTIP_DELAY', () => {

@@ -1,6 +1,6 @@
 # ivorie
 
-Copy [Ivorie](https://github.com/marvelousdev99/ivorie-ui) Angular components into your app, shadcn/ui style.
+Copy [Ivorie](https://github.com/Inlaylab/ivorie) Angular components into your app, shadcn/ui style.
 Needs Angular 22 and Node 22.22.3+ or 24.15+.
 
 ```bash

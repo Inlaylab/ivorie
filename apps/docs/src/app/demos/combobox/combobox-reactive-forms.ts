@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { IV_COMBOBOX_IMPORTS } from '@ivorie/ui/combobox';
+import { IV_COMBOBOX_IMPORTS } from '@inlaylab/ivorie/combobox';
 
 @Component({
   selector: 'demo-combobox-reactive-forms',

@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, TemplateRef, inject, signal, viewChild } from '@angular/core';
-import { IvButton } from '@ivorie/ui/button';
-import { DialogCloseEvent, IV_DIALOG_IMPORTS, IvDialog } from '@ivorie/ui/dialog';
+import { IvButton } from '@inlaylab/ivorie/button';
+import { DialogCloseEvent, IV_DIALOG_IMPORTS, IvDialog } from '@inlaylab/ivorie/dialog';
 
 @Component({
   selector: 'demo-dialog-close-reasons',

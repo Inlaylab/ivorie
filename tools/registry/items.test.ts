@@ -3,9 +3,9 @@ import assert from 'node:assert/strict';
 import { collectDeps, listEntries, normalizeRange, registryDeps, rewriteImports } from './items.ts';
 
 test('rewriteImports points entry imports at the copied folder', () => {
-  assert.equal(rewriteImports("import { cn } from '@ivorie/ui/core';"), "import { cn } from '../core/public-api';");
+  assert.equal(rewriteImports("import { cn } from '@inlaylab/ivorie/core';"), "import { cn } from '../core/public-api';");
   assert.equal(
-    rewriteImports("from '@ivorie/ui/extras/select-picker'"),
+    rewriteImports("from '@inlaylab/ivorie/extras/select-picker'"),
     "from '../select-picker/public-api'",
   );
   assert.equal(rewriteImports("import { X } from './button';"), "import { X } from './button';");
@@ -39,13 +39,13 @@ test('collectDeps lists npm deps with ranges, never Angular core packages', () =
   }
 });
 
-test('registryDeps follows @ivorie/ui imports', () => {
+test('registryDeps follows @inlaylab/ivorie imports', () => {
   const picker = registryDeps(byName('select-picker'));
   for (const d of ['core', 'dialog', 'button', 'checkbox', 'input', 'table', 'card']) {
     assert.ok(picker.includes(d), `select-picker needs ${d}`);
   }
   for (const e of entries) {
-    const usesCore = e.files.some((f) => f.content.includes("'@ivorie/ui/core'"));
+    const usesCore = e.files.some((f) => f.content.includes("'@inlaylab/ivorie/core'"));
     if (usesCore) assert.ok(registryDeps(e).includes('core'), e.name);
   }
 });

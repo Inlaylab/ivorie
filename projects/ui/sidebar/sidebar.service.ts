@@ -10,7 +10,7 @@ import {
   inject,
   signal,
 } from '@angular/core'
-import { IV_CONFIG, IvIdGenerator } from '@ivorie/ui/core'
+import { IV_CONFIG, IvIdGenerator } from '@inlaylab/ivorie/core'
 
 export const SIDEBAR_COOKIE_NAME = 'sidebar_state'
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 7

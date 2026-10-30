@@ -1,7 +1,7 @@
 import { PLATFORM_ID, REQUEST } from '@angular/core'
 import { TestBed } from '@angular/core/testing'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { provideIvorie } from '@ivorie/ui/core'
+import { provideIvorie } from '@inlaylab/ivorie/core'
 import { IvSidebarService } from './sidebar.service'
 
 function clearCookie() {

@@ -1,7 +1,7 @@
 import { Component, signal } from '@angular/core'
 import { TestBed } from '@angular/core/testing'
 import { describe, expect, it } from 'vitest'
-import { IV_TABS_IMPORTS, TabsListVariants, tabsListVariants } from '@ivorie/ui/tabs'
+import { IV_TABS_IMPORTS, TabsListVariants, tabsListVariants } from '@inlaylab/ivorie/tabs'
 
 describe('tabsListVariants', () => {
   it('is exported with its type and carries the variant hook', () => {

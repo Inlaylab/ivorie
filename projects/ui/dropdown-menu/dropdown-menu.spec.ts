@@ -2,7 +2,7 @@ import { Component, signal } from '@angular/core'
 import { TestBed } from '@angular/core/testing'
 import { Overlay } from '@angular/cdk/overlay'
 import { describe, expect, it, vi } from 'vitest'
-import { IvDialog } from '@ivorie/ui/dialog'
+import { IvDialog } from '@inlaylab/ivorie/dialog'
 import { IV_DROPDOWN_MENU_IMPORTS } from './dropdown-menu'
 
 @Component({

@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { LucideLayoutDashboard, LucideInbox, LucideFolderKanban, LucideCalendar, LucideUsers, LucidePlus, LucideEllipsis, LucideChevronsUpDown, LucideSparkles } from '@lucide/angular';
-import { IV_SIDEBAR_IMPORTS } from '@ivorie/ui/sidebar';
+import { IV_SIDEBAR_IMPORTS } from '@inlaylab/ivorie/sidebar';
 
 // A full app shell. The trigger or the rail hides the sidebar off-canvas; Ctrl+B also works.
 // cookieName="" so this demo never saves its state over the site's own sidebar.

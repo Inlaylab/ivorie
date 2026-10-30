@@ -2,7 +2,7 @@
 title: Progress
 description: A horizontal progress bar from 0 to 100.
 section: component
-entry: '@ivorie/ui/progress'
+entry: '@inlaylab/ivorie/progress'
 ---
 
 Set `value` to bind it. Set it to `null` for indeterminate.
@@ -10,7 +10,7 @@ Set `value` to bind it. Set it to `null` for indeterminate.
 ## Usage
 
 ```ts
-import { IvProgress } from '@ivorie/ui/progress';
+import { IvProgress } from '@inlaylab/ivorie/progress';
 ```
 
 ```html

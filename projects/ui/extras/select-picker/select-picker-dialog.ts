@@ -1,11 +1,11 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core'
 import { LucideSearch } from '@lucide/angular'
-import { IvButton } from '@ivorie/ui/button'
-import { IV_CARD_IMPORTS } from '@ivorie/ui/card'
-import { IvCheckbox } from '@ivorie/ui/checkbox'
-import { IV_DIALOG_DATA, IV_DIALOG_IMPORTS, IvDialogRef } from '@ivorie/ui/dialog'
-import { IV_INPUT_IMPORTS } from '@ivorie/ui/input'
-import { IV_TABLE_IMPORTS } from '@ivorie/ui/table'
+import { IvButton } from '@inlaylab/ivorie/button'
+import { IV_CARD_IMPORTS } from '@inlaylab/ivorie/card'
+import { IvCheckbox } from '@inlaylab/ivorie/checkbox'
+import { IV_DIALOG_DATA, IV_DIALOG_IMPORTS, IvDialogRef } from '@inlaylab/ivorie/dialog'
+import { IV_INPUT_IMPORTS } from '@inlaylab/ivorie/input'
+import { IV_TABLE_IMPORTS } from '@inlaylab/ivorie/table'
 import { SelectPickerDialogData, SelectPickerRow } from './select-picker.model'
 
 /**

@@ -3,7 +3,7 @@ import { Component, ChangeDetectionStrategy, computed, input, output } from '@an
 import { LucideCircleAlert, LucideCircleCheck, LucideDynamicIcon, LucideInfo, LucideTriangleAlert, LucideX } from '@lucide/angular'
 
 import { ToastItem, ToastVariant } from './toast.service'
-import { cn } from '@ivorie/ui/core'
+import { cn } from '@inlaylab/ivorie/core'
 
 const VARIANT_CLASSES: Record<ToastVariant, string> = {
   success: 'bg-emerald-50 border-emerald-300 text-emerald-900',

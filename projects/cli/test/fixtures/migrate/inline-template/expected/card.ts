@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { IV_CARD_IMPORTS } from '@ivorie/ui/card';
+import { IV_CARD_IMPORTS } from '@inlaylab/ivorie/card';
 
 @Component({
   selector: 'app-card',

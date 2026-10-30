@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { LucideSettings } from '@lucide/angular';
-import { IvButton } from '@ivorie/ui/button';
-import { IV_TOOLTIP_IMPORTS } from '@ivorie/ui/tooltip';
+import { IvButton } from '@inlaylab/ivorie/button';
+import { IV_TOOLTIP_IMPORTS } from '@inlaylab/ivorie/tooltip';
 
 @Component({
   selector: 'demo-tooltip-icon-button',

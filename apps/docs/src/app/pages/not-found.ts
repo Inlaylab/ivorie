@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { IvButton } from '@ivorie/ui/button';
+import { IvButton } from '@inlaylab/ivorie/button';
 
 @Component({
   selector: 'docs-not-found',

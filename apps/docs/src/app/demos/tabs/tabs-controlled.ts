@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
-import { IV_TABS_IMPORTS } from '@ivorie/ui/tabs';
+import { IV_TABS_IMPORTS } from '@inlaylab/ivorie/tabs';
 
 @Component({
   selector: 'demo-tabs-controlled',

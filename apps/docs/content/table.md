@@ -2,7 +2,7 @@
 title: Table
 description: Styled parts for native HTML tables.
 section: component
-entry: '@ivorie/ui/table'
+entry: '@inlaylab/ivorie/table'
 ---
 
 Ports the shadcn/ui `Table`. `iv-table` wraps a native `<table>` in a horizontally scrollable container. The other parts are attribute directives on native table elements, so the HTML table semantics stay intact.
@@ -10,7 +10,7 @@ Ports the shadcn/ui `Table`. `iv-table` wraps a native `<table>` in a horizontal
 ## Usage
 
 ```ts
-import { IV_TABLE_IMPORTS } from '@ivorie/ui/table';
+import { IV_TABLE_IMPORTS } from '@inlaylab/ivorie/table';
 ```
 
 ```html

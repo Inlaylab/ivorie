@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { IV_SCROLL_AREA_IMPORTS } from '@ivorie/ui/scroll-area';
+import { IV_SCROLL_AREA_IMPORTS } from '@inlaylab/ivorie/scroll-area';
 
 @Component({
   selector: 'demo-scroll-area-horizontal',

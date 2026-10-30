@@ -2,7 +2,7 @@
 title: Field
 description: Form layout parts that group a label, control, description and error.
 section: component
-entry: '@ivorie/ui/field'
+entry: '@inlaylab/ivorie/field'
 ---
 
 Layout only. It does not manage form state.
@@ -10,7 +10,7 @@ Layout only. It does not manage form state.
 ## Usage
 
 ```ts
-import { IV_FIELD_IMPORTS } from '@ivorie/ui/field';
+import { IV_FIELD_IMPORTS } from '@inlaylab/ivorie/field';
 ```
 
 ```html

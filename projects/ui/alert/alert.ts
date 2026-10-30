@@ -1,6 +1,6 @@
 import { Component, ChangeDetectionStrategy, computed, input } from '@angular/core'
 import { cva, VariantProps } from 'class-variance-authority'
-import { cn } from '@ivorie/ui/core'
+import { cn } from '@inlaylab/ivorie/core'
 
 export const alertVariants = cva('cn-alert group/alert relative w-full', {
   variants: {

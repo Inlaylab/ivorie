@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { IvToastService } from '@ivorie/ui/toast';
+import { IvToastService } from '@inlaylab/ivorie/toast';
 
 @Component({
   selector: 'app-root',

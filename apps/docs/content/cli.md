@@ -46,7 +46,7 @@ npx ivorie add --all
 ```
 
 - Copies each component and the components it needs into `<path>/<name>/`.
-- Rewrites `@ivorie/ui/<name>` imports to the copied folders, and the prefix to yours.
+- Rewrites `@inlaylab/ivorie/<name>` imports to the copied folders, and the prefix to yours.
 - A file you changed is skipped. Pass `--overwrite` to replace it.
 - Installs the npm packages the components need, unless `--skip-install`.
 
@@ -64,7 +64,7 @@ Updates code written for the old `ui-*` components:
 npx ivorie migrate src
 ```
 
-- Renames symbols, selectors and import paths (`UiButtonComponent` → `IvButton`, `ui-card` → `iv-card`, `.../ui-card/...` → `@ivorie/ui/card`).
+- Renames symbols, selectors and import paths (`UiButtonComponent` → `IvButton`, `ui-card` → `iv-card`, `.../ui-card/...` → `@inlaylab/ivorie/card`).
 - Turns `<ui-button>` into `<button ivButton>`.
 - Lists what it cannot fix as `file:line note`, for example `IvTabs.setActive → select`.
 - Running it twice changes nothing. `--dry-run` lists the files.

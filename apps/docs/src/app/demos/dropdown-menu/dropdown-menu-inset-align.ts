@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { LucideEllipsis } from '@lucide/angular';
-import { IvButton } from '@ivorie/ui/button';
-import { IV_DROPDOWN_MENU_IMPORTS } from '@ivorie/ui/dropdown-menu';
+import { IvButton } from '@inlaylab/ivorie/button';
+import { IV_DROPDOWN_MENU_IMPORTS } from '@inlaylab/ivorie/dropdown-menu';
 
 @Component({
   selector: 'demo-dropdown-menu-inset-align',

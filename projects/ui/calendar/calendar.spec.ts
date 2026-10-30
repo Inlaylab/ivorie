@@ -2,7 +2,7 @@ import { Component, LOCALE_ID, signal } from '@angular/core'
 import { TestBed } from '@angular/core/testing'
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { describe, expect, it, vi } from 'vitest'
-import { IvCalendar, IvDateRange } from '@ivorie/ui/calendar'
+import { IvCalendar, IvDateRange } from '@inlaylab/ivorie/calendar'
 
 const JAN = new Date(2026, 0, 1)
 

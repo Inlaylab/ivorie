@@ -1,7 +1,7 @@
 import { Component, signal } from '@angular/core'
 import { TestBed } from '@angular/core/testing'
 import { describe, expect, it } from 'vitest'
-import { IV_ITEM_IMPORTS, ItemVariants, itemVariants } from '@ivorie/ui/item'
+import { IV_ITEM_IMPORTS, ItemVariants, itemVariants } from '@inlaylab/ivorie/item'
 
 @Component({
   imports: [IV_ITEM_IMPORTS],

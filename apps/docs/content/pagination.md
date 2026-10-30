@@ -2,7 +2,7 @@
 title: Pagination
 description: Page navigation links with previous, next and ellipsis.
 section: component
-entry: '@ivorie/ui/pagination'
+entry: '@inlaylab/ivorie/pagination'
 ---
 
 Ports the shadcn/ui `Pagination`. It is presentational only. You own the page state, the range and the navigation.
@@ -10,7 +10,7 @@ Ports the shadcn/ui `Pagination`. It is presentational only. You own the page st
 ## Usage
 
 ```ts
-import { IV_PAGINATION_IMPORTS } from '@ivorie/ui/pagination';
+import { IV_PAGINATION_IMPORTS } from '@inlaylab/ivorie/pagination';
 ```
 
 ```html

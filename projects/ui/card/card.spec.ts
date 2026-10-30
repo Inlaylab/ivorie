@@ -1,7 +1,7 @@
 import { Component, signal } from '@angular/core'
 import { TestBed } from '@angular/core/testing'
 import { describe, expect, it } from 'vitest'
-import { IV_CARD_IMPORTS } from '@ivorie/ui/card'
+import { IV_CARD_IMPORTS } from '@inlaylab/ivorie/card'
 
 @Component({
   imports: [IV_CARD_IMPORTS],

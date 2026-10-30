@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core'
 import { LucideChevronRight, LucideEllipsis } from '@lucide/angular'
-import { cn } from '@ivorie/ui/core'
+import { cn } from '@inlaylab/ivorie/core'
 
 @Component({
   selector: 'nav[ivBreadcrumb]',

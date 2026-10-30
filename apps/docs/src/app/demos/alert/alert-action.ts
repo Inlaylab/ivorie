@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
-import { IV_ALERT_IMPORTS } from '@ivorie/ui/alert';
-import { IvButton } from '@ivorie/ui/button';
+import { IV_ALERT_IMPORTS } from '@inlaylab/ivorie/alert';
+import { IvButton } from '@inlaylab/ivorie/button';
 import { LucideX } from '@lucide/angular';
 
 @Component({

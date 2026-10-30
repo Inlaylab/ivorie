@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { IvSwitch } from '@ivorie/ui/switch';
+import { IvSwitch } from '@inlaylab/ivorie/switch';
 
 @Component({
   selector: 'demo-switch-small',

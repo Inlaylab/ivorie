@@ -14,7 +14,7 @@ import {
   computed,
   input
 } from '@angular/core'
-import { Align, IvIdGenerator, Side, cn, connectedPositions } from '@ivorie/ui/core'
+import { Align, IvIdGenerator, Side, cn, connectedPositions } from '@inlaylab/ivorie/core'
 
 @Injectable()
 export class IvHoverCardStore implements OnDestroy {

@@ -2,7 +2,7 @@
 title: Tabs
 description: One short sentence.
 section: component
-entry: '@ivorie/ui/tabs'
+entry: '@inlaylab/ivorie/tabs'
 ---
 
 Optional intro, 1–2 sentences.
@@ -10,7 +10,7 @@ Optional intro, 1–2 sentences.
 ## Usage
 
 ```ts
-import { IV_TABS_IMPORTS } from '@ivorie/ui/tabs';
+import { IV_TABS_IMPORTS } from '@inlaylab/ivorie/tabs';
 ```
 
 ```html

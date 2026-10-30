@@ -2,7 +2,7 @@
 title: Alert Dialog
 description: A modal that asks for an explicit choice.
 section: component
-entry: '@ivorie/ui/alert-dialog'
+entry: '@inlaylab/ivorie/alert-dialog'
 ---
 
 A confirm dialog on CDK Overlay. A backdrop click never closes it. The user picks Cancel or Action.
@@ -10,7 +10,7 @@ A confirm dialog on CDK Overlay. A backdrop click never closes it. The user pick
 ## Usage
 
 ```ts
-import { IvAlertDialog, IV_ALERT_DIALOG_IMPORTS } from '@ivorie/ui/alert-dialog';
+import { IvAlertDialog, IV_ALERT_DIALOG_IMPORTS } from '@inlaylab/ivorie/alert-dialog';
 ```
 
 ```html

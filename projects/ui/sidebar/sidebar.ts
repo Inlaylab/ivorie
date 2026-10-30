@@ -16,9 +16,9 @@ import {
 } from '@angular/core'
 import { cva, VariantProps } from 'class-variance-authority'
 import { LucidePanelLeft } from '@lucide/angular'
-import { buttonVariants } from '@ivorie/ui/button'
-import { IvIdGenerator, cn } from '@ivorie/ui/core'
-import { IV_TOOLTIP_IMPORTS } from '@ivorie/ui/tooltip'
+import { buttonVariants } from '@inlaylab/ivorie/button'
+import { IvIdGenerator, cn } from '@inlaylab/ivorie/core'
+import { IV_TOOLTIP_IMPORTS } from '@inlaylab/ivorie/tooltip'
 import { IvSidebarService, SIDEBAR_COOKIE_NAME, SidebarCollapsible, SidebarVariant } from './sidebar.service'
 
 // ─── Provider ────────────────────────────────────────────────────────────────

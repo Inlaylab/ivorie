@@ -3,26 +3,26 @@
 Angular components with the [shadcn/ui](https://github.com/shadcn-ui/ui) look and behavior.
 Built for Angular 22 and Tailwind CSS 4: signals, zoneless, server rendering and keyboard support.
 
-- **`@ivorie/ui`**: the npm package. 34 components, one entry point each (`@ivorie/ui/button`). Works in standalone, NgModule, SSR and zoneless apps.
+- **`@inlaylab/ivorie`**: the npm package. 34 components, one entry point each (`@inlaylab/ivorie/button`). Works in standalone, NgModule, SSR and zoneless apps.
 - **`ivorie`**: a CLI that copies component source into your app, so you own and edit it.
 
 ## Use the package
 
 ```bash
-npm i @ivorie/ui @angular/cdk @lucide/angular
+npm i @inlaylab/ivorie @angular/cdk @lucide/angular
 npm i -D tailwindcss @tailwindcss/postcss tw-animate-css
 ```
 
 ```css
 /* src/styles.css */
-@import "@ivorie/ui/styles/theme.css";
-@import "@ivorie/ui/styles/style-maia.css";
+@import "@inlaylab/ivorie/styles/theme.css";
+@import "@inlaylab/ivorie/styles/style-maia.css";
 ```
 
 Add `class="style-maia"` to `<body>`, then import what you need:
 
 ```ts
-import { IvButton } from '@ivorie/ui/button';
+import { IvButton } from '@inlaylab/ivorie/button';
 ```
 
 The full steps are on the Installation page of the docs.

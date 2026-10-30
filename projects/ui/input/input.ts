@@ -1,7 +1,7 @@
 import { Component, Directive, ElementRef, inject, ChangeDetectionStrategy, computed, input } from '@angular/core'
 import { cva, VariantProps } from 'class-variance-authority'
-import { buttonVariants, ButtonVariants } from '@ivorie/ui/button'
-import { cn } from '@ivorie/ui/core'
+import { buttonVariants, ButtonVariants } from '@inlaylab/ivorie/button'
+import { cn } from '@inlaylab/ivorie/core'
 
 const INPUT_BASE =
   'cn-input w-full min-w-0 outline-none file:inline-flex file:border-0 file:bg-transparent file:text-foreground placeholder:text-muted-foreground disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50'

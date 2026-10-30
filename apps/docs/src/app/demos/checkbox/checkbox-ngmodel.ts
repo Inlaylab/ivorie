@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { IvCheckbox } from '@ivorie/ui/checkbox';
+import { IvCheckbox } from '@inlaylab/ivorie/checkbox';
 
 @Component({
   selector: 'demo-checkbox-ngmodel',

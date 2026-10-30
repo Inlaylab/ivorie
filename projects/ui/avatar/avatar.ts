@@ -9,7 +9,7 @@ import {
   signal,
   viewChild,
 } from '@angular/core'
-import { cn } from '@ivorie/ui/core'
+import { cn } from '@inlaylab/ivorie/core'
 
 export type AvatarImageState = 'loading' | 'loaded' | 'error'
 

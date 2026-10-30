@@ -1,7 +1,7 @@
 import { Component, signal } from '@angular/core'
 import { TestBed } from '@angular/core/testing'
 import { describe, expect, it } from 'vitest'
-import { AlertVariants, IV_ALERT_IMPORTS, alertVariants } from '@ivorie/ui/alert'
+import { AlertVariants, IV_ALERT_IMPORTS, alertVariants } from '@inlaylab/ivorie/alert'
 
 @Component({
   imports: [IV_ALERT_IMPORTS],

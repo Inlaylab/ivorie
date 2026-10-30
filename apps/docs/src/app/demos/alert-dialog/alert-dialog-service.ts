@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, TemplateRef, inject, signal, viewChild } from '@angular/core';
-import { IvButton } from '@ivorie/ui/button';
-import { IV_ALERT_DIALOG_IMPORTS, IvAlertDialog } from '@ivorie/ui/alert-dialog';
+import { IvButton } from '@inlaylab/ivorie/button';
+import { IV_ALERT_DIALOG_IMPORTS, IvAlertDialog } from '@inlaylab/ivorie/alert-dialog';
 
 @Component({
   selector: 'demo-alert-dialog-service',

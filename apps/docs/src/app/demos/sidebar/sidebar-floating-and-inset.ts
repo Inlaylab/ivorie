@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { LucideLayoutDashboard, LucideInbox, LucideFolderKanban, LucideCalendar, LucideUsers, LucidePlus, LucideEllipsis, LucideChevronsUpDown, LucideSparkles } from '@lucide/angular';
-import { IvButton } from '@ivorie/ui/button';
-import { IV_SIDEBAR_IMPORTS } from '@ivorie/ui/sidebar';
+import { IvButton } from '@inlaylab/ivorie/button';
+import { IV_SIDEBAR_IMPORTS } from '@inlaylab/ivorie/sidebar';
 
 // Floating draws the sidebar as a card; inset also sets the page in a card. Switch between them in the header.
 // cookieName="" so this demo never saves its state over the site's own sidebar.

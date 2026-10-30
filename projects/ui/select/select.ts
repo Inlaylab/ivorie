@@ -20,8 +20,8 @@ import {
 } from '@angular/core'
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms'
 import { LucideCheck, LucideChevronDown } from '@lucide/angular'
-import { IvTruncateTooltip } from '@ivorie/ui/tooltip'
-import { IvIdGenerator, cn, connectedPositions } from '@ivorie/ui/core'
+import { IvTruncateTooltip } from '@inlaylab/ivorie/tooltip'
+import { IvIdGenerator, cn, connectedPositions } from '@inlaylab/ivorie/core'
 
 // ─── Root ────────────────────────────────────────────────────────────────────
 

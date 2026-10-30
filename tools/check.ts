@@ -57,9 +57,9 @@ export const rules: Rule[] = [
     // Generated pages quote the old ui-* names in the migrate docs.
     exclude: /[\\/]generated[\\/]/,
   },
-  // Import from entry points (@ivorie/ui/<name>), never the empty root barrel.
-  { name: 'no-root-import', pattern: /from '@ivorie\/ui'/, paths: ['apps/docs', 'apps/module-smoke', 'projects/ui'] },
-  // Copy-in readiness: component folders import each other only via @ivorie/ui/<name>.
+  // Import from entry points (@inlaylab/ivorie/<name>), never the empty root barrel.
+  { name: 'no-root-import', pattern: /from '@inlaylab\/ivorie'/, paths: ['apps/docs', 'apps/module-smoke', 'projects/ui'] },
+  // Copy-in readiness: component folders import each other only via @inlaylab/ivorie/<name>.
   { name: 'no-relative-cross-import', pattern: /from '\.\.\//, paths: ['projects/ui'] },
   // Docs live in apps/docs. Lowercase only: the package README.md stays.
   { name: 'no-lib-readme', pattern: /[\\/]readme\.md$/, paths: ['projects/ui'], on: 'path' },

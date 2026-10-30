@@ -22,8 +22,8 @@ import {
   IvAlertDialogRef,
   IvAlertDialog,
 } from './alert-dialog.service'
-import { IvIdGenerator, cn } from '@ivorie/ui/core'
-import { ButtonVariants, buttonVariants } from '@ivorie/ui/button'
+import { IvIdGenerator, cn } from '@inlaylab/ivorie/core'
+import { ButtonVariants, buttonVariants } from '@inlaylab/ivorie/button'
 
 @Component({
   selector: 'iv-alert-dialog-container',

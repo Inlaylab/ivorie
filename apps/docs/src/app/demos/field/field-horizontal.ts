@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { IV_FIELD_IMPORTS } from '@ivorie/ui/field';
-import { IV_INPUT_IMPORTS } from '@ivorie/ui/input';
+import { IV_FIELD_IMPORTS } from '@inlaylab/ivorie/field';
+import { IV_INPUT_IMPORTS } from '@inlaylab/ivorie/input';
 
 @Component({
   selector: 'demo-field-horizontal',

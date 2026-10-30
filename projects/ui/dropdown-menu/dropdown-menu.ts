@@ -27,7 +27,7 @@ import {
 } from '@angular/core'
 import { LucideCheck, LucideChevronRight } from '@lucide/angular'
 import { Subject } from 'rxjs'
-import { cn, connectedPositions } from '@ivorie/ui/core'
+import { cn, connectedPositions } from '@inlaylab/ivorie/core'
 
 /** Where focus goes when a menu opens: first / last item (keyboard), the menu itself (click), or
  *  nowhere (hover — the trigger keeps focus; only an explicit action should move it). */

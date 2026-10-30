@@ -2,7 +2,7 @@
 title: Dialog
 description: A modal window opened from a template or a component.
 section: component
-entry: '@ivorie/ui/dialog'
+entry: '@inlaylab/ivorie/dialog'
 ---
 
 A modal dialog on CDK Overlay. Open a `TemplateRef` or a whole component. The close event tells you why it closed.
@@ -10,7 +10,7 @@ A modal dialog on CDK Overlay. Open a `TemplateRef` or a whole component. The cl
 ## Usage
 
 ```ts
-import { IvDialog, IV_DIALOG_IMPORTS } from '@ivorie/ui/dialog';
+import { IvDialog, IV_DIALOG_IMPORTS } from '@inlaylab/ivorie/dialog';
 ```
 
 ```html

@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { IvProgress } from '@ivorie/ui/progress';
+import { IvProgress } from '@inlaylab/ivorie/progress';
 
 @Component({
   selector: 'demo-progress-indeterminate',

@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, TemplateRef, inject, viewChild } from '@angular/core';
-import { IvButton } from '@ivorie/ui/button';
-import { DialogSize, IV_DIALOG_IMPORTS, IvDialog } from '@ivorie/ui/dialog';
+import { IvButton } from '@inlaylab/ivorie/button';
+import { DialogSize, IV_DIALOG_IMPORTS, IvDialog } from '@inlaylab/ivorie/dialog';
 
 @Component({
   selector: 'demo-dialog-sizes',

@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
-import { IvCheckbox } from '@ivorie/ui/checkbox';
+import { IvCheckbox } from '@inlaylab/ivorie/checkbox';
 
 @Component({
   selector: 'demo-checkbox-indeterminate',

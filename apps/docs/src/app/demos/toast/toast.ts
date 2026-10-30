@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { IvButton } from '@ivorie/ui/button';
-import { IvToastService } from '@ivorie/ui/toast';
+import { IvButton } from '@inlaylab/ivorie/button';
+import { IvToastService } from '@inlaylab/ivorie/toast';
 
 @Component({
   selector: 'demo-toast',

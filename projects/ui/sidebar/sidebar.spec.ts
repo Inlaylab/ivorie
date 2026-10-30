@@ -5,7 +5,7 @@ import { BreakpointObserver } from '@angular/cdk/layout'
 import { BehaviorSubject } from 'rxjs'
 import { Injectable } from '@angular/core'
 import { afterEach, describe, expect, it } from 'vitest'
-import { provideIvorie } from '@ivorie/ui/core'
+import { provideIvorie } from '@inlaylab/ivorie/core'
 import { IV_SIDEBAR_IMPORTS, sidebarMenuButtonVariants } from './sidebar'
 
 @Component({

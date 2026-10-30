@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { IV_ITEM_IMPORTS } from '@ivorie/ui/item';
+import { IV_ITEM_IMPORTS } from '@inlaylab/ivorie/item';
 
 @Component({
   selector: 'demo-item-header-footer',

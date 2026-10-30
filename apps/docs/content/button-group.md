@@ -2,7 +2,7 @@
 title: Button Group
 description: Fuses buttons, inputs and text addons into one control.
 section: component
-entry: '@ivorie/ui/button-group'
+entry: '@inlaylab/ivorie/button-group'
 ---
 
 Adjacent borders collapse and inner radii are removed. Works horizontally or vertically.
@@ -10,7 +10,7 @@ Adjacent borders collapse and inner radii are removed. Works horizontally or ver
 ## Usage
 
 ```ts
-import { IV_BUTTON_GROUP_IMPORTS } from '@ivorie/ui/button-group';
+import { IV_BUTTON_GROUP_IMPORTS } from '@inlaylab/ivorie/button-group';
 ```
 
 ```html

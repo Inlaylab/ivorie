@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { IvSpinner } from '@ivorie/ui/spinner';
-import { IvButton } from '@ivorie/ui/button';
+import { IvSpinner } from '@inlaylab/ivorie/spinner';
+import { IvButton } from '@inlaylab/ivorie/button';
 
 @Component({
   selector: 'demo-spinner-button',

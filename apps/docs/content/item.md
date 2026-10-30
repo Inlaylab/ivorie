@@ -2,13 +2,13 @@
 title: Item
 description: A composable row for action lists, settings and rich menu rows.
 section: component
-entry: '@ivorie/ui/item'
+entry: '@inlaylab/ivorie/item'
 ---
 
 ## Usage
 
 ```ts
-import { IV_ITEM_IMPORTS } from '@ivorie/ui/item';
+import { IV_ITEM_IMPORTS } from '@inlaylab/ivorie/item';
 ```
 
 ```html

@@ -69,7 +69,7 @@ A style class on `<body>` selects the component look: spacing, radius, borders a
 Import the file for each style you use, then set its class:
 
 ```css
-@import "@ivorie/ui/styles/style-nova.css";
+@import "@inlaylab/ivorie/styles/style-nova.css";
 ```
 
 ```html
@@ -83,8 +83,8 @@ Use the docs header menu to switch styles on this site.
 Declare your values after the imports. Use `:root` for light and `.dark` for dark.
 
 ```css
-@import "@ivorie/ui/styles/theme.css";
-@import "@ivorie/ui/styles/style-maia.css";
+@import "@inlaylab/ivorie/styles/theme.css";
+@import "@inlaylab/ivorie/styles/style-maia.css";
 
 :root {
   --primary: oklch(0.55 0.2 260);

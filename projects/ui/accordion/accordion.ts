@@ -14,7 +14,7 @@ import {
   ElementRef,
 } from '@angular/core'
 import { LucideChevronDown, LucideChevronUp } from '@lucide/angular'
-import { IvIdGenerator, cn } from '@ivorie/ui/core'
+import { IvIdGenerator, cn } from '@inlaylab/ivorie/core'
 
 /** Keys the accordion handles between triggers (WAI-ARIA accordion pattern). */
 const NAV_KEYS = new Set(['ArrowDown', 'ArrowUp', 'Home', 'End'])

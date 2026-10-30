@@ -2,7 +2,7 @@
 title: Toast
 description: Short messages that close on their own.
 section: component
-entry: '@ivorie/ui/toast'
+entry: '@inlaylab/ivorie/toast'
 ---
 
 Short messages at the bottom of the screen. They close after a delay.
@@ -10,7 +10,7 @@ Short messages at the bottom of the screen. They close after a delay.
 ## Usage
 
 ```ts
-import { IvToastService, provideIvToast } from '@ivorie/ui/toast';
+import { IvToastService, provideIvToast } from '@inlaylab/ivorie/toast';
 
 export const appConfig: ApplicationConfig = {
   providers: [provideIvToast()],

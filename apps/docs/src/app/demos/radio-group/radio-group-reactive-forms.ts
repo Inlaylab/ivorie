@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { IV_RADIO_GROUP_IMPORTS } from '@ivorie/ui/radio-group';
+import { IV_RADIO_GROUP_IMPORTS } from '@inlaylab/ivorie/radio-group';
 
 @Component({
   selector: 'demo-radio-group-reactive-forms',

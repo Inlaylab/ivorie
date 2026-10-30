@@ -1,7 +1,7 @@
 import { DestroyRef, Directive, ElementRef, ViewContainerRef, inject, input } from '@angular/core'
 import { Overlay, OverlayRef } from '@angular/cdk/overlay'
 import { ComponentPortal } from '@angular/cdk/portal'
-import { connectedPositions } from '@ivorie/ui/core'
+import { connectedPositions } from '@inlaylab/ivorie/core'
 import { TooltipPanelComponent, TooltipSide } from './tooltip-overlay'
 
 /**

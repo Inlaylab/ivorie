@@ -2,7 +2,7 @@
 title: Calendar
 description: A month grid for picking a date or a date range.
 section: component
-entry: '@ivorie/ui/calendar'
+entry: '@inlaylab/ivorie/calendar'
 ---
 
 A date picker grid with previous/next navigation. It picks one date or a range, and works with `ngModel` and reactive forms. It uses native `Date` and has no date library dependency.
@@ -10,7 +10,7 @@ A date picker grid with previous/next navigation. It picks one date or a range, 
 ## Usage
 
 ```ts
-import { IvCalendar } from '@ivorie/ui/calendar';
+import { IvCalendar } from '@inlaylab/ivorie/calendar';
 ```
 
 ```html

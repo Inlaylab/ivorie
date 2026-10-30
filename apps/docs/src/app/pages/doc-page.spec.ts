@@ -18,7 +18,7 @@ describe('DocPage', () => {
   it('renders title, entry chip, demo frames and toc links', async () => {
     const { el, data } = await render('tabs');
     expect(el.querySelector('h1')?.textContent).toContain('Tabs');
-    expect(el.querySelector('[data-entry]')?.textContent).toContain("from '@ivorie/ui/tabs'");
+    expect(el.querySelector('[data-entry]')?.textContent).toContain("from '@inlaylab/ivorie/tabs'");
     const demoSegments = data.page.segments.filter((s) => s.kind === 'demo').length;
     expect(el.querySelectorAll('docs-demo-frame').length).toBe(demoSegments);
     expect(el.querySelector('docs-install')?.textContent).toContain('npx ivorie add tabs');

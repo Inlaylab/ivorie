@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
-import { IV_PAGINATION_IMPORTS } from '@ivorie/ui/pagination';
+import { IV_PAGINATION_IMPORTS } from '@inlaylab/ivorie/pagination';
 
 @Component({
   selector: 'demo-pagination-ellipsis',

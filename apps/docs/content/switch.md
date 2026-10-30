@@ -2,7 +2,7 @@
 title: Switch
 description: A toggle switch that works with Angular forms.
 section: component
-entry: '@ivorie/ui/switch'
+entry: '@inlaylab/ivorie/switch'
 ---
 
 A native `<button role="switch">` that works as a form control. It supports `ngModel`, reactive forms and plain two-way binding.
@@ -10,7 +10,7 @@ A native `<button role="switch">` that works as a form control. It supports `ngM
 ## Usage
 
 ```ts
-import { IvSwitch } from '@ivorie/ui/switch';
+import { IvSwitch } from '@inlaylab/ivorie/switch';
 ```
 
 ```html

@@ -22,7 +22,7 @@ import {
   tooltipArrowClasses,
   tooltipPanelClasses,
 } from './tooltip-overlay'
-import { IV_CONFIG, IvIdGenerator, cn, connectedPositions } from '@ivorie/ui/core'
+import { IV_CONFIG, IvIdGenerator, cn, connectedPositions } from '@inlaylab/ivorie/core'
 
 // ─── Config (scoped per provider, or falls back to global token) ──────────────
 

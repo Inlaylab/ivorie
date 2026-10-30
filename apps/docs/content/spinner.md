@@ -2,7 +2,7 @@
 title: Spinner
 description: An inline spinning loader.
 section: component
-entry: '@ivorie/ui/spinner'
+entry: '@inlaylab/ivorie/spinner'
 ---
 
 Wraps the Lucide `LoaderCircle` icon.
@@ -10,7 +10,7 @@ Wraps the Lucide `LoaderCircle` icon.
 ## Usage
 
 ```ts
-import { IvSpinner } from '@ivorie/ui/spinner';
+import { IvSpinner } from '@inlaylab/ivorie/spinner';
 ```
 
 ```html

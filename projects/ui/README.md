@@ -1,4 +1,4 @@
-# @ivorie/ui
+# @inlaylab/ivorie
 
 Angular UI components in the style of [shadcn/ui](https://github.com/shadcn-ui/ui).
 
@@ -15,9 +15,9 @@ Angular UI components in the style of [shadcn/ui](https://github.com/shadcn-ui/u
 ```css
 @import "tailwindcss";
 @import "tw-animate-css";
-@import "@ivorie/ui/styles/theme.css";
-@import "@ivorie/ui/styles/style-maia.css";
-@source "../node_modules/@ivorie/ui";
+@import "@inlaylab/ivorie/styles/theme.css";
+@import "@inlaylab/ivorie/styles/style-maia.css";
+@source "../node_modules/@inlaylab/ivorie";
 ```
 
 Then turn the style on for the page: `<body class="style-maia">`. Without it, components have no look.

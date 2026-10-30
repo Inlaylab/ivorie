@@ -2,7 +2,7 @@
 title: Scroll Area
 description: A scrollable region with a thin, themed native scrollbar.
 section: component
-entry: '@ivorie/ui/scroll-area'
+entry: '@inlaylab/ivorie/scroll-area'
 ---
 
 Ports the shadcn/ui `ScrollArea`. It uses the browser's native scrolling and styles the scrollbar with CSS. No measuring, so it works with SSR.
@@ -10,7 +10,7 @@ Ports the shadcn/ui `ScrollArea`. It uses the browser's native scrolling and sty
 ## Usage
 
 ```ts
-import { IV_SCROLL_AREA_IMPORTS } from '@ivorie/ui/scroll-area';
+import { IV_SCROLL_AREA_IMPORTS } from '@inlaylab/ivorie/scroll-area';
 ```
 
 ```html

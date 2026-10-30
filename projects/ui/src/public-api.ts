@@ -1,5 +1,5 @@
 /*
- * Public API Surface of @ivorie/ui
- * The root entry exports nothing. Import from entry points: @ivorie/ui/<name>.
+ * Public API Surface of @inlaylab/ivorie
+ * The root entry exports nothing. Import from entry points: @inlaylab/ivorie/<name>.
  */
 export {};

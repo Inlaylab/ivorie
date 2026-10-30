@@ -1,6 +1,6 @@
 # Ivorie — Claude guide
 
-Angular 22 UI library (`@ivorie/ui`) + copy-in CLI (`ivorie`). Based on shadcn/ui.
+Angular 22 UI library (`@inlaylab/ivorie`) + copy-in CLI (`ivorie`). Based on shadcn/ui.
 Source was copied once from the admin portal. **Never touch `D:\idemeum\adminportal`.**
 
 ## Start of every session

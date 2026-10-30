@@ -3,7 +3,7 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
 import {
   IvSidebarGroup, IvSidebarGroupContent, IvSidebarGroupLabel, IvSidebarMenu, IvSidebarMenuItem,
   IvSidebarService,
-} from '@ivorie/ui/sidebar';
+} from '@inlaylab/ivorie/sidebar';
 import { PAGES } from '../../generated/pages';
 
 @Component({

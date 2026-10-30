@@ -2,7 +2,7 @@
 title: Radio Group
 description: A set of radio buttons with arrow-key navigation that works with Angular forms.
 section: component
-entry: '@ivorie/ui/radio-group'
+entry: '@inlaylab/ivorie/radio-group'
 ---
 
 A group of native `<button role="radio">` items. It supports `ngModel`, reactive forms and plain two-way binding.
@@ -10,7 +10,7 @@ A group of native `<button role="radio">` items. It supports `ngModel`, reactive
 ## Usage
 
 ```ts
-import { IV_RADIO_GROUP_IMPORTS } from '@ivorie/ui/radio-group';
+import { IV_RADIO_GROUP_IMPORTS } from '@inlaylab/ivorie/radio-group';
 ```
 
 ```html

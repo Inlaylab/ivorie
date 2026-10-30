@@ -36,9 +36,9 @@ export function listEntries(root = UI): Entry[] {
   return [...top, ...extras].sort((a, b) => a.name.localeCompare(b.name));
 }
 
-/** `@ivorie/ui/<x>` and `@ivorie/ui/extras/<x>` → `../<x>/public-api` (copied folders are siblings). */
+/** `@inlaylab/ivorie/<x>` and `@inlaylab/ivorie/extras/<x>` → `../<x>/public-api` (copied folders are siblings). */
 export function rewriteImports(content: string): string {
-  return content.replace(/'@ivorie\/ui\/(?:extras\/)?([a-z-]+)'/g, "'../$1/public-api'");
+  return content.replace(/'@inlaylab\/ivorie\/(?:extras\/)?([a-z-]+)'/g, "'../$1/public-api'");
 }
 
 /** `>=X.0.0 <X+1.0.0` → `^X.0.0`; other ranges stay as written. */
@@ -67,7 +67,7 @@ function rangeOf(pkg: string): string {
 export function collectDeps(e: Entry): string[] {
   const pkgs = new Set(
     imports(e)
-      .filter((s) => !s.startsWith('@ivorie/ui'))
+      .filter((s) => !s.startsWith('@inlaylab/ivorie'))
       .map(pkgOf)
       .filter((p) => !BUILT_IN.test(p)),
   );
@@ -77,7 +77,7 @@ export function collectDeps(e: Entry): string[] {
 /** Other registry items this entry imports, sorted. */
 export function registryDeps(e: Entry): string[] {
   const names = imports(e)
-    .map((s) => /^@ivorie\/ui\/(?:extras\/)?([a-z-]+)$/.exec(s)?.[1])
+    .map((s) => /^@inlaylab\/ivorie\/(?:extras\/)?([a-z-]+)$/.exec(s)?.[1])
     .filter((n): n is string => !!n && n !== e.name);
   return [...new Set(names)].sort();
 }

@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core'
 import { LucideChevronLeft, LucideChevronRight, LucideEllipsis } from '@lucide/angular'
-import { ButtonVariants, buttonVariants } from '@ivorie/ui/button'
-import { cn } from '@ivorie/ui/core'
+import { ButtonVariants, buttonVariants } from '@inlaylab/ivorie/button'
+import { cn } from '@inlaylab/ivorie/core'
 
 @Component({
   selector: 'nav[ivPagination]',

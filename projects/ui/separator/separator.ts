@@ -1,5 +1,5 @@
 import { Component, ChangeDetectionStrategy, computed, input } from '@angular/core'
-import { cn } from '@ivorie/ui/core'
+import { cn } from '@inlaylab/ivorie/core'
 
 @Component({
   selector: 'iv-separator',

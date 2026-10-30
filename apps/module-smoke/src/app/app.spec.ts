@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
-import { IV_CONFIG } from '@ivorie/ui/core';
-import { IvToastService } from '@ivorie/ui/toast';
+import { IV_CONFIG } from '@inlaylab/ivorie/core';
+import { IvToastService } from '@inlaylab/ivorie/toast';
 import { AppModule } from './app.module';
 import { App } from './app';
 

@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { IV_ALERT_IMPORTS } from '@ivorie/ui/alert';
+import { IV_ALERT_IMPORTS } from '@inlaylab/ivorie/alert';
 import { LucideCircleAlert } from '@lucide/angular';
 
 @Component({

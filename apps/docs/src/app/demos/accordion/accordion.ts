@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { IV_ACCORDION_IMPORTS } from '@ivorie/ui/accordion';
+import { IV_ACCORDION_IMPORTS } from '@inlaylab/ivorie/accordion';
 
 @Component({
   selector: 'demo-accordion',

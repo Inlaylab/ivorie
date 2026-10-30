@@ -2,7 +2,7 @@ import { Component, signal } from '@angular/core'
 import { TestBed } from '@angular/core/testing'
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { describe, expect, it, vi } from 'vitest'
-import { IV_RADIO_GROUP_IMPORTS } from '@ivorie/ui/radio-group'
+import { IV_RADIO_GROUP_IMPORTS } from '@inlaylab/ivorie/radio-group'
 
 @Component({
   imports: [IV_RADIO_GROUP_IMPORTS, FormsModule],

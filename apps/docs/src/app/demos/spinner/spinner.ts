@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { IvSpinner } from '@ivorie/ui/spinner';
+import { IvSpinner } from '@inlaylab/ivorie/spinner';
 
 @Component({
   selector: 'demo-spinner',

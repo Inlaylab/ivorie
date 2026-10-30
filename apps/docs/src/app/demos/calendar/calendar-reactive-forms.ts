@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { IvCalendar } from '@ivorie/ui/calendar';
+import { IvCalendar } from '@inlaylab/ivorie/calendar';
 
 @Component({
   selector: 'demo-calendar-reactive-forms',

@@ -2,7 +2,7 @@
 title: Tabs
 description: Switch between panels of related content, one at a time.
 section: component
-entry: '@ivorie/ui/tabs'
+entry: '@inlaylab/ivorie/tabs'
 ---
 
 Tabs with horizontal and vertical layout and two list styles (`default` pill, `line` underline). Ports the shadcn/ui `Tabs`.
@@ -10,7 +10,7 @@ Tabs with horizontal and vertical layout and two list styles (`default` pill, `l
 ## Usage
 
 ```ts
-import { IV_TABS_IMPORTS } from '@ivorie/ui/tabs';
+import { IV_TABS_IMPORTS } from '@inlaylab/ivorie/tabs';
 ```
 
 ```html

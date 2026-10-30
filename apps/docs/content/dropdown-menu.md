@@ -2,7 +2,7 @@
 title: Dropdown Menu
 description: A menu of actions opened from a trigger.
 section: component
-entry: '@ivorie/ui/dropdown-menu'
+entry: '@inlaylab/ivorie/dropdown-menu'
 ---
 
 A composable action menu with checkbox items, radio groups and sub menus. It renders in a CDK overlay.
@@ -10,7 +10,7 @@ A composable action menu with checkbox items, radio groups and sub menus. It ren
 ## Usage
 
 ```ts
-import { IV_DROPDOWN_MENU_IMPORTS } from '@ivorie/ui/dropdown-menu';
+import { IV_DROPDOWN_MENU_IMPORTS } from '@inlaylab/ivorie/dropdown-menu';
 ```
 
 ```html

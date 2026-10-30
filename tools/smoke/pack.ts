@@ -1,5 +1,5 @@
 // Package smoke: builds both apps against the `npm pack` tarball instead of the source paths.
-// Do not run while another check uses this node_modules: it installs @ivorie/ui there for a while.
+// Do not run while another check uses this node_modules: it installs @inlaylab/ivorie there for a while.
 // Usage: npm run smoke:pack
 import { execSync } from 'node:child_process';
 import { mkdirSync, readdirSync, readFileSync, rmSync } from 'node:fs';
@@ -40,7 +40,7 @@ try {
 } catch (err) {
   console.error(err instanceof Error ? err.message : err);
 } finally {
-  rmSync('node_modules/@ivorie/ui', { recursive: true, force: true });
+  rmSync('node_modules/@inlaylab/ivorie', { recursive: true, force: true });
 }
 
 console.log(ok ? 'PASS smoke-pack' : 'FAIL smoke-pack');

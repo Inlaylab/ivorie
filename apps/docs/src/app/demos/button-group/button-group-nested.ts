@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { IV_BUTTON_GROUP_IMPORTS } from '@ivorie/ui/button-group';
-import { IvButton } from '@ivorie/ui/button';
+import { IV_BUTTON_GROUP_IMPORTS } from '@inlaylab/ivorie/button-group';
+import { IvButton } from '@inlaylab/ivorie/button';
 
 @Component({
   selector: 'demo-button-group-nested',

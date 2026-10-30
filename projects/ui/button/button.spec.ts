@@ -1,7 +1,7 @@
 import { Component, signal } from '@angular/core'
 import { TestBed } from '@angular/core/testing'
 import { describe, expect, it } from 'vitest'
-import { ButtonVariants, IvButton, buttonVariants } from '@ivorie/ui/button'
+import { ButtonVariants, IvButton, buttonVariants } from '@inlaylab/ivorie/button'
 
 @Component({
   imports: [IvButton],

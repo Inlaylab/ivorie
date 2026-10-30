@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
-import { IvButton } from '@ivorie/ui/button';
-import { AlertDialogCloseEvent, IV_ALERT_DIALOG_IMPORTS } from '@ivorie/ui/alert-dialog';
+import { IvButton } from '@inlaylab/ivorie/button';
+import { AlertDialogCloseEvent, IV_ALERT_DIALOG_IMPORTS } from '@inlaylab/ivorie/alert-dialog';
 
 @Component({
   selector: 'demo-alert-dialog-result',

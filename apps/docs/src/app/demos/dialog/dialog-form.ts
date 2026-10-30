@@ -1,8 +1,8 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { IvButton } from '@ivorie/ui/button';
-import { IV_DIALOG_IMPORTS, IvDialog, IvDialogRef } from '@ivorie/ui/dialog';
-import { IvInput } from '@ivorie/ui/input';
+import { IvButton } from '@inlaylab/ivorie/button';
+import { IV_DIALOG_IMPORTS, IvDialog, IvDialogRef } from '@inlaylab/ivorie/dialog';
+import { IvInput } from '@inlaylab/ivorie/input';
 
 @Component({
   imports: [IV_DIALOG_IMPORTS, ReactiveFormsModule, IvButton, IvInput],

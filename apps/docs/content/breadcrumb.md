@@ -2,7 +2,7 @@
 title: Breadcrumb
 description: Show the path to the current page.
 section: component
-entry: '@ivorie/ui/breadcrumb'
+entry: '@inlaylab/ivorie/breadcrumb'
 ---
 
 Ports the shadcn/ui `Breadcrumb`. Each part is an attribute selector on a native element, so there are no wrapper elements.
@@ -10,7 +10,7 @@ Ports the shadcn/ui `Breadcrumb`. Each part is an attribute selector on a native
 ## Usage
 
 ```ts
-import { IV_BREADCRUMB_IMPORTS } from '@ivorie/ui/breadcrumb';
+import { IV_BREADCRUMB_IMPORTS } from '@inlaylab/ivorie/breadcrumb';
 ```
 
 ```html

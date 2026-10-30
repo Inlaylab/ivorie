@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { IvCheckbox } from '@ivorie/ui/checkbox';
+import { IvCheckbox } from '@inlaylab/ivorie/checkbox';
 
 @Component({
   selector: 'demo-checkbox-reactive-forms',

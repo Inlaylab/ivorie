@@ -1,7 +1,16 @@
 {
-  "name": "@ivorie/ui",
+  "name": "@inlaylab/ivorie",
   "version": "1.0.0",
+  "description": "Angular components with the shadcn/ui look and behavior.",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Inlaylab/ivorie.git",
+    "directory": "projects/ui"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "peerDependencies": {
     "@angular/core": ">=22.0.0 <23.0.0",
     "@angular/common": ">=22.0.0 <23.0.0",

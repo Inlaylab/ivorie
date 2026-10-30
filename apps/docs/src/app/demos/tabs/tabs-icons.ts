@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { LucideHouse, LucideSettings } from '@lucide/angular';
-import { IV_TABS_IMPORTS } from '@ivorie/ui/tabs';
+import { IV_TABS_IMPORTS } from '@inlaylab/ivorie/tabs';
 
 @Component({
   selector: 'demo-tabs-icons',

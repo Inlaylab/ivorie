@@ -1,9 +1,9 @@
 /* Pack build (ng build docs -c production,pack): same as styles.css, but the library comes from the
    installed npm tarball. Its theme.css @source scans the package. Keep in sync with styles.css. */
 /* theme.css already imports tailwindcss and tw-animate-css. */
-@import "@ivorie/ui/styles/theme.css";
+@import "@inlaylab/ivorie/styles/theme.css";
 /* Default style. The others are separate bundles: src/styles/style-*.css. */
-@import "@ivorie/ui/styles/style-maia.css";
+@import "@inlaylab/ivorie/styles/style-maia.css";
 @plugin "@tailwindcss/typography";
 /* Tailwind scans from the repo root; plans, tools and markdown are not UI. */
 /* Prove the package alone feeds Tailwind: never scan the library source. */

@@ -2,7 +2,7 @@
 title: Checkbox
 description: A checkbox with an indeterminate state that works with Angular forms.
 section: component
-entry: '@ivorie/ui/checkbox'
+entry: '@inlaylab/ivorie/checkbox'
 ---
 
 A native `<button role="checkbox">` that works as a form control. It supports `ngModel`, reactive forms and plain two-way binding.
@@ -10,7 +10,7 @@ A native `<button role="checkbox">` that works as a form control. It supports `n
 ## Usage
 
 ```ts
-import { IvCheckbox } from '@ivorie/ui/checkbox';
+import { IvCheckbox } from '@inlaylab/ivorie/checkbox';
 ```
 
 ```html

@@ -2,7 +2,7 @@ import { Component, signal } from '@angular/core'
 import { TestBed } from '@angular/core/testing'
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { describe, expect, it, vi } from 'vitest'
-import { IvCheckbox } from '@ivorie/ui/checkbox'
+import { IvCheckbox } from '@inlaylab/ivorie/checkbox'
 
 @Component({
   imports: [IvCheckbox, FormsModule],

@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { IV_SELECT_PICKER_IMPORTS } from '@ivorie/ui/extras/select-picker';
+import { IV_SELECT_PICKER_IMPORTS } from '@inlaylab/ivorie/extras/select-picker';
 
 @Component({
   selector: 'demo-select-picker-form-control',

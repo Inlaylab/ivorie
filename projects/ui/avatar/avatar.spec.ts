@@ -1,7 +1,7 @@
 import { Component, signal } from '@angular/core'
 import { TestBed } from '@angular/core/testing'
 import { describe, expect, it } from 'vitest'
-import { IV_AVATAR_IMPORTS } from '@ivorie/ui/avatar'
+import { IV_AVATAR_IMPORTS } from '@inlaylab/ivorie/avatar'
 
 @Component({
   imports: [IV_AVATAR_IMPORTS],

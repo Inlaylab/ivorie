@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { IV_HOVER_CARD_IMPORTS } from '@ivorie/ui/hover-card';
+import { IV_HOVER_CARD_IMPORTS } from '@inlaylab/ivorie/hover-card';
 
 @Component({
   selector: 'demo-hover-card-side-align',

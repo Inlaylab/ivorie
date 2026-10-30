@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { IV_AVATAR_IMPORTS } from '@ivorie/ui/avatar';
+import { IV_AVATAR_IMPORTS } from '@inlaylab/ivorie/avatar';
 
 @Component({
   selector: 'demo-avatar-sizes',

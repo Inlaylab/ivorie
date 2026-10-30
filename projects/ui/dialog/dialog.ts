@@ -18,7 +18,7 @@ import {
   viewChild
 } from '@angular/core'
 import { LucideX } from '@lucide/angular'
-import { IvButton } from '@ivorie/ui/button'
+import { IvButton } from '@inlaylab/ivorie/button'
 import {
   DialogCloseEvent,
   DialogCloseReason,
@@ -26,7 +26,7 @@ import {
   IvDialogRef,
   IvDialog,
 } from './dialog.service'
-import { IvIdGenerator, cn } from '@ivorie/ui/core'
+import { IvIdGenerator, cn } from '@inlaylab/ivorie/core'
 
 @Component({
   selector: 'iv-dialog-container',

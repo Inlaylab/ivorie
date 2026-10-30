@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core'
-import { Align, Side, cn } from '@ivorie/ui/core'
+import { Align, Side, cn } from '@inlaylab/ivorie/core'
 
 export type TooltipSide = Side
 export type TooltipAlign = Align

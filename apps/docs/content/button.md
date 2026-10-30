@@ -2,7 +2,7 @@
 title: Button
 description: A styled button or link with variants and sizes.
 section: component
-entry: '@ivorie/ui/button'
+entry: '@inlaylab/ivorie/button'
 ---
 
 Apply `ivButton` to a native `button` or `a` element.
@@ -10,7 +10,7 @@ Apply `ivButton` to a native `button` or `a` element.
 ## Usage
 
 ```ts
-import { IvButton } from '@ivorie/ui/button';
+import { IvButton } from '@inlaylab/ivorie/button';
 ```
 
 ```html

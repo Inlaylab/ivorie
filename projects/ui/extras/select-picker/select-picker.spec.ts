@@ -3,7 +3,7 @@ import { TestBed } from '@angular/core/testing'
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { Subject } from 'rxjs'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { DialogCloseEvent, IvDialog } from '@ivorie/ui/dialog'
+import { DialogCloseEvent, IvDialog } from '@inlaylab/ivorie/dialog'
 import { fitChips } from './chip-fit'
 import { IvSelectPicker } from './select-picker'
 

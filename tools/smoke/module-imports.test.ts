@@ -40,6 +40,6 @@ test('module imports every IV_*_IMPORTS', () => {
 });
 
 test('module imports from every entry point', () => {
-  const missing = entries.filter((e) => !source.includes(`'@ivorie/ui/${e}'`));
+  const missing = entries.filter((e) => !source.includes(`'@inlaylab/ivorie/${e}'`));
   assert.deepEqual(missing, [], `${MODULE}: missing ${missing.join(', ')}`);
 });

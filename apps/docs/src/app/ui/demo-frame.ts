@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, Type, input } from '@angular/core';
 import { NgComponentOutlet } from '@angular/common';
-import { IV_TABS_IMPORTS } from '@ivorie/ui/tabs';
+import { IV_TABS_IMPORTS } from '@inlaylab/ivorie/tabs';
 import type { DocDemoSource } from '../content/types';
 import { CopyButton } from './copy-button';
 import { TrustedHtmlPipe } from './trusted-html.pipe';

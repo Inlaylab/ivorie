@@ -1,7 +1,7 @@
 import { Component, signal } from '@angular/core'
 import { TestBed } from '@angular/core/testing'
 import { describe, expect, it } from 'vitest'
-import { BadgeVariants, IvBadge, badgeVariants } from '@ivorie/ui/badge'
+import { BadgeVariants, IvBadge, badgeVariants } from '@inlaylab/ivorie/badge'
 
 @Component({
   imports: [IvBadge],

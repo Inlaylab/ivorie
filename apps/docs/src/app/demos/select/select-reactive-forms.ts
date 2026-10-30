@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { IV_SELECT_IMPORTS } from '@ivorie/ui/select';
+import { IV_SELECT_IMPORTS } from '@inlaylab/ivorie/select';
 
 @Component({
   selector: 'demo-select-reactive-forms',

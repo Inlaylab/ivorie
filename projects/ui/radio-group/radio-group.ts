@@ -17,7 +17,7 @@ import {
 } from '@angular/core'
 import { FocusKeyManager, FocusableOption } from '@angular/cdk/a11y'
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms'
-import { cn } from '@ivorie/ui/core'
+import { cn } from '@inlaylab/ivorie/core'
 
 @Component({
   selector: 'iv-radio-group',

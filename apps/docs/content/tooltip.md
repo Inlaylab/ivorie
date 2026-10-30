@@ -2,7 +2,7 @@
 title: Tooltip
 description: A short label shown on hover or focus.
 section: component
-entry: '@ivorie/ui/tooltip'
+entry: '@inlaylab/ivorie/tooltip'
 ---
 
 Shows a short label next to a trigger. The panel renders in a CDK overlay with an arrow.
@@ -10,7 +10,7 @@ Shows a short label next to a trigger. The panel renders in a CDK overlay with a
 ## Usage
 
 ```ts
-import { IV_TOOLTIP_IMPORTS } from '@ivorie/ui/tooltip';
+import { IV_TOOLTIP_IMPORTS } from '@inlaylab/ivorie/tooltip';
 ```
 
 ```html

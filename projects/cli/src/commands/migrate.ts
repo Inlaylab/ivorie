@@ -46,13 +46,13 @@ export function createMigrator(map: RenameMap) {
     ([from, to]) => [new RegExp(`(?<![\\w-])${escape(from)}(?![\\w-])`, 'g'), to] as const,
   );
 
-  /** `…/ui-card/ui-card.component` → `@ivorie/ui/card` for known entries. */
+  /** `…/ui-card/ui-card.component` → `@inlaylab/ivorie/card` for known entries. */
   const rewritePath = (spec: string) => {
     const parts = spec.split('/');
     const i = parts.findIndex((p, idx) => idx > 0 && p.startsWith('ui-') && entries.has(p.slice(3)));
     if (i < 0) return spec;
     const name = parts[i].slice(3);
-    return `@ivorie/ui/${name === 'select-picker' ? 'extras/select-picker' : name}`;
+    return `@inlaylab/ivorie/${name === 'select-picker' ? 'extras/select-picker' : name}`;
   };
 
   return (text: string): string => {

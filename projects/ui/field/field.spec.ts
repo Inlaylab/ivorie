@@ -1,7 +1,7 @@
 import { Component, signal } from '@angular/core'
 import { TestBed } from '@angular/core/testing'
 import { describe, expect, it } from 'vitest'
-import { IV_FIELD_IMPORTS } from '@ivorie/ui/field'
+import { IV_FIELD_IMPORTS } from '@inlaylab/ivorie/field'
 
 type Orientation = 'vertical' | 'horizontal' | 'responsive'
 

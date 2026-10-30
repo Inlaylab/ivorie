@@ -2,7 +2,7 @@
 title: Select Picker
 description: A multi-select that shows chips on one line and picks in a searchable checkbox dialog.
 section: component
-entry: '@ivorie/ui/extras/select-picker'
+entry: '@inlaylab/ivorie/extras/select-picker'
 ---
 
 Use it for multi-select from a known list. For free-text tag entry, use the combobox with `searchSubmit`.
@@ -10,7 +10,7 @@ Use it for multi-select from a known list. For free-text tag entry, use the comb
 ## Usage
 
 ```ts
-import { IV_SELECT_PICKER_IMPORTS } from '@ivorie/ui/extras/select-picker';
+import { IV_SELECT_PICKER_IMPORTS } from '@inlaylab/ivorie/extras/select-picker';
 ```
 
 ```html

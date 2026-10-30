@@ -2,13 +2,13 @@
 title: Alert
 description: A callout box with title, description and optional action.
 section: component
-entry: '@ivorie/ui/alert'
+entry: '@inlaylab/ivorie/alert'
 ---
 
 ## Usage
 
 ```ts
-import { IV_ALERT_IMPORTS } from '@ivorie/ui/alert';
+import { IV_ALERT_IMPORTS } from '@inlaylab/ivorie/alert';
 ```
 
 ```html

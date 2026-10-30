@@ -14,8 +14,8 @@ import {
 } from '@angular/core'
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms'
 import { LucideChevronLeft, LucideChevronRight } from '@lucide/angular'
-import { IvButton } from '@ivorie/ui/button'
-import { cn, IvIdGenerator } from '@ivorie/ui/core'
+import { IvButton } from '@inlaylab/ivorie/button'
+import { cn, IvIdGenerator } from '@inlaylab/ivorie/core'
 
 function isSameDay(a: Date, b: Date): boolean {
   return (

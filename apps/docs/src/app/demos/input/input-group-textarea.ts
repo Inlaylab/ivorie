@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
-import { IV_INPUT_IMPORTS } from '@ivorie/ui/input';
+import { IV_INPUT_IMPORTS } from '@inlaylab/ivorie/input';
 import { LucidePaperclip, LucideSmile } from '@lucide/angular';
 
 @Component({

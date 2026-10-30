@@ -12,7 +12,7 @@ import {
 const render = createRenderer(await createHighlighter());
 
 const md = (fm: string, body = 'Body.') => `---\n${fm}\n---\n\n${body}\n`;
-const TABS_FM = "title: Tabs\ndescription: Tab panels.\nsection: component\nentry: '@ivorie/ui/tabs'";
+const TABS_FM = "title: Tabs\ndescription: Tab panels.\nsection: component\nentry: '@inlaylab/ivorie/tabs'";
 
 test('frontmatter: title, description, section and entry parse', () => {
   const { data, body } = parseFrontmatter(md(TABS_FM), 'x.md');
@@ -20,7 +20,7 @@ test('frontmatter: title, description, section and entry parse', () => {
     title: 'Tabs',
     description: 'Tab panels.',
     section: 'component',
-    entry: '@ivorie/ui/tabs',
+    entry: '@inlaylab/ivorie/tabs',
   });
   assert.equal(body.trim(), 'Body.');
 });
@@ -121,8 +121,8 @@ test('buildPage: unknown demo marker throws', () => {
 test('buildPage: component page starts with its main demo', () => {
   const p = page('Hi.', new Map([['tabs', 'x']]));
   assert.deepEqual(p.segments[0], { kind: 'demo', name: 'tabs' });
-  assert.deepEqual(p.segments[1], { kind: 'install', slug: 'tabs', entry: '@ivorie/ui/tabs' });
-  assert.equal(p.entry, '@ivorie/ui/tabs');
+  assert.deepEqual(p.segments[1], { kind: 'install', slug: 'tabs', entry: '@inlaylab/ivorie/tabs' });
+  assert.equal(p.entry, '@inlaylab/ivorie/tabs');
 });
 
 test('buildPage: demos holds only used demos with raw source', () => {

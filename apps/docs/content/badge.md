@@ -2,7 +2,7 @@
 title: Badge
 description: A small inline pill for status, counts, tags and labels.
 section: component
-entry: '@ivorie/ui/badge'
+entry: '@inlaylab/ivorie/badge'
 ---
 
 Use it for status, counts, tags, or inline warnings.
@@ -10,7 +10,7 @@ Use it for status, counts, tags, or inline warnings.
 ## Usage
 
 ```ts
-import { IvBadge } from '@ivorie/ui/badge';
+import { IvBadge } from '@inlaylab/ivorie/badge';
 ```
 
 ```html

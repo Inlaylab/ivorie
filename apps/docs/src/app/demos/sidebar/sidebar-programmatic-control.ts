@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { LucideLayoutDashboard, LucideInbox, LucideFolderKanban, LucideCalendar, LucideUsers, LucidePlus, LucideEllipsis, LucideChevronsUpDown, LucideSparkles } from '@lucide/angular';
-import { IvButton } from '@ivorie/ui/button';
-import { IV_SIDEBAR_IMPORTS } from '@ivorie/ui/sidebar';
+import { IvButton } from '@inlaylab/ivorie/button';
+import { IV_SIDEBAR_IMPORTS } from '@inlaylab/ivorie/sidebar';
 
 // Read and set the state through the sidebar service on the provider.
 // cookieName="" so this demo never saves its state over the site's own sidebar.

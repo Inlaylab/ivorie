@@ -4,7 +4,7 @@ import { ActiveDescendantKeyManager } from '@angular/cdk/a11y'
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { Overlay } from '@angular/cdk/overlay'
 import { describe, expect, it, vi } from 'vitest'
-import { IV_COMBOBOX_IMPORTS } from '@ivorie/ui/combobox'
+import { IV_COMBOBOX_IMPORTS } from '@inlaylab/ivorie/combobox'
 
 const ITEMS = `
   <iv-combobox-content>

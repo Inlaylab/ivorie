@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { LucideLayoutDashboard, LucideInbox, LucideFolderKanban, LucideCalendar, LucideUsers, LucideChevronsUpDown, LucideSparkles } from '@lucide/angular';
-import { IV_SIDEBAR_IMPORTS } from '@ivorie/ui/sidebar';
+import { IV_SIDEBAR_IMPORTS } from '@inlaylab/ivorie/sidebar';
 
 // A nested list under a menu item, with the current page marked.
 // cookieName="" so this demo never saves its state over the site's own sidebar.

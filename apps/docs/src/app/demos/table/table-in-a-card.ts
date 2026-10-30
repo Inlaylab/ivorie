@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { IV_CARD_IMPORTS } from '@ivorie/ui/card';
-import { IV_TABLE_IMPORTS } from '@ivorie/ui/table';
+import { IV_CARD_IMPORTS } from '@inlaylab/ivorie/card';
+import { IV_TABLE_IMPORTS } from '@inlaylab/ivorie/table';
 
 @Component({
   selector: 'demo-table-in-a-card',

@@ -2,7 +2,7 @@
 title: Combobox
 description: A searchable select with single and multi-select modes for Angular forms.
 section: component
-entry: '@ivorie/ui/combobox'
+entry: '@inlaylab/ivorie/combobox'
 ---
 
 An autocomplete input with a filterable list. It supports single select, multi-select with chips, groups, an empty state, `ngModel` and reactive forms.
@@ -10,7 +10,7 @@ An autocomplete input with a filterable list. It supports single select, multi-s
 ## Usage
 
 ```ts
-import { IV_COMBOBOX_IMPORTS } from '@ivorie/ui/combobox';
+import { IV_COMBOBOX_IMPORTS } from '@inlaylab/ivorie/combobox';
 ```
 
 ```html

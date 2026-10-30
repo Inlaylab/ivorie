@@ -2,7 +2,7 @@
 title: Select
 description: A custom dropdown for picking one value, built for Angular forms.
 section: component
-entry: '@ivorie/ui/select'
+entry: '@inlaylab/ivorie/select'
 ---
 
 A styled dropdown, not a native `<select>`. It supports `ngModel`, reactive forms, groups, labels and separators.
@@ -10,7 +10,7 @@ A styled dropdown, not a native `<select>`. It supports `ngModel`, reactive form
 ## Usage
 
 ```ts
-import { IV_SELECT_IMPORTS } from '@ivorie/ui/select';
+import { IV_SELECT_IMPORTS } from '@inlaylab/ivorie/select';
 ```
 
 ```html

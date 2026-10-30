@@ -2,7 +2,7 @@
 title: Collapsible
 description: A trigger that shows or hides a region, with a height animation.
 section: component
-entry: '@ivorie/ui/collapsible'
+entry: '@inlaylab/ivorie/collapsible'
 ---
 
 Ports the shadcn/ui `Collapsible`. The height animates with a CSS grid transition. No `@angular/animations` needed.
@@ -10,7 +10,7 @@ Ports the shadcn/ui `Collapsible`. The height animates with a CSS grid transitio
 ## Usage
 
 ```ts
-import { IV_COLLAPSIBLE_IMPORTS } from '@ivorie/ui/collapsible';
+import { IV_COLLAPSIBLE_IMPORTS } from '@inlaylab/ivorie/collapsible';
 ```
 
 ```html

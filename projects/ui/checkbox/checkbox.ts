@@ -10,7 +10,7 @@ import {
 } from '@angular/core'
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms'
 import { LucideCheck, LucideMinus } from '@lucide/angular'
-import { cn } from '@ivorie/ui/core'
+import { cn } from '@inlaylab/ivorie/core'
 
 // The checkbox is a native <button> (like Radix), so <label for> and focus work without extra code.
 @Component({

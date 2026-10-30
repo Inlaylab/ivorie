@@ -2,7 +2,7 @@
 title: Hover Card
 description: Rich content in a floating panel shown on hover.
 section: component
-entry: '@ivorie/ui/hover-card'
+entry: '@inlaylab/ivorie/hover-card'
 ---
 
 Shows a card next to a trigger after a hover delay. The card renders in a CDK overlay.
@@ -10,7 +10,7 @@ Shows a card next to a trigger after a hover delay. The card renders in a CDK ov
 ## Usage
 
 ```ts
-import { IV_HOVER_CARD_IMPORTS } from '@ivorie/ui/hover-card';
+import { IV_HOVER_CARD_IMPORTS } from '@inlaylab/ivorie/hover-card';
 ```
 
 ```html

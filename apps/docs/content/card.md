@@ -2,13 +2,13 @@
 title: Card
 description: A container with header, content and footer parts.
 section: component
-entry: '@ivorie/ui/card'
+entry: '@inlaylab/ivorie/card'
 ---
 
 ## Usage
 
 ```ts
-import { IV_CARD_IMPORTS } from '@ivorie/ui/card';
+import { IV_CARD_IMPORTS } from '@inlaylab/ivorie/card';
 ```
 
 ```html

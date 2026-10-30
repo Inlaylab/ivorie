@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { LucideLayoutDashboard, LucideInbox, LucideFolderKanban, LucideCalendar, LucideUsers, LucidePlus, LucideEllipsis, LucideChevronsUpDown, LucideSparkles } from '@lucide/angular';
-import { IV_SIDEBAR_IMPORTS } from '@ivorie/ui/sidebar';
+import { IV_SIDEBAR_IMPORTS } from '@inlaylab/ivorie/sidebar';
 
 // The sidebar sits on the right: place it after the inset in markup, and the trigger on that side too.
 // cookieName="" so this demo never saves its state over the site's own sidebar.

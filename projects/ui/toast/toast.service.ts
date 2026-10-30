@@ -1,7 +1,7 @@
 import { DestroyRef, Injectable, Signal, inject, signal } from '@angular/core'
 import { toObservable } from '@angular/core/rxjs-interop'
 import { Observable } from 'rxjs'
-import { IvIdGenerator } from '@ivorie/ui/core'
+import { IvIdGenerator } from '@inlaylab/ivorie/core'
 
 export type ToastVariant = 'success' | 'destructive' | 'info' | 'warning'
 

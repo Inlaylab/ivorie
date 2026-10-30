@@ -2,13 +2,13 @@
 title: Separator
 description: A thin divider for horizontal or vertical layouts.
 section: component
-entry: '@ivorie/ui/separator'
+entry: '@inlaylab/ivorie/separator'
 ---
 
 ## Usage
 
 ```ts
-import { IvSeparator } from '@ivorie/ui/separator';
+import { IvSeparator } from '@inlaylab/ivorie/separator';
 ```
 
 ```html

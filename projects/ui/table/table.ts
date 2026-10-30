@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, Directive, computed, input } from '@angular/core'
-import { cn } from '@ivorie/ui/core'
+import { cn } from '@inlaylab/ivorie/core'
 
 /** The host is the scroll container; `class` and `layout` style the inner `<table>`. */
 @Component({

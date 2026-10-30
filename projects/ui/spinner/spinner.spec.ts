@@ -1,7 +1,7 @@
 import { Component } from '@angular/core'
 import { TestBed } from '@angular/core/testing'
 import { describe, expect, it } from 'vitest'
-import { IvSpinner } from '@ivorie/ui/spinner'
+import { IvSpinner } from '@inlaylab/ivorie/spinner'
 
 @Component({
   imports: [IvSpinner],

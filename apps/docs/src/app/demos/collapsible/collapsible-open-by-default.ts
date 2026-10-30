@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { LucideChevronRight } from '@lucide/angular';
-import { IV_COLLAPSIBLE_IMPORTS } from '@ivorie/ui/collapsible';
+import { IV_COLLAPSIBLE_IMPORTS } from '@inlaylab/ivorie/collapsible';
 
 @Component({
   selector: 'demo-collapsible-open-by-default',

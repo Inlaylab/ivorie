@@ -4,7 +4,7 @@ The why and the shape of the work. Status and task lists live in [ROADMAP.md](..
 
 ## Goal
 Publish the admin portal UI components as an open-source Angular library.
-- npm package `@ivorie/ui`: works in standalone, NgModule, SSR and zoneless apps. Built for the latest versions: Angular 22, Tailwind 4.3. See [COMPAT.md](COMPAT.md).
+- npm package `@inlaylab/ivorie`: works in standalone, NgModule, SSR and zoneless apps. Built for the latest versions: Angular 22, Tailwind 4.3. See [COMPAT.md](COMPAT.md).
 - CLI `ivorie`: copies component source into your app, like shadcn.
 - One source of truth: the library source. The CLI copies from it.
 

@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
-import { IV_COMBOBOX_IMPORTS } from '@ivorie/ui/combobox';
+import { IV_COMBOBOX_IMPORTS } from '@inlaylab/ivorie/combobox';
 
 @Component({
   selector: 'demo-combobox-groups',

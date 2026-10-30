@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
-import { IV_TABLE_IMPORTS } from '@ivorie/ui/table';
+import { IV_TABLE_IMPORTS } from '@inlaylab/ivorie/table';
 
 @Component({
   selector: 'demo-table-selected-rows',

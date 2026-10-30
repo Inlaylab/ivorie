@@ -2,7 +2,7 @@
 title: Sidebar
 description: A collapsible app sidebar with a mobile drawer and saved state.
 section: component
-entry: '@ivorie/ui/sidebar'
+entry: '@inlaylab/ivorie/sidebar'
 ---
 
 Ports the shadcn/ui `Sidebar`. Desktop modes: slide off-screen, collapse to icons, or fixed. Below 768px it is a modal drawer. The open state is saved in a cookie and works with SSR.
@@ -10,7 +10,7 @@ Ports the shadcn/ui `Sidebar`. Desktop modes: slide off-screen, collapse to icon
 ## Usage
 
 ```ts
-import { IV_SIDEBAR_IMPORTS } from '@ivorie/ui/sidebar';
+import { IV_SIDEBAR_IMPORTS } from '@inlaylab/ivorie/sidebar';
 ```
 
 ```html

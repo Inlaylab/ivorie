@@ -1,6 +1,6 @@
 import { Component, ChangeDetectionStrategy, computed, input } from '@angular/core'
 import { LucideLoaderCircle } from '@lucide/angular'
-import { cn } from '@ivorie/ui/core'
+import { cn } from '@inlaylab/ivorie/core'
 
 @Component({
   selector: 'iv-spinner',

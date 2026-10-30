@@ -2,7 +2,7 @@
 title: Avatar
 description: A circular avatar with image, fallback, status badge and group support.
 section: component
-entry: '@ivorie/ui/avatar'
+entry: '@inlaylab/ivorie/avatar'
 ---
 
 The fallback shows until the image has loaded. It stays if the image fails.
@@ -10,7 +10,7 @@ The fallback shows until the image has loaded. It stays if the image fails.
 ## Usage
 
 ```ts
-import { IV_AVATAR_IMPORTS } from '@ivorie/ui/avatar';
+import { IV_AVATAR_IMPORTS } from '@inlaylab/ivorie/avatar';
 ```
 
 ```html

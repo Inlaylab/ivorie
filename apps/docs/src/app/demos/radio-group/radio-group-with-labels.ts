@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
-import { IV_RADIO_GROUP_IMPORTS } from '@ivorie/ui/radio-group';
+import { IV_RADIO_GROUP_IMPORTS } from '@inlaylab/ivorie/radio-group';
 
 @Component({
   selector: 'demo-radio-group-with-labels',

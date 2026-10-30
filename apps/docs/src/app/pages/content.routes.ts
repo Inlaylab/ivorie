@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { provideIvToast } from '@ivorie/ui/toast';
+import { provideIvToast } from '@inlaylab/ivorie/toast';
 import { allDemosResolver } from './all.resolver';
 import { docPageResolver } from './doc-page.resolver';
 

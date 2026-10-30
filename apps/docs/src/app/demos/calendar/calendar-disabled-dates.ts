@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
-import { IvCalendar } from '@ivorie/ui/calendar';
+import { IvCalendar } from '@inlaylab/ivorie/calendar';
 
 @Component({
   selector: 'demo-calendar-disabled-dates',

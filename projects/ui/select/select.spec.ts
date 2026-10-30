@@ -3,7 +3,7 @@ import { TestBed } from '@angular/core/testing'
 import { ActiveDescendantKeyManager } from '@angular/cdk/a11y'
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { describe, expect, it, vi } from 'vitest'
-import { IV_SELECT_IMPORTS } from '@ivorie/ui/select'
+import { IV_SELECT_IMPORTS } from '@inlaylab/ivorie/select'
 
 @Component({
   imports: [IV_SELECT_IMPORTS, FormsModule],

@@ -21,7 +21,7 @@ export interface DocPage {
   title: string;
   description: string;
   section: DocSection;
-  /** '@ivorie/ui/tabs' for components, null for guides. */
+  /** '@inlaylab/ivorie/tabs' for components, null for guides. */
   entry: string | null;
   segments: DocSegment[];
   toc: TocItem[];

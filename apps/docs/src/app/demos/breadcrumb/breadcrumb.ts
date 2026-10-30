@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { IV_BREADCRUMB_IMPORTS } from '@ivorie/ui/breadcrumb';
+import { IV_BREADCRUMB_IMPORTS } from '@inlaylab/ivorie/breadcrumb';
 
 @Component({
   selector: 'demo-breadcrumb',

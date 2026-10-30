@@ -10,7 +10,7 @@ Ivorie needs Angular 22 and Tailwind 4.
 ## 1. Install packages
 
 ```bash
-npm i @ivorie/ui @angular/cdk @lucide/angular
+npm i @inlaylab/ivorie @angular/cdk @lucide/angular
 npm i -D tailwindcss @tailwindcss/postcss tw-animate-css
 ```
 
@@ -27,8 +27,8 @@ Create `.postcssrc.json` in the project root.
 In `src/styles.css`:
 
 ```css
-@import "@ivorie/ui/styles/theme.css";
-@import "@ivorie/ui/styles/style-maia.css";
+@import "@inlaylab/ivorie/styles/theme.css";
+@import "@inlaylab/ivorie/styles/style-maia.css";
 ```
 
 `theme.css` already imports `tailwindcss` and `tw-animate-css`. Do not import them again.
@@ -51,7 +51,7 @@ In `src/index.html`:
 
 ```ts
 import { ApplicationConfig } from '@angular/core';
-import { provideIvorie } from '@ivorie/ui/core';
+import { provideIvorie } from '@inlaylab/ivorie/core';
 
 export const appConfig: ApplicationConfig = {
   providers: [provideIvorie({ tooltipDelay: 200, sidebarMobile: false })],
@@ -66,7 +66,7 @@ Options:
 NgModule apps use `IvorieModule.forRoot()` with the same options:
 
 ```ts
-import { IvorieModule } from '@ivorie/ui/core';
+import { IvorieModule } from '@inlaylab/ivorie/core';
 
 @NgModule({ imports: [IvorieModule.forRoot({ tooltipDelay: 200 })] })
 export class AppModule {}
@@ -75,7 +75,7 @@ export class AppModule {}
 In an NgModule, spread the import arrays. They are readonly, and NgModule `imports` takes only plain arrays:
 
 ```ts
-import { IV_TABS_IMPORTS } from '@ivorie/ui/tabs';
+import { IV_TABS_IMPORTS } from '@inlaylab/ivorie/tabs';
 
 @NgModule({ imports: [...IV_TABS_IMPORTS] })
 export class AppModule {}
@@ -84,7 +84,7 @@ export class AppModule {}
 For toasts, add `provideIvToast()`:
 
 ```ts
-import { provideIvToast } from '@ivorie/ui/toast';
+import { provideIvToast } from '@inlaylab/ivorie/toast';
 
 providers: [provideIvToast()];
 ```
@@ -93,7 +93,7 @@ providers: [provideIvToast()];
 
 ```ts
 import { Component } from '@angular/core';
-import { IvButton } from '@ivorie/ui/button';
+import { IvButton } from '@inlaylab/ivorie/button';
 
 @Component({
   selector: 'app-root',

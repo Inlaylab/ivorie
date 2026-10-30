@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { IV_SELECT_PICKER_IMPORTS } from '@ivorie/ui/extras/select-picker';
+import { IV_SELECT_PICKER_IMPORTS } from '@inlaylab/ivorie/extras/select-picker';
 
 @Component({
   selector: 'demo-select-picker',

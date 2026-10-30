@@ -1,12 +1,12 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { IvBadge } from '@ivorie/ui/badge';
-import { IvButton } from '@ivorie/ui/button';
-import { IV_CARD_IMPORTS } from '@ivorie/ui/card';
-import { IV_FIELD_IMPORTS } from '@ivorie/ui/field';
-import { IV_INPUT_IMPORTS } from '@ivorie/ui/input';
-import { IvProgress } from '@ivorie/ui/progress';
-import { IvSwitch } from '@ivorie/ui/switch';
+import { IvBadge } from '@inlaylab/ivorie/badge';
+import { IvButton } from '@inlaylab/ivorie/button';
+import { IV_CARD_IMPORTS } from '@inlaylab/ivorie/card';
+import { IV_FIELD_IMPORTS } from '@inlaylab/ivorie/field';
+import { IV_INPUT_IMPORTS } from '@inlaylab/ivorie/input';
+import { IvProgress } from '@inlaylab/ivorie/progress';
+import { IvSwitch } from '@inlaylab/ivorie/switch';
 import { PAGES } from '../../generated/pages';
 import { CopyButton } from '../ui/copy-button';
 
@@ -46,7 +46,7 @@ import { CopyButton } from '../ui/copy-button';
       </div>
       <div class="bg-muted/60 mt-6 inline-flex items-center gap-3 rounded-lg border py-1 pr-1 pl-4 font-mono text-[0.8125rem]">
         <span><span class="text-muted-foreground select-none">$ </span>npm i &#64;ivorie/ui</span>
-        <docs-copy-button text="npm i @ivorie/ui" label="Copy install command" />
+        <docs-copy-button text="npm i @inlaylab/ivorie" label="Copy install command" />
       </div>
     </section>
 

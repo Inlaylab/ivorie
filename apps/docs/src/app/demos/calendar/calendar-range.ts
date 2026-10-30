@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
-import { IvCalendar, IvDateRange } from '@ivorie/ui/calendar';
+import { IvCalendar, IvDateRange } from '@inlaylab/ivorie/calendar';
 
 @Component({
   selector: 'demo-calendar-range',

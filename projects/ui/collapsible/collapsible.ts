@@ -7,7 +7,7 @@ import {
   input,
   model,
 } from '@angular/core'
-import { IvIdGenerator } from '@ivorie/ui/core'
+import { IvIdGenerator } from '@inlaylab/ivorie/core'
 
 @Component({
   selector: 'iv-collapsible',

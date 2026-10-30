@@ -103,11 +103,11 @@ try {
   writeFileSync(join(npmApp, '.postcssrc.json'), '{ "plugins": { "@tailwindcss/postcss": {} } }\n');
   writeFileSync(
     join(npmApp, 'src/styles.css'),
-    '@import "@ivorie/ui/styles/theme.css";\n@import "@ivorie/ui/styles/style-maia.css";\n',
+    '@import "@inlaylab/ivorie/styles/theme.css";\n@import "@inlaylab/ivorie/styles/style-maia.css";\n',
   );
   const index = join(npmApp, 'src/index.html');
   writeFileSync(index, readFileSync(index, 'utf8').replace('<body>', '<body class="style-maia">'));
-  writeApp(npmApp, '@ivorie/ui');
+  writeApp(npmApp, '@inlaylab/ivorie');
 
   run('npx ng build', cliApp);
   run('npx ng build', npmApp);

@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
-import { IvButton } from '@ivorie/ui/button';
-import { IV_DROPDOWN_MENU_IMPORTS } from '@ivorie/ui/dropdown-menu';
+import { IvButton } from '@inlaylab/ivorie/button';
+import { IV_DROPDOWN_MENU_IMPORTS } from '@inlaylab/ivorie/dropdown-menu';
 
 @Component({
   selector: 'demo-dropdown-menu-radio-group',

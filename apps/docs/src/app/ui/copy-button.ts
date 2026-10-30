@@ -8,7 +8,7 @@ import {
   signal,
 } from '@angular/core';
 import { LucideCheck, LucideCopy } from '@lucide/angular';
-import { IvButton } from '@ivorie/ui/button';
+import { IvButton } from '@inlaylab/ivorie/button';
 
 @Component({
   selector: 'docs-copy-button',

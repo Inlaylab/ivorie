@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { IvButton } from '@ivorie/ui/button';
-import { IV_DIALOG_IMPORTS } from '@ivorie/ui/dialog';
+import { IvButton } from '@inlaylab/ivorie/button';
+import { IV_DIALOG_IMPORTS } from '@inlaylab/ivorie/dialog';
 
 @Component({
   selector: 'demo-dialog-scrolling-body',

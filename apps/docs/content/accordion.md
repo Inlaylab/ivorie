@@ -2,7 +2,7 @@
 title: Accordion
 description: Vertically stacked sections that expand and collapse.
 section: component
-entry: '@ivorie/ui/accordion'
+entry: '@inlaylab/ivorie/accordion'
 ---
 
 Sections with a heading trigger and a collapsible body. Open one at a time or many. Ports the shadcn/ui `Accordion`.
@@ -10,7 +10,7 @@ Sections with a heading trigger and a collapsible body. Open one at a time or ma
 ## Usage
 
 ```ts
-import { IV_ACCORDION_IMPORTS } from '@ivorie/ui/accordion';
+import { IV_ACCORDION_IMPORTS } from '@inlaylab/ivorie/accordion';
 ```
 
 ```html

@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { IV_PAGINATION_IMPORTS } from '@ivorie/ui/pagination';
+import { IV_PAGINATION_IMPORTS } from '@inlaylab/ivorie/pagination';
 
 @Component({
   selector: 'demo-pagination-router-links',

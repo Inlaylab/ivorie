@@ -1,8 +1,8 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { IV_CARD_IMPORTS } from '@ivorie/ui/card';
-import { IV_FIELD_IMPORTS } from '@ivorie/ui/field';
-import { IV_INPUT_IMPORTS } from '@ivorie/ui/input';
-import { IvButton } from '@ivorie/ui/button';
+import { IV_CARD_IMPORTS } from '@inlaylab/ivorie/card';
+import { IV_FIELD_IMPORTS } from '@inlaylab/ivorie/field';
+import { IV_INPUT_IMPORTS } from '@inlaylab/ivorie/input';
+import { IvButton } from '@inlaylab/ivorie/button';
 
 @Component({
   selector: 'demo-card',

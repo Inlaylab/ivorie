@@ -2,7 +2,7 @@
 title: Input
 description: Styled input, textarea, label and input group with addons.
 section: component
-entry: '@ivorie/ui/input'
+entry: '@inlaylab/ivorie/input'
 ---
 
 Plain directives on native elements. Template-driven and reactive forms work unchanged.
@@ -10,7 +10,7 @@ Plain directives on native elements. Template-driven and reactive forms work unc
 ## Usage
 
 ```ts
-import { IV_INPUT_IMPORTS } from '@ivorie/ui/input';
+import { IV_INPUT_IMPORTS } from '@inlaylab/ivorie/input';
 ```
 
 ```html

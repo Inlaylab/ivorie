@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { LucideTrash2 } from '@lucide/angular';
-import { IvButton } from '@ivorie/ui/button';
-import { IV_ALERT_DIALOG_IMPORTS } from '@ivorie/ui/alert-dialog';
+import { IvButton } from '@inlaylab/ivorie/button';
+import { IV_ALERT_DIALOG_IMPORTS } from '@inlaylab/ivorie/alert-dialog';
 
 @Component({
   selector: 'demo-alert-dialog-media',

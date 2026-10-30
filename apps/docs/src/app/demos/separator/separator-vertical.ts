@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { IvSeparator } from '@ivorie/ui/separator';
+import { IvSeparator } from '@inlaylab/ivorie/separator';
 
 @Component({
   selector: 'demo-separator-vertical',

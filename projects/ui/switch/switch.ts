@@ -9,7 +9,7 @@ import {
   signal,
 } from '@angular/core'
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms'
-import { cn } from '@ivorie/ui/core'
+import { cn } from '@inlaylab/ivorie/core'
 
 // The switch is a native <button> (like Radix): <label for>, focus, Space and Enter work without extra code.
 @Component({

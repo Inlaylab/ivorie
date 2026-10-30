@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { IvTruncateTooltip } from '@ivorie/ui/tooltip';
+import { IvTruncateTooltip } from '@inlaylab/ivorie/tooltip';
 
 @Component({
   selector: 'demo-tooltip-truncate',

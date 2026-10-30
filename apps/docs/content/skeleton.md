@@ -2,7 +2,7 @@
 title: Skeleton
 description: A pulsing placeholder for loading content.
 section: component
-entry: '@ivorie/ui/skeleton'
+entry: '@inlaylab/ivorie/skeleton'
 ---
 
 Size it with Tailwind utilities.
@@ -10,7 +10,7 @@ Size it with Tailwind utilities.
 ## Usage
 
 ```ts
-import { IvSkeleton } from '@ivorie/ui/skeleton';
+import { IvSkeleton } from '@inlaylab/ivorie/skeleton';
 ```
 
 ```html

@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { IvBadge } from '@ivorie/ui/badge';
+import { IvBadge } from '@inlaylab/ivorie/badge';
 
 @Component({
   selector: 'demo-badge-variants',

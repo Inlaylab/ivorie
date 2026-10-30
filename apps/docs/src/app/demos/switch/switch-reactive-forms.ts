@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
-import { IvSwitch } from '@ivorie/ui/switch';
+import { IvSwitch } from '@inlaylab/ivorie/switch';
 
 @Component({
   selector: 'demo-switch-reactive-forms',

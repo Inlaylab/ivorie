@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { IvSkeleton } from '@ivorie/ui/skeleton';
+import { IvSkeleton } from '@inlaylab/ivorie/skeleton';
 
 @Component({
   selector: 'demo-skeleton',

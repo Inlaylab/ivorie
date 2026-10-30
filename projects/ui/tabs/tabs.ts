@@ -16,7 +16,7 @@ import {
   output,
 } from '@angular/core'
 import { cva, VariantProps } from 'class-variance-authority'
-import { IvIdGenerator, cn } from '@ivorie/ui/core'
+import { IvIdGenerator, cn } from '@inlaylab/ivorie/core'
 
 type Orientation = 'horizontal' | 'vertical'
 

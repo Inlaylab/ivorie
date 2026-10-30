@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing'
 import { describe, expect, it, vi } from 'vitest'
-import { IV_DIALOG_DATA, IvDialogRef } from '@ivorie/ui/dialog'
+import { IV_DIALOG_DATA, IvDialogRef } from '@inlaylab/ivorie/dialog'
 import { SelectPickerDialogData } from './select-picker.model'
 import { IvSelectPickerDialog } from './select-picker-dialog'
 

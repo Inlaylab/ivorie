@@ -2,7 +2,7 @@ import { Component, signal } from '@angular/core'
 import { TestBed } from '@angular/core/testing'
 import { FormsModule } from '@angular/forms'
 import { describe, expect, it } from 'vitest'
-import { IV_INPUT_IMPORTS } from '@ivorie/ui/input'
+import { IV_INPUT_IMPORTS } from '@inlaylab/ivorie/input'
 
 @Component({
   imports: [IV_INPUT_IMPORTS, FormsModule],

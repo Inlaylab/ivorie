@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { IV_SELECT_IMPORTS } from '@ivorie/ui/select';
+import { IV_SELECT_IMPORTS } from '@inlaylab/ivorie/select';
 
 @Component({
   selector: 'demo-select-ngmodel',
