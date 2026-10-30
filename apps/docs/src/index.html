@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Ivorie</title>
+  <meta name="description" content="Angular components with the shadcn/ui look and behavior.">
+  <base href="/">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/x-icon" href="favicon.ico" sizes="any">
+  <link rel="icon" type="image/svg+xml" href="app.svg">
+</head>
+<body class="style-maia">
+  <!-- Apply the saved appearance before first paint. Must never throw. -->
+  <script>
+    (function () {
+      try {
+        var s = JSON.parse(localStorage.getItem('ivorie-docs:appearance') || 'null') || {};
+        var dark = s.mode === 'dark' || ((s.mode === 'system' || !s.mode) && matchMedia('(prefers-color-scheme: dark)').matches);
+        if (dark) document.documentElement.classList.add('dark');
+        document.documentElement.style.colorScheme = dark ? 'dark' : 'light';
+        if (typeof s.style === 'string' && /^[a-z]+$/.test(s.style)) {
+          document.body.className = 'style-' + s.style;
+          if (/^(vega|nova|luma|rhea)$/.test(s.style)) {
+            var l = document.createElement('link');
+            l.id = 'docs-style';
+            l.rel = 'stylesheet';
+            l.href = 'style-' + s.style + '.css';
+            document.head.appendChild(l);
+          }
+        }
+      } catch (e) {}
+    })();
+  </script>
+  <app-root></app-root>
+</body>
+</html>

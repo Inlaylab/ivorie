@@ -1,0 +1,5 @@
+/* Comments are allowed here. */
+{
+  // Like a real ng new tsconfig.
+  "compilerOptions": { "strict": true }
+}

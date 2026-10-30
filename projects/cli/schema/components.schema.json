@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ivorie.dev/schema/components.json",
+  "title": "Ivorie components.json",
+  "type": "object",
+  "required": ["path", "prefix", "style", "tailwind", "font", "radius", "iconLibrary"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "path": { "type": "string", "description": "Where components are copied, e.g. src/app/ui." },
+    "prefix": { "type": "string", "pattern": "^[a-z][a-z0-9]*$", "description": "Selector and class prefix." },
+    "style": { "type": "string" },
+    "tailwind": {
+      "type": "object",
+      "required": ["css", "baseColor"],
+      "properties": {
+        "css": { "type": "string", "description": "The app styles file." },
+        "baseColor": { "type": "string" }
+      }
+    },
+    "font": { "type": "string" },
+    "radius": { "type": "string" },
+    "iconLibrary": { "const": "lucide" },
+    "registry": { "type": "string", "description": "Registry dir or URL. Default: the bundled one." }
+  }
+}

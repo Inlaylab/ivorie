@@ -1,0 +1,8 @@
+/* Same imports as the docs. theme.css already imports tailwindcss and tw-animate-css. */
+@import "../../../projects/ui/styles/theme.css";
+@import "../../../projects/ui/styles/style-maia.css";
+@source "../../../projects/ui";
+@source not "../../../docs";
+@source not "../../../tools";
+@source not "../../../.superpowers";
+@source not "../../../projects/ui/**/*.spec.ts";

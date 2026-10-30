@@ -1,0 +1,221 @@
+{
+  "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+  "version": 1,
+  "cli": {
+    "packageManager": "npm"
+  },
+  "newProjectRoot": "projects",
+  "projects": {
+    "ui": {
+      "projectType": "library",
+      "root": "projects/ui",
+      "sourceRoot": "projects/ui",
+      "prefix": "iv",
+      "architect": {
+        "build": {
+          "builder": "@angular/build:ng-packagr",
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/ui/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/ui/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "test": {
+          "builder": "@angular/build:unit-test",
+          "options": {
+            "tsConfig": "projects/ui/tsconfig.spec.json",
+            "setupFiles": [
+              "projects/ui/testing/setup.ts"
+            ]
+          }
+        }
+      }
+    },
+    "docs": {
+      "projectType": "application",
+      "schematics": {
+        "@schematics/angular:class": {
+          "skipTests": true
+        },
+        "@schematics/angular:component": {
+          "skipTests": true
+        },
+        "@schematics/angular:directive": {
+          "skipTests": true
+        },
+        "@schematics/angular:guard": {
+          "skipTests": true
+        },
+        "@schematics/angular:interceptor": {
+          "skipTests": true
+        },
+        "@schematics/angular:pipe": {
+          "skipTests": true
+        },
+        "@schematics/angular:resolver": {
+          "skipTests": true
+        },
+        "@schematics/angular:service": {
+          "skipTests": true
+        }
+      },
+      "root": "apps/docs",
+      "sourceRoot": "apps/docs/src",
+      "prefix": "app",
+      "architect": {
+        "build": {
+          "builder": "@angular/build:application",
+          "options": {
+            "browser": "apps/docs/src/main.ts",
+            "tsConfig": "apps/docs/tsconfig.app.json",
+            "assets": [
+              {
+                "glob": "**/*",
+                "input": "apps/docs/public"
+              }
+            ],
+            "styles": [
+              "apps/docs/src/styles.css",
+              {
+                "input": "apps/docs/src/styles/style-vega.css",
+                "bundleName": "style-vega",
+                "inject": false
+              },
+              {
+                "input": "apps/docs/src/styles/style-nova.css",
+                "bundleName": "style-nova",
+                "inject": false
+              },
+              {
+                "input": "apps/docs/src/styles/style-luma.css",
+                "bundleName": "style-luma",
+                "inject": false
+              },
+              {
+                "input": "apps/docs/src/styles/style-rhea.css",
+                "bundleName": "style-rhea",
+                "inject": false
+              }
+            ],
+            "server": "apps/docs/src/main.server.ts",
+            "outputMode": "server",
+            "security": {
+              "allowedHosts": [
+                "localhost"
+              ]
+            },
+            "ssr": {
+              "entry": "apps/docs/src/server.ts"
+            }
+          },
+          "configurations": {
+            "production": {
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "850kB",
+                  "maximumError": "900kB"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "4kB",
+                  "maximumError": "8kB"
+                }
+              ],
+              "outputHashing": "all"
+            },
+            "development": {
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true
+            },
+            "pack": {
+              "tsConfig": "apps/docs/tsconfig.pack.json",
+              "styles": [
+                "apps/docs/src/styles.pack.css"
+              ]
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "serve": {
+          "builder": "@angular/build:dev-server",
+          "configurations": {
+            "production": {
+              "buildTarget": "docs:build:production"
+            },
+            "development": {
+              "buildTarget": "docs:build:development"
+            }
+          },
+          "defaultConfiguration": "development"
+        },
+        "test": {
+          "builder": "@angular/build:unit-test",
+          "options": {
+            "tsConfig": "apps/docs/tsconfig.spec.json",
+            "setupFiles": [
+              "projects/ui/testing/setup.ts"
+            ]
+          }
+        }
+      }
+    },
+    "module-smoke": {
+      "projectType": "application",
+      "root": "apps/module-smoke",
+      "sourceRoot": "apps/module-smoke/src",
+      "prefix": "app",
+      "architect": {
+        "build": {
+          "builder": "@angular/build:application",
+          "options": {
+            "browser": "apps/module-smoke/src/main.ts",
+            "index": "apps/module-smoke/src/index.html",
+            "tsConfig": "apps/module-smoke/tsconfig.app.json",
+            "styles": [
+              "apps/module-smoke/src/styles.css"
+            ]
+          },
+          "configurations": {
+            "production": {
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "1MB",
+                  "maximumError": "2MB"
+                }
+              ],
+              "outputHashing": "all"
+            },
+            "development": {
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true
+            },
+            "pack": {
+              "tsConfig": "apps/module-smoke/tsconfig.pack.json",
+              "styles": [
+                "apps/module-smoke/src/styles.pack.css"
+              ]
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "test": {
+          "builder": "@angular/build:unit-test",
+          "options": {
+            "tsConfig": "apps/module-smoke/tsconfig.spec.json",
+            "setupFiles": [
+              "projects/ui/testing/setup.ts"
+            ]
+          }
+        }
+      }
+    }
+  }
+}
