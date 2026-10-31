@@ -125,6 +125,15 @@ test('buildPage: component page starts with its main demo', () => {
   assert.equal(p.entry, '@inlaylab/ivorie/tabs');
 });
 
+test('buildPage: demo source with a long backtick run stays one code block', () => {
+  // A line of four backticks closed the old four-backtick fence.
+  const raw = 'const md = `\n````\n`;\nconst tail = 1;';
+  const p = page('Hi.', new Map([['tabs', raw]]));
+  const code = p.demos['tabs'].code;
+  assert.equal(code.match(/<pre/g)?.length, 1);
+  assert.ok(code.replace(/<[^>]+>/g, '').includes('const tail = 1;'));
+});
+
 test('buildPage: demos holds only used demos with raw source', () => {
   const demos = new Map([
     ['tabs', 'const a = 1;'],
