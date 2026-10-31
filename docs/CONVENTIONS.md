@@ -28,7 +28,7 @@ git -C .ref/shadcn sparse-checkout set apps/v4/registry packages/shadcn
 1. `input()`, `input.required()`, `output()`. Two-way binding with `model()`. CVA form controls: `input()` + `linkedSignal` + `xChange` output, not `model()`, so `writeValue` does not emit. Disabled = `disabled` input OR form-disabled (`computed`).
 2. Classes with `computed()`. Queries with `viewChild()` / `contentChildren()`.
 3. `ChangeDetectionStrategy.OnPush` always.
-4. Host classes: `host: { '[class]': 'classes()' }`. Never read `class` from `ElementRef`.
+4. Host classes: `host: { '[class]': 'classes()' }`. Never read `class` from `ElementRef`. Reading other host facts is fine (`IvButton` reads the `tagName`).
 5. Every part has a `class` input, merged with `cn()` so the user's classes win.
 6. Use `inject()`, not constructor params.
 
@@ -51,6 +51,7 @@ Form controls (input, checkbox, switch, radio, select, combobox, calendar) imple
 
 ## Icons
 Use `@lucide/angular` (not `lucide-angular`). Import the icons the component needs inside the component. The user must not register them.
+From 1.4 (Phase 11): use `IvIcon` with a semantic name (`<svg ivIcon="chevron-down">`). The app picks the icon library.
 
 ## Versions
 Only stable, non-deprecated APIs of the latest Angular. Full list: [COMPAT.md](COMPAT.md#code-rules-stay-working-on-new-versions).
@@ -60,3 +61,14 @@ Vitest. Cover: inputs, two-way binding, CVA (if a form control), keyboard, axe. 
 
 ## Docs
 No `readme.md` in the library. Docs live in `apps/docs`.
+- One page per component: `apps/docs/content/<name>.md` (start from `_template.md`). Frontmatter: `title`, `description`, `section: component`, `entry`.
+- Main demo `apps/docs/src/app/demos/<name>/<name>.ts` is required. It shows at the top, then install, then `## Examples`.
+- Each example: a `### Title` and a `<!-- demo: <name>-<example> -->` marker. It renders as preview on top, code below.
+
+## Add a component
+1. `projects/ui/<name>/`: `ng-package.json` (copy from `badge`), `public-api.ts`, `<name>.ts`, `<name>.spec.ts` (Vitest + axe).
+2. Style hooks: `node tools/styles/sync.ts <style>` for vega, nova, maia, luma, rhea. `tools/styles/coverage.test.ts` must pass.
+3. Count bumps: `tools/registry/items.test.ts` (entry count); `tools/smoke/module-imports.test.ts` (only with `IV_<NAME>_IMPORTS`).
+4. Module smoke: `apps/module-smoke/src/app/app.module.ts`, `app.html`, and the `data-slot` in `app.spec.ts`.
+5. Docs: page + main demo + example demos (see Docs). `npm run docs:content` regenerates `apps/docs/src/generated/`.
+6. Check: `npx ng test ui --watch=false`, then `npm run check`.
