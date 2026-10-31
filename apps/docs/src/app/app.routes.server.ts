@@ -3,6 +3,7 @@ import { PAGES } from '../generated/pages';
 
 export const serverRoutes: ServerRoute[] = [
   { path: '', renderMode: RenderMode.Prerender },
+  { path: 'docs/components', renderMode: RenderMode.Prerender },
   {
     path: 'docs/:slug',
     renderMode: RenderMode.Prerender,

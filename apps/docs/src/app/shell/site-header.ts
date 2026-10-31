@@ -115,7 +115,7 @@ export class SiteHeader {
   protected readonly appearance = inject(Appearance);
   protected readonly links = [
     { path: '/docs/installation', label: 'Docs' },
-    { path: '/docs/accordion', label: 'Components' },
+    { path: '/docs/components', label: 'Components' },
   ];
   protected readonly styles: readonly { name: StyleName; label: string }[] = STYLES;
 
