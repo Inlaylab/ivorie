@@ -8,6 +8,7 @@ test('the CLI has no runtime dependencies', () => {
   assert.equal(pkg.dependencies, undefined);
 });
 
-test('bin points to ./index.js', () => {
-  assert.deepEqual(pkg.bin, { ivorie: './index.js' });
+// No "./" prefix: npm publish strips a bin path that has one.
+test('bin points to index.js', () => {
+  assert.deepEqual(pkg.bin, { ivorie: 'index.js' });
 });
