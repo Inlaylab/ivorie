@@ -58,8 +58,12 @@
 .shiki {
   @apply overflow-x-auto rounded-lg border p-4 font-mono text-[0.8125rem] leading-relaxed;
 }
+/* Inside the demo card: no own border. Collapsed shows about 10 lines under a fade. */
 .docs-code .shiki {
-  @apply max-h-[32rem] pr-12;
+  @apply rounded-none border-0 pr-12;
+}
+.docs-code[data-collapsed] .shiki {
+  @apply max-h-60 overflow-y-hidden;
 }
 
 /* Prose in theme tokens, so a preset re-skins it. */

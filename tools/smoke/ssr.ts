@@ -93,7 +93,7 @@ try {
   await page.locator('[data-demo="dialog"] button').first().click();
   await page.waitForSelector('[role="dialog"]', { timeout: 3_000 });
 
-  for (const slug of slugs) {
+  for (const slug of ['components', ...slugs]) {
     at = `/docs/${slug}`;
     await visit(page, at);
   }

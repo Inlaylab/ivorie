@@ -22,3 +22,20 @@ PORT=4000 NG_ALLOWED_HOSTS=docs.example.com node dist/docs/server/server.mjs
 - Angular SSR rejects requests whose `Host` is not allowed (HTTP 400).
 - `angular.json` allows only `localhost` (`security.allowedHosts`).
 - Add your domain with `NG_ALLOWED_HOSTS` (comma-separated) or in `security.allowedHosts`.
+
+# Publish to npm
+Publishing is public and cannot be undone. Ask before every publish.
+
+## Release workflow (default)
+1. Versions: `npx changeset version` (from 1.1). Both packages share one version.
+2. Merge to `main`. CI green.
+3. GitHub → Actions → **Release** → Run workflow on `main`. It runs `npm run check`, then publishes `./dist/ui` and `./dist/cli` with provenance.
+
+## Trusted Publisher (one-time per package)
+npmjs.com → package → Settings → Trusted Publisher → GitHub Actions: repo `Inlaylab/ivorie`, workflow `release.yml`. Then the workflow needs no `NPM_TOKEN`.
+
+## Manual fallback
+`npm run publish:all` runs `npm run check`, then publishes both packages from your machine. It asks for your 2FA code. No provenance.
+
+## If only one package published
+Never publish the same version twice. Publish only the missing one, from the repo root: `npm publish ./dist/cli --access public` (or `./dist/ui`).

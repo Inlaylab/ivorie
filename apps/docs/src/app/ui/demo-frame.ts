@@ -1,40 +1,56 @@
-import { ChangeDetectionStrategy, Component, Type, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Type, computed, inject, input, signal } from '@angular/core';
 import { NgComponentOutlet } from '@angular/common';
-import { IV_TABS_IMPORTS } from '@inlaylab/ivorie/tabs';
+import { IvButton } from '@inlaylab/ivorie/button';
+import { IvIdGenerator } from '@inlaylab/ivorie/core';
 import type { DocDemoSource } from '../content/types';
 import { CopyButton } from './copy-button';
 import { TrustedHtmlPipe } from './trusted-html.pipe';
 
-/** A live demo with its source: Preview and Code tabs. */
+/** Lines shown before the code needs Expand. */
+const COLLAPSED_LINES = 10;
+
+/** A live demo with its source below, in one card. Long code starts collapsed. */
 @Component({
   selector: 'docs-demo-frame',
-  imports: [NgComponentOutlet, IV_TABS_IMPORTS, CopyButton, TrustedHtmlPipe],
+  imports: [NgComponentOutlet, IvButton, CopyButton, TrustedHtmlPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  host: { class: 'not-prose my-6 block' },
+  host: { class: 'not-prose my-6 block overflow-hidden rounded-xl border' },
   template: `
-    <iv-tabs defaultValue="preview">
-      <iv-tabs-list variant="line">
-        <iv-tabs-trigger value="preview">Preview</iv-tabs-trigger>
-        <iv-tabs-trigger value="code">Code</iv-tabs-trigger>
-      </iv-tabs-list>
-      <iv-tabs-content value="preview">
-        <!-- The demo host fills the frame and centers its children, so a w-full child gets real width and wide ones shrink on phones. -->
+    <!-- The demo host fills the frame and centers its children, so a w-full child gets real width and wide ones shrink on phones. -->
+    <div
+      class="docs-preview bg-background flex min-h-[320px] w-full items-center justify-center overflow-x-auto p-4 sm:p-8 *:grid *:w-full *:grid-cols-1 *:justify-items-center"
+    >
+      <ng-container [ngComponentOutlet]="demo()" />
+    </div>
+    <div class="docs-code relative border-t" [attr.data-collapsed]="(long() && collapsed()) || null">
+      <docs-copy-button class="absolute top-2 right-2 z-10" [text]="source().raw" />
+      <div [id]="codeId" [innerHTML]="source().code | trustedHtml"></div>
+      @if (long()) {
         <div
-          class="docs-preview bg-background flex min-h-[320px] w-full items-center justify-center overflow-x-auto rounded-xl border p-4 sm:p-8 *:grid *:w-full *:grid-cols-1 *:justify-items-center"
+          class="flex justify-center p-2"
+          [class]="collapsed() ? 'from-background via-background/80 absolute inset-x-0 bottom-0 h-20 items-end bg-linear-to-t to-transparent' : 'border-t'"
         >
-          <ng-container [ngComponentOutlet]="demo()" />
+          <button
+            ivButton
+            type="button"
+            variant="secondary"
+            size="sm"
+            [attr.aria-expanded]="!collapsed()"
+            [attr.aria-controls]="codeId"
+            (click)="collapsed.set(!collapsed())"
+          >
+            {{ collapsed() ? 'Expand' : 'Collapse' }}
+          </button>
         </div>
-      </iv-tabs-content>
-      <iv-tabs-content value="code">
-        <div class="docs-code relative">
-          <docs-copy-button class="absolute top-2 right-2 z-10" [text]="source().raw" />
-          <div [innerHTML]="source().code | trustedHtml"></div>
-        </div>
-      </iv-tabs-content>
-    </iv-tabs>
+      }
+    </div>
   `,
 })
 export class DemoFrame {
   readonly demo = input.required<Type<unknown>>();
   readonly source = input.required<DocDemoSource>();
+
+  protected readonly codeId = inject(IvIdGenerator).next('docs-code');
+  protected readonly long = computed(() => this.source().raw.trimEnd().split('\n').length > COLLAPSED_LINES);
+  protected readonly collapsed = signal(true);
 }

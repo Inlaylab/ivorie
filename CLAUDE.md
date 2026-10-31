@@ -3,7 +3,7 @@
 Angular 22 UI library (`@inlaylab/ivorie`) + copy-in CLI (`ivorie`). Based on shadcn/ui.
 
 ## Start of every session
-1. Read [ROADMAP.md](ROADMAP.md). **Status** names the current phase and next task. **Pending** holds its tasks.
+1. Read [ROADMAP.md](ROADMAP.md). **Status** names the current phase and next task. Each `## Phase N` section holds its tasks.
 2. Do the **Must do** items in ROADMAP.md first. Items marked "user" need the user: ask, do not act.
 3. Read [docs/CONVENTIONS.md](docs/CONVENTIONS.md) only when you write component code.
 4. Read [docs/PLAN.md](docs/PLAN.md) only for the why behind the phases.
@@ -12,12 +12,14 @@ Angular 22 UI library (`@inlaylab/ivorie`) + copy-in CLI (`ivorie`). Based on sh
 Latest only: Angular 22, Tailwind 4.3, zoneless, Vitest, `@lucide/angular`. No deprecated APIs. See [docs/COMPAT.md](docs/COMPAT.md).
 
 ## Rules
-- One phase = one branch = one PR. Branch name: `phase-N-short-name`.
+- One phase = one minor release = one branch = one PR. Branch name: `phase-N-short-name`.
+- Last task of a phase: `npx changeset version` (both packages, one version), CHANGELOG, release.
 - Finish one task → run its check → commit → update **Status** in ROADMAP.md.
 - Commit messages and PRs: no `Co-Authored-By` or any AI attribution line.
 - A phase is done only when its **exit gate** passes. Run the commands, show the output.
-- Phase says "outline only"? Expand it into tasks first (superpowers:writing-plans), write them into ROADMAP.md, get OK, then build.
-- Publishing to npm is public and cannot be undone. Ask before every publish.
+- New component? Follow "Add a component" in [docs/CONVENTIONS.md](docs/CONVENTIONS.md) (style sync, count bumps, module smoke, docs).
+- Phase says "outline"? Expand it into tasks first (superpowers:writing-plans), write them into ROADMAP.md, get OK, then build.
+- Publishing to npm is public and cannot be undone. Ask before every publish (Release workflow or `npm run publish:all`). See [docs/DEPLOY.md](docs/DEPLOY.md).
 - Force-push or history rewrite: ask first.
 - New big choice? Add one line to [docs/DECISIONS.md](docs/DECISIONS.md).
 - Keep docs short and plain. Short sentences. No filler.
@@ -33,6 +35,7 @@ Latest only: Angular 22, Tailwind 4.3, zoneless, Vitest, `@lucide/angular`. No d
 | Package smoke | `npm run smoke:pack` |
 | CLI smoke (network) | `npm run smoke:cli` |
 | Static docs | `npm run docs:build` |
+| Manual publish (ask first) | `npm run publish:all` |
 
 ## Reference: shadcn/ui
 Repo: https://github.com/shadcn-ui/ui (MIT). Our components copy its classes, variants and behavior.
@@ -48,5 +51,7 @@ Repo: https://github.com/shadcn-ui/ui (MIT). Our components copy its classes, va
 - `projects/cli/` — the `ivorie` CLI.
 - `apps/docs/` — docs + playground app (SSR, prerender). `apps/module-smoke/` — NgModule smoke app.
 - `tools/` — scripts: check, docs build, registry, styles sync, smoke tests, rename map.
-- `ROADMAP.md` — status, must do, pending phases, hardening, deferred findings, upcoming features.
+- `ROADMAP.md` — status, must do, phases 8–12 (releases 1.1–1.5) with tasks, backlog.
+- `CHANGELOG.md` — release notes. `.changeset/` — pending version notes (from Phase 8 T0).
+- `.github/workflows/` — `ci.yml` (checks), `release.yml` (manual npm publish), `docs.yml` (GitHub Pages).
 - `docs/` — PLAN (why), ARCHITECTURE, CONVENTIONS, COMPAT, DECISIONS, DEPLOY.

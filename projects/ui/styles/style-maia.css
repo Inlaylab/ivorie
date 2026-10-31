@@ -396,6 +396,39 @@
       @apply data-open:animate-in data-closed:animate-out data-closed:fade-out-0 data-open:fade-in-0 data-closed:zoom-out-95 data-open:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 ring-foreground/5 bg-popover text-popover-foreground min-w-36 rounded-2xl p-1 shadow-2xl ring-1 duration-100;
     }
 
+    /* MARK: Empty */
+    .cn-empty {
+      @apply gap-4 rounded-lg border-dashed p-12;
+    }
+
+    .cn-empty-header {
+      @apply gap-2;
+    }
+
+    .cn-empty-media {
+      @apply mb-2;
+    }
+
+    .cn-empty-media-default {
+      @apply bg-transparent;
+    }
+
+    .cn-empty-media-icon {
+      @apply bg-muted text-foreground flex size-10 shrink-0 items-center justify-center rounded-lg [&_svg:not([class*='size-'])]:size-6;
+    }
+
+    .cn-empty-title {
+      @apply text-lg font-medium tracking-tight;
+    }
+
+    .cn-empty-description {
+      @apply text-sm/relaxed;
+    }
+
+    .cn-empty-content {
+      @apply gap-4 text-sm;
+    }
+
     /* MARK: Field */
     .cn-field-set {
       @apply gap-6 has-[>[data-slot=checkbox-group]]:gap-3 has-[>[data-slot=radio-group]]:gap-3;
@@ -524,9 +557,27 @@
       @apply my-2;
     }
 
+    /* MARK: Kbd */
+    .cn-kbd {
+      @apply bg-muted text-muted-foreground in-data-[slot=tooltip-content]:bg-background/20 in-data-[slot=tooltip-content]:text-background dark:in-data-[slot=tooltip-content]:bg-background/10 h-5 w-fit min-w-5 gap-1 rounded-sm px-1 font-sans text-xs font-medium [&_svg:not([class*='size-'])]:size-3;
+    }
+
+    .cn-kbd-group {
+      @apply gap-1;
+    }
+
     /* MARK: Label */
     .cn-label {
       @apply gap-2 text-sm leading-none font-medium group-data-[disabled=true]:opacity-50 peer-disabled:opacity-50;
+    }
+
+    /* MARK: Native Select */
+    .cn-native-select {
+      @apply border-input bg-input/30 placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 dark:hover:bg-input/50 focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive dark:aria-invalid:border-destructive/50 h-9 w-full min-w-0 appearance-none rounded-4xl border py-1 pr-8 pl-3 text-sm transition-colors select-none focus-visible:ring-[3px] aria-invalid:ring-[3px] data-[size=sm]:h-8;
+    }
+
+    .cn-native-select-icon {
+      @apply text-muted-foreground top-1/2 right-3.5 size-4 -translate-y-1/2;
     }
 
     /* MARK: Pagination */
@@ -875,8 +926,10 @@
     .cn-field-orientation-horizontal {}
     .cn-field-orientation-responsive {}
     .cn-field-orientation-vertical {}
+    .cn-font-heading {}
     .cn-input-group-button-size-sm {}
     .cn-menu-target {}
+    .cn-native-select-wrapper {}
     .cn-pagination {}
     .cn-pagination-link {}
     .cn-pagination-next-text {}

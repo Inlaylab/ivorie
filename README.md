@@ -50,10 +50,23 @@ npm run check      # every build, test and lint gate
 | `npm run smoke:cli` | Two fresh `ng new --ssr` apps: CLI copy vs npm package must match. Needs network. |
 | `npm run docs:build` | Static docs in `dist/docs/browser`. See [docs/DEPLOY.md](docs/DEPLOY.md). |
 
+## What's next
+
+- **1.1** More components (popover, sheet, slider, toggle, command, …) and a docs page that lists every example.
+- **1.2** Playground: pick style, base color, font and radius, then install that look.
+- **1.3** Blocks: ready-made login, signup and sidebar layouts.
+- **1.4** Icon libraries as plugins: lucide, tabler, phosphor, hugeicons, remix.
+- **1.5** Charts: line, area, bar, pie.
+
+Details: [ROADMAP.md](ROADMAP.md).
+
 ## Learn more
 
 - Architecture: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
 - Conventions: [docs/CONVENTIONS.md](docs/CONVENTIONS.md)
 - Decisions: [docs/DECISIONS.md](docs/DECISIONS.md)
 - Credits: [NOTICE.md](NOTICE.md)
+- Changes: [CHANGELOG.md](CHANGELOG.md)
+- Contribute: [CONTRIBUTING.md](CONTRIBUTING.md)
+- Security: [SECURITY.md](SECURITY.md)
 - License: [MIT](LICENSE)

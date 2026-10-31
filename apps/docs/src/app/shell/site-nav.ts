@@ -41,7 +41,10 @@ export class SiteNav {
 
   protected readonly groups = [
     { label: 'Getting started', pages: PAGES.filter((p) => p.section === 'guide') },
-    { label: 'Components', pages: PAGES.filter((p) => p.section === 'component') },
+    {
+      label: 'Components',
+      pages: [{ slug: 'components', title: 'Overview' }, ...PAGES.filter((p) => p.section === 'component')],
+    },
   ];
 
   protected closeOnMobile(): void {

@@ -7,6 +7,7 @@ import { IvorieModule } from '@inlaylab/ivorie/core';
 import { IV_ACCORDION_IMPORTS } from '@inlaylab/ivorie/accordion';
 import { IV_ALERT_IMPORTS } from '@inlaylab/ivorie/alert';
 import { IV_ALERT_DIALOG_IMPORTS } from '@inlaylab/ivorie/alert-dialog';
+import { IvAspectRatio } from '@inlaylab/ivorie/aspect-ratio';
 import { IV_AVATAR_IMPORTS } from '@inlaylab/ivorie/avatar';
 import { IvBadge } from '@inlaylab/ivorie/badge';
 import { IV_BREADCRUMB_IMPORTS } from '@inlaylab/ivorie/breadcrumb';
@@ -19,10 +20,13 @@ import { IV_COLLAPSIBLE_IMPORTS } from '@inlaylab/ivorie/collapsible';
 import { IV_COMBOBOX_IMPORTS } from '@inlaylab/ivorie/combobox';
 import { IV_DIALOG_IMPORTS } from '@inlaylab/ivorie/dialog';
 import { IV_DROPDOWN_MENU_IMPORTS } from '@inlaylab/ivorie/dropdown-menu';
+import { IV_EMPTY_IMPORTS } from '@inlaylab/ivorie/empty';
 import { IV_FIELD_IMPORTS } from '@inlaylab/ivorie/field';
 import { IV_HOVER_CARD_IMPORTS } from '@inlaylab/ivorie/hover-card';
 import { IV_INPUT_IMPORTS } from '@inlaylab/ivorie/input';
 import { IV_ITEM_IMPORTS } from '@inlaylab/ivorie/item';
+import { IV_KBD_IMPORTS } from '@inlaylab/ivorie/kbd';
+import { IV_NATIVE_SELECT_IMPORTS } from '@inlaylab/ivorie/native-select';
 import { IV_PAGINATION_IMPORTS } from '@inlaylab/ivorie/pagination';
 import { IvProgress } from '@inlaylab/ivorie/progress';
 import { IV_RADIO_GROUP_IMPORTS } from '@inlaylab/ivorie/radio-group';
@@ -62,6 +66,9 @@ import { App } from './app';
     ...IV_HOVER_CARD_IMPORTS,
     ...IV_INPUT_IMPORTS,
     ...IV_ITEM_IMPORTS,
+    ...IV_EMPTY_IMPORTS,
+    ...IV_KBD_IMPORTS,
+    ...IV_NATIVE_SELECT_IMPORTS,
     ...IV_PAGINATION_IMPORTS,
     ...IV_RADIO_GROUP_IMPORTS,
     ...IV_SCROLL_AREA_IMPORTS,
@@ -71,6 +78,7 @@ import { App } from './app';
     ...IV_TABS_IMPORTS,
     ...IV_TOOLTIP_IMPORTS,
     ...IV_SELECT_PICKER_IMPORTS,
+    IvAspectRatio,
     IvBadge,
     IvButton,
     IvCalendar,

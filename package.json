@@ -12,7 +12,8 @@
     "docs:content": "node tools/docs/build.ts",
     "docs:build": "node tools/docs/build.ts && ng build docs && node tools/docs/postbuild.ts",
     "smoke:pack": "node tools/smoke/pack.ts",
-    "smoke:cli": "node tools/smoke/cli-e2e.ts"
+    "smoke:cli": "node tools/smoke/cli-e2e.ts",
+    "publish:all": "npm run check && npm publish ./dist/ui --access public && npm publish ./dist/cli --access public"
   },
   "prettier": {
     "printWidth": 100,
