@@ -57,7 +57,7 @@ import { CopyButton } from '../ui/copy-button';
           <iv-card-title>Release checklist</iv-card-title>
           <iv-card-description>v1.0 ships when every gate is green.</iv-card-description>
         </iv-card-header>
-        <iv-card-content class="flex flex-col gap-4">
+        <iv-card-content class="flex flex-1 flex-col gap-4">
           <iv-progress [value]="done() * 25" aria-label="Release progress" />
           @for (gate of gates; track gate.label; let i = $index) {
             <label class="flex items-center justify-between gap-4 text-sm">
@@ -82,18 +82,22 @@ import { CopyButton } from '../ui/copy-button';
           <iv-card-title>Invite a teammate</iv-card-title>
           <iv-card-description>They get access to this project only.</iv-card-description>
         </iv-card-header>
-        <iv-card-content class="flex flex-col gap-4">
+        <!-- flex-1: the grid stretches both cards, so the footers line up at the bottom. -->
+        <iv-card-content class="flex flex-1 flex-col gap-4">
           <iv-field>
             <label ivLabel for="home-email">Email</label>
-            <input ivInput id="home-email" type="email" placeholder="ada@example.com" />
+            <input ivInput id="home-email" type="email" autocomplete="email" placeholder="ada@example.com" />
           </iv-field>
           <label class="flex items-center justify-between gap-4 text-sm">
-            Can edit components
+            <span class="flex flex-col gap-0.5">
+              Can edit components
+              <span class="text-muted-foreground text-xs">Off: they can only view.</span>
+            </span>
             <iv-switch [checked]="true" />
           </label>
         </iv-card-content>
         <iv-card-footer class="justify-end">
-          <button ivButton size="sm">Send invite</button>
+          <button ivButton size="sm" class="w-full sm:w-auto">Send invite</button>
         </iv-card-footer>
       </iv-card>
     </section>
