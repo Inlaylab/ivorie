@@ -1,6 +1,7 @@
 # Ivorie
 
 Angular components with the [shadcn/ui](https://github.com/shadcn-ui/ui) look and behavior.
+Accessibility and keyboard patterns follow [Radix UI](https://github.com/radix-ui/primitives).
 Built for Angular 22 and Tailwind CSS 4: signals, zoneless, server rendering and keyboard support.
 
 - **`@inlaylab/ivorie`**: the npm package. 34 components, one entry point each (`@inlaylab/ivorie/button`). Works in standalone, NgModule, SSR and zoneless apps.

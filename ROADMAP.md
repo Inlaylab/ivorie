@@ -16,13 +16,13 @@ Fixed choices:
 More detail: [ARCHITECTURE](docs/ARCHITECTURE.md) · [CONVENTIONS](docs/CONVENTIONS.md) · [COMPAT](docs/COMPAT.md) · [DECISIONS](docs/DECISIONS.md) · [DEPLOY](docs/DEPLOY.md).
 
 ## Status
-**Next:** Phase 7 — Release v1.0 (outline only: expand into tasks and get an OK first).
+**Next:** Phase 7 — Release v1.0. Tasks written, waiting for the user's OK. See U1–U5 and tasks 1–8.
 Done: GitHub repo `Inlaylab/ivorie` and npm org `@inlaylab` exist. Package renamed to `@inlaylab/ivorie`. `npm run check` passes.
 Both packages are at `1.0.0` and are not published yet. Docs initial bundle is ~800 kB, mostly lucide icons (fix: icon plugins in the v1.x backlog).
 
 | # | Phase | Status |
 |---|---|---|
-| 7 | Release v1.0 (npm publish) | outline only |
+| 7 | Release v1.0 (npm publish) | tasks written, awaiting OK |
 | — | v1.x | backlog |
 
 ## Must do (before v1.0)
@@ -31,7 +31,6 @@ Owner in brackets. Items marked "user" need a person, not code.
 2. **GitHub home and npm org:** done. Repo `Inlaylab/ivorie`, org `@inlaylab`, packages `@inlaylab/ivorie` + `ivorie` (CLI).
 3. **[user] Push `main` to `Inlaylab/ivorie`, then CI green.** Check the Actions tab: `check` (lock + tailwind-latest), `pack`, `cli-e2e`. Phase 7 needs it.
 4. **[user] npm auth for CI:** 2FA on, owner of `inlaylab`. Make a granular token with publish rights on `@inlaylab/*` and `ivorie`. Save it as GitHub secret `NPM_TOKEN`. Trusted Publisher can replace it after the first publish.
-5. Never touch the source app the components came from (`D:\idemeum\adminportal`).
 
 ## How we work
 - One phase = one branch = one PR. Branch name: `phase-N-short-name`.
@@ -65,33 +64,32 @@ It also runs these grep rules:
 
 ## Pending 
 
-### Phase 7 — Release v1.0 (outline only)
-Branch `phase-7-release`. Expand into tasks and get an OK before starting.
+### Phase 7 — Release v1.0
+Branch `phase-7-release`. Tasks below are OK'd by the user before work starts.
 **Publishing is public and cannot be undone. Ask the user before every publish.**
 
 **Goal:** `@inlaylab/ivorie` and `ivorie` v1.0.0 on npm, published from CI with provenance.
 
-Scope:
-1. **Manual checks:**
-   - The CLI name `ivorie` is free on npm.
-   - Trademark is checked.
-   - Company legal is OK.
-2. **Package metadata:** `repository`, `description` and `publishConfig` are done for `@inlaylab/ivorie`. Add `homepage` and `keywords` to both packages.
-3. **Repo files:**
-   - Add CONTRIBUTING, CODE_OF_CONDUCT, SECURITY, and issue and PR templates.
-   - README credits shadcn/ui and Radix. Radix is in NOTICE.md but not in the README yet.
-4. **Changesets** for versions and the CHANGELOG (optional for 1.0.0; may wait for 1.1).
-5. **Pre-publish checks:** `npm run check`, `npm run smoke:pack`, `npm run smoke:cli`. Then `npm publish --dry-run` in each output folder and read the file list.
-6. **Publish workflow:**
-   - `.github/workflows/release.yml` runs on tag `v*`, with `id-token: write`.
-   - It runs `npm ci`, `npm run check`, then `npm publish --provenance --access public` for both packages.
-   - Each `repository.url` must match `Inlaylab/ivorie`.
-7. **Publish:** ask the user first. Then push tag `v1.0.0`.
-8. **Final check:** install from npm into two fresh apps:
-   - a standalone SSR app;
-   - an NgModule app.
+**User steps (code cannot do these):**
+- U1. [done] Git history: local `main` and `origin/main` are unrelated root commits (both "v1.0.0"). Only `ROADMAP.md` differs, and local is newer. Fix: force-push local `main` over `origin/main` (ask first), or recreate the remote repo.
+- U2. [done] Name and legal: `ivorie` is free on npm today (`npm view ivorie` gives 404). Trademark and company legal OK are still open. The unscoped name can be taken by anyone until we publish.
+- U3. [done] CI green on GitHub after U1: `check` (lock + tailwind-latest), `pack`, `cli-e2e`.
+- U4. [done] `NPM_TOKEN`: 2FA on, owner of `inlaylab`. Granular token, publish rights on `@inlaylab/*` and `ivorie`. Save as GitHub secret `NPM_TOKEN`. A new package cannot use Trusted Publisher before its first publish.
+- U5. [open] Give a contact email for SECURITY.md and CODE_OF_CONDUCT.md (task 2).
 
-   All components render, with no hydration warnings.
+**Tasks (code):**
+1. **Package metadata.** Add `homepage`, `bugs` and `keywords` to `projects/ui/package.json` and `projects/cli/package.json`. Check: `npm run check` (publint, publint-cli).
+2. **Repo files.** Add `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md` (done, needs `CONTACT_EMAIL` filled), `SECURITY.md` (done), `.github/ISSUE_TEMPLATE/{bug,feature}.yml`, `.github/PULL_REQUEST_TEMPLATE.md`. Add a Radix UI credit to `README.md` next to shadcn/ui. Needs U5.
+3. **CHANGELOG.** Hand-written `CHANGELOG.md` with a 1.0.0 entry. No Changesets for 1.0.0 (one line in DECISIONS.md). Add Changesets in 1.1.
+4. **Release workflow.** Add `.github/workflows/release.yml`:
+   - Trigger: manual only (`workflow_dispatch`), and only on `main`. Permissions: `contents: read`, `id-token: write`.
+   - Steps: checkout, setup-node (`registry-url: https://registry.npmjs.org`), `npm ci`, fail if the two package versions differ, `npm run check`, then `npm publish dist/ui --provenance --access public` and `npm publish dist/cli --provenance --access public`.
+   - Auth: `NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}`.
+   - Check: `repository.url` in both packages is `git+https://github.com/Inlaylab/ivorie.git`.
+5. **Pre-publish checks.** Run `npm run check`, `npm run smoke:pack`, `npm run smoke:cli`. Then `npm publish --dry-run` in `dist/ui` and `dist/cli`. Read both file lists: no `.ref`, tests, or source maps of private code.
+6. **PR and merge.** Open the PR `phase-7-release` into `main`. CI green. Merge.
+7. **Publish (ask the user first).** Run the `Release` workflow from the GitHub Actions tab on `main`. Watch the run. Check `npm view @inlaylab/ivorie` and `npm view ivorie` show 1.0.0 with provenance.
+8. **Final check.** Install from npm into two fresh apps: a standalone SSR app and an NgModule app. All components render, no hydration warnings.
 
 **Exit gate:**
 - Both packages are on npm with provenance.

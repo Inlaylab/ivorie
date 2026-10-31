@@ -1,7 +1,6 @@
 # Ivorie — Claude guide
 
 Angular 22 UI library (`@inlaylab/ivorie`) + copy-in CLI (`ivorie`). Based on shadcn/ui.
-Source was copied once from the admin portal. **Never touch `D:\idemeum\adminportal`.**
 
 ## Start of every session
 1. Read [ROADMAP.md](ROADMAP.md). **Status** names the current phase and next task. **Pending** holds its tasks.

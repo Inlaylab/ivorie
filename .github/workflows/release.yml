@@ -1,0 +1,36 @@
+name: Release
+
+on:
+  workflow_dispatch: # manual only: Actions tab -> Release -> Run workflow
+
+permissions:
+  contents: read
+  id-token: write # npm provenance
+
+jobs:
+  publish:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          registry-url: https://registry.npmjs.org
+      - run: npm ci
+      - name: Both packages must have the same version
+        run: |
+          node -e '
+            const [ui, cli] = ["projects/ui", "projects/cli"].map((p) => require("./" + p + "/package.json").version);
+            if (ui !== cli) { console.error("ui is " + ui + ", cli is " + cli); process.exit(1); }
+          '
+      - run: npm run check
+        env:
+          SMOKE_BROWSER: chrome
+      - run: npm publish dist/ui --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - run: npm publish dist/cli --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

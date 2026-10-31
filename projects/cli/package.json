@@ -4,8 +4,18 @@
   "description": "Copy Ivorie Angular components into your app.",
   "type": "module",
   "license": "MIT",
+  "homepage": "https://github.com/Inlaylab/ivorie#readme",
+  "bugs": "https://github.com/Inlaylab/ivorie/issues",
+  "keywords": [
+    "angular",
+    "cli",
+    "shadcn",
+    "components",
+    "tailwindcss",
+    "scaffold"
+  ],
   "bin": {
-    "ivorie": "./index.js"
+    "ivorie": "index.js"
   },
   "engines": {
     "node": "^22.22.3 || >=24.15.0"

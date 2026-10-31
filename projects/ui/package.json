@@ -3,6 +3,18 @@
   "version": "1.0.0",
   "description": "Angular components with the shadcn/ui look and behavior.",
   "license": "MIT",
+  "homepage": "https://github.com/Inlaylab/ivorie#readme",
+  "bugs": "https://github.com/Inlaylab/ivorie/issues",
+  "keywords": [
+    "angular",
+    "components",
+    "ui",
+    "shadcn",
+    "tailwindcss",
+    "signals",
+    "ssr",
+    "zoneless"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Inlaylab/ivorie.git",

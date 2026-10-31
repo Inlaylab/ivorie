@@ -37,3 +37,4 @@ One line per decision. Newest at the bottom. Format: `date — decision — why`
 - 2026-10-29 — `IV_*_IMPORTS` stay `as const`: the Angular compiler reads their tuple type from `.d.ts` across entries (NG1010 without it). NgModule `imports` rejects readonly arrays (TS2322), so NgModule apps spread them: `...IV_X_IMPORTS`.
 - 2026-10-29 — `shadcn add` of a registry item is checked by the ubuntu `cli-e2e` CI job only. On Windows the shadcn CLI reads a local `D:\` path as a URL scheme and fails.
 - 2026-10-30 — Org **Inlaylab** owns the project: npm `@inlaylab/ivorie` (was `@ivorie/ui`) + unscoped CLI `ivorie`, repo `github.com/Inlaylab/ivorie`. The brand and `iv` prefix stay Ivorie.
+- 2026-10-31 — v1.0.0 has no Changesets. A hand-written CHANGELOG.md is enough for one release. Add Changesets in 1.1.

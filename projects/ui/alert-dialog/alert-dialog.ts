@@ -123,7 +123,13 @@ export class IvAlertDialogTrigger<T = unknown, R = unknown, D = unknown> {
 export class IvAlertDialogHeader {
   readonly class = input('');
 
-  readonly classes = computed(() => cn('cn-alert-dialog-header', this.class()))
+  // Without grid-cols, the auto columns stretch and push the text far from the media.
+  readonly classes = computed(() =>
+    cn(
+      'cn-alert-dialog-header sm:group-data-[size=default]/alert-dialog-content:has-data-[slot=alert-dialog-media]:grid-cols-[auto_1fr]',
+      this.class(),
+    ),
+  )
 }
 
 @Component({
@@ -160,7 +166,13 @@ export class IvAlertDialogFooter {
 export class IvAlertDialogMedia {
   readonly class = input('');
 
-  readonly classes = computed(() => cn('cn-alert-dialog-media', this.class()))
+  // Beside the text (default size, sm+) keep it small: size-10 tile, size-5 icon, top-aligned with the title.
+  readonly classes = computed(() =>
+    cn(
+      'cn-alert-dialog-media sm:group-data-[size=default]/alert-dialog-content:mb-0 sm:group-data-[size=default]/alert-dialog-content:size-10 sm:group-data-[size=default]/alert-dialog-content:rounded-lg sm:group-data-[size=default]/alert-dialog-content:*:[svg:not([class*="size-"])]:size-5',
+      this.class(),
+    ),
+  )
 }
 
 @Component({

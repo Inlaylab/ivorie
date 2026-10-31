@@ -1,0 +1,11 @@
+name: Feature request
+description: Suggest a component or change
+labels: [enhancement]
+body:
+  - type: textarea
+    id: idea
+    attributes:
+      label: What do you want, and why?
+      description: Link the shadcn/ui component if there is one.
+    validations:
+      required: true
