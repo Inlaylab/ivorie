@@ -180,6 +180,24 @@
     <iv-tabs-content value="password">Password settings.</iv-tabs-content>
   </iv-tabs>
 
+  <iv-aspect-ratio [ratio]="16 / 9" class="bg-muted w-64"></iv-aspect-ratio>
+
+  <iv-empty>
+    <iv-empty-header>
+      <iv-empty-title>No items</iv-empty-title>
+      <iv-empty-description>Add one to start.</iv-empty-description>
+    </iv-empty-header>
+  </iv-empty>
+
+  <kbd ivKbdGroup><kbd ivKbd>Ctrl</kbd><kbd ivKbd>K</kbd></kbd>
+
+  <iv-native-select>
+    <select ivNativeSelect aria-label="Size" [(ngModel)]="size">
+      <option ivNativeSelectOption value="s">Small</option>
+      <option ivNativeSelectOption value="m">Medium</option>
+    </select>
+  </iv-native-select>
+
   <button ivButton (click)="notifySaved()">Save</button>
   <iv-toast-container />
 

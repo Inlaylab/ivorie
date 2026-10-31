@@ -17,6 +17,7 @@ export class App {
   notify = false;
   date = new Date(2026, 0, 15);
   picked = ['Apple'];
+  size = 'm';
   readonly fruits = ['Apple', 'Banana', 'Cherry'];
 
   notifySaved() {
