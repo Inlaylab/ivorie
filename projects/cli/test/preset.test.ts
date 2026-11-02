@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { DEFAULT_PRESET, RADII, checkPreset, decodePreset, encodePreset, resolvePreset } from '../src/preset.ts';
-import { PRESET_GOLDEN } from '../src/preset.fixture.ts';
+import { PRESET_GOLDEN } from './preset.fixture.ts';
 import type { RegistryIndex } from '../src/registry.ts';
 
 const index = {

@@ -1,5 +1,5 @@
 // A non-default preset and its share code. The CLI, docs and smoke tests check against it.
-import type { Preset } from './preset.ts';
+import type { Preset } from '../src/preset.ts';
 
 export const PRESET_GOLDEN: { preset: Preset; code: string } = {
   preset: { style: 'nova', baseColor: 'olive', font: 'inter', fontHeading: 'lora', radius: 'large' },
