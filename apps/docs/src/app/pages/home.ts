@@ -42,10 +42,10 @@ import { CopyButton } from '../ui/copy-button';
       </p>
       <div class="mt-8 flex flex-wrap justify-center gap-2">
         <a ivButton routerLink="/docs/installation">Get started</a>
-        <a ivButton variant="ghost" routerLink="/docs/accordion">Browse components</a>
+        <a ivButton variant="ghost" routerLink="/docs/components">Browse components</a>
       </div>
       <div class="bg-muted/60 mt-6 inline-flex items-center gap-3 rounded-lg border py-1 pr-1 pl-4 font-mono text-[0.8125rem]">
-        <span><span class="text-muted-foreground select-none">$ </span>npm i &#64;ivorie/ui</span>
+        <span><span class="text-muted-foreground select-none">$ </span>npm i &#64;inlaylab/ivorie</span>
         <docs-copy-button text="npm i @inlaylab/ivorie" label="Copy install command" />
       </div>
     </section>
