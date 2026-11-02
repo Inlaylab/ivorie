@@ -20,7 +20,7 @@ import { PAGES } from '../../generated/pages';
         <li>
           <a
             [routerLink]="['/docs', p.slug]"
-            class="hover:bg-muted/60 focus-visible:ring-ring flex h-full flex-col gap-1 rounded-lg border p-4 outline-none transition-colors focus-visible:ring-2"
+            class="hover:bg-muted/60 focus-visible:ring-ring flex h-full flex-col gap-1 rounded-2xl border p-5 outline-none transition-colors focus-visible:ring-2"
           >
             <span class="text-foreground font-medium">{{ p.title }}</span>
             <span class="text-muted-foreground text-sm text-pretty">{{ p.description }}</span>

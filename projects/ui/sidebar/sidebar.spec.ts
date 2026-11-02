@@ -73,6 +73,23 @@ class Host {
 })
 class EmptyHost {}
 
+// The sidebar one level down, next to the content (a header above, a row below it).
+@Component({
+  imports: [IV_SIDEBAR_IMPORTS],
+  template: `
+    <iv-sidebar-provider>
+      <header><iv-sidebar-trigger /></header>
+      <div class="row">
+        <iv-sidebar>
+          <iv-sidebar-content><a href="#docs">Docs</a></iv-sidebar-content>
+        </iv-sidebar>
+        <main ivSidebarInset><a href="#page">Page</a></main>
+      </div>
+    </iv-sidebar-provider>
+  `,
+})
+class NestedHost {}
+
 // jsdom has no layout, so CDK sees no element as visible and the focus trap finds nothing to focus.
 @Injectable()
 class VisibleChecker extends InteractivityChecker {
@@ -348,6 +365,17 @@ describe('IvSidebar', () => {
       expect(sidebarHost.inert).toBeFalsy()
       await key(document.activeElement!, { key: 'Escape' })
       expect(main.inert).toBe(false)
+    })
+
+    it('a sidebar nested in a layout div stays usable: only what does not hold it goes inert', async () => {
+      const { el, trigger, stable } = await render({ mobile: true, host: NestedHost })
+      trigger().click()
+      await stable()
+      const inert = (sel: string) => (el.querySelector(sel) as HTMLElement & { inert: boolean }).inert
+      expect(inert('.row')).toBeFalsy()
+      expect(inert('[data-slot="sidebar"]')).toBeFalsy()
+      expect(inert('header')).toBe(true)
+      expect(inert('main[ivSidebarInset]')).toBe(true)
     })
 
     it('resizing to desktop while open: no error, no dialog, content moves to the panel', async () => {

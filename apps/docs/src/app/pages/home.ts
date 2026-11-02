@@ -79,7 +79,7 @@ const DEFAULT_CODE = encodePreset(DEFAULT_PRESET);
       </div>
 
       <!-- Real components. The controls under them re-skin only this frame. -->
-      <figure class="docs-gradient-border mx-auto mt-16 mb-20 max-w-6xl overflow-hidden rounded-[1.75rem] shadow-[0_40px_80px_-40px_rgb(0_0_0/0.35)] sm:mx-6 lg:mx-auto">
+      <figure class="docs-gradient-border mx-4 mt-16 mb-20 max-w-6xl overflow-hidden rounded-[1.75rem] shadow-[0_40px_80px_-40px_rgb(0_0_0/0.35)] sm:mx-6 lg:mx-auto">
         <div #stage class="docs-stage bg-background grid gap-4 p-4 sm:p-6 md:grid-cols-2 lg:grid-cols-3">
           <iv-card>
             <iv-card-header>

@@ -74,10 +74,18 @@ export class IvSidebarProvider implements OnInit {
     if (locked) {
       this.prevBodyOverflow = body.style.overflow
       body.style.overflow = 'hidden'
-      const drawer = this.host.nativeElement.querySelector(':scope > [data-slot="sidebar"]')
-      this.inertedSiblings = [...this.host.nativeElement.children].filter(
-        (el): el is HTMLElement & { inert: boolean } => el !== drawer,
+      // The sidebar may sit inside layout elements: walk up from it and make the siblings at each
+      // level inert, never an element that holds it.
+      const host = this.host.nativeElement as HTMLElement
+      const drawer = [...host.querySelectorAll<HTMLElement>('[data-slot="sidebar"]')].find(
+        (el) => el.closest('[data-slot="sidebar-wrapper"]') === host,
       )
+      this.inertedSiblings = []
+      for (let el = drawer; el && el !== host; el = el.parentElement ?? undefined) {
+        for (const sib of el.parentElement?.children ?? []) {
+          if (sib !== el) this.inertedSiblings.push(sib as HTMLElement & { inert: boolean })
+        }
+      }
       this.inertedSiblings.forEach((el) => (el.inert = true))
     } else {
       body.style.overflow = this.prevBodyOverflow
