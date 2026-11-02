@@ -134,3 +134,23 @@ test('--base-color olive writes the olive vars', async () => {
   const theme = readFileSync(join(cwd, 'src/app/ui/styles/theme.css'), 'utf8');
   assert.match(theme, /--primary: oklch\(0\.228 0\.013 107\.4\);/);
 });
+
+test('--font inter --font-heading lora --radius large: config, theme, import, install note', async () => {
+  const cwd = app();
+  const report = await runInit({ cwd, registry, skipInstall: true, yes: true, font: 'inter', fontHeading: 'lora', radius: 'large' });
+  const config = JSON.parse(read(cwd, 'components.json'));
+  assert.equal(config.font, 'inter');
+  assert.equal(config.fontHeading, 'lora');
+  assert.equal(config.radius, 'large');
+  const theme = read(cwd, 'src/app/ui/styles/theme.css');
+  assert.match(theme, /--radius: 0\.875rem;/);
+  assert.match(theme, /--font-sans: 'Inter Variable', sans-serif;/);
+  assert.match(read(cwd, 'src/styles.css'), /@import "@fontsource-variable\/inter";\n@import "@fontsource-variable\/lora";/);
+  assert.ok(report.notes.some((n) => n.includes('@fontsource-variable/inter') && n.includes('@fontsource-variable/lora')));
+});
+
+test('the default preset writes no fontHeading in components.json', async () => {
+  const cwd = app();
+  await runInit({ cwd, registry, skipInstall: true, yes: true });
+  assert.equal('fontHeading' in JSON.parse(read(cwd, 'components.json')), false);
+});

@@ -3,6 +3,7 @@
 import { readFileSync } from 'node:fs';
 import { parseArgs, type ParseArgsConfig } from 'node:util';
 import { runAdd } from './commands/add.ts';
+import { runApply } from './commands/apply.ts';
 import { runInit } from './commands/init.ts';
 import { runMigrate } from './commands/migrate.ts';
 import { printReport, red } from './log.ts';
@@ -12,6 +13,7 @@ const HELP = `Usage: ivorie <command> [options]
 Commands:
   init               Set up theme, style and components.json in an Angular 22 app
   add <names...>     Copy components into your app (add --all for every one)
+  apply <preset>     Change the look: a preset name or an ivp1_ code from the playground
   migrate [paths...] Update code written for the old ui-* components (default: src)
 
 Common options:
@@ -28,8 +30,14 @@ init options:
   --preset <name|code>  Theme preset (default: default)
   --style <name>        Override the preset style
   --base-color <name>   Override the preset base color
+  --font <name>         Override the preset font
+  --font-heading <name> Override the preset heading font (inherit = same as font)
+  --radius <name>       Override the preset radius (default, none, small, medium, large)
   --force               Run again over an existing setup
   -y, --yes             No prompts, use the defaults
+
+apply options:
+  --project <name>      App in angular.json (needed when there are several)
 
 add options:
   --overwrite           Replace files you changed
@@ -55,9 +63,13 @@ const OPTIONS = {
     preset: { type: 'string' },
     style: { type: 'string' },
     'base-color': { type: 'string' },
+    font: { type: 'string' },
+    'font-heading': { type: 'string' },
+    radius: { type: 'string' },
     force: { type: 'boolean' },
     yes: { type: 'boolean', short: 'y' },
   },
+  apply: { ...common, project: { type: 'string' } },
   add: { ...common, overwrite: { type: 'boolean' }, all: { type: 'boolean' } },
   migrate: { 'dry-run': { type: 'boolean' }, 'rename-map': { type: 'string' }, help: { type: 'boolean', short: 'h' } },
 } as const satisfies Record<string, ParseArgsConfig['options']>;
@@ -104,9 +116,15 @@ async function main(argv: string[]): Promise<number> {
       preset: v['preset'] as string | undefined,
       style: v['style'] as string | undefined,
       baseColor: v['base-color'] as string | undefined,
+      font: v['font'] as string | undefined,
+      fontHeading: v['font-heading'] as string | undefined,
+      radius: v['radius'] as string | undefined,
       force: v['force'] === true,
       yes: v['yes'] === true,
     });
+    printReport(r, dryRun);
+  } else if (command === 'apply') {
+    const r = await runApply(positionals[0], { ...common, project: v['project'] as string | undefined });
     printReport(r, dryRun);
   } else if (command === 'add') {
     const r = await runAdd(positionals, { ...common, overwrite: v['overwrite'] === true, all: v['all'] === true });

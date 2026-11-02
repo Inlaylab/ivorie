@@ -3,12 +3,12 @@ import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { createInterface } from 'node:readline/promises';
 import { CONFIG_FILE, SCHEMA_URL, validateConfig, type ComponentsJson } from '../config.ts';
-import { ensureCssImports, relativeImport, setBodyStyleClass } from '../edit.ts';
+import { ensureCssImports, setBodyStyleClass } from '../edit.ts';
 import { installCommand, runInstall } from '../install.ts';
 import { checkPreset, resolvePreset } from '../preset.ts';
 import { detectProject } from '../project.ts';
 import { bundledRegistry, openRegistry, packageName } from '../registry.ts';
-import { renderTheme } from '../theme.ts';
+import { renderLook } from '../look.ts';
 import { runAdd, writeFile } from './add.ts';
 import { emptyReport, type CommonOptions, type Report } from './report.ts';
 
@@ -19,6 +19,9 @@ export interface InitOptions extends CommonOptions {
   preset?: string;
   style?: string;
   baseColor?: string;
+  font?: string;
+  fontHeading?: string;
+  radius?: string;
   force?: boolean;
   yes?: boolean;
 }
@@ -55,6 +58,9 @@ export async function runInit(o: InitOptions): Promise<Report> {
   const preset = { ...resolvePreset(o.preset, index) };
   if (o.style) preset.style = o.style;
   if (o.baseColor) preset.baseColor = o.baseColor;
+  if (o.font) preset.font = o.font;
+  if (o.fontHeading) preset.fontHeading = o.fontHeading;
+  if (o.radius) preset.radius = o.radius;
   checkPreset(preset, index);
 
   const interactive = process.stdin.isTTY && !o.yes && !o.dryRun;
@@ -68,6 +74,7 @@ export async function runInit(o: InitOptions): Promise<Report> {
     style: preset.style,
     tailwind: { css: project.stylesFile, baseColor: preset.baseColor },
     font: preset.font,
+    ...(preset.fontHeading !== 'inherit' && { fontHeading: preset.fontHeading }),
     radius: preset.radius,
     iconLibrary: 'lucide',
   });
@@ -76,14 +83,9 @@ export async function runInit(o: InitOptions): Promise<Report> {
 
   write(CONFIG_FILE, JSON.stringify(config, null, 2) + '\n');
 
-  const [base, color, style] = await Promise.all([
-    reg.item('theme-base'),
-    reg.item(`theme-${preset.baseColor}`),
-    reg.item(`style-${preset.style}`),
-  ]);
-  const theme = renderTheme({ base: base.files![0].content, ...color.cssVars! }, { imports: false });
-  write(`${path}/styles/theme.css`, theme);
-  write(`${path}/styles/style-${preset.style}.css`, style.files![0].content);
+  const look = await renderLook(preset, reg, path, project.stylesFile);
+  write(`${path}/styles/theme.css`, look.themeCss);
+  write(`${path}/styles/${look.styleFile}`, look.styleCss);
 
   await runAdd(['core'], { ...o, config, deps: false, overwrite: o.force }, report);
   const core = await reg.item('core');
@@ -97,15 +99,7 @@ export async function runInit(o: InitOptions): Promise<Report> {
     report.written.push(file);
     if (!o.dryRun) writeFileSync(full, next);
   };
-  const rel = (to: string) => relativeImport(project.stylesFile, to);
-  edit(project.stylesFile, (css) =>
-    ensureCssImports(css, [
-      '@import "tailwindcss";',
-      '@import "tw-animate-css";',
-      `@import "${rel(`${path}/styles/theme.css`)}";`,
-      `@import "${rel(`${path}/styles/style-${preset.style}.css`)}";`,
-    ]),
-  );
+  edit(project.stylesFile, (css) => ensureCssImports(css, look.imports));
   if (existsSync(join(o.cwd, project.indexHtml))) edit(project.indexHtml, (html) => setBodyStyleClass(html, preset.style));
   else report.notes.push(`add class="style-${preset.style}" to <body> (no ${project.indexHtml})`);
 
@@ -116,7 +110,7 @@ export async function runInit(o: InitOptions): Promise<Report> {
   }
 
   const missing = (deps: string[]) => deps.filter((d) => !project.deps.has(packageName(d)));
-  const deps = missing([...new Set([...(core.dependencies ?? []), ...RUNTIME_DEPS])].sort());
+  const deps = missing([...new Set([...(core.dependencies ?? []), ...RUNTIME_DEPS, ...look.dependencies])].sort());
   const devDeps = missing(TAILWIND_DEPS);
   for (const [list, dev] of [
     [deps, false],

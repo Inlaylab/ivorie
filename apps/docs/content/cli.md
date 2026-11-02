@@ -20,10 +20,10 @@ It does this, and never overwrites a file you changed:
 1. Writes `components.json`.
 2. Writes `<path>/styles/theme.css` and the style file, for example `style-maia.css`.
 3. Copies `core` (`cn`, ids, positions, the Ivorie config).
-4. Adds four `@import` lines to your styles file: Tailwind, `tw-animate-css`, the theme and the style.
+4. Adds `@import` lines to your styles file: Tailwind, `tw-animate-css`, the preset fonts, the theme and the style.
 5. Adds `class="style-maia"` to `<body>` in `index.html`.
 6. Writes `.postcssrc.json` for `@tailwindcss/postcss`, if no PostCSS config loads it yet.
-7. Installs `@angular/cdk`, `tw-animate-css`, the `core` deps and Tailwind.
+7. Installs `@angular/cdk`, `tw-animate-css`, the `core` deps, the font packages and Tailwind.
 
 | Flag | Default | Description |
 |---|---|---|
@@ -32,7 +32,10 @@ It does this, and never overwrites a file you changed:
 | `--prefix <prefix>` | `iv` | Selector and class prefix: `acme` gives `<acme-tabs>`, `acmeButton`, `AcmeButton`. |
 | `--preset <name\|code>` | `default` | Theme preset. |
 | `--style <name>` | from the preset | `vega`, `nova`, `maia`, `luma` or `rhea`. |
-| `--base-color <name>` | from the preset | `neutral`. |
+| `--base-color <name>` | from the preset | `neutral`, `stone`, `zinc`, `mauve`, `olive`, `mist` or `taupe`. |
+| `--font <name>` | from the preset | `system` or a font name, for example `inter`. |
+| `--font-heading <name>` | from the preset | `inherit` (same as `--font`) or a font name. |
+| `--radius <name>` | from the preset | `default`, `none`, `small`, `medium` or `large`. |
 | `--force` | off | Run again over an existing setup. |
 | `-y`, `--yes` | off | No prompts. |
 | `--skip-install` | off | Print the install commands instead of running them. |
@@ -69,6 +72,22 @@ npx ivorie migrate src
 - Lists what it cannot fix as `file:line note`, for example `IvTabs.setActive → select`.
 - Running it twice changes nothing. `--dry-run` lists the files.
 
+## apply
+
+Change the look of an app that ran `init`. Pass a preset name or a code from the [playground](/playground):
+
+```bash
+npx ivorie apply ivp1_…
+```
+
+It rewrites `theme.css`, writes the new style file, swaps the style and font `@import` lines, sets the `<body>` style class, updates `components.json` and installs new font packages. Run it again with the same code and nothing changes. The old style file stays; delete it if you did not change it.
+
+| Flag | Default | Description |
+|---|---|---|
+| `--project <name>` | the only app | App in `angular.json`. |
+| `--skip-install` | off | Print the install command instead of running it. |
+| `--dry-run` | off | Show what would change. Write nothing. |
+
 ## components.json
 
 | Field | Description |
@@ -79,14 +98,15 @@ npx ivorie migrate src
 | `style` | The component style. |
 | `tailwind.css` | Your styles file. |
 | `tailwind.baseColor` | The base color of the theme. |
-| `font` | `system` for now. |
-| `radius` | `default` for now. |
+| `font` | `system` or a font name. |
+| `fontHeading` | Optional. The heading font. Left out: same as `font`. |
+| `radius` | `default`, `none`, `small`, `medium` or `large`. |
 | `iconLibrary` | `lucide`. |
 | `registry` | Optional. A registry dir or URL for `add`. |
 
 ## Presets
 
-A preset names a style, a base color, a font and a radius. Only `--preset default` exists now. Preset codes (`ivp1_…`) come with the theme customizer.
+A preset names a style, a base color, a font, a heading font and a radius. Make one in the [playground](/playground) and copy its code (`ivp1_…`). `--preset default` is maia, neutral, the system font and the default radius.
 
 ## Registry
 

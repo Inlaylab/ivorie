@@ -19,7 +19,7 @@ test('--version prints the package version', () => {
 test('--help lists the commands', () => {
   const r = run(['--help']);
   assert.equal(r.status, 0);
-  for (const c of ['init', 'add', 'migrate']) assert.match(r.stdout, new RegExp(`^  ${c}\\b`, 'm'));
+  for (const c of ['init', 'add', 'apply', 'migrate']) assert.match(r.stdout, new RegExp(`^  ${c}\\b`, 'm'));
 });
 
 test('an unknown command exits 1 with help', () => {
@@ -37,4 +37,10 @@ test('add without components.json fails with a hint', () => {
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }
+});
+
+test('apply without a preset fails with a hint', () => {
+  const r = run(['apply']);
+  assert.equal(r.status, 1);
+  assert.match(r.stderr, /error: apply needs a preset name or an ivp1_ code/);
 });

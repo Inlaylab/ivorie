@@ -9,6 +9,8 @@ export interface ComponentsJson {
   style: string;
   tailwind: { css: string; baseColor: string };
   font: string;
+  /** Left out when the heading font is the body font. */
+  fontHeading?: string;
   radius: string;
   iconLibrary: 'lucide';
   registry?: string;
@@ -50,5 +52,6 @@ export function validateConfig(value: unknown): ComponentsJson {
   str(tw as Record<string, unknown>, 'baseColor', 'tailwind.baseColor');
   if (v['iconLibrary'] !== 'lucide') throw new Error('components.json: "iconLibrary" must be "lucide"');
   if (v['registry'] !== undefined) str(v, 'registry');
+  if (v['fontHeading'] !== undefined) str(v, 'fontHeading');
   return v as unknown as ComponentsJson;
 }

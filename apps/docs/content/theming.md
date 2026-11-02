@@ -114,4 +114,16 @@ Set `--radius` once. Other radii derive from it in `theme.css`.
 }
 ```
 
-More base colors and fonts come later. shadcn pairs each style with a font (Maia uses Figtree, Nova uses Geist); Ivorie sets no font, so add your own.
+## Presets
+
+Base color, font, heading font and radius are preset choices. Pick them in the [playground](/playground), then run `npx ivorie init --preset ivp1_…` in a new app or `npx ivorie apply ivp1_…` in an existing one.
+
+| Radius | `--radius` |
+|---|---|
+| `default` | `0.625rem` (theme value) |
+| `none` | `0` |
+| `small` | `0.45rem` |
+| `medium` | `0.625rem` |
+| `large` | `0.875rem` |
+
+A font sets `--font-sans`. A heading font sets `--font-heading`, used by card, dialog, sheet, drawer and empty titles (`.cn-font-heading`). With no heading font, titles use `--font-sans`. Fonts come from `@fontsource-variable` packages.

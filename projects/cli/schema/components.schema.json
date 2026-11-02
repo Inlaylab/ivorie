@@ -18,6 +18,7 @@
       }
     },
     "font": { "type": "string" },
+    "fontHeading": { "type": "string", "description": "Heading font. Left out: same as font." },
     "radius": { "type": "string" },
     "iconLibrary": { "const": "lucide" },
     "registry": { "type": "string", "description": "Registry dir or URL. Default: the bundled one." }
