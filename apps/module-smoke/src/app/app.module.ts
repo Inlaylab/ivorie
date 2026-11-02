@@ -18,6 +18,14 @@ import { IV_CARD_IMPORTS } from '@inlaylab/ivorie/card';
 import { IvCheckbox } from '@inlaylab/ivorie/checkbox';
 import { IV_COLLAPSIBLE_IMPORTS } from '@inlaylab/ivorie/collapsible';
 import { IV_COMBOBOX_IMPORTS } from '@inlaylab/ivorie/combobox';
+import { IV_CONTEXT_MENU_IMPORTS } from '@inlaylab/ivorie/context-menu';
+import { IV_MENUBAR_IMPORTS } from '@inlaylab/ivorie/menubar';
+import { IV_NAVIGATION_MENU_IMPORTS } from '@inlaylab/ivorie/navigation-menu';
+import { IV_POPOVER_IMPORTS } from '@inlaylab/ivorie/popover';
+import { IV_SHEET_IMPORTS } from '@inlaylab/ivorie/sheet';
+import { IvSlider } from '@inlaylab/ivorie/slider';
+import { IvToggle } from '@inlaylab/ivorie/toggle';
+import { IV_TOGGLE_GROUP_IMPORTS } from '@inlaylab/ivorie/toggle-group';
 import { IV_DIALOG_IMPORTS } from '@inlaylab/ivorie/dialog';
 import { IV_DROPDOWN_MENU_IMPORTS } from '@inlaylab/ivorie/dropdown-menu';
 import { IV_EMPTY_IMPORTS } from '@inlaylab/ivorie/empty';
@@ -69,6 +77,14 @@ import { App } from './app';
     ...IV_EMPTY_IMPORTS,
     ...IV_KBD_IMPORTS,
     ...IV_NATIVE_SELECT_IMPORTS,
+    ...IV_CONTEXT_MENU_IMPORTS,
+    ...IV_MENUBAR_IMPORTS,
+    ...IV_NAVIGATION_MENU_IMPORTS,
+    ...IV_POPOVER_IMPORTS,
+    ...IV_SHEET_IMPORTS,
+    ...IV_TOGGLE_GROUP_IMPORTS,
+    IvSlider,
+    IvToggle,
     ...IV_PAGINATION_IMPORTS,
     ...IV_RADIO_GROUP_IMPORTS,
     ...IV_SCROLL_AREA_IMPORTS,

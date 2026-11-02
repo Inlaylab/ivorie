@@ -41,7 +41,14 @@ export interface DialogConfig<D = unknown> {
   ariaDescribedBy?: string
 }
 
-export const IV_DIALOG_DATA = new InjectionToken<unknown>('IV_DIALOG_DATA')
+export interface DialogShell {
+  /** Container component; must extend IvDialogContainer. */
+  container?: Type<IvDialogContainer>
+  /** Backdrop hook class. Default `cn-dialog-overlay`. */
+  overlayClass?: string
+}
+
+export const IV_DIALOG_DATA =new InjectionToken<unknown>('IV_DIALOG_DATA')
 
 interface ClosableContainer {
   beginClose(): void
@@ -118,14 +125,16 @@ export class IvDialog {
   private document = inject(DOCUMENT)
   private parentInjector = inject(Injector)
 
+  /** `shell` swaps the container and overlay hook; the sheet entry uses it. */
   open<T = unknown, R = unknown, D = unknown>(
     content: Type<T> | TemplateRef<unknown>,
     config: DialogConfig<D> = {},
+    shell: DialogShell = {},
   ): IvDialogRef<T, R> {
     const opener = this.document.activeElement as HTMLElement | null
     const overlayRef = this.overlay.create({
       hasBackdrop: true,
-      backdropClass: ['cn-dialog-overlay', 'fixed', 'inset-0', 'isolate', 'z-50', ...toArr(config.backdropClass)],
+      backdropClass: [shell.overlayClass ?? 'cn-dialog-overlay', 'fixed', 'inset-0', 'isolate', 'z-50', ...toArr(config.backdropClass)],
       panelClass: toArr(config.panelClass),
       scrollStrategy: this.overlay.scrollStrategies.block(),
       positionStrategy: this.overlay.position().global().centerHorizontally().centerVertically(),
@@ -143,7 +152,7 @@ export class IvDialog {
       ],
     })
 
-    const portal = new ComponentPortal(IvDialogContainer, null, injector)
+    const portal = new ComponentPortal(shell.container ?? IvDialogContainer, null, injector)
     const containerRef = overlayRef.attach(portal)
     // Without this the maia `.cn-dialog-overlay` fade-in/out never matches: it is keyed off data-state.
     overlayRef.backdropElement?.setAttribute('data-state', 'open')

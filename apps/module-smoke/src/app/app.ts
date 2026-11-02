@@ -18,6 +18,8 @@ export class App {
   date = new Date(2026, 0, 15);
   picked = ['Apple'];
   size = 'm';
+  align: string | string[] | null = 'left';
+  volume = [40];
   readonly fruits = ['Apple', 'Banana', 'Cherry'];
 
   notifySaved() {

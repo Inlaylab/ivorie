@@ -39,6 +39,12 @@ export class IvDropdownMenuStore {
   readonly parent = inject(IvDropdownMenuStore, { optional: true, skipSelf: true })
   readonly isOpen = signal(false)
   readonly triggerRef = signal<ElementRef<HTMLElement> | null>(null)
+  /** Context menu: the pointer position the menu opens at, instead of the trigger. */
+  readonly point = signal<{ x: number; y: number } | null>(null)
+  /** False in a menubar: no backdrop, so the next trigger gets hover and clicks. */
+  modal = true
+  /** Menubar: Left / Right in an open root menu move to the next menu. */
+  navigate?: (step: 1 | -1) => void
   openFocus: OpenFocus = 'menu'
   /** Set by the menu content: true while a typeahead search is in progress. */
   isTyping: () => boolean = () => false
@@ -211,6 +217,7 @@ abstract class IvMenuContentBase {
     .skipPredicate((i) => i.disabled())
   protected readonly menuEl = viewChild<ElementRef<HTMLElement>>('menu')
   readonly originRef = this.store.triggerRef
+  readonly origin = computed(() => this.store.point() ?? this.store.triggerRef())
 
   constructor() {
     this.store.isTyping = () => this.keyManager.isTyping()
@@ -243,6 +250,9 @@ abstract class IvMenuContentBase {
     } else if (event.key === 'Tab') {
       event.preventDefault()
       this.store.closeAll()
+    } else if ((event.key === 'ArrowRight' || event.key === 'ArrowLeft') && this.store.navigate && !this.store.parent) {
+      event.preventDefault()
+      this.store.navigate(event.key === 'ArrowRight' ? 1 : -1)
     } else {
       this.keyManager.onKeydown(event)
     }
@@ -255,16 +265,17 @@ abstract class IvMenuContentBase {
   imports: [OverlayModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    @if (originRef()) {
+    @if (origin()) {
       <ng-template
         cdkConnectedOverlay
-        [cdkConnectedOverlayOrigin]="originRef()!"
+        [cdkConnectedOverlayOrigin]="origin()!"
         [cdkConnectedOverlayOpen]="store.isOpen()"
         [cdkConnectedOverlayPositions]="positions()"
-        [cdkConnectedOverlayHasBackdrop]="true"
+        [cdkConnectedOverlayHasBackdrop]="store.modal"
         cdkConnectedOverlayBackdropClass="cdk-overlay-transparent-backdrop"
         [cdkConnectedOverlayPanelClass]="['iv-dropdown-menu-panel']"
         (backdropClick)="store.close()"
+        (overlayOutsideClick)="onOutsideClick($event)"
         (detach)="store.close()"
         (attach)="onAttach()"
       >
@@ -295,6 +306,12 @@ export class IvDropdownMenuContent extends IvMenuContentBase {
   readonly positions = computed(() =>
     connectedPositions(this.side(), this.align(), this.sideOffset(), this.alignOffset()),
   )
+
+  /** Non-modal only (with a backdrop this never fires). The trigger's own click toggles. */
+  onOutsideClick(event: MouseEvent) {
+    if (!this.store.modal && !this.originRef()?.nativeElement.contains(event.target as Node)) this.store.close()
+  }
+
   readonly classes = computed(() =>
     cn(
       'cn-dropdown-menu-content cn-menu-target cn-menu-translucent z-50 max-h-[var(--cdk-overlay-available-height,80vh)] overflow-x-hidden overflow-y-auto outline-hidden',

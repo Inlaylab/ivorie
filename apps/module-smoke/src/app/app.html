@@ -198,6 +198,46 @@
     </select>
   </iv-native-select>
 
+  <button ivToggle aria-label="Bold">B</button>
+
+  <iv-toggle-group type="single" aria-label="Align" [(ngModel)]="align">
+    <button ivToggleGroupItem value="left">Left</button>
+    <button ivToggleGroupItem value="right">Right</button>
+  </iv-toggle-group>
+
+  <iv-slider aria-label="Volume" [(ngModel)]="volume" />
+
+  <iv-popover>
+    <button ivButton ivPopoverTrigger variant="outline">Open popover</button>
+    <iv-popover-content><iv-popover-title>Popover</iv-popover-title></iv-popover-content>
+  </iv-popover>
+
+  <button ivButton variant="outline" [ivSheetTrigger]="sheet">Open sheet</button>
+  <ng-template #sheet>
+    <iv-sheet-header><iv-sheet-title>Sheet</iv-sheet-title></iv-sheet-header>
+  </ng-template>
+
+  <iv-context-menu>
+    <div ivContextMenuTrigger>Right-click</div>
+    <iv-dropdown-menu-content><iv-dropdown-menu-item>Copy</iv-dropdown-menu-item></iv-dropdown-menu-content>
+  </iv-context-menu>
+
+  <iv-menubar>
+    <iv-menubar-menu>
+      <button ivMenubarTrigger>File</button>
+      <iv-dropdown-menu-content><iv-dropdown-menu-item>New</iv-dropdown-menu-item></iv-dropdown-menu-content>
+    </iv-menubar-menu>
+  </iv-menubar>
+
+  <iv-navigation-menu>
+    <ul ivNavigationMenuList>
+      <li ivNavigationMenuItem>
+        <button ivNavigationMenuTrigger>Docs</button>
+        <iv-navigation-menu-content><a ivNavigationMenuLink href="#">Intro</a></iv-navigation-menu-content>
+      </li>
+    </ul>
+  </iv-navigation-menu>
+
   <button ivButton (click)="notifySaved()">Save</button>
   <iv-toast-container />
 
