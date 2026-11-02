@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.2.0
+
+Both packages: `@inlaylab/ivorie` and `ivorie` 1.2.0. Per-package notes: `projects/ui/CHANGELOG.md`, `projects/cli/CHANGELOG.md`.
+
+- Presets for the whole look: 7 base colors, 26 fonts, a heading font and 5 radius options. Share code `ivp1_…`; 1.1 codes still work.
+- CLI: `ivorie init` applies font, heading font and radius (`--font`, `--font-heading`, `--radius`). New `ivorie apply <preset|ivp1_…>` changes the look of an existing app.
+- Library: card, dialog and alert dialog titles use the heading font (`.cn-font-heading`, `--font-heading`). Every radius token follows `--radius` (`sm` to `4xl`), so a preset radius reaches every style.
+- Fixes: menus are solid (no see-through panels on long lists); the sidebar's mobile drawer works when the sidebar is nested in a layout element.
+- Docs: new playground at `/playground` (pick a look, copy one command), new home page, floating header with one light/dark button, docs sidebar with a filter.
+
 ## 1.1.0
 
 Both packages: `@inlaylab/ivorie` and `ivorie` 1.1.0. Per-package notes: `projects/ui/CHANGELOG.md`, `projects/cli/CHANGELOG.md`.

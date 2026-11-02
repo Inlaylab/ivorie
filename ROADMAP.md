@@ -16,8 +16,8 @@ Fixed choices:
 More detail: [PLAN](docs/PLAN.md) · [ARCHITECTURE](docs/ARCHITECTURE.md) · [CONVENTIONS](docs/CONVENTIONS.md) · [COMPAT](docs/COMPAT.md) · [DECISIONS](docs/DECISIONS.md) · [DEPLOY](docs/DEPLOY.md).
 
 ## Status
-**Next:** Phase 9, task T1 (base colors as data).
-Shipped: 1.0.0, 1.1.0 (both packages). Docs initial bundle is ~800 kB, mostly lucide icons (fixed in Phase 11).
+**Next:** Phase 9 T7: `smoke:cli`, PR, then publish 1.2.0 (ask first). Done: T1–T6, version bump.
+Shipped: 1.0.0, 1.1.0 (both packages). 1.2.0 bumped, not yet published. Docs initial bundle is ~800 kB, mostly lucide icons (fixed in Phase 11).
 
 | # | Release | What | Status |
 |---|---|---|---|
