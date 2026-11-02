@@ -90,6 +90,29 @@ describe('IvAccordion', () => {
     expect(c.dataset['state']).toBe('open')
   })
 
+  it('sets the measured height for the keyframes and hides only after the close animation', async () => {
+    const { content, click, stable } = await render()
+    const c = content('Alpha')
+    Object.defineProperty(c.firstElementChild, 'scrollHeight', { configurable: true, value: 120 })
+    let running = true
+    Object.defineProperty(c, 'getAnimations', { configurable: true, value: () => (running ? [{}] : []) })
+    await click('Alpha')
+    expect(c.style.getPropertyValue('--radix-accordion-content-height')).toBe('120px')
+    await click('Alpha')
+    expect(c.dataset['state']).toBe('closed')
+    expect(c.hidden).toBe(false)
+    c.firstElementChild!.dispatchEvent(new Event('animationend', { bubbles: true }))
+    await stable()
+    expect(c.hidden).toBe(false)
+    c.dispatchEvent(new Event('animationend'))
+    await stable()
+    expect(c.hidden).toBe(true)
+    running = false
+    await click('Alpha')
+    await click('Alpha')
+    expect(c.hidden).toBe(true)
+  })
+
   it('single: opening one closes the other and emits once each', async () => {
     const { host, item, click } = await render()
     await click('Alpha')

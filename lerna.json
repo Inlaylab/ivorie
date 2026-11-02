@@ -1,0 +1,4 @@
+{
+  "$comment": "Read only by Changesets (via @manypkg) to find the two packages. Lerna is not used. See docs/DECISIONS.md.",
+  "packages": ["projects/ui", "projects/cli"]
+}

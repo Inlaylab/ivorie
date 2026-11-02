@@ -30,13 +30,16 @@ import type { DocPageData } from './doc-page.resolver';
           }
         </header>
 
-        @for (seg of p.segments; track $index) {
-          @if (seg.kind === 'html') {
-            <div class="docs-prose prose dark:prose-invert max-w-none" [innerHTML]="seg.html | trustedHtml"></div>
-          } @else if (seg.kind === 'install') {
-            <docs-install [slug]="seg.slug" [entry]="seg.entry" />
-          } @else {
-            <docs-demo-frame [demo]="resolved.demos[seg.name]" [source]="p.demos[seg.name]" />
+        <!-- Keyed by slug: a new page rebuilds every segment instead of reusing frames by index. -->
+        @for (r of [resolved]; track r.page.slug) {
+          @for (seg of r.page.segments; track $index) {
+            @if (seg.kind === 'html') {
+              <div class="docs-prose prose dark:prose-invert max-w-none" [innerHTML]="seg.html | trustedHtml"></div>
+            } @else if (seg.kind === 'install') {
+              <docs-install [slug]="seg.slug" [entry]="seg.entry" />
+            } @else {
+              <docs-demo-frame [demo]="r.demos[seg.name]" [source]="r.page.demos[seg.name]" />
+            }
           }
         }
 

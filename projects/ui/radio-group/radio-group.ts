@@ -33,7 +33,7 @@ import { cn } from '@inlaylab/ivorie/core'
     'role': 'radiogroup',
     '[class]': 'classes()',
     '[attr.aria-orientation]': 'orientation()',
-    '[attr.data-disabled]': '_disabled() ? "" : null',
+    '[attr.data-disabled]': 'isDisabled() ? "" : null',
   },
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `<ng-content />`,
@@ -50,7 +50,7 @@ export class IvRadioGroup implements ControlValueAccessor {
   readonly _value = linkedSignal(this.value)
   // Two sources, so a later [disabled] change cannot re-enable a form-disabled control.
   private readonly _formDisabled = signal(false)
-  readonly _disabled = computed(() => this.disabled() || this._formDisabled())
+  readonly isDisabled = computed(() => this.disabled() || this._formDisabled())
 
   private readonly items = contentChildren(forwardRef(() => IvRadioGroupItem), { descendants: true })
   private readonly keys = new FocusKeyManager(this.items, inject(Injector))
@@ -72,7 +72,7 @@ export class IvRadioGroup implements ControlValueAccessor {
   }
 
   select(value: string) {
-    if (this._disabled() || value === this._value()) return
+    if (this.isDisabled() || value === this._value()) return
     this._value.set(value)
     this._onChange(value)
     this.valueChange.emit(value)
@@ -153,7 +153,7 @@ export class IvRadioGroupItem implements FocusableOption, OnInit {
   // Set once inputs are bound: the group must not read `value` of an item rendered later in the same pass.
   readonly ready = signal(false)
   readonly checked = computed(() => this.group._value() === this.value())
-  readonly isDisabled = computed(() => this.disabledInput() || this.group._disabled())
+  readonly isDisabled = computed(() => this.disabledInput() || this.group.isDisabled())
   get disabled() { return this.isDisabled() }
 
   ngOnInit(): void { this.ready.set(true) }

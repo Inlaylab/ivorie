@@ -1,3 +1,4 @@
+import { ApplicationRef } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { describe, expect, it } from 'vitest';
@@ -25,6 +26,36 @@ describe('DocPage', () => {
     for (const item of data.page.toc) {
       expect(el.querySelector(`a[href$="#${item.id}"]`), item.id).not.toBeNull();
     }
+  });
+
+  it('shows preview and code together; long code starts collapsed and expands', async () => {
+    const { el } = await render('dialog');
+    const frame = el.querySelector('docs-demo-frame')!;
+    expect(frame.querySelector('[role="tablist"]')).toBeNull();
+    expect(frame.querySelector('.docs-preview')).not.toBeNull();
+    expect(frame.querySelector('.docs-code .shiki')).not.toBeNull();
+    const longFrame = [...el.querySelectorAll('docs-demo-frame')].find((f) => f.querySelector('[aria-controls]'))!;
+    const button = longFrame.querySelector<HTMLButtonElement>('button[aria-controls]')!;
+    expect(button.textContent).toContain('Expand');
+    expect(longFrame.querySelector('[data-collapsed]')).not.toBeNull();
+    button.click();
+    await TestBed.inject(ApplicationRef).whenStable();
+    expect(button.getAttribute('aria-expanded')).toBe('true');
+    expect(longFrame.querySelector('[data-collapsed]')).toBeNull();
+  });
+
+  it('rebuilds demo frames when the page changes', async () => {
+    TestBed.configureTestingModule({ providers: [provideRouter([])] });
+    const fixture = TestBed.createComponent(DocPageView);
+    fixture.componentRef.setInput('page', await loadDocPage(PAGES.find((p) => p.slug === 'tabs')!));
+    await fixture.whenStable();
+    const before = fixture.nativeElement.querySelector('docs-demo-frame');
+    const button = await loadDocPage(PAGES.find((p) => p.slug === 'button')!);
+    fixture.componentRef.setInput('page', button);
+    await fixture.whenStable();
+    const frames = fixture.nativeElement.querySelectorAll('docs-demo-frame');
+    expect(frames.length).toBe(button.page.segments.filter((s) => s.kind === 'demo').length);
+    expect(frames[0]).not.toBe(before);
   });
 
   it('renders a guide without an entry chip', async () => {

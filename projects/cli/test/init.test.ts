@@ -114,7 +114,8 @@ test('ng-objstyles: imports land in the object styles entry', async () => {
 test('notes list the deps and the missing tailwind trio', async () => {
   const r = await runInit({ cwd: app(), registry, skipInstall: true, yes: true });
   const notes = r.notes.join('\n');
-  for (const d of ['@angular/cdk@^22.0.0', '@lucide/angular', 'tw-animate-css', 'clsx@']) assert.ok(notes.includes(d), d);
+  for (const d of ['@angular/cdk@^22.0.0', 'tw-animate-css', 'clsx@']) assert.ok(notes.includes(d), d);
+  assert.ok(!notes.includes('@lucide/angular'), 'components draw their own icons');
   assert.match(notes, /npm install -D .*tailwindcss.*@tailwindcss\/postcss.*postcss/);
 });
 

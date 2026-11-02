@@ -10,6 +10,7 @@ export const contentRoutes: Routes = [
     providers: [provideIvToast()],
     children: [
       { path: 'docs', pathMatch: 'full', redirectTo: 'docs/installation' },
+      { path: 'docs/components', loadComponent: () => import('./components'), title: 'Components · Ivorie' },
       {
         path: 'docs/:slug',
         loadComponent: () => import('./doc-page'),

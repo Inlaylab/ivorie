@@ -4,9 +4,11 @@ import {
   ElementRef,
   afterNextRender,
   computed,
+  effect,
   inject,
   input,
   signal,
+  untracked,
   viewChild,
 } from '@angular/core'
 import { cn } from '@inlaylab/ivorie/core'
@@ -65,6 +67,11 @@ export class IvAvatarImage {
   protected readonly classes = computed(() => cn('cn-avatar-image aspect-square size-full object-cover', this.class()))
 
   constructor() {
+    // A new src is a new image: show the fallback until it loads.
+    effect(() => {
+      this.src()
+      untracked(() => this.setState('loading'))
+    })
     // With SSR the image can finish before hydration, so its load event is missed. Read it once.
     afterNextRender(() => {
       const img = this.img().nativeElement

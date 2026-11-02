@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { Router, UrlSerializer, provideRouter, withComponentInputBinding } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
 import { describe, expect, it } from 'vitest';
-import { TrailingSlashUrlSerializer, routes } from './app.routes';
+import { SITE_DESCRIPTION, TrailingSlashUrlSerializer, routes } from './app.routes';
 
 async function open(url: string) {
   TestBed.configureTestingModule({
@@ -13,7 +13,7 @@ async function open(url: string) {
   });
   const harness = await RouterTestingHarness.create();
   await harness.navigateByUrl(url);
-  return { el: harness.routeNativeElement as HTMLElement, url: TestBed.inject(Router).url };
+  return { harness, el: harness.routeNativeElement as HTMLElement, url: TestBed.inject(Router).url };
 }
 
 // Odd slugs show the right page or the not-found page, never crash.
@@ -22,6 +22,12 @@ describe('docs routes', () => {
     const { el } = await open('/docs/tabs/');
     expect(el.querySelector('h1')?.textContent).toContain('Tabs');
   }, 120_000); // First lazy demo import compiles its chunk.
+
+  it('serves /docs/components as the components index, not a doc page', async () => {
+    const { el } = await open('/docs/components');
+    expect(el.querySelector('h1')?.textContent).toContain('Components');
+    expect(el.querySelector('li a[href="/docs/accordion"]')).not.toBeNull();
+  });
 
   it('redirects /docs/Tabs to the canonical /docs/tabs (H9)', async () => {
     const { el, url } = await open('/docs/Tabs');
@@ -34,4 +40,18 @@ describe('docs routes', () => {
     expect(url).toBe('/docs/nope');
     expect(el.querySelector('h1')?.textContent).toContain('This page does not exist');
   });
+
+  it('leaving a doc page or /all resets the description and drops noindex', async () => {
+    const { harness } = await open('/docs/tabs');
+    const description = () => document.querySelector('meta[name="description"]')?.getAttribute('content');
+    const robots = () => document.querySelector('meta[name="robots"]');
+    expect(description()).not.toBe(SITE_DESCRIPTION);
+    await harness.navigateByUrl('/');
+    expect(description()).toBe(SITE_DESCRIPTION);
+    await harness.navigateByUrl('/all');
+    expect(robots()).not.toBeNull();
+    await harness.navigateByUrl('/not-found');
+    expect(robots()).toBeNull();
+    expect(description()).toBe(SITE_DESCRIPTION);
+  }, 120_000);
 });

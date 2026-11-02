@@ -18,7 +18,7 @@
         var dark = s.mode === 'dark' || ((s.mode === 'system' || !s.mode) && matchMedia('(prefers-color-scheme: dark)').matches);
         if (dark) document.documentElement.classList.add('dark');
         document.documentElement.style.colorScheme = dark ? 'dark' : 'light';
-        if (typeof s.style === 'string' && /^[a-z]+$/.test(s.style)) {
+        if (/^(vega|nova|maia|luma|rhea)$/.test(s.style)) {
           document.body.className = 'style-' + s.style;
           if (/^(vega|nova|luma|rhea)$/.test(s.style)) {
             var l = document.createElement('link');

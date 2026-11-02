@@ -98,7 +98,7 @@ try {
 
   // 2. npm package, following installation.md.
   const npmApp = newApp('npm-app', cliMajor);
-  run(`npm i "${uiTgz}" @angular/cdk@^${cliMajor} @lucide/angular`, npmApp);
+  run(`npm i "${uiTgz}" @angular/cdk@^${cliMajor}`, npmApp);
   run('npm i -D tailwindcss @tailwindcss/postcss tw-animate-css', npmApp);
   writeFileSync(join(npmApp, '.postcssrc.json'), '{ "plugins": { "@tailwindcss/postcss": {} } }\n');
   writeFileSync(

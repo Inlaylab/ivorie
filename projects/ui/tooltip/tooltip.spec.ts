@@ -95,6 +95,23 @@ describe('IvTooltip', () => {
     return { fixture, trigger, root, settle, tip }
   }
 
+  it('adds no document listeners of its own', async () => {
+    const add = vi.spyOn(document, 'addEventListener')
+    await render()
+    expect(add.mock.calls.map(([type]) => type)).toEqual([])
+    add.mockRestore()
+  })
+
+  it('keyboard focus after a pointer press that gave no focus still opens it', async () => {
+    const { trigger, root, settle, tip } = await render()
+    trigger.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }))
+    root.dispatchEvent(new MouseEvent('mouseleave'))
+    await settle(200)
+    trigger.dispatchEvent(new FocusEvent('focusin', { bubbles: true }))
+    await settle(300)
+    expect(tip()).not.toBeNull()
+  })
+
   it('creates no overlay before the first hover', async () => {
     const create = vi.spyOn(TestBed.inject(Overlay), 'create')
     const { tip, settle, root } = await render()
@@ -158,7 +175,8 @@ describe('IvTooltip', () => {
     const { trigger, settle, tip, root } = await render()
     root.dispatchEvent(new MouseEvent('mouseenter'))
     await settle(300)
-    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }))
+    // The CDK overlay dispatcher listens on body and reads keyCode.
+    document.body.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', keyCode: 27, bubbles: true }))
     await settle()
     expect(tip()).toBeNull()
   })

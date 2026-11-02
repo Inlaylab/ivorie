@@ -1,10 +1,10 @@
 import { Component, ChangeDetectionStrategy, computed, input } from '@angular/core'
-import { LucideLoaderCircle } from '@lucide/angular'
+import { IvIcon } from '@inlaylab/ivorie/icon'
 import { cn } from '@inlaylab/ivorie/core'
 
 @Component({
   selector: 'iv-spinner',
-  imports: [LucideLoaderCircle],
+  imports: [IvIcon],
   host: {
     'data-slot': 'spinner',
     role: 'status',
@@ -12,7 +12,7 @@ import { cn } from '@inlaylab/ivorie/core'
     '[class]': 'classes()',
   },
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `<svg lucideLoaderCircle [size]="size()" aria-hidden="true"></svg>`,
+  template: `<svg ivIcon="loader-circle" [size]="size()" aria-hidden="true"></svg>`,
 })
 export class IvSpinner {
   readonly size = input(16);

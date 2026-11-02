@@ -10,7 +10,7 @@ Ivorie needs Angular 22 and Tailwind 4.
 ## 1. Install packages
 
 ```bash
-npm i @inlaylab/ivorie @angular/cdk @lucide/angular
+npm i @inlaylab/ivorie @angular/cdk
 npm i -D tailwindcss @tailwindcss/postcss tw-animate-css
 ```
 

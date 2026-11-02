@@ -14,7 +14,7 @@ import {
   viewChild,
 } from '@angular/core'
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms'
-import { LucideChevronDown } from '@lucide/angular'
+import { IvIcon } from '@inlaylab/ivorie/icon'
 import { firstValueFrom } from 'rxjs'
 import { IvDialog } from '@inlaylab/ivorie/dialog'
 import { cn } from '@inlaylab/ivorie/core'
@@ -32,7 +32,7 @@ import { IvSelectPickerDialog } from './select-picker-dialog'
 @Component({
   selector: 'iv-select-picker',
   standalone: true,
-  imports: [LucideChevronDown],
+  imports: [IvIcon],
   templateUrl: './select-picker.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
@@ -182,8 +182,8 @@ export class IvSelectPicker<T = unknown> implements ControlValueAccessor {
       // defaultValue: a dialog disposed by navigation completes without a close event.
       const closed = await firstValueFrom(ref.afterClosed(), { defaultValue: undefined })
 
-      // Cancel / Escape close without a result: the value stays.
-      if (this.destroyed || !closed?.result) return
+      // Cancel / Escape close without a result: the value stays. A control disabled meanwhile takes no write.
+      if (this.destroyed || this.isDisabled() || !closed?.result) return
       this.value.set(closed.result)
       this.onChange(closed.result)
       this.selectionChange.emit(closed.result)

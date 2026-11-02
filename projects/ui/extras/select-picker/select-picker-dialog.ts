@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core'
-import { LucideSearch } from '@lucide/angular'
+import { IvIcon } from '@inlaylab/ivorie/icon'
 import { IvButton } from '@inlaylab/ivorie/button'
 import { IV_CARD_IMPORTS } from '@inlaylab/ivorie/card'
 import { IvCheckbox } from '@inlaylab/ivorie/checkbox'
@@ -19,7 +19,7 @@ import { SelectPickerDialogData, SelectPickerRow } from './select-picker.model'
   standalone: true,
   templateUrl: './select-picker-dialog.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [LucideSearch, IvButton, IvCheckbox, IV_CARD_IMPORTS, IV_DIALOG_IMPORTS, IV_INPUT_IMPORTS, IV_TABLE_IMPORTS],
+  imports: [IvButton, IvCheckbox, IV_CARD_IMPORTS, IV_DIALOG_IMPORTS, IV_INPUT_IMPORTS, IV_TABLE_IMPORTS, IvIcon],
 })
 export class IvSelectPickerDialog {
   private readonly dialogRef = inject<IvDialogRef<IvSelectPickerDialog, string[]>>(IvDialogRef)

@@ -41,6 +41,8 @@ try {
   console.error(err instanceof Error ? err.message : err);
 } finally {
   rmSync('node_modules/@inlaylab/ivorie', { recursive: true, force: true });
+  // `install --no-save` can also move or prune other packages: put the tree back to the lockfile.
+  run('npm install --no-audit --no-fund --prefer-offline');
 }
 
 console.log(ok ? 'PASS smoke-pack' : 'FAIL smoke-pack');

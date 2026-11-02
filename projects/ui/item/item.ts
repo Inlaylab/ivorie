@@ -50,8 +50,8 @@ export type ItemVariants = VariantProps<typeof itemVariants>
     'data-slot': 'item',
     // The group is role="list": its direct children must be listitems, nested ones must not.
     '[attr.role]': 'role()',
-    '[attr.data-variant]': 'variant()',
-    '[attr.data-size]': 'size()',
+    '[attr.data-variant]': 'variant() ?? "default"',
+    '[attr.data-size]': 'size() ?? "default"',
     '[class]': 'classes()',
   },
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -96,7 +96,7 @@ export type ItemMediaVariants = VariantProps<typeof itemMediaVariants>
   selector: 'iv-item-media',
   host: {
     'data-slot': 'item-media',
-    '[attr.data-variant]': 'variant()',
+    '[attr.data-variant]': 'variant() ?? "default"',
     '[class]': 'classes()',
   },
   changeDetection: ChangeDetectionStrategy.OnPush,

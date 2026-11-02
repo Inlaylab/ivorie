@@ -1,6 +1,6 @@
 {
   "name": "ivorie",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "scripts": {
     "ng": "ng",
     "start": "node tools/docs/build.ts && ng serve docs",
@@ -12,7 +12,8 @@
     "docs:content": "node tools/docs/build.ts",
     "docs:build": "node tools/docs/build.ts && ng build docs && node tools/docs/postbuild.ts",
     "smoke:pack": "node tools/smoke/pack.ts",
-    "smoke:cli": "node tools/smoke/cli-e2e.ts"
+    "smoke:cli": "node tools/smoke/cli-e2e.ts",
+    "publish:all": "npm run check && npm publish ./dist/ui --access public && npm publish ./dist/cli --access public"
   },
   "prettier": {
     "printWidth": 100,
@@ -50,6 +51,7 @@
     "@angular/cli": "^22.2.5",
     "@angular/compiler-cli": "^22.2.4",
     "@arethetypeswrong/cli": "^0.18.5",
+    "@changesets/cli": "^3.0.3",
     "@fontsource-variable/geist": "^5.3.0",
     "@fontsource-variable/geist-mono": "^5.3.0",
     "@tailwindcss/postcss": "^4.3.3",
@@ -59,6 +61,7 @@
     "axe-core": "^4.14.0",
     "istanbul-lib-instrument": "^6.0.3",
     "jsdom": "^30.1.3",
+    "lucide": "^1.66.0",
     "marked": "^18.1.2",
     "ng-packagr": "^22.2.5",
     "playwright-core": "^1.64.1",

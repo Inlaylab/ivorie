@@ -19,7 +19,7 @@ import {
   viewChild,
 } from '@angular/core'
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms'
-import { LucideCheck, LucideChevronDown } from '@lucide/angular'
+import { IvIcon } from '@inlaylab/ivorie/icon'
 import { IvTruncateTooltip } from '@inlaylab/ivorie/tooltip'
 import { IvIdGenerator, cn, connectedPositions } from '@inlaylab/ivorie/core'
 
@@ -115,6 +115,11 @@ export class IvSelect implements ControlValueAccessor {
     this.isOpen() ? this.close() : this.open()
   }
 
+  /** Leaving the closed trigger marks the control touched; while open, close() does it. */
+  onTriggerBlur() {
+    if (!this.isOpen()) this._onTouched()
+  }
+
   select(value: string) {
     this._value.set(value)
     this._onChange(value)
@@ -157,7 +162,7 @@ export class IvSelect implements ControlValueAccessor {
 // The trigger is a native <button> (like Radix), so <label for> and focus work without extra code.
 @Component({
   selector: 'iv-select-trigger',
-  imports: [LucideChevronDown, IvTruncateTooltip],
+  imports: [IvTruncateTooltip, IvIcon],
   host: {
     style: 'display: contents',
     // id, aria-label and aria-labelledby move to the button.
@@ -186,6 +191,7 @@ export class IvSelect implements ControlValueAccessor {
       [class]="classes()"
       (click)="parent.toggle()"
       (keydown)="parent.onKeydown($event)"
+      (blur)="parent.onTriggerBlur()"
     >
       <span
         data-slot="select-value"
@@ -205,7 +211,7 @@ export class IvSelect implements ControlValueAccessor {
           >{{ text() }}</span
         >
       </span>
-      <svg lucideChevronDown class="cn-select-trigger-icon pointer-events-none" aria-hidden="true"></svg>
+      <svg ivIcon="chevron-down" class="cn-select-trigger-icon pointer-events-none" aria-hidden="true"></svg>
     </button>
   `,
 })
@@ -332,7 +338,7 @@ export class IvSelectLabel {
 
 @Component({
   selector: 'iv-select-item',
-  imports: [LucideCheck],
+  imports: [IvIcon],
   host: {
     'data-slot': 'select-item',
     'role': 'option',
@@ -349,7 +355,7 @@ export class IvSelectLabel {
   template: `
     <span class="cn-select-item-indicator">
       @if (isSelected()) {
-        <svg lucideCheck class="cn-select-item-indicator-icon pointer-events-none" aria-hidden="true"></svg>
+        <svg ivIcon="check" class="cn-select-item-indicator-icon pointer-events-none" aria-hidden="true"></svg>
       }
     </span>
     <span #text><ng-content /></span>

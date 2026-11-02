@@ -70,8 +70,6 @@ export class IvTooltipProvider {
     '(focusin)': 'onFocus()',
     '(focusout)': 'onLeave()',
     '(mousedown)': 'onPointerDown()',
-    '(document:mouseup)': 'pointerDown = false',
-    '(document:keydown.escape)': 'close()',
   },
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `<ng-content />`,
@@ -87,6 +85,7 @@ export class IvTooltip {
   /** IvTooltipContent puts its `hidden` input here: a hidden tooltip describes nothing. */
   contentHidden: Signal<boolean> = signal(false)
   // Focus that comes from a pointer press does not open the tooltip (Radix).
+  // No document listeners: the next focus or leave consumes the flag. Escape comes from the CDK overlay.
   pointerDown = false
   readonly triggerRef = signal<ElementRef<HTMLElement> | null>(null)
 
@@ -121,7 +120,9 @@ export class IvTooltip {
   }
 
   onFocus() {
-    if (!this.pointerDown) this.onEnter()
+    const fromPointer = this.pointerDown
+    this.pointerDown = false
+    if (!fromPointer) this.onEnter()
   }
 
   onPointerDown() {
@@ -130,6 +131,7 @@ export class IvTooltip {
   }
 
   onLeave() {
+    this.pointerDown = false
     clearTimeout(this._openTimer)
     this._closeTimer = setTimeout(() => this.isOpen.set(false), 100)
   }
@@ -189,6 +191,7 @@ export class IvTooltipTrigger implements OnInit {
         [cdkConnectedOverlayPositions]="positions()"
         [cdkConnectedOverlayHasBackdrop]="false"
         [cdkConnectedOverlayPanelClass]="['iv-tooltip-overlay-panel']"
+        (detach)="parent.close()"
       >
         <div
           [id]="parent.id"

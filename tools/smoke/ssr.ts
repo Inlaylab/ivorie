@@ -59,9 +59,12 @@ async function visit(page: Page, path: string) {
   if (res?.status() !== 200) failures.push(`${path}: status ${res?.status()}`);
 }
 
+// What is being checked: every failure names it.
+let at = 'server start';
 try {
   await listening();
 
+  at = '/all';
   const all = await fetch(`${BASE}/all`);
   const html = await all.text();
   if (all.status !== 200) failures.push(`/all: status ${all.status}`);
@@ -80,7 +83,6 @@ try {
     throw err;
   }
   const page = await browser.newPage();
-  let at = '/all';
   page.on('console', (msg) => {
     // First line only: dev-mode errors carry long stacks.
     const f = failureOf({ type: msg.type(), text: msg.text().split('\n')[0] });
@@ -93,12 +95,12 @@ try {
   await page.locator('[data-demo="dialog"] button').first().click();
   await page.waitForSelector('[role="dialog"]', { timeout: 3_000 });
 
-  for (const slug of slugs) {
+  for (const slug of ['components', ...slugs]) {
     at = `/docs/${slug}`;
     await visit(page, at);
   }
 } catch (err) {
-  failures.push(String(err instanceof Error ? err.message : err).split('\n')[0]);
+  failures.push(`${at}: ${String(err instanceof Error ? err.message : err).split('\n')[0]}`);
 } finally {
   await browser?.close();
   server.kill();

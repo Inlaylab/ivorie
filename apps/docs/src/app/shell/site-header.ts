@@ -53,7 +53,7 @@ import { STYLES, type StyleName } from './appearance-options';
       </svg>
     </button>
     <a routerLink="/" class="text-foreground mr-4 flex items-center gap-2 text-[0.95rem] font-semibold tracking-tight" aria-label="Ivorie home">
-      <img src="app_transparant.svg" alt="" width="28" height="28" class="size-7" />ivorie
+      ivorie
     </a>
     <nav aria-label="Main" class="hidden items-center gap-1 md:flex">
       @for (link of links; track link.path) {
@@ -115,7 +115,7 @@ export class SiteHeader {
   protected readonly appearance = inject(Appearance);
   protected readonly links = [
     { path: '/docs/installation', label: 'Docs' },
-    { path: '/docs/accordion', label: 'Components' },
+    { path: '/docs/components', label: 'Components' },
   ];
   protected readonly styles: readonly { name: StyleName; label: string }[] = STYLES;
 

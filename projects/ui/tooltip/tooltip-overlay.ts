@@ -40,10 +40,11 @@ export function tooltipArrowClasses(side: TooltipSide, align: TooltipAlign = 'ce
   selector: 'iv-tooltip-panel',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `<div [class]="panelClass()" data-slot="tooltip-content" data-state="open" data-side="top" role="tooltip">{{ text() }}</div>`,
+  template: `<div [class]="panelClass()" data-slot="tooltip-content" data-state="open" [attr.data-side]="side()" role="tooltip">{{ text() }}</div>`,
 })
 export class TooltipPanelComponent {
   readonly text = input('')
+  readonly side = input<TooltipSide>('top')
   readonly extraClass = input('');
 
   readonly panelClass = computed(() => tooltipPanelClasses(this.extraClass()))

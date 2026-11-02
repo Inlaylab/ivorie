@@ -100,7 +100,6 @@ export class IvHoverCard {
     '(click)': 'onClick()',
     '(focus)': 'onFocus()',
     '(blur)': 'onBlur()',
-    '(document:keydown.escape)': 'store.isOpen() && store.close()',
     '[attr.data-state]': 'store.isOpen() ? "open" : "closed"',
     '[attr.aria-expanded]': 'store.isOpen()',
     '[attr.aria-controls]': 'store.isOpen() ? store.id : null',
@@ -148,6 +147,7 @@ export class IvHoverCardTrigger implements OnInit {
         [cdkConnectedOverlayOpen]="store.isOpen()"
         [cdkConnectedOverlayPositions]="positions()"
         [cdkConnectedOverlayPanelClass]="['iv-hover-card-panel']"
+        (detach)="store.close()"
       >
         <div
           [id]="store.id"

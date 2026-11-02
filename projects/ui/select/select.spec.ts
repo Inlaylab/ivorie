@@ -65,6 +65,22 @@ class ValueHost {
   items = signal(['Apple', 'Banana'])
 }
 
+@Component({
+  imports: [IV_SELECT_IMPORTS],
+  template: `
+    <iv-select (valueChange)="changes.push($event)">
+      <iv-select-trigger aria-label="Fruit" />
+      <iv-select-content>
+        <iv-select-item value="apple" [disabled]="true">Apple</iv-select-item>
+        <iv-select-item value="banana" [disabled]="true">Banana</iv-select-item>
+      </iv-select-content>
+    </iv-select>
+  `,
+})
+class DisabledHost {
+  changes: (string | null)[] = []
+}
+
 // The item's label changes independently of its value, unlike ValueHost above.
 @Component({
   imports: [IV_SELECT_IMPORTS],
@@ -211,14 +227,30 @@ describe('IvSelect', () => {
   })
 
   it('an empty list opens without throwing; keys select nothing', async () => {
-    const { fixture, key, listbox, host } = await render(ValueHost)
+    const { fixture, trigger, key, listbox, text, host } = await render(ValueHost)
     host.items.set([])
     await fixture.whenStable()
     await key('ArrowDown')
     expect(listbox()).not.toBeNull()
+    expect(trigger.hasAttribute('aria-activedescendant')).toBe(false)
     await key('ArrowDown')
     await key('Enter')
     expect(listbox()).not.toBeNull()
+    expect(host.value()).toBeNull()
+    expect(text()).toBe('Pick')
+  })
+
+  it('a list with only disabled items opens with no active item; keys select nothing', async () => {
+    const { fixture, trigger, key, listbox, host } = await render(DisabledHost)
+    await key('ArrowDown')
+    expect(listbox()).not.toBeNull()
+    expect(trigger.hasAttribute('aria-activedescendant')).toBe(false)
+    await key('ArrowDown')
+    await key('End')
+    expect(trigger.hasAttribute('aria-activedescendant')).toBe(false)
+    await key('Enter')
+    await fixture.whenStable()
+    expect(host.changes).toEqual([])
   })
 
   it('[value] from the parent updates the label', async () => {
@@ -264,6 +296,21 @@ describe('IvSelect', () => {
     expect(host.control.touched).toBe(false)
     await key('Escape')
     expect(host.control.touched).toBe(true)
+  })
+
+  it('tabbing past the closed trigger marks the control touched', async () => {
+    const { trigger, host } = await render(FormHost)
+    trigger.focus()
+    trigger.blur()
+    expect(host.control.touched).toBe(true)
+  })
+
+  it('blur while open leaves touched to close()', async () => {
+    const { trigger, key, host } = await render(FormHost)
+    trigger.focus()
+    await key('Enter')
+    trigger.blur()
+    expect(host.control.touched).toBe(false)
   })
 
   it('a selected item label that changes after render updates the trigger text (H6)', async () => {

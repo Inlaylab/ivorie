@@ -25,7 +25,7 @@ export interface InitOptions extends CommonOptions {
 
 const DEFAULT_PATH = 'src/app/ui';
 const DEFAULT_PREFIX = 'iv';
-const RUNTIME_DEPS = ['@angular/cdk@^22.0.0', '@lucide/angular', 'tw-animate-css'];
+const RUNTIME_DEPS = ['@angular/cdk@^22.0.0', 'tw-animate-css'];
 const TAILWIND_DEPS = ['tailwindcss', '@tailwindcss/postcss', 'postcss'];
 const POSTCSS = '{\n  "plugins": {\n    "@tailwindcss/postcss": {}\n  }\n}\n';
 

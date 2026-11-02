@@ -15,7 +15,7 @@ import {
   viewChild,
 } from '@angular/core'
 import { cva, VariantProps } from 'class-variance-authority'
-import { LucidePanelLeft } from '@lucide/angular'
+import { IvIcon } from '@inlaylab/ivorie/icon'
 import { buttonVariants } from '@inlaylab/ivorie/button'
 import { IvIdGenerator, cn } from '@inlaylab/ivorie/core'
 import { IV_TOOLTIP_IMPORTS } from '@inlaylab/ivorie/tooltip'
@@ -222,7 +222,7 @@ export class IvSidebar {
 @Component({
   selector: 'iv-sidebar-trigger',
   standalone: true,
-  imports: [LucidePanelLeft],
+  imports: [IvIcon],
   host: { 'data-slot': 'sidebar-trigger', 'data-sidebar': 'trigger' },
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -233,7 +233,7 @@ export class IvSidebar {
       [attr.aria-controls]="sidebar.id"
       (click)="sidebar.toggle()"
     >
-      <svg lucidePanelLeft class="cn-rtl-flip"></svg>
+      <svg ivIcon="panel-left" class="cn-rtl-flip"></svg>
       <span class="sr-only">Toggle Sidebar</span>
     </button>
   `,
@@ -431,7 +431,7 @@ export type SidebarMenuButtonVariants = VariantProps<typeof sidebarMenuButtonVar
     'data-slot': 'sidebar-menu-button',
     'data-sidebar': 'menu-button',
     class: 'peer/menu-button relative block w-full',
-    '[attr.data-size]': 'size()',
+    '[attr.data-size]': 'size() ?? "default"',
     '[attr.data-active]': 'isActive() ? "" : null',
   },
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -440,7 +440,7 @@ export type SidebarMenuButtonVariants = VariantProps<typeof sidebarMenuButtonVar
       <button
         ivTooltipTrigger
         type="button"
-        [attr.data-size]="size()"
+        [attr.data-size]="size() ?? 'default'"
         [attr.data-active]="isActive() ? '' : null"
         [attr.aria-current]="isActive() ? 'page' : null"
         [class]="classes()"

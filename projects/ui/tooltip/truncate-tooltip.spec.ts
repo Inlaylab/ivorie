@@ -11,6 +11,7 @@ import { IvTruncateTooltip } from './truncate-tooltip'
       id="host"
       class="truncate"
       [ivTruncateTooltip]="text()"
+      [ivTruncateTooltipSide]="side()"
       [ivTruncateTooltipMeasure]="measureInner() ? inner : null"
       >Execution request approvals <span #inner id="inner">Execution request approvals</span></span
     >
@@ -19,6 +20,7 @@ import { IvTruncateTooltip } from './truncate-tooltip'
 class TestHostComponent {
   text = signal('Execution request approvals')
   measureInner = signal(false)
+  side = signal<'top' | 'bottom'>('top')
 }
 
 // jsdom has no layout (DECISIONS 2026-10-27): mock the two sizes the directive reads.
@@ -59,6 +61,20 @@ describe('IvTruncateTooltip', () => {
     expect(tooltip()?.textContent).toContain('Execution request approvals')
     expect(tooltip()!.classList).toContain('cn-tooltip-content')
     expect(tooltip()!.hasAttribute('aria-live')).toBe(false)
+  })
+
+  it('data-side names the side the panel is on', async () => {
+    await hover()
+    expect(tooltip()!.dataset['side']).toBe('top')
+    host.dispatchEvent(new Event('mouseleave'))
+    fixture.destroy()
+    fixture = TestBed.createComponent(TestHostComponent)
+    fixture.componentInstance.side.set('bottom')
+    fixture.detectChanges()
+    host = fixture.nativeElement.querySelector('#host')
+    setSize(host, 200, 40)
+    await hover()
+    expect(tooltip()!.dataset['side']).toBe('bottom')
   })
 
   it('does not show the tooltip when the text fits', async () => {

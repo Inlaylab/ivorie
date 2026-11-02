@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { buildStyle } from './sync.ts';
+import { buildStyle, unknownShapes } from './sync.ts';
 
 const shadcn = `.style-maia {
   /* MARK: Badge */
@@ -41,4 +41,10 @@ test('hooks the style has no rule for get an empty rule', () => {
 
 test('names the shadcn source in the header', () => {
   assert.match(buildStyle('maia', shadcn, new Set()), /registry\/styles\/style-maia\.css/);
+});
+
+test('reports top-level rule shapes the parser skips', () => {
+  const css = `${shadcn}  .cn-card-content:has(> [data-slot=x]) {\n    @apply p-0;\n  }\n  .cn-a, .cn-b {\n  }\n`;
+  assert.deepEqual(unknownShapes(shadcn), []);
+  assert.deepEqual(unknownShapes(css), ['.cn-card-content:has(> [data-slot=x]) {', '.cn-a, .cn-b {']);
 });

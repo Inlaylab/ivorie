@@ -5,7 +5,7 @@ on:
 
 permissions:
   contents: read
-  id-token: write # npm provenance
+  id-token: write # npm OIDC sign-in and provenance
 
 jobs:
   publish:
@@ -29,9 +29,6 @@ jobs:
         env:
           SMOKE_BROWSER: chrome
       # "./" matters: bare "dist/ui" is read as the GitHub repo dist/ui.
+      # Trusted Publishing: npm (>= 11.5, bundled with Node 24) signs in with GitHub OIDC. No token.
       - run: npm publish ./dist/ui --provenance --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       - run: npm publish ./dist/cli --provenance --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

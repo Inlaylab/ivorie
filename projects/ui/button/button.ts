@@ -38,8 +38,8 @@ export type ButtonVariants = VariantProps<typeof buttonVariants>
   selector: 'button[ivButton], a[ivButton]',
   host: {
     'data-slot': 'button',
-    '[attr.data-variant]': 'variant()',
-    '[attr.data-size]': 'size()',
+    '[attr.data-variant]': 'variant() ?? "default"',
+    '[attr.data-size]': 'size() ?? "default"',
     // Anchors have no button type; buttons default to "button" so they never submit by accident.
     '[attr.type]': 'isButton ? type() : null',
     '[class]': 'classes()',

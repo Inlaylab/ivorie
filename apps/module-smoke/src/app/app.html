@@ -180,6 +180,103 @@
     <iv-tabs-content value="password">Password settings.</iv-tabs-content>
   </iv-tabs>
 
+  <iv-aspect-ratio [ratio]="16 / 9" class="bg-muted w-64"></iv-aspect-ratio>
+
+  <iv-empty>
+    <iv-empty-header>
+      <iv-empty-title>No items</iv-empty-title>
+      <iv-empty-description>Add one to start.</iv-empty-description>
+    </iv-empty-header>
+  </iv-empty>
+
+  <kbd ivKbdGroup><kbd ivKbd>Ctrl</kbd><kbd ivKbd>K</kbd></kbd>
+
+  <iv-native-select>
+    <select ivNativeSelect aria-label="Size" [(ngModel)]="size">
+      <option ivNativeSelectOption value="s">Small</option>
+      <option ivNativeSelectOption value="m">Medium</option>
+    </select>
+  </iv-native-select>
+
+  <button ivToggle aria-label="Bold">B</button>
+
+  <iv-toggle-group type="single" aria-label="Align" [(ngModel)]="align">
+    <button ivToggleGroupItem value="left">Left</button>
+    <button ivToggleGroupItem value="right">Right</button>
+  </iv-toggle-group>
+
+  <iv-slider aria-label="Volume" [(ngModel)]="volume" />
+
+  <iv-popover>
+    <button ivButton ivPopoverTrigger variant="outline">Open popover</button>
+    <iv-popover-content><iv-popover-title>Popover</iv-popover-title></iv-popover-content>
+  </iv-popover>
+
+  <button ivButton variant="outline" [ivSheetTrigger]="sheet">Open sheet</button>
+  <ng-template #sheet>
+    <iv-sheet-header><iv-sheet-title>Sheet</iv-sheet-title></iv-sheet-header>
+  </ng-template>
+
+  <iv-context-menu>
+    <div ivContextMenuTrigger>Right-click</div>
+    <iv-dropdown-menu-content><iv-dropdown-menu-item>Copy</iv-dropdown-menu-item></iv-dropdown-menu-content>
+  </iv-context-menu>
+
+  <iv-menubar>
+    <iv-menubar-menu>
+      <button ivMenubarTrigger>File</button>
+      <iv-dropdown-menu-content><iv-dropdown-menu-item>New</iv-dropdown-menu-item></iv-dropdown-menu-content>
+    </iv-menubar-menu>
+  </iv-menubar>
+
+  <iv-navigation-menu>
+    <ul ivNavigationMenuList>
+      <li ivNavigationMenuItem>
+        <button ivNavigationMenuTrigger>Docs</button>
+        <iv-navigation-menu-content><a ivNavigationMenuLink href="#">Intro</a></iv-navigation-menu-content>
+      </li>
+    </ul>
+  </iv-navigation-menu>
+
+  <iv-command class="rounded-lg border">
+    <iv-command-input placeholder="Search" />
+    <iv-command-list>
+      <iv-command-empty>No results.</iv-command-empty>
+      <iv-command-item>Calendar</iv-command-item>
+    </iv-command-list>
+  </iv-command>
+
+  <iv-input-otp maxLength="4" aria-label="Code" [(ngModel)]="otp">
+    <iv-input-otp-group>
+      <iv-input-otp-slot index="0" />
+      <iv-input-otp-slot index="1" />
+      <iv-input-otp-slot index="2" />
+      <iv-input-otp-slot index="3" />
+    </iv-input-otp-group>
+  </iv-input-otp>
+
+  <iv-resizable-panel-group class="h-24 rounded-lg border">
+    <iv-resizable-panel defaultSize="50">One</iv-resizable-panel>
+    <iv-resizable-handle [withHandle]="true" />
+    <iv-resizable-panel>Two</iv-resizable-panel>
+  </iv-resizable-panel-group>
+
+  <button ivButton variant="outline" [ivDrawerTrigger]="drawer">Open drawer</button>
+  <ng-template #drawer>
+    <iv-drawer-header><iv-drawer-title>Drawer</iv-drawer-title></iv-drawer-header>
+  </ng-template>
+
+  <iv-carousel class="w-48" aria-label="Slides">
+    <iv-carousel-content>
+      <iv-carousel-item>One</iv-carousel-item>
+      <iv-carousel-item>Two</iv-carousel-item>
+    </iv-carousel-content>
+    <button ivCarouselPrevious></button>
+    <button ivCarouselNext></button>
+  </iv-carousel>
+
+  <svg ivIcon="check" class="size-4"></svg>
+
   <button ivButton (click)="notifySaved()">Save</button>
   <iv-toast-container />
 

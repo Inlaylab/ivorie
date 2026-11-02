@@ -97,7 +97,8 @@ describe('IvHoverCard', () => {
     const { trigger, settle, card } = await render()
     trigger.dispatchEvent(new MouseEvent('mouseenter'))
     await settle(300)
-    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }))
+    // The CDK overlay dispatcher listens on body and reads keyCode.
+    document.body.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', keyCode: 27, bubbles: true }))
     await settle()
     expect(card()).toBeNull()
     expect(trigger.getAttribute('aria-expanded')).toBe('false')

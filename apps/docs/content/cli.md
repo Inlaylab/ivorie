@@ -23,7 +23,7 @@ It does this, and never overwrites a file you changed:
 4. Adds four `@import` lines to your styles file: Tailwind, `tw-animate-css`, the theme and the style.
 5. Adds `class="style-maia"` to `<body>` in `index.html`.
 6. Writes `.postcssrc.json` for `@tailwindcss/postcss`, if no PostCSS config loads it yet.
-7. Installs `@angular/cdk`, `@lucide/angular`, `tw-animate-css`, the `core` deps and Tailwind.
+7. Installs `@angular/cdk`, `tw-animate-css`, the `core` deps and Tailwind.
 
 | Flag | Default | Description |
 |---|---|---|

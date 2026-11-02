@@ -151,7 +151,9 @@ export function buildPage(input: {
     }
     const raw = input.demos.get(part.name);
     if (raw === undefined) throw new Error(`unknown demo "${part.name}" in ${file}`);
-    demos[part.name] ??= { code: render('````ts\n' + raw + '\n````').html, raw };
+    // A fence longer than any backtick run in the source, so the source cannot close it.
+    const fence = '`'.repeat(Math.max(3, ...(raw.match(/`+/g) ?? []).map((r) => r.length + 1)));
+    demos[part.name] ??= { code: render(`${fence}ts\n${raw}\n${fence}`).html, raw };
     segments.push(part);
     // Install tabs (CLI / npm) right after the main demo.
     if (part.name === slug && data.entry && segments.length === 1) {

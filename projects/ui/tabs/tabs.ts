@@ -117,8 +117,9 @@ export class IvTabs {
   }
 }
 
+/** One-to-one: every char but letters, digits and '-' becomes _<hex>_, so "a b" and "a_b" stay apart. */
 function toIdPart(value: string) {
-  return value.replace(/[^\w-]/g, '_')
+  return value.replace(/[^a-zA-Z0-9-]/g, (c) => `_${c.charCodeAt(0).toString(16)}_`)
 }
 
 // ─── List ────────────────────────────────────────────────────────────────────
@@ -145,7 +146,7 @@ export type TabsListVariants = VariantProps<typeof tabsListVariants>
     'data-slot': 'tabs-list',
     role: 'tablist',
     '[attr.aria-orientation]': 'tabs.orientation()',
-    '[attr.data-variant]': 'variant()',
+    '[attr.data-variant]': 'variant() ?? "default"',
     '[class]': 'classes()',
   },
   changeDetection: ChangeDetectionStrategy.OnPush,

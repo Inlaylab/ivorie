@@ -1,6 +1,6 @@
 
 import { Component, ChangeDetectionStrategy, computed, input, output } from '@angular/core'
-import { LucideCircleAlert, LucideCircleCheck, LucideDynamicIcon, LucideInfo, LucideTriangleAlert, LucideX } from '@lucide/angular'
+import { IconName, IvIcon } from '@inlaylab/ivorie/icon'
 
 import { ToastItem, ToastVariant } from './toast.service'
 import { cn } from '@inlaylab/ivorie/core'
@@ -12,24 +12,24 @@ const VARIANT_CLASSES: Record<ToastVariant, string> = {
   info: 'bg-sky-50 border-sky-300 text-sky-900',
 }
 
-const LEGACY_ICON_MAP: Record<string, any> = {
-  check_circle: LucideCircleCheck,
-  error: LucideCircleAlert,
-  warning: LucideTriangleAlert,
-  info: LucideInfo,
+const LEGACY_ICON_MAP: Record<string, IconName> = {
+  check_circle: 'circle-check',
+  error: 'circle-alert',
+  warning: 'triangle-alert',
+  info: 'info',
 }
 
-const VARIANT_FALLBACK_ICON: Record<ToastVariant, any> = {
-  success: LucideCircleCheck,
-  destructive: LucideCircleAlert,
-  warning: LucideTriangleAlert,
-  info: LucideInfo,
+const VARIANT_FALLBACK_ICON: Record<ToastVariant, IconName> = {
+  success: 'circle-check',
+  destructive: 'circle-alert',
+  warning: 'triangle-alert',
+  info: 'info',
 }
 
 @Component({
   selector: 'iv-toast',
   standalone: true,
-  imports: [LucideX, LucideDynamicIcon],
+  imports: [IvIcon],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div
@@ -39,7 +39,7 @@ const VARIANT_FALLBACK_ICON: Record<ToastVariant, any> = {
       [attr.aria-live]="assertive() ? 'assertive' : 'polite'"
       [class]="containerClass()"
     >
-      <svg [lucideIcon]="resolvedIcon()" [size]="16" class="shrink-0"></svg>
+      <svg [ivIcon]="resolvedIcon()" [size]="16" class="shrink-0"></svg>
       <div class="min-w-0 flex-1 text-sm leading-snug" [innerHTML]="toast().message"></div>
       <button
         type="button"
@@ -47,7 +47,7 @@ const VARIANT_FALLBACK_ICON: Record<ToastVariant, any> = {
         (click)="close.emit()"
         aria-label="Dismiss"
       >
-        <svg lucideX [size]="14"></svg>
+        <svg ivIcon="x" [size]="14"></svg>
       </button>
     </div>
   `,
@@ -62,7 +62,8 @@ export class IvToast {
 
   readonly resolvedIcon = computed(() => {
     const toast = this.toast()
-    return (toast.icon && LEGACY_ICON_MAP[toast.icon]) || VARIANT_FALLBACK_ICON[toast.variant]
+    // Own keys only: a name like "constructor" must not reach the prototype.
+    return (toast.icon && Object.hasOwn(LEGACY_ICON_MAP, toast.icon) && LEGACY_ICON_MAP[toast.icon]) || VARIANT_FALLBACK_ICON[toast.variant]
   })
 
   // No style defines the variant colours (like alert warning / success / info), so they stay utilities.

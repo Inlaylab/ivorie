@@ -9,6 +9,7 @@ import {
   TemplateRef,
   ViewContainerRef,
   computed,
+  contentChild,
   contentChildren,
   effect,
   forwardRef,
@@ -22,7 +23,7 @@ import {
   viewChild
 } from '@angular/core'
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms'
-import { LucideCheck, LucideChevronDown, LucideX } from '@lucide/angular'
+import { IvIcon } from '@inlaylab/ivorie/icon'
 import { ActiveDescendantKeyManager, Highlightable } from '@angular/cdk/a11y'
 import { Overlay, OverlayRef } from '@angular/cdk/overlay'
 import { TemplatePortal } from '@angular/cdk/portal'
@@ -94,7 +95,10 @@ export class IvCombobox implements ControlValueAccessor {
   readonly isDisabled = computed(() => this.disabled() || this._formDisabled())
   readonly searchValue = signal('')
   readonly isOpen = signal(false)
-  readonly listboxId = inject(IvIdGenerator).next('iv-combobox-listbox')
+  private readonly list = contentChild(IvComboboxList)
+  private readonly generatedListboxId = inject(IvIdGenerator).next('iv-combobox-listbox')
+  /** The list's [id], else a generated one. The list, input and chips all read this. */
+  readonly listboxId = computed(() => this.list()?.id() ?? this.generatedListboxId)
 
   // Items exist even while the panel is closed (projected content is created eagerly).
   readonly items = contentChildren(IvComboboxItem, { descendants: true })
@@ -112,11 +116,16 @@ export class IvCombobox implements ControlValueAccessor {
     // Labels can arrive after writeValue: show the selected item's label once it is known.
     effect(() => {
       const value = this._value()
-      if (this.multiple() || typeof value !== 'string' || !value) return
+      if (this.multiple()) return
       // While open the search belongs to the user (it may be cleared on purpose); close() restores the label.
       if (untracked(this.isOpen)) return
-      const label = this.labelFor(value)
       const search = untracked(this.searchValue)
+      // A parent reset to no value clears the text, like close() does.
+      if (typeof value !== 'string' || !value) {
+        if (search) this.searchValue.set('')
+        return
+      }
+      const label = this.labelFor(value)
       if (!search || search === value) this.searchValue.set(label)
     })
     // destroy() tears down the effect the key manager keeps on the items signal; without it, that
@@ -245,7 +254,7 @@ export class IvCombobox implements ControlValueAccessor {
 @Component({
   selector: 'iv-combobox-input',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [LucideX, LucideChevronDown, IvTruncateTooltip, IvInputGroupInput, IvInputGroupAddon, IvInputGroupButton],
+  imports: [IvTruncateTooltip, IvInputGroupInput, IvInputGroupAddon, IvInputGroupButton, IvIcon],
   host: {
     'data-slot': 'input-group',
     'role': 'group',
@@ -271,7 +280,7 @@ export class IvCombobox implements ControlValueAccessor {
       [attr.id]="id()"
       [attr.aria-label]="ariaLabel()"
       [attr.aria-expanded]="parent.isOpen()"
-      [attr.aria-controls]="parent.isOpen() ? (listboxId() ?? parent.listboxId) : null"
+      [attr.aria-controls]="parent.isOpen() ? parent.listboxId() : null"
       [attr.aria-activedescendant]="parent.isOpen() ? (parent.activeItem()?.id ?? null) : null"
       [placeholder]="placeholder() ?? parent.placeholder()"
       [disabled]="parent.isDisabled()"
@@ -293,7 +302,7 @@ export class IvCombobox implements ControlValueAccessor {
           [aria-label]="parent.isOpen() ? 'Close' : 'Open'"
           (click)="parent.toggle()"
         >
-          <svg lucideChevronDown class="cn-combobox-trigger-icon pointer-events-none" aria-hidden="true"></svg>
+          <svg ivIcon="chevron-down" class="cn-combobox-trigger-icon pointer-events-none" aria-hidden="true"></svg>
         </iv-input-group-button>
       }
       @if (showClear() && parent.searchValue()) {
@@ -306,7 +315,7 @@ export class IvCombobox implements ControlValueAccessor {
           aria-label="Clear search"
           (click)="parent.clearSearch(); searchInput.focus()"
         >
-          <svg lucideX class="cn-combobox-clear-icon pointer-events-none" aria-hidden="true"></svg>
+          <svg ivIcon="x" class="cn-combobox-clear-icon pointer-events-none" aria-hidden="true"></svg>
         </iv-input-group-button>
       }
     </iv-input-group-addon>
@@ -318,8 +327,6 @@ export class IvComboboxInput {
   readonly showTrigger = input(true);
   readonly showClear = input(false);
   readonly placeholder = input<string>();
-  /** Defaults to the list's generated id. */
-  readonly listboxId = input<string>();
   readonly id = input<string | null>(null)
   readonly ariaLabel = input<string | null>(null, { alias: 'aria-label' })
   readonly class = input('');
@@ -476,7 +483,7 @@ export class IvComboboxContent implements OnDestroy {
   host: {
     'data-slot': 'combobox-list',
     'role': 'listbox',
-    '[id]': 'id() ?? parent.listboxId',
+    '[id]': 'parent.listboxId()',
     '[attr.aria-multiselectable]': 'parent.multiple() || null',
     '[attr.data-empty]': 'parent.shouldShowEmpty() ? "" : null',
     '[class]': 'classes()',
@@ -499,7 +506,7 @@ export class IvComboboxList {
 @Component({
   selector: 'iv-combobox-item',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [LucideCheck],
+  imports: [IvIcon],
   host: {
     'data-slot': 'combobox-item',
     'role': 'option',
@@ -521,7 +528,7 @@ export class IvComboboxList {
     <ng-content />
     @if (isSelected()) {
       <span class="cn-combobox-item-indicator" aria-hidden="true">
-        <svg lucideCheck class="cn-combobox-item-indicator-icon pointer-events-none"></svg>
+        <svg ivIcon="check" class="cn-combobox-item-indicator-icon pointer-events-none"></svg>
       </span>
     }
   `,
@@ -649,7 +656,7 @@ export class IvComboboxEmpty {
       [attr.id]="id()"
       [attr.aria-label]="ariaLabel()"
       [attr.aria-expanded]="parent.isOpen()"
-      [attr.aria-controls]="parent.isOpen() ? parent.listboxId : null"
+      [attr.aria-controls]="parent.isOpen() ? parent.listboxId() : null"
       [attr.aria-activedescendant]="parent.isOpen() ? (parent.activeItem()?.id ?? null) : null"
       [placeholder]="hasSelectedValues() ? '' : parent.placeholder()"
       [disabled]="parent.isDisabled()"
@@ -690,7 +697,7 @@ export class IvComboboxChips {
 
 @Component({
   selector: 'iv-combobox-chip',
-  imports: [LucideX, IvButton],
+  imports: [IvButton, IvIcon],
   host: { 'data-slot': 'combobox-chip', '[class]': 'classes()' },
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -701,7 +708,7 @@ export class IvComboboxChips {
       [disabled]="parent.isDisabled()"
       [attr.aria-label]="'Remove ' + label()"
       (click)="$event.stopPropagation(); parent.removeValue(value())">
-      <svg lucideX class="cn-combobox-chip-indicator-icon pointer-events-none" aria-hidden="true"></svg>
+      <svg ivIcon="x" class="cn-combobox-chip-indicator-icon pointer-events-none" aria-hidden="true"></svg>
     </button>
   `,
 })

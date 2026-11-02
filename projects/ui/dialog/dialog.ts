@@ -17,7 +17,7 @@ import {
   output,
   viewChild
 } from '@angular/core'
-import { LucideX } from '@lucide/angular'
+import { IvIcon } from '@inlaylab/ivorie/icon'
 import { IvButton } from '@inlaylab/ivorie/button'
 import {
   DialogCloseEvent,
@@ -31,7 +31,7 @@ import { IvIdGenerator, cn } from '@inlaylab/ivorie/core'
 @Component({
   selector: 'iv-dialog-container',
   standalone: true,
-  imports: [NgTemplateOutlet, CdkTrapFocus, LucideX, IvButton],
+  imports: [NgTemplateOutlet, CdkTrapFocus, IvButton, IvIcon],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div
@@ -62,7 +62,7 @@ import { IvIdGenerator, cn } from '@inlaylab/ivorie/core'
           data-slot="dialog-close"
           (click)="onCloseButton()"
         >
-          <svg lucideX></svg>
+          <svg ivIcon="x"></svg>
           <span class="sr-only">Close</span>
         </button>
       }
