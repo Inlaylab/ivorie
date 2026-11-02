@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core'
-import { LucideChevronLeft, LucideChevronRight, LucideEllipsis } from '@lucide/angular'
+import { IvIcon } from '@inlaylab/ivorie/icon'
 import { ButtonVariants, buttonVariants } from '@inlaylab/ivorie/button'
 import { cn } from '@inlaylab/ivorie/core'
 
@@ -73,7 +73,7 @@ export class IvPaginationLink {
 @Component({
   selector: 'a[ivPaginationPrevious]',
   standalone: true,
-  imports: [LucideChevronLeft],
+  imports: [IvIcon],
   host: {
     'data-slot': 'pagination-link',
     'aria-label': 'Go to previous page',
@@ -81,7 +81,7 @@ export class IvPaginationLink {
   },
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <svg lucideChevronLeft class="cn-rtl-flip"></svg>
+    <svg ivIcon="chevron-left" class="cn-rtl-flip"></svg>
     <span class="cn-pagination-previous-text hidden sm:block">{{ text() }}</span>
   `,
 })
@@ -97,7 +97,7 @@ export class IvPaginationPrevious {
 @Component({
   selector: 'a[ivPaginationNext]',
   standalone: true,
-  imports: [LucideChevronRight],
+  imports: [IvIcon],
   host: {
     'data-slot': 'pagination-link',
     'aria-label': 'Go to next page',
@@ -106,7 +106,7 @@ export class IvPaginationPrevious {
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <span class="cn-pagination-next-text hidden sm:block">{{ text() }}</span>
-    <svg lucideChevronRight class="cn-rtl-flip"></svg>
+    <svg ivIcon="chevron-right" class="cn-rtl-flip"></svg>
   `,
 })
 export class IvPaginationNext {
@@ -121,7 +121,7 @@ export class IvPaginationNext {
 @Component({
   selector: 'span[ivPaginationEllipsis]',
   standalone: true,
-  imports: [LucideEllipsis],
+  imports: [IvIcon],
   host: {
     'data-slot': 'pagination-ellipsis',
     'aria-hidden': 'true',
@@ -129,7 +129,7 @@ export class IvPaginationNext {
   },
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <svg lucideEllipsis></svg>
+    <svg ivIcon="ellipsis"></svg>
     <span class="sr-only">More pages</span>
   `,
 })

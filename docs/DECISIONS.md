@@ -40,3 +40,4 @@ One line per decision. Newest at the bottom. Format: `date — decision — why`
 - 2026-10-31 — v1.0.0 has no Changesets. A hand-written CHANGELOG.md is enough for one release. Add Changesets in 1.1.
 - 2026-11-02 — Carousel uses CSS scroll-snap, not embla-carousel. No new dep, touch and wheel come from the browser, SSR renders slides as-is. No loop or autoplay.
 - 2026-11-02 — Changesets finds the two packages through `lerna.json` `packages` (Lerna itself is not used). npm `workspaces` would link `node_modules/@inlaylab/ivorie` to the source folder (breaks `smoke:pack`) and clash with the root package name `ivorie`.
+- 2026-11-02 — Components draw their icons with `IvIcon` (`@inlaylab/ivorie/icon`): Lucide shapes copied into `icons.ts`. `@lucide/angular` is one 10.7 MB file with no per-icon entry; `ng serve` does not tree-shake deps, so every dev reload of a blank app loaded ~14.5 MB of JS. The peer dependency is dropped. Phase 11 adds other icon libraries on top.

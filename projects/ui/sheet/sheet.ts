@@ -13,7 +13,7 @@ import {
   input,
   output,
 } from '@angular/core'
-import { LucideX } from '@lucide/angular'
+import { IvIcon } from '@inlaylab/ivorie/icon'
 import { IvButton } from '@inlaylab/ivorie/button'
 import { IvIdGenerator, cn } from '@inlaylab/ivorie/core'
 import {
@@ -35,7 +35,7 @@ export interface SheetConfig<D = unknown> extends Omit<DialogConfig<D>, 'size' |
 /** A dialog docked to an edge. Close and focus behave as in IvDialog. */
 @Component({
   selector: 'iv-sheet-container',
-  imports: [NgTemplateOutlet, CdkTrapFocus, LucideX, IvButton],
+  imports: [NgTemplateOutlet, CdkTrapFocus, IvButton, IvIcon],
   // Sheet title and description register with the container like the dialog ones.
   providers: [{ provide: IvDialogContainer, useExisting: IvSheetContainer }],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -58,7 +58,7 @@ export interface SheetConfig<D = unknown> extends Omit<DialogConfig<D>, 'size' |
       <ng-container #dynamicHost />
       @if (showCloseButton) {
         <button ivButton type="button" variant="ghost" size="icon-sm" class="cn-sheet-close" data-slot="sheet-close" (click)="onCloseButton()">
-          <svg lucideX></svg>
+          <svg ivIcon="x"></svg>
           <span class="sr-only">Close</span>
         </button>
       }

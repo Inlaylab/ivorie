@@ -25,7 +25,7 @@ import {
   untracked,
   viewChild
 } from '@angular/core'
-import { LucideCheck, LucideChevronRight } from '@lucide/angular'
+import { IvIcon } from '@inlaylab/ivorie/icon'
 import { Subject } from 'rxjs'
 import { cn, connectedPositions } from '@inlaylab/ivorie/core'
 
@@ -392,7 +392,7 @@ const checkItemClasses =
 @Component({
   selector: 'iv-dropdown-menu-checkbox-item',
   standalone: true,
-  imports: [LucideCheck],
+  imports: [IvIcon],
   providers: [{ provide: IV_MENU_ITEM, useExisting: IvDropdownMenuCheckboxItem }],
   host: {
     ...itemHost,
@@ -406,7 +406,7 @@ const checkItemClasses =
   template: `
     <span class="cn-dropdown-menu-item-indicator pointer-events-none" data-slot="dropdown-menu-checkbox-item-indicator">
       @if (checked()) {
-        <svg lucideCheck></svg>
+        <svg ivIcon="check"></svg>
       }
     </span>
     <ng-content />
@@ -464,7 +464,7 @@ export class IvDropdownMenuRadioGroup {
 @Component({
   selector: 'iv-dropdown-menu-radio-item',
   standalone: true,
-  imports: [LucideCheck],
+  imports: [IvIcon],
   providers: [{ provide: IV_MENU_ITEM, useExisting: IvDropdownMenuRadioItem }],
   host: {
     ...itemHost,
@@ -478,7 +478,7 @@ export class IvDropdownMenuRadioGroup {
   template: `
     <span class="cn-dropdown-menu-item-indicator pointer-events-none" data-slot="dropdown-menu-radio-item-indicator">
       @if (isChecked()) {
-        <svg lucideCheck></svg>
+        <svg ivIcon="check"></svg>
       }
     </span>
     <ng-content />
@@ -543,7 +543,7 @@ export class IvDropdownMenuSub {}
 @Component({
   selector: 'iv-dropdown-menu-sub-trigger',
   standalone: true,
-  imports: [LucideChevronRight],
+  imports: [IvIcon],
   providers: [{ provide: IV_MENU_ITEM, useExisting: IvDropdownMenuSubTrigger }],
   host: {
     ...itemHost,
@@ -559,7 +559,7 @@ export class IvDropdownMenuSub {}
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <ng-content />
-    <svg lucideChevronRight class="cn-rtl-flip ml-auto"></svg>
+    <svg ivIcon="chevron-right" class="cn-rtl-flip ml-auto"></svg>
   `,
 })
 export class IvDropdownMenuSubTrigger extends IvMenuItemBase implements AfterViewInit {

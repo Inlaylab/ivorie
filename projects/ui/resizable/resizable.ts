@@ -11,7 +11,7 @@ import {
   numberAttribute,
   output,
 } from '@angular/core'
-import { LucideGripVertical } from '@lucide/angular'
+import { IvIcon } from '@inlaylab/ivorie/icon'
 import { IvIdGenerator, cn } from '@inlaylab/ivorie/core'
 
 /** Panels and handles alternate: panel, handle, panel, … Sizes are percentages of the group. */
@@ -95,7 +95,7 @@ export class IvResizablePanel {
 
 @Component({
   selector: 'iv-resizable-handle',
-  imports: [LucideGripVertical],
+  imports: [IvIcon],
   host: {
     'role': 'separator',
     'tabindex': '0',
@@ -117,7 +117,7 @@ export class IvResizablePanel {
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (withHandle()) {
-      <div class="cn-resizable-handle-icon z-10 flex shrink-0"><svg lucideGripVertical aria-hidden="true"></svg></div>
+      <div class="cn-resizable-handle-icon z-10 flex shrink-0"><svg ivIcon="grip-vertical" aria-hidden="true"></svg></div>
     }
   `,
 })

@@ -23,7 +23,7 @@ import {
   viewChild
 } from '@angular/core'
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms'
-import { LucideCheck, LucideChevronDown, LucideX } from '@lucide/angular'
+import { IvIcon } from '@inlaylab/ivorie/icon'
 import { ActiveDescendantKeyManager, Highlightable } from '@angular/cdk/a11y'
 import { Overlay, OverlayRef } from '@angular/cdk/overlay'
 import { TemplatePortal } from '@angular/cdk/portal'
@@ -254,7 +254,7 @@ export class IvCombobox implements ControlValueAccessor {
 @Component({
   selector: 'iv-combobox-input',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [LucideX, LucideChevronDown, IvTruncateTooltip, IvInputGroupInput, IvInputGroupAddon, IvInputGroupButton],
+  imports: [IvTruncateTooltip, IvInputGroupInput, IvInputGroupAddon, IvInputGroupButton, IvIcon],
   host: {
     'data-slot': 'input-group',
     'role': 'group',
@@ -302,7 +302,7 @@ export class IvCombobox implements ControlValueAccessor {
           [aria-label]="parent.isOpen() ? 'Close' : 'Open'"
           (click)="parent.toggle()"
         >
-          <svg lucideChevronDown class="cn-combobox-trigger-icon pointer-events-none" aria-hidden="true"></svg>
+          <svg ivIcon="chevron-down" class="cn-combobox-trigger-icon pointer-events-none" aria-hidden="true"></svg>
         </iv-input-group-button>
       }
       @if (showClear() && parent.searchValue()) {
@@ -315,7 +315,7 @@ export class IvCombobox implements ControlValueAccessor {
           aria-label="Clear search"
           (click)="parent.clearSearch(); searchInput.focus()"
         >
-          <svg lucideX class="cn-combobox-clear-icon pointer-events-none" aria-hidden="true"></svg>
+          <svg ivIcon="x" class="cn-combobox-clear-icon pointer-events-none" aria-hidden="true"></svg>
         </iv-input-group-button>
       }
     </iv-input-group-addon>
@@ -506,7 +506,7 @@ export class IvComboboxList {
 @Component({
   selector: 'iv-combobox-item',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [LucideCheck],
+  imports: [IvIcon],
   host: {
     'data-slot': 'combobox-item',
     'role': 'option',
@@ -528,7 +528,7 @@ export class IvComboboxList {
     <ng-content />
     @if (isSelected()) {
       <span class="cn-combobox-item-indicator" aria-hidden="true">
-        <svg lucideCheck class="cn-combobox-item-indicator-icon pointer-events-none"></svg>
+        <svg ivIcon="check" class="cn-combobox-item-indicator-icon pointer-events-none"></svg>
       </span>
     }
   `,
@@ -697,7 +697,7 @@ export class IvComboboxChips {
 
 @Component({
   selector: 'iv-combobox-chip',
-  imports: [LucideX, IvButton],
+  imports: [IvButton, IvIcon],
   host: { 'data-slot': 'combobox-chip', '[class]': 'classes()' },
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -708,7 +708,7 @@ export class IvComboboxChips {
       [disabled]="parent.isDisabled()"
       [attr.aria-label]="'Remove ' + label()"
       (click)="$event.stopPropagation(); parent.removeValue(value())">
-      <svg lucideX class="cn-combobox-chip-indicator-icon pointer-events-none" aria-hidden="true"></svg>
+      <svg ivIcon="x" class="cn-combobox-chip-indicator-icon pointer-events-none" aria-hidden="true"></svg>
     </button>
   `,
 })

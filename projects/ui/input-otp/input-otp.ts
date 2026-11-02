@@ -11,7 +11,7 @@ import {
   signal,
 } from '@angular/core'
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms'
-import { LucideMinus } from '@lucide/angular'
+import { IvIcon } from '@inlaylab/ivorie/icon'
 import { cn } from '@inlaylab/ivorie/core'
 
 /** Allows digits only; pass to `pattern`. */
@@ -145,10 +145,10 @@ export class IvInputOtpSlot {
 
 @Component({
   selector: 'iv-input-otp-separator',
-  imports: [LucideMinus],
+  imports: [IvIcon],
   host: { 'role': 'separator', 'data-slot': 'input-otp-separator', '[class]': 'classes()' },
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `<svg lucideMinus aria-hidden="true"></svg>`,
+  template: `<svg ivIcon="minus" aria-hidden="true"></svg>`,
 })
 export class IvInputOtpSeparator {
   readonly class = input('')

@@ -13,7 +13,7 @@ import {
   signal,
 } from '@angular/core'
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms'
-import { LucideChevronLeft, LucideChevronRight } from '@lucide/angular'
+import { IvIcon } from '@inlaylab/ivorie/icon'
 import { IvButton } from '@inlaylab/ivorie/button'
 import { cn, IvIdGenerator } from '@inlaylab/ivorie/core'
 
@@ -103,7 +103,7 @@ const KEY_STEP: Record<string, number> = { ArrowLeft: -1, ArrowRight: 1, ArrowUp
 
 @Component({
   selector: 'iv-calendar',
-  imports: [LucideChevronLeft, LucideChevronRight, IvButton],
+  imports: [IvButton, IvIcon],
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
@@ -128,7 +128,7 @@ const KEY_STEP: Record<string, number> = { ArrowLeft: -1, ArrowRight: 1, ArrowUp
           [disabled]="prevDisabled()"
           aria-label="Previous month"
         >
-          <svg lucideChevronLeft class="cn-rtl-flip size-4 rtl:rotate-180" aria-hidden="true"></svg>
+          <svg ivIcon="chevron-left" class="cn-rtl-flip size-4 rtl:rotate-180" aria-hidden="true"></svg>
         </button>
         <button
           ivButton
@@ -138,7 +138,7 @@ const KEY_STEP: Record<string, number> = { ArrowLeft: -1, ArrowRight: 1, ArrowUp
           [disabled]="nextDisabled()"
           aria-label="Next month"
         >
-          <svg lucideChevronRight class="cn-rtl-flip size-4 rtl:rotate-180" aria-hidden="true"></svg>
+          <svg ivIcon="chevron-right" class="cn-rtl-flip size-4 rtl:rotate-180" aria-hidden="true"></svg>
         </button>
       </div>
 

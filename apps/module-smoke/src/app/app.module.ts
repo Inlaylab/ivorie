@@ -29,6 +29,7 @@ import { IV_TOGGLE_GROUP_IMPORTS } from '@inlaylab/ivorie/toggle-group';
 import { IV_CAROUSEL_IMPORTS } from '@inlaylab/ivorie/carousel';
 import { IV_COMMAND_IMPORTS } from '@inlaylab/ivorie/command';
 import { IV_DRAWER_IMPORTS } from '@inlaylab/ivorie/drawer';
+import { IvIcon } from '@inlaylab/ivorie/icon';
 import { IV_INPUT_OTP_IMPORTS } from '@inlaylab/ivorie/input-otp';
 import { IV_RESIZABLE_IMPORTS } from '@inlaylab/ivorie/resizable';
 import { IV_DIALOG_IMPORTS } from '@inlaylab/ivorie/dialog';
@@ -93,6 +94,7 @@ import { App } from './app';
     ...IV_CAROUSEL_IMPORTS,
     ...IV_COMMAND_IMPORTS,
     ...IV_DRAWER_IMPORTS,
+    IvIcon,
     ...IV_INPUT_OTP_IMPORTS,
     ...IV_RESIZABLE_IMPORTS,
     ...IV_PAGINATION_IMPORTS,

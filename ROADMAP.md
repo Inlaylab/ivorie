@@ -220,12 +220,12 @@ Branch `phase-11-icons`. Outline: expand into tasks and get an OK first.
 
 **Goal:** choose lucide, tabler, phosphor, hugeicons or remix like a theme. Smaller docs bundle.
 
-Today: 14 component files import `@lucide/angular` directly (~17 icons: chevron-down, check, x, …). Each lucide icon is a full component (~3 kB compiled); the docs initial chunk holds ~112 kB of icons.
+Today (since 1.1): components draw 18 Lucide shapes with `IvIcon` (`@inlaylab/ivorie/icon`, data in `icons.ts`); the library no longer imports `@lucide/angular`. The docs app still does.
 
 Scope:
-1. **Semantic icon set:** one name per icon the components use (`chevron-down`, `check`, `x`, …).
-2. **`IvIcon`** (`<svg ivIcon="chevron-down">`) + `provideIvIcons(map)`. One map per library: `@inlaylab/ivorie/icons/lucide`, `/tabler`, `/phosphor`, `/hugeicons`, `/remix`. Lucide is the default. No API change for package users.
-3. **Components:** replace the direct `@lucide/angular` imports in the 14 files with `IvIcon`.
+1. ~~Semantic icon set~~ done in 1.1 (`IconName`).
+2. ~~`IvIcon`~~ done in 1.1. Left: `provideIvIcons(map)`. One map per library: `@inlaylab/ivorie/icons/lucide`, `/tabler`, `/phosphor`, `/hugeicons`, `/remix`. Lucide is the default. No API change for package users.
+3. ~~Components use `IvIcon`~~ done in 1.1.
 4. **CLI:** `iconLibrary` enum in `projects/cli/schema/components.schema.json:22`; `ivorie init --icon-library <lib>`; rewrite icon imports at `add.ts:68` after `rewritePrefix`; dependencies from the chosen library (`init.ts:28`). Reference: shadcn `packages/shadcn/src/migrations/migrate-icons.ts`, `apps/v4/registry/icons/`.
 5. **Playground:** icon library picker.
 6. **Dependencies:** icon libraries become optional peers.

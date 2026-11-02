@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core'
-import { LucideChevronRight, LucideEllipsis } from '@lucide/angular'
+import { IvIcon } from '@inlaylab/ivorie/icon'
 import { cn } from '@inlaylab/ivorie/core'
 
 @Component({
@@ -87,7 +87,7 @@ export class IvBreadcrumbPage {
 @Component({
   selector: 'li[ivBreadcrumbSeparator]',
   standalone: true,
-  imports: [LucideChevronRight],
+  imports: [IvIcon],
   host: {
     'data-slot': 'breadcrumb-separator',
     role: 'presentation',
@@ -98,7 +98,7 @@ export class IvBreadcrumbPage {
   template: `
     <ng-content />
     @if (showDefault()) {
-      <svg lucideChevronRight class="cn-rtl-flip"></svg>
+      <svg ivIcon="chevron-right" class="cn-rtl-flip"></svg>
     }
   `,
 })
@@ -112,7 +112,7 @@ export class IvBreadcrumbSeparator {
 @Component({
   selector: 'span[ivBreadcrumbEllipsis]',
   standalone: true,
-  imports: [LucideEllipsis],
+  imports: [IvIcon],
   host: {
     'data-slot': 'breadcrumb-ellipsis',
     role: 'presentation',
@@ -121,7 +121,7 @@ export class IvBreadcrumbSeparator {
   },
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <svg lucideEllipsis></svg>
+    <svg ivIcon="ellipsis"></svg>
     <span class="sr-only">More</span>
   `,
 })

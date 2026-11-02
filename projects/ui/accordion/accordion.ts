@@ -17,7 +17,7 @@ import {
   viewChild,
   ElementRef,
 } from '@angular/core'
-import { LucideChevronDown, LucideChevronUp } from '@lucide/angular'
+import { IvIcon } from '@inlaylab/ivorie/icon'
 import { IvIdGenerator, cn } from '@inlaylab/ivorie/core'
 
 /** Keys the accordion handles between triggers (WAI-ARIA accordion pattern). */
@@ -131,7 +131,7 @@ export class IvAccordionItem {
 @Component({
   selector: 'iv-accordion-trigger',
   standalone: true,
-  imports: [LucideChevronDown, LucideChevronUp],
+  imports: [IvIcon],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <h3 class="flex">
@@ -149,12 +149,12 @@ export class IvAccordionItem {
       >
         <ng-content />
         <svg
-          lucideChevronDown
+          ivIcon="chevron-down"
           data-slot="accordion-trigger-icon"
           class="cn-accordion-trigger-icon pointer-events-none shrink-0 group-aria-expanded/accordion-trigger:hidden"
         ></svg>
         <svg
-          lucideChevronUp
+          ivIcon="chevron-up"
           data-slot="accordion-trigger-icon"
           class="cn-accordion-trigger-icon pointer-events-none hidden shrink-0 group-aria-expanded/accordion-trigger:inline"
         ></svg>

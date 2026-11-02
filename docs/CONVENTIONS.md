@@ -50,8 +50,8 @@ Form controls (input, checkbox, switch, radio, select, combobox, calendar) imple
 - Browser-only APIs (`ResizeObserver`, cookies) behind `afterNextRender` or `isPlatformBrowser`.
 
 ## Icons
-Use `@lucide/angular` (not `lucide-angular`). Import the icons the component needs inside the component. The user must not register them.
-From 1.4 (Phase 11): use `IvIcon` with a semantic name (`<svg ivIcon="chevron-down">`). The app picks the icon library.
+Use `IvIcon` from `@inlaylab/ivorie/icon`: `<svg ivIcon="chevron-down" class="size-4">`. Never import `@lucide/angular` in the library: it is one 10 MB file that dev servers load whole.
+A new icon: copy its Lucide shape into `projects/ui/icon/icons.ts`. From Phase 11 the app can pick another icon library.
 
 ## Versions
 Only stable, non-deprecated APIs of the latest Angular. Full list: [COMPAT.md](COMPAT.md#code-rules-stay-working-on-new-versions).

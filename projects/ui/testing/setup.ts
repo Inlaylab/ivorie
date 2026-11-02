@@ -1,6 +1,9 @@
 // Vitest setup for the ui specs (angular.json → test.options.setupFiles).
 import axe from 'axe-core';
-import { expect } from 'vitest';
+import { expect, vi } from 'vitest';
+
+// axe and first-time component compiles take seconds when 60 spec files run in parallel; 5 s flaked in the full gate.
+vi.setConfig({ testTimeout: 20_000 });
 
 expect.extend({
   async toHaveNoViolations(received: Element) {

@@ -10,7 +10,7 @@ import {
   signal,
   viewChild,
 } from '@angular/core'
-import { LucideArrowLeft, LucideArrowRight } from '@lucide/angular'
+import { IvIcon } from '@inlaylab/ivorie/icon'
 import { ButtonVariants, buttonVariants } from '@inlaylab/ivorie/button'
 import { cn } from '@inlaylab/ivorie/core'
 
@@ -146,7 +146,7 @@ abstract class IvCarouselNav {
 
 @Component({
   selector: 'button[ivCarouselPrevious]',
-  imports: [LucideArrowLeft],
+  imports: [IvIcon],
   host: {
     'type': 'button',
     'data-slot': 'carousel-previous',
@@ -155,7 +155,7 @@ abstract class IvCarouselNav {
     '(click)': 'carousel.scroll(-1)',
   },
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `<svg lucideArrowLeft class="cn-rtl-flip" aria-hidden="true"></svg><span class="sr-only">Previous slide</span>`,
+  template: `<svg ivIcon="arrow-left" class="cn-rtl-flip" aria-hidden="true"></svg><span class="sr-only">Previous slide</span>`,
 })
 export class IvCarouselPrevious extends IvCarouselNav {
   protected readonly kind = 'previous'
@@ -163,7 +163,7 @@ export class IvCarouselPrevious extends IvCarouselNav {
 
 @Component({
   selector: 'button[ivCarouselNext]',
-  imports: [LucideArrowRight],
+  imports: [IvIcon],
   host: {
     'type': 'button',
     'data-slot': 'carousel-next',
@@ -172,7 +172,7 @@ export class IvCarouselPrevious extends IvCarouselNav {
     '(click)': 'carousel.scroll(1)',
   },
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `<svg lucideArrowRight class="cn-rtl-flip" aria-hidden="true"></svg><span class="sr-only">Next slide</span>`,
+  template: `<svg ivIcon="arrow-right" class="cn-rtl-flip" aria-hidden="true"></svg><span class="sr-only">Next slide</span>`,
 })
 export class IvCarouselNext extends IvCarouselNav {
   protected readonly kind = 'next'

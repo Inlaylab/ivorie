@@ -25,7 +25,7 @@ Planned (see [ROADMAP](../ROADMAP.md)):
 - `core` is shared. Components may import `@inlaylab/ivorie/core`. Components import other components only through their entry point (`@inlaylab/ivorie/button`), never by relative path.
 
 ## Dependencies
-- **peerDependencies** (app installs them): `@angular/core|common|forms|cdk >=22.0.0 <23.0.0`, `@lucide/angular`, `tailwindcss ^4.0.0`, `tw-animate-css ^1.0.0`.
+- **peerDependencies** (app installs them): `@angular/core|common|forms|cdk >=22.0.0 <23.0.0`, `tailwindcss ^4.0.0`, `tw-animate-css ^1.0.0`.
 - **dependencies** (we bring them): `class-variance-authority`, `clsx`, `tailwind-merge ^3`.
 - Version rules: [COMPAT.md](COMPAT.md).
 - `sideEffects: false`, except `styles/*.css`.

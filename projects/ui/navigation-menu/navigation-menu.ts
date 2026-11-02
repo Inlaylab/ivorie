@@ -13,7 +13,7 @@ import {
   input,
   signal,
 } from '@angular/core'
-import { LucideChevronDown } from '@lucide/angular'
+import { IvIcon } from '@inlaylab/ivorie/icon'
 import { IvIdGenerator, cn } from '@inlaylab/ivorie/core'
 
 export const navigationMenuTriggerStyle =
@@ -125,7 +125,7 @@ export class IvNavigationMenuItem {
 
 @Component({
   selector: 'button[ivNavigationMenuTrigger]',
-  imports: [LucideChevronDown],
+  imports: [IvIcon],
   host: {
     'type': 'button',
     'data-slot': 'navigation-menu-trigger',
@@ -139,7 +139,7 @@ export class IvNavigationMenuItem {
     '(keydown.arrowdown)': 'onArrowDown($event)',
   },
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `<ng-content /><svg lucideChevronDown class="cn-navigation-menu-trigger-icon" aria-hidden="true"></svg>`,
+  template: `<ng-content /><svg ivIcon="chevron-down" class="cn-navigation-menu-trigger-icon" aria-hidden="true"></svg>`,
 })
 export class IvNavigationMenuTrigger {
   protected readonly item = inject(IvNavigationMenuItem)

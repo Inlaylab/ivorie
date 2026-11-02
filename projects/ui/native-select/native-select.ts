@@ -1,5 +1,5 @@
 import { Component, Directive, ChangeDetectionStrategy, computed, inject, input } from '@angular/core'
-import { LucideChevronDown } from '@lucide/angular'
+import { IvIcon } from '@inlaylab/ivorie/icon'
 import { cn } from '@inlaylab/ivorie/core'
 
 export type NativeSelectSize = 'default' | 'sm'
@@ -7,7 +7,7 @@ export type NativeSelectSize = 'default' | 'sm'
 /** Wrapper: holds a `select[ivNativeSelect]` and draws the chevron over it. */
 @Component({
   selector: 'iv-native-select',
-  imports: [LucideChevronDown],
+  imports: [IvIcon],
   host: {
     'data-slot': 'native-select-wrapper',
     '[attr.data-size]': 'size()',
@@ -17,7 +17,7 @@ export type NativeSelectSize = 'default' | 'sm'
   template: `
     <ng-content />
     <svg
-      lucideChevronDown
+      ivIcon="chevron-down"
       data-slot="native-select-icon"
       class="cn-native-select-icon pointer-events-none absolute select-none"
       aria-hidden="true"

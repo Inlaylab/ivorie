@@ -19,9 +19,10 @@ test('normalizeRange turns a one-major range into a caret', () => {
 
 const entries = listEntries();
 
-test('entries: 50 components + core + select-picker', () => {
+test('entries: 50 components + core + icon + select-picker', () => {
   const names = entries.map((e) => e.name);
-  assert.equal(names.length, 52);
+  assert.equal(names.length, 53);
+  assert.ok(names.includes('icon'));
   assert.ok(names.includes('core'));
   assert.ok(names.includes('select-picker'));
   assert.ok(!names.includes('src') && !names.includes('styles') && !names.includes('testing'));

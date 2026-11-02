@@ -16,7 +16,8 @@ import {
   signal,
   untracked,
 } from '@angular/core'
-import { LucideCheck, LucideSearch } from '@lucide/angular'
+import { IvIcon } from '@inlaylab/ivorie/icon'
+
 import { IvIdGenerator, cn } from '@inlaylab/ivorie/core'
 
 /** A searchable list of actions. Type to filter; arrows and Enter pick. */
@@ -85,12 +86,12 @@ export class IvCommand {
 
 @Component({
   selector: 'iv-command-input',
-  imports: [LucideSearch],
+  imports: [IvIcon],
   host: { 'data-slot': 'command-input-wrapper', 'class': 'cn-command-input-wrapper block' },
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="cn-command-input-group flex items-center">
-      <svg lucideSearch class="cn-command-input-icon shrink-0" aria-hidden="true"></svg>
+      <svg ivIcon="search" class="cn-command-input-icon shrink-0" aria-hidden="true"></svg>
       <input
         data-slot="command-input"
         role="combobox"
@@ -199,7 +200,7 @@ export class IvCommandSeparator {
 
 @Component({
   selector: 'iv-command-item',
-  imports: [LucideCheck],
+  imports: [IvIcon],
   host: {
     'role': 'option',
     'data-slot': 'command-item',
@@ -217,7 +218,7 @@ export class IvCommandSeparator {
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <ng-content />
-    <svg lucideCheck class="cn-command-item-indicator ml-auto opacity-0 group-has-data-[slot=command-shortcut]/command-item:hidden group-data-[checked=true]/command-item:opacity-100" aria-hidden="true"></svg>
+    <svg ivIcon="check" class="cn-command-item-indicator ml-auto opacity-0 group-has-data-[slot=command-shortcut]/command-item:hidden group-data-[checked=true]/command-item:opacity-100" aria-hidden="true"></svg>
   `,
 })
 export class IvCommandItem implements Highlightable {

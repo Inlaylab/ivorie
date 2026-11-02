@@ -9,13 +9,13 @@ import {
   signal,
 } from '@angular/core'
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms'
-import { LucideCheck, LucideMinus } from '@lucide/angular'
+import { IvIcon } from '@inlaylab/ivorie/icon'
 import { cn } from '@inlaylab/ivorie/core'
 
 // The checkbox is a native <button> (like Radix), so <label for> and focus work without extra code.
 @Component({
   selector: 'iv-checkbox',
-  imports: [LucideMinus, LucideCheck],
+  imports: [IvIcon],
   providers: [
     {
       provide: NG_VALUE_ACCESSOR,
@@ -49,9 +49,9 @@ import { cn } from '@inlaylab/ivorie/core'
     >
       <span data-slot="checkbox-indicator" class="cn-checkbox-indicator grid place-content-center text-current transition-none">
         @if (_indeterminate()) {
-          <svg lucideMinus aria-hidden="true"></svg>
+          <svg ivIcon="minus" aria-hidden="true"></svg>
         } @else if (_checked()) {
-          <svg lucideCheck aria-hidden="true"></svg>
+          <svg ivIcon="check" aria-hidden="true"></svg>
         }
       </span>
     </button>
