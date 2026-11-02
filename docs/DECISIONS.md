@@ -39,3 +39,4 @@ One line per decision. Newest at the bottom. Format: `date — decision — why`
 - 2026-10-30 — Org **Inlaylab** owns the project: npm `@inlaylab/ivorie` (was `@ivorie/ui`) + unscoped CLI `ivorie`, repo `github.com/Inlaylab/ivorie`. The brand and `iv` prefix stay Ivorie.
 - 2026-10-31 — v1.0.0 has no Changesets. A hand-written CHANGELOG.md is enough for one release. Add Changesets in 1.1.
 - 2026-11-02 — Carousel uses CSS scroll-snap, not embla-carousel. No new dep, touch and wheel come from the browser, SSR renders slides as-is. No loop or autoplay.
+- 2026-11-02 — Changesets finds the two packages through `lerna.json` `packages` (Lerna itself is not used). npm `workspaces` would link `node_modules/@inlaylab/ivorie` to the source folder (breaks `smoke:pack`) and clash with the root package name `ivorie`.
