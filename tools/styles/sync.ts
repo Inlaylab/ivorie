@@ -38,8 +38,12 @@ export function unknownShapes(css: string): string[] {
     .map((l) => l.trim());
 }
 
+// Opt-in looks: shadcn applies these only for a non-default preset option (menuColor *-translucent).
+// Copying them would make every menu see-through, and the blur layer does not follow a scrolled list.
+const OPT_IN = new Set(['cn-menu-translucent']);
+
 export function buildStyle(name: string, shadcnCss: string, hooks: Set<string>): string {
-  const rules = parse(shadcnCss).filter((r) => hooks.has(r.hook));
+  const rules = parse(shadcnCss).filter((r) => hooks.has(r.hook) && !OPT_IN.has(r.hook));
   const covered = new Set(rules.map((r) => r.hook));
   const out: string[] = [];
   let mark = '';

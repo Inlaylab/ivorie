@@ -12,6 +12,12 @@ export const contentRoutes: Routes = [
       { path: 'docs', pathMatch: 'full', redirectTo: 'docs/installation' },
       { path: 'docs/components', loadComponent: () => import('./components'), title: 'Components · Ivorie' },
       {
+        path: 'playground',
+        loadComponent: () => import('../playground/playground'),
+        title: 'Playground · Ivorie',
+        data: { wide: true },
+      },
+      {
         path: 'docs/:slug',
         loadComponent: () => import('./doc-page'),
         resolve: { page: docPageResolver },

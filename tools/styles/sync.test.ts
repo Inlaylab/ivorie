@@ -48,3 +48,10 @@ test('reports top-level rule shapes the parser skips', () => {
   assert.deepEqual(unknownShapes(shadcn), []);
   assert.deepEqual(unknownShapes(css), ['.cn-card-content:has(> [data-slot=x]) {', '.cn-a, .cn-b {']);
 });
+
+test('cn-menu-translucent stays empty: shadcn menus are solid unless the translucent menu color is chosen', () => {
+  const css = '  /* MARK: Menu Translucent */\n  .cn-menu-translucent {\n    @apply bg-popover/70;\n  }\n';
+  const out = buildStyle('x', css, new Set(['cn-menu-translucent']));
+  assert.doesNotMatch(out, /bg-popover\/70/);
+  assert.match(out, /^ {4}\.cn-menu-translucent \{\}$/m);
+});

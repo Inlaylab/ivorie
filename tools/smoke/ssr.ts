@@ -99,6 +99,8 @@ try {
     at = `/docs/${slug}`;
     await visit(page, at);
   }
+  at = '/playground';
+  await visit(page, at);
 } catch (err) {
   failures.push(`${at}: ${String(err instanceof Error ? err.message : err).split('\n')[0]}`);
 } finally {

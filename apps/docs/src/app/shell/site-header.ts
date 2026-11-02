@@ -116,6 +116,7 @@ export class SiteHeader {
   protected readonly links = [
     { path: '/docs/installation', label: 'Docs' },
     { path: '/docs/components', label: 'Components' },
+    { path: '/playground', label: 'Playground' },
   ];
   protected readonly styles: readonly { name: StyleName; label: string }[] = STYLES;
 
