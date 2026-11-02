@@ -118,6 +118,7 @@ describe('IvDialog', () => {
     expect(q('dialog-header').classList).toContain('cn-dialog-header')
     expect(q('dialog-header').classList).toContain('extra')
     expect(q('dialog-title').classList).toContain('cn-dialog-title')
+    expect(q('dialog-title').classList).toContain('cn-font-heading')
     expect(q('dialog-description').classList).toContain('cn-dialog-description')
     expect(q('dialog-footer').classList).toContain('cn-dialog-footer')
     const close = document.querySelector('.cn-dialog-close')!

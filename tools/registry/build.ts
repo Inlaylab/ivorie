@@ -6,7 +6,7 @@ import { parseArgs } from 'node:util';
 import { fileURLToPath } from 'node:url';
 import { parseFrontmatter } from '../docs/content.ts';
 import { parseTheme } from '../../projects/cli/src/theme.ts';
-import { DEFAULT_PRESET } from '../../projects/cli/src/preset.ts';
+import { DEFAULT_PRESET, RADII } from '../../projects/cli/src/preset.ts';
 import { collectDeps, listEntries, registryDeps, rewriteImports } from './items.ts';
 
 const ITEM_SCHEMA = 'https://ui.shadcn.com/schema/registry-item.json';
@@ -14,8 +14,12 @@ const REGISTRY_SCHEMA = 'https://ui.shadcn.com/schema/registry.json';
 const STYLES_DIR = 'projects/ui/styles';
 // Var maps from shadcn/ui (MIT) apps/v4/registry/themes.ts, keys as --name.
 const BASE_COLORS_DIR = 'tools/registry/base-colors';
+// From shadcn/ui (MIT) apps/v4/lib/font-definitions.ts. Each font is a @fontsource-variable package.
+const FONTS: { name: string; title: string; type: string; family: string; import: string; dependency: string }[] = JSON.parse(
+  readFileSync('tools/registry/fonts.json', 'utf8'),
+);
 
-type Kind = 'component' | 'lib' | 'style' | 'base-color' | 'theme-base';
+type Kind = 'component' | 'lib' | 'style' | 'base-color' | 'theme-base' | 'font';
 interface File {
   path: string;
   type: 'registry:file';
@@ -25,13 +29,14 @@ interface File {
 interface Item {
   $schema: string;
   name: string;
-  type: 'registry:item' | 'registry:theme';
+  type: 'registry:item' | 'registry:theme' | 'registry:font';
   title: string;
   description: string;
   dependencies?: string[];
   registryDependencies?: string[];
   files?: File[];
   cssVars?: { light: Record<string, string>; dark: Record<string, string> };
+  font?: { family: string; provider: 'google'; variable: '--font-sans'; subsets: string[]; import: string; dependency: string };
   meta: { ivorie: { kind: Kind } };
 }
 
@@ -107,6 +112,18 @@ export function buildItems(): Item[] {
     });
   }
 
+  for (const f of FONTS) {
+    items.push({
+      $schema: ITEM_SCHEMA,
+      name: `font-${f.name}`,
+      type: 'registry:font',
+      title: f.title,
+      description: `The ${f.title} font (${f.type}).`,
+      font: { family: f.family, provider: 'google', variable: '--font-sans', subsets: ['latin'], import: f.import, dependency: f.dependency },
+      meta: { ivorie: { kind: 'font' } },
+    });
+  }
+
   const theme = parseTheme(readFileSync(join(STYLES_DIR, 'theme.css'), 'utf8'));
   items.push(
     {
@@ -141,8 +158,8 @@ export function build(out: string): void {
       })),
       styles: kinds('style').map((n) => n.slice('style-'.length)),
       baseColors: kinds('base-color').map((n) => n.slice('theme-'.length)),
-      fonts: ['system'],
-      radii: ['default'],
+      fonts: ['system', ...FONTS.map((f) => f.name)],
+      radii: Object.keys(RADII),
       presets: { default: DEFAULT_PRESET },
     }),
   );

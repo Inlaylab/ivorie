@@ -187,7 +187,7 @@ export class IvDialogHeader {
 export class IvDialogTitle {
   readonly id = inject(IvIdGenerator).next('iv-dialog-title')
   readonly class = input('');
-  readonly classes = computed(() => cn('cn-dialog-title', this.class()))
+  readonly classes = computed(() => cn('cn-dialog-title cn-font-heading', this.class()))
 
   constructor() {
     inject(IvDialogContainer, { optional: true })?.titleId.set(this.id)

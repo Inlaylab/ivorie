@@ -37,6 +37,11 @@ describe('IvCard', () => {
     },
   )
 
+  it('title uses the heading font hook', async () => {
+    const { part } = await setup()
+    expect(part('card-title').classList).toContain('cn-font-heading')
+  })
+
   it('sets data-size and keeps the user class', async () => {
     const { fixture, part } = await setup()
     expect(part('card').dataset['size']).toBe('default')

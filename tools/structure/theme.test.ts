@@ -7,7 +7,8 @@ const theme = readFileSync('projects/ui/styles/theme.css', 'utf8');
 
 test('theme sets no font', () => {
   assert.doesNotMatch(theme, /Figtree/);
-  assert.doesNotMatch(theme, /--font-sans/);
+  // --font-heading may point at --font-sans; the theme must not define it.
+  assert.doesNotMatch(theme, /--font-sans:/);
 });
 
 test('theme has the shadcn dark variant', () => {

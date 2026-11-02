@@ -52,6 +52,17 @@ test('index.json lists every item and the preset axes', () => {
   assert.ok(index.styles.includes('maia'));
   assert.deepEqual(index.baseColors, ['mauve', 'mist', 'neutral', 'olive', 'stone', 'taupe', 'zinc']);
   assert.equal(index.presets.default.style, 'maia');
+  assert.equal(index.fonts.length, 27);
+  assert.equal(index.fonts[0], 'system');
+  assert.deepEqual(index.radii, ['default', 'none', 'small', 'medium', 'large']);
+});
+
+test('one font item per font, with family and package', () => {
+  const inter = items.find((i) => i.name === 'font-inter');
+  assert.equal(inter.type, 'registry:font');
+  assert.equal(inter.font.family, "'Inter Variable', sans-serif");
+  assert.equal(inter.font.dependency, '@fontsource-variable/inter');
+  assert.equal(items.filter((i) => i.meta.ivorie.kind === 'font').length, 26);
 });
 
 test('building twice gives byte-identical output', () => {

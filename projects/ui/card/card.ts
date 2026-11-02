@@ -50,7 +50,7 @@ export class IvCardTitle {
   readonly class = input('');
 
   protected readonly classes = computed(() =>
-    cn('cn-card-title', this.class())
+    cn('cn-card-title cn-font-heading', this.class())
   )
 }
 

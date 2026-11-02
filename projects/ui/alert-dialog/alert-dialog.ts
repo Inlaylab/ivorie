@@ -189,7 +189,7 @@ export class IvAlertDialogMedia {
 export class IvAlertDialogTitle {
   readonly id = inject(IvIdGenerator).next('iv-alert-dialog-title')
   readonly class = input('');
-  readonly classes = computed(() => cn('cn-alert-dialog-title', this.class()))
+  readonly classes = computed(() => cn('cn-alert-dialog-title cn-font-heading', this.class()))
 
   constructor() {
     inject(IvAlertDialogContainer, { optional: true })?.titleId.set(this.id)

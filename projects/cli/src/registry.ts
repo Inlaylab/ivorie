@@ -4,7 +4,7 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { Preset } from './preset.ts';
 
-export type ItemKind = 'component' | 'lib' | 'style' | 'base-color' | 'theme-base';
+export type ItemKind = 'component' | 'lib' | 'style' | 'base-color' | 'theme-base' | 'font';
 
 export interface RegistryIndex {
   version: string;
@@ -26,13 +26,14 @@ export interface RegistryFile {
 export interface RegistryItem {
   $schema: string;
   name: string;
-  type: 'registry:item' | 'registry:theme';
+  type: 'registry:item' | 'registry:theme' | 'registry:font';
   title: string;
   description: string;
   dependencies?: string[];
   registryDependencies?: string[];
   files?: RegistryFile[];
   cssVars?: { light: Record<string, string>; dark: Record<string, string> };
+  font?: { family: string; dependency: string };
   meta: { ivorie: { kind: ItemKind } };
 }
 

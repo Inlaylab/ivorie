@@ -1,6 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { DEFAULT_PRESET, decodePreset, encodePreset, resolvePreset } from '../src/preset.ts';
+import { DEFAULT_PRESET, RADII, checkPreset, decodePreset, encodePreset, resolvePreset } from '../src/preset.ts';
+import { PRESET_GOLDEN } from '../src/preset.fixture.ts';
 import type { RegistryIndex } from '../src/registry.ts';
 
 const index = {
@@ -36,4 +37,44 @@ test('an unknown name throws', () => {
 test('a bad code throws', () => {
   assert.throws(() => decodePreset('ivp1_!!!'), { message: 'invalid preset code' });
   assert.throws(() => resolvePreset('ivp1_e30', index), { message: 'invalid preset code' });
+});
+
+// Made by 1.0 and 1.1, before fontHeading. Must never change.
+const CODE_1_1 =
+  'ivp1_eyJiYXNlQ29sb3IiOiJuZXV0cmFsIiwiZm9udCI6InN5c3RlbSIsInJhZGl1cyI6ImRlZmF1bHQiLCJzdHlsZSI6Im1haWEifQ';
+
+test('the default code is the same as in 1.1', () => {
+  assert.equal(encodePreset(DEFAULT_PRESET), CODE_1_1);
+});
+
+test('a 1.1 code decodes with fontHeading inherit', () => {
+  assert.deepEqual(decodePreset(CODE_1_1), { ...DEFAULT_PRESET, fontHeading: 'inherit' });
+  assert.equal(DEFAULT_PRESET.fontHeading, 'inherit');
+});
+
+test('the golden preset round-trips to its code', () => {
+  assert.equal(encodePreset(PRESET_GOLDEN.preset), PRESET_GOLDEN.code);
+  assert.deepEqual(decodePreset(PRESET_GOLDEN.code), PRESET_GOLDEN.preset);
+});
+
+const full = {
+  ...index,
+  styles: ['maia', 'nova'],
+  baseColors: ['neutral', 'olive'],
+  fonts: ['system', 'inter', 'lora'],
+  radii: Object.keys(RADII),
+} satisfies RegistryIndex;
+
+test('checkPreset accepts the golden preset', () => {
+  assert.doesNotThrow(() => checkPreset(PRESET_GOLDEN.preset, full));
+});
+
+test('fontHeading must be inherit or a real font, not system', () => {
+  assert.throws(() => checkPreset({ ...DEFAULT_PRESET, fontHeading: 'system' }, full), {
+    message: 'unknown fontHeading "system" (available: inherit, inter, lora)',
+  });
+});
+
+test('RADII: default keeps the style radius, the rest set --radius', () => {
+  assert.deepEqual(RADII, { default: null, none: '0', small: '0.45rem', medium: '0.625rem', large: '0.875rem' });
 });

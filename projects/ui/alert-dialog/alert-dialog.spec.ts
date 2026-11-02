@@ -80,6 +80,7 @@ describe('IvAlertDialog', () => {
     expect(el.getAttribute('role')).toBe('alertdialog')
     expect(el.getAttribute('aria-modal')).toBe('true')
     const title = document.querySelector('[data-slot="alert-dialog-title"]')!
+    expect(title.classList).toContain('cn-font-heading')
     const description = document.querySelector('[data-slot="alert-dialog-description"]')!
     expect(el.getAttribute('aria-labelledby')).toBe(title.id)
     expect(el.getAttribute('aria-describedby')).toBe(description.id)
