@@ -61,3 +61,18 @@ test('every shadcn style has a source file and a package export', () => {
 test('theme @source covers the shipped .mjs files', () => {
   assert.ok(theme.includes('@source "../**/*.{html,ts,mjs}";'));
 });
+
+test('every radius token follows --radius (shadcn scale), so a preset radius reaches rounded-2xl..4xl too', () => {
+  const scale = {
+    sm: 'calc(var(--radius) * 0.6)',
+    md: 'calc(var(--radius) * 0.8)',
+    lg: 'var(--radius)',
+    xl: 'calc(var(--radius) * 1.4)',
+    '2xl': 'calc(var(--radius) * 1.8)',
+    '3xl': 'calc(var(--radius) * 2.2)',
+    '4xl': 'calc(var(--radius) * 2.6)',
+  };
+  for (const [size, value] of Object.entries(scale)) {
+    assert.ok(theme.includes(`--radius-${size}: ${value};`), `--radius-${size}`);
+  }
+});
