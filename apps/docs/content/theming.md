@@ -116,7 +116,7 @@ Set `--radius` once. Other radii derive from it in `theme.css`.
 
 ## Presets
 
-Base color, font, heading font and radius are preset choices. Pick them in the [playground](/playground), then run `npx ivorie init --preset ivp1_…` in a new app or `npx ivorie apply ivp1_…` in an existing one.
+Base color, font, heading font and radius are preset choices. Pick them in the [playground](playground), then run `npx ivorie init --preset ivp1_…` in a new app or `npx ivorie apply ivp1_…` in an existing one.
 
 | Radius | `--radius` |
 |---|---|

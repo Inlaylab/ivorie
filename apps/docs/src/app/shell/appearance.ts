@@ -45,6 +45,8 @@ export class Appearance {
   private readonly win = isPlatformBrowser(inject(PLATFORM_ID)) ? this.doc.defaultView : null;
   private readonly _state = signal<AppearanceState>(this.read());
   private readonly prefersDark = signal(false);
+  /** A style shown but not saved: the playground sets it while open. */
+  private readonly preview = signal<StyleName | null>(null);
 
   readonly state = this._state.asReadonly();
   readonly dark = computed(() => {
@@ -69,10 +71,12 @@ export class Appearance {
     });
     effect(() => {
       const body = this.doc.body;
-      const style = `style-${this._state().style}`;
+      // Signals, not activeStyle: every setStyle re-runs this, so stray style-* classes go.
+      const name = this.preview() ?? this._state().style;
+      const style = `style-${name}`;
       for (const c of [...body.classList]) if (c.startsWith('style-') && c !== style) body.classList.remove(c);
       body.classList.add(style);
-      this.loadStyleSheet(this._state().style);
+      this.loadStyleSheet(name);
     });
   }
 
@@ -82,6 +86,11 @@ export class Appearance {
 
   setStyle(style: StyleName): void {
     this.update({ style });
+  }
+
+  /** Shows a style without saving it. null goes back to the saved style. */
+  previewStyle(style: StyleName | null): void {
+    this.preview.set(style);
   }
 
   /** The default style is in the main CSS; the others are separate bundles (angular.json, inject: false). */

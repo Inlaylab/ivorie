@@ -1,11 +1,12 @@
 // Compiles apps/docs/content/*.md into lazy TS page modules in apps/docs/src/generated/.
-// Also publishes the CLI registry at /r/ and the components.json schema at /schema/.
+// Also writes the playground look options (looks.ts) and publishes the CLI registry at /r/ and the components.json schema at /schema/.
 // Usage: node tools/docs/build.ts
 import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { basename, join } from 'node:path';
 import { buildPage, createHighlighter, createRenderer, parseFrontmatter } from './content.ts';
 import type { DocPage } from '../../apps/docs/src/app/content/types.ts';
 import { build as buildRegistry } from '../registry/build.ts';
+import { looksModule } from './looks.ts';
 
 const CONTENT = 'apps/docs/content';
 const DEMOS = 'apps/docs/src/app/demos';
@@ -93,6 +94,8 @@ writeFileSync(
   `${HEADER}import type { DemoLoader } from '../app/content/types';\n\n` +
     `export const DEMOS: Record<string, DemoLoader> = {\n${loaders.join('\n')}\n};\n`,
 );
+
+writeFileSync(join(OUT, 'looks.ts'), looksModule());
 
 buildRegistry('apps/docs/public/r');
 mkdirSync('apps/docs/public/schema', { recursive: true });

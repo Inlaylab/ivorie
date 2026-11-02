@@ -1,0 +1,17 @@
+import { describe, expect, it } from 'vitest';
+import { DEFAULT_PRESET, decodePreset, encodePreset } from './preset-code';
+
+// Made by the 1.1 CLI, before fontHeading.
+const CODE_1_1 =
+  'ivp1_eyJiYXNlQ29sb3IiOiJuZXV0cmFsIiwiZm9udCI6InN5c3RlbSIsInJhZGl1cyI6ImRlZmF1bHQiLCJzdHlsZSI6Im1haWEifQ';
+
+describe('preset code', () => {
+  it('the default preset gives the 1.1 code', () => {
+    expect(encodePreset(DEFAULT_PRESET)).toBe(CODE_1_1);
+    expect(decodePreset(CODE_1_1)).toEqual(DEFAULT_PRESET);
+  });
+
+  it('bad input gives null, never throws', () => {
+    for (const bad of ['ivp1_!!', 'ivp1_e30', 'nope', '', 'ivp1_' + btoa('[1]')]) expect(decodePreset(bad)).toBeNull();
+  });
+});

@@ -74,7 +74,7 @@ npx ivorie migrate src
 
 ## apply
 
-Change the look of an app that ran `init`. Pass a preset name or a code from the [playground](/playground):
+Change the look of an app that ran `init`. Pass a preset name or a code from the [playground](playground):
 
 ```bash
 npx ivorie apply ivp1_…
@@ -106,7 +106,7 @@ It rewrites `theme.css`, writes the new style file, swaps the style and font `@i
 
 ## Presets
 
-A preset names a style, a base color, a font, a heading font and a radius. Make one in the [playground](/playground) and copy its code (`ivp1_…`). `--preset default` is maia, neutral, the system font and the default radius.
+A preset names a style, a base color, a font, a heading font and a radius. Make one in the [playground](playground) and copy its code (`ivp1_…`). `--preset default` is maia, neutral, the system font and the default radius.
 
 ## Registry
 
