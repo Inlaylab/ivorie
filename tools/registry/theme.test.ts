@@ -25,3 +25,22 @@ test('CLI form drops the package imports', () => {
 test('parseTheme throws without the var blocks', () => {
   assert.throws(() => parseTheme('a {}'), /no :root block/);
 });
+
+const colorsDir = 'tools/registry/base-colors';
+const color = (n: string) => JSON.parse(readFileSync(`${colorsDir}/${n}.json`, 'utf8'));
+const BASE_COLORS = ['neutral', 'stone', 'zinc', 'mauve', 'olive', 'mist', 'taupe'];
+
+test('neutral.json equals the theme.css var blocks, in order', () => {
+  const { light, dark } = parseTheme(css);
+  assert.deepEqual(Object.entries(color('neutral').light), Object.entries(light));
+  assert.deepEqual(color('neutral').dark, dark);
+});
+
+test('every base color has the same var keys as neutral', () => {
+  const ref = color('neutral');
+  for (const n of BASE_COLORS) {
+    assert.deepEqual(Object.keys(color(n).light).sort(), Object.keys(ref.light).sort(), n);
+    assert.deepEqual(Object.keys(color(n).dark).sort(), Object.keys(ref.dark).sort(), n);
+    assert.ok(color(n).title, n);
+  }
+});

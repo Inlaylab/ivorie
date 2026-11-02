@@ -50,7 +50,7 @@ test('index.json lists every item and the preset axes', () => {
   const index = JSON.parse(readFileSync(join(dirA, 'index.json'), 'utf8'));
   assert.equal(index.items.length, items.length);
   assert.ok(index.styles.includes('maia'));
-  assert.deepEqual(index.baseColors, ['neutral']);
+  assert.deepEqual(index.baseColors, ['mauve', 'mist', 'neutral', 'olive', 'stone', 'taupe', 'zinc']);
   assert.equal(index.presets.default.style, 'maia');
 });
 

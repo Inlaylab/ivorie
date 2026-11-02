@@ -89,8 +89,8 @@ test('the default preset code gives the same output as no preset', async () => {
 });
 
 test('an unknown base color fails with the options', async () => {
-  await assert.rejects(runInit({ cwd: app(), registry, skipInstall: true, yes: true, baseColor: 'zinc' }), {
-    message: 'unknown baseColor "zinc" (available: neutral)',
+  await assert.rejects(runInit({ cwd: app(), registry, skipInstall: true, yes: true, baseColor: 'slate' }), {
+    message: 'unknown baseColor "slate" (available: mauve, mist, neutral, olive, stone, taupe, zinc)',
   });
 });
 
@@ -126,4 +126,11 @@ test('dry run writes nothing', async () => {
   assert.ok(r.written.includes('components.json'));
   assert.ok(!existsSync(join(cwd, 'components.json')));
   assert.equal(read(cwd, 'src/styles.css'), before);
+});
+
+test('--base-color olive writes the olive vars', async () => {
+  const cwd = app();
+  await runInit({ cwd, registry, skipInstall: true, yes: true, baseColor: 'olive' });
+  const theme = readFileSync(join(cwd, 'src/app/ui/styles/theme.css'), 'utf8');
+  assert.match(theme, /--primary: oklch\(0\.228 0\.013 107\.4\);/);
 });

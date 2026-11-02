@@ -12,7 +12,8 @@ import { collectDeps, listEntries, registryDeps, rewriteImports } from './items.
 const ITEM_SCHEMA = 'https://ui.shadcn.com/schema/registry-item.json';
 const REGISTRY_SCHEMA = 'https://ui.shadcn.com/schema/registry.json';
 const STYLES_DIR = 'projects/ui/styles';
-const BASE_COLOR = DEFAULT_PRESET.baseColor;
+// Var maps from shadcn/ui (MIT) apps/v4/registry/themes.ts, keys as --name.
+const BASE_COLORS_DIR = 'tools/registry/base-colors';
 
 type Kind = 'component' | 'lib' | 'style' | 'base-color' | 'theme-base';
 interface File {
@@ -92,17 +93,22 @@ export function buildItems(): Item[] {
     });
   }
 
+  for (const f of readdirSync(BASE_COLORS_DIR).filter((f) => f.endsWith('.json')).sort()) {
+    const name = f.slice(0, -'.json'.length);
+    const color = JSON.parse(readFileSync(join(BASE_COLORS_DIR, f), 'utf8'));
+    items.push({
+      $schema: ITEM_SCHEMA,
+      name: `theme-${name}`,
+      type: 'registry:theme',
+      title: `Theme ${name}`,
+      description: `The ${name} base color: light and dark CSS variables.`,
+      cssVars: { light: color.light, dark: color.dark },
+      meta: { ivorie: { kind: 'base-color' } },
+    });
+  }
+
   const theme = parseTheme(readFileSync(join(STYLES_DIR, 'theme.css'), 'utf8'));
   items.push(
-    {
-      $schema: ITEM_SCHEMA,
-      name: `theme-${BASE_COLOR}`,
-      type: 'registry:theme',
-      title: `Theme ${BASE_COLOR}`,
-      description: `The ${BASE_COLOR} base color: light and dark CSS variables.`,
-      cssVars: { light: theme.light, dark: theme.dark },
-      meta: { ivorie: { kind: 'base-color' } },
-    },
     {
       $schema: ITEM_SCHEMA,
       name: 'theme-base',
