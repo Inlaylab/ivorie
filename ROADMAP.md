@@ -16,7 +16,7 @@ Fixed choices:
 More detail: [PLAN](docs/PLAN.md) · [ARCHITECTURE](docs/ARCHITECTURE.md) · [CONVENTIONS](docs/CONVENTIONS.md) · [COMPAT](docs/COMPAT.md) · [DECISIONS](docs/DECISIONS.md) · [DEPLOY](docs/DEPLOY.md).
 
 ## Status
-**Next:** Phase 8, task T6 (quick wins). Done: T1–T5. T0 runs last.
+**Next:** Phase 8, task T0 (release hygiene), then T7 (release 1.1.0). Done: T1–T6. T0 runs last.
 Shipped: 1.0.0 (both packages). Docs initial bundle is ~800 kB, mostly lucide icons (fixed in Phase 11).
 
 | # | Release | What | Status |
@@ -71,7 +71,7 @@ It also runs these grep rules:
 ---
 
 ## Phase 8 — Release 1.1.0: Components + quick wins
-Branch `phase-8-components`. Tasks are OK'd.
+Branch `v1.1.0`. Tasks are OK'd.
 
 **Goal:** browse all components and all their examples easily, add the missing shadcn components, fix the small known bugs.
 
