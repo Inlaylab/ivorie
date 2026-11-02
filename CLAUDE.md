@@ -12,7 +12,8 @@ Angular 22 UI library (`@inlaylab/ivorie`) + copy-in CLI (`ivorie`). Based on sh
 Latest only: Angular 22, Tailwind 4.3, zoneless, Vitest, `@lucide/angular`. No deprecated APIs. See [docs/COMPAT.md](docs/COMPAT.md).
 
 ## Rules
-- One phase = one minor release = one branch = one PR. Branch name: `phase-N-short-name`.
+- One phase = one minor release = one branch = one PR. SemVer: feature = minor, fix = patch, breaking = major.
+- Branches from `main`: `feat/<short-name>` (phase), `fix/<short-name>` (patch), `chore/<short-name>` (tooling/docs). Conventional Commits. Release commit `chore: release X.Y.Z`, tag `vX.Y.Z` on `main` after merge.
 - Last task of a phase: `npx changeset version` (both packages, one version), CHANGELOG, release.
 - Finish one task → run its check → commit → update **Status** in ROADMAP.md.
 - Commit messages and PRs: no `Co-Authored-By` or any AI attribution line.

@@ -15,7 +15,6 @@ export const contentRoutes: Routes = [
         path: 'playground',
         loadComponent: () => import('../playground/playground'),
         title: 'Playground · Ivorie',
-        data: { wide: true },
       },
       {
         path: 'docs/:slug',

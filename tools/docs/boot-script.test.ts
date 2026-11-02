@@ -57,13 +57,7 @@ test('localStorage getter throws: no throw', () => {
   assert.deepEqual(classes, []);
 });
 
-test('saved dark mode and a known style apply', () => {
+test('saved dark mode applies; a saved style is ignored (the site is always maia)', () => {
   const r = run({ getItem: () => JSON.stringify({ mode: 'dark', style: 'vega' }) });
-  assert.deepEqual(r, { dark: true, body: 'style-vega', links: 1 });
-});
-
-test('an unknown style name is ignored', () => {
-  for (const style of ['evil', 'maia x', 'style-maia', 42]) {
-    assert.deepEqual(run({ getItem: () => JSON.stringify({ style }) }), { dark: false, body: 'style-maia', links: 0 });
-  }
+  assert.deepEqual(r, { dark: true, body: 'style-maia', links: 0 });
 });

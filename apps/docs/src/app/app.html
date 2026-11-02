@@ -1,13 +1,16 @@
 <iv-sidebar-provider class="docs-shell flex-col">
-  <docs-site-header />
+  <docs-site-header [docs]="docs()" />
   <div class="flex flex-1">
-    <iv-sidebar>
-      <iv-sidebar-content class="no-scrollbar py-4">
-        <docs-site-nav />
-      </iv-sidebar-content>
-    </iv-sidebar>
+    <!-- Class, not @if: the server and the client must render the same markup. -->
+    <div class="contents" [class.hidden]="!docs()">
+      <iv-sidebar>
+        <iv-sidebar-content class="no-scrollbar py-4">
+          <docs-site-nav />
+        </iv-sidebar-content>
+      </iv-sidebar>
+    </div>
     <div ivSidebarInset class="min-w-0">
-      <main class="mx-auto w-full px-4 py-8 sm:px-6 lg:px-10 lg:py-10" [class.max-w-6xl]="!wide()" [class.max-w-screen-2xl]="wide()">
+      <main class="w-full" [class]="docs() ? 'mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-10 lg:py-10' : ''">
         <router-outlet />
       </main>
     </div>

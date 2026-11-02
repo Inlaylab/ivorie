@@ -36,7 +36,11 @@ Owner in brackets. Items marked "user" need a person, not code.
 3. **[user] Trademark and company legal OK** for the name, if still open.
 
 ## How we work
-- One phase = one release = one branch = one PR. Branch name: `phase-N-short-name`.
+- One phase = one minor release = one branch = one PR into `main`.
+- Versions follow SemVer 2.0: a new feature is a minor (1.x.0), a bug fix is a patch (1.x.y), a breaking change is a major (x.0.0). Both packages share one version (Changesets `fixed`).
+- Branches: `feat/<short-name>` for a phase, `fix/<short-name>` for a patch, `chore/<short-name>` for tooling or docs only. Lowercase, hyphens, no version in the name. Branch from `main`.
+- Commits: Conventional Commits (`feat:`, `fix:`, `docs:`, `chore:`, `test:`; `!` or `BREAKING CHANGE:` for a major).
+- Release: the version bump commit is `chore: release X.Y.Z`. After merge, tag `main` as `vX.Y.Z` and publish from that tag.
 - Finish a task, run its check, commit, then update **Status** here.
 - A phase marked "outline" is expanded into tasks (superpowers:writing-plans) and OK'd before work starts.
 - A phase is done only when its exit gate passes. Run the commands and show the output.
@@ -162,7 +166,7 @@ Won't fix (notes, not bugs):
 ### T7. Release 1.1.0
 1. `npx changeset version` → 1.1.0 for both packages, CHANGELOG entry.
 2. `npm run check`, `npm run smoke:pack`, `npm run smoke:cli`.
-3. PR `phase-8-components` → `main`. CI green. Merge.
+3. PR → `main`. CI green. Merge.
 4. Ask the user. Run the Release workflow on `main`.
 
 **Exit gate:**
@@ -172,7 +176,7 @@ Won't fix (notes, not bugs):
 ---
 
 ## Phase 9 — Release 1.2.0: Playground (themes, colors, fonts)
-Branch `phase-9-playground`. Outline: expand into tasks and get an OK first.
+Branch `phase-9-playground` (made before the naming rule). Tasks are OK'd.
 
 **Goal:** pick a style, base color, font and radius on one page, see real components change live, then install that exact look with one command.
 
@@ -206,7 +210,7 @@ Tasks:
 ---
 
 ## Phase 10 — Release 1.3.0: Blocks
-Branch `phase-10-blocks`. Outline: expand into tasks and get an OK first.
+Branch `feat/blocks`. Outline: expand into tasks and get an OK first.
 
 **Goal:** ready-made page sections (login, signup, sidebar layouts) users add with one command and then own.
 
@@ -225,7 +229,7 @@ Scope:
 ---
 
 ## Phase 11 — Release 1.4.0: Icon libraries as plugins
-Branch `phase-11-icons`. Outline: expand into tasks and get an OK first.
+Branch `feat/icon-libraries`. Outline: expand into tasks and get an OK first.
 
 **Goal:** choose lucide, tabler, phosphor, hugeicons or remix like a theme. Smaller docs bundle.
 
@@ -247,7 +251,7 @@ Scope:
 ---
 
 ## Phase 12 — Release 1.5.0: Charts
-Branch `phase-12-charts`. Outline: expand into tasks and get an OK first.
+Branch `feat/charts`. Outline: expand into tasks and get an OK first.
 
 **Goal:** line, area, bar and pie charts that follow the theme, like shadcn charts.
 

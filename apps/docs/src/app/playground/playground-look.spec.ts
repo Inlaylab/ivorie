@@ -8,17 +8,19 @@ import { DEFAULT_PRESET, encodePreset } from './preset-code';
 
 const olive = BASE_COLORS.find((c) => c.name === 'olive')!;
 const html = () => document.documentElement;
-const inlineVars = () => [...html().style].filter((p) => p.startsWith('--'));
+const inlineVars = (el: HTMLElement) => [...el.style].filter((p) => p.startsWith('--'));
 
-function create() {
+function create(providers: unknown[] = []) {
   Object.defineProperty(document.defaultView!, 'matchMedia', {
     configurable: true,
     value: () => ({ matches: false, addEventListener: () => {}, removeEventListener: () => {} }),
   });
-  TestBed.configureTestingModule({ providers: [PlaygroundLook] });
+  TestBed.configureTestingModule({ providers: [PlaygroundLook, ...(providers as never[])] });
   const look = TestBed.inject(PlaygroundLook);
+  const stage = document.body.appendChild(document.createElement('div'));
+  look.attach(stage);
   TestBed.tick();
-  return { look, appearance: TestBed.inject(Appearance) };
+  return { look, stage, appearance: TestBed.inject(Appearance) };
 }
 
 describe('PlaygroundLook', () => {
@@ -28,28 +30,30 @@ describe('PlaygroundLook', () => {
     html().className = '';
     html().removeAttribute('style');
     document.body.className = '';
+    document.body.innerHTML = '';
     document.head.querySelectorAll('link').forEach((l) => l.remove());
   });
 
-  it('applies the base color for light, then dark', () => {
-    const { look, appearance } = create();
+  it('applies the base color to the attached element only, for light then dark', () => {
+    const { look, stage, appearance } = create();
     look.set({ baseColor: 'olive' });
     TestBed.tick();
-    expect(html().style.getPropertyValue('--primary')).toBe(olive.light['--primary']);
+    expect(stage.style.getPropertyValue('--primary')).toBe(olive.light['--primary']);
+    expect(inlineVars(html())).toEqual([]);
     appearance.setMode('dark');
     TestBed.tick();
-    expect(html().style.getPropertyValue('--primary')).toBe(olive.dark['--primary']);
+    expect(stage.style.getPropertyValue('--primary')).toBe(olive.dark['--primary']);
   });
 
   it('sets --radius from the radius name', () => {
-    const { look } = create();
+    const { look, stage } = create();
     look.set({ radius: 'large' });
     TestBed.tick();
-    expect(html().style.getPropertyValue('--radius')).toBe('0.875rem');
+    expect(stage.style.getPropertyValue('--radius')).toBe('0.875rem');
   });
 
   it('loads a font once from @fontsource-variable and sets the tokens', () => {
-    const { look } = create();
+    const { look, stage } = create();
     look.set({ font: 'inter', fontHeading: 'lora' });
     TestBed.tick();
     look.set({ radius: 'small' });
@@ -59,27 +63,29 @@ describe('PlaygroundLook', () => {
       'https://cdn.jsdelivr.net/npm/@fontsource-variable/inter/index.css',
       'https://cdn.jsdelivr.net/npm/@fontsource-variable/lora/index.css',
     ]);
-    expect(html().style.getPropertyValue('--font-sans')).toContain("'Inter Variable'");
-    expect(html().style.getPropertyValue('--font-heading')).toContain("'Lora Variable'");
+    expect(stage.style.getPropertyValue('--font-sans')).toContain("'Inter Variable'");
+    expect(stage.style.getPropertyValue('--font-heading')).toContain("'Lora Variable'");
     expect(() => links[0].dispatchEvent(new Event('error'))).not.toThrow();
   });
 
-  it('previews the style on <body> without saving it', () => {
-    const { look, appearance } = create();
+  it('puts the style class on the element and loads its sheet; <body> keeps maia', () => {
+    document.body.className = 'style-maia';
+    const { look, stage } = create();
     look.set({ style: 'nova' });
     TestBed.tick();
-    expect(document.body.classList).toContain('style-nova');
-    expect(appearance.state().style).toBe('maia');
-    expect(localStorage.getItem('ivorie-docs:appearance')).toBeNull();
+    expect([...stage.classList]).toEqual(['style-nova']);
+    expect(document.body.className).toBe('style-maia');
+    expect(document.getElementById('docs-style-nova')?.getAttribute('href')).toBe('style-nova.css');
   });
 
-  it('cleans up on destroy: no vars, no font links, saved style back', () => {
-    const { look } = create();
+  it('cleans up on destroy: no vars, no style class, no links', () => {
+    const { look, stage } = create();
     look.set({ baseColor: 'olive', font: 'inter', style: 'nova', radius: 'large' });
     TestBed.tick();
     TestBed.resetTestingModule();
-    expect(inlineVars()).toEqual([]);
-    expect(document.head.querySelector('link[id^="docs-font-"]')).toBeNull();
+    expect(inlineVars(stage)).toEqual([]);
+    expect(stage.className).toBe('');
+    expect(document.head.querySelector('link[id^="docs-font-"], link[id^="docs-style-"]')).toBeNull();
   });
 
   it('load(): a valid code, a bad code, an unknown value', () => {
@@ -106,10 +112,9 @@ describe('PlaygroundLook', () => {
   });
 
   it('does nothing on the server', () => {
-    TestBed.configureTestingModule({ providers: [PlaygroundLook, { provide: PLATFORM_ID, useValue: 'server' }] });
-    const look = TestBed.inject(PlaygroundLook);
+    const { look, stage } = create([{ provide: PLATFORM_ID, useValue: 'server' }]);
     look.set({ baseColor: 'olive' });
     TestBed.tick();
-    expect(inlineVars()).toEqual([]);
+    expect(inlineVars(stage)).toEqual([]);
   });
 });

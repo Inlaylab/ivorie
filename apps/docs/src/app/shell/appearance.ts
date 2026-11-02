@@ -9,44 +9,36 @@ import {
   signal,
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import { DEFAULT_STYLE, STYLES, type StyleName } from './appearance-options';
 
 export type ColorMode = 'light' | 'dark' | 'system';
-/** Saved as JSON. Unknown keys are kept, so later presets can add fields. */
+/** Saved as JSON. Unknown keys (an old `style`) are kept as they are. */
 export interface AppearanceState {
   mode: ColorMode;
-  style: StyleName;
   [key: string]: unknown;
 }
 export const APPEARANCE_KEY = 'ivorie-docs:appearance';
 
 const MODES: readonly ColorMode[] = ['light', 'dark', 'system'];
-const DEFAULTS: AppearanceState = { mode: 'system', style: DEFAULT_STYLE };
+const DEFAULTS: AppearanceState = { mode: 'system' };
 
 function parse(raw: string | null): AppearanceState {
   try {
     const value: unknown = JSON.parse(raw ?? 'null');
     if (!value || typeof value !== 'object' || Array.isArray(value)) return { ...DEFAULTS };
     const v = value as Record<string, unknown>;
-    return {
-      ...v,
-      mode: MODES.includes(v['mode'] as ColorMode) ? (v['mode'] as ColorMode) : DEFAULTS.mode,
-      style: STYLES.some((s) => s.name === v['style']) ? (v['style'] as StyleName) : DEFAULTS.style,
-    };
+    return { ...v, mode: MODES.includes(v['mode'] as ColorMode) ? (v['mode'] as ColorMode) : DEFAULTS.mode };
   } catch {
     return { ...DEFAULTS };
   }
 }
 
-/** Light / dark / system and the style class. Browser only; the server renders the defaults. */
+/** Light / dark / system on <html>. Browser only; the server renders light. The site style is always maia. */
 @Injectable({ providedIn: 'root' })
 export class Appearance {
   private readonly doc = inject(DOCUMENT);
   private readonly win = isPlatformBrowser(inject(PLATFORM_ID)) ? this.doc.defaultView : null;
   private readonly _state = signal<AppearanceState>(this.read());
   private readonly prefersDark = signal(false);
-  /** A style shown but not saved: the playground sets it while open. */
-  private readonly preview = signal<StyleName | null>(null);
 
   readonly state = this._state.asReadonly();
   readonly dark = computed(() => {
@@ -69,41 +61,15 @@ export class Appearance {
       html.classList.toggle('dark', dark);
       html.style.colorScheme = dark ? 'dark' : 'light';
     });
-    effect(() => {
-      const body = this.doc.body;
-      // Signals, not activeStyle: every setStyle re-runs this, so stray style-* classes go.
-      const name = this.preview() ?? this._state().style;
-      const style = `style-${name}`;
-      for (const c of [...body.classList]) if (c.startsWith('style-') && c !== style) body.classList.remove(c);
-      body.classList.add(style);
-      this.loadStyleSheet(name);
-    });
   }
 
   setMode(mode: ColorMode): void {
     this.update({ mode });
   }
 
-  setStyle(style: StyleName): void {
-    this.update({ style });
-  }
-
-  /** Shows a style without saving it. null goes back to the saved style. */
-  previewStyle(style: StyleName | null): void {
-    this.preview.set(style);
-  }
-
-  /** The default style is in the main CSS; the others are separate bundles (angular.json, inject: false). */
-  private loadStyleSheet(style: StyleName): void {
-    const current = this.doc.head.querySelector<HTMLLinkElement>('link#docs-style');
-    if (style === DEFAULT_STYLE) {
-      current?.remove();
-      return;
-    }
-    const link = current ?? this.doc.head.appendChild(this.doc.createElement('link'));
-    link.id = 'docs-style';
-    link.rel = 'stylesheet';
-    link.setAttribute('href', `style-${style}.css`);
+  /** Light if dark is showing, else dark. Saved as an explicit choice. */
+  toggle(): void {
+    this.setMode(this.dark() ? 'light' : 'dark');
   }
 
   private update(patch: Partial<AppearanceState>): void {

@@ -34,14 +34,14 @@ describe('Appearance', () => {
   it('defaults to system + maia with no storage', () => {
     mockMatchMedia(false);
     const { appearance } = create();
-    expect(appearance.state()).toEqual({ mode: 'system', style: 'maia' });
+    expect(appearance.state()).toEqual({ mode: 'system' });
   });
 
   it('falls back to defaults on corrupt JSON', () => {
     mockMatchMedia(false);
     localStorage.setItem(APPEARANCE_KEY, '{nope');
     const { appearance } = create();
-    expect(appearance.state()).toEqual({ mode: 'system', style: 'maia' });
+    expect(appearance.state()).toEqual({ mode: 'system' });
   });
 
   it('falls back to defaults when getItem throws', () => {
@@ -50,7 +50,7 @@ describe('Appearance', () => {
       throw new Error('blocked');
     });
     const { appearance } = create();
-    expect(appearance.state()).toEqual({ mode: 'system', style: 'maia' });
+    expect(appearance.state()).toEqual({ mode: 'system' });
   });
 
   it('setMode(dark) sets the class and keeps unknown keys in storage', () => {
@@ -76,45 +76,21 @@ describe('Appearance', () => {
     expect(doc.documentElement.classList.contains('dark')).toBe(false);
   });
 
-  it('setStyle(maia) leaves one style class on body', () => {
-    mockMatchMedia(false);
+  it('toggle() flips what is showing and saves it', () => {
+    mockMatchMedia(true);
     const { appearance, doc } = create();
-    doc.body.classList.add('style-old', 'keep');
-    appearance.setStyle('maia');
+    appearance.toggle();
     TestBed.tick();
-    const styles = [...doc.body.classList].filter((c) => c.startsWith('style-'));
-    expect(styles).toEqual(['style-maia']);
-    expect(doc.body.classList.contains('keep')).toBe(true);
+    expect(appearance.state().mode).toBe('light');
+    expect(doc.documentElement.classList.contains('dark')).toBe(false);
+    appearance.toggle();
+    expect(JSON.parse(localStorage.getItem(APPEARANCE_KEY)!).mode).toBe('dark');
   });
 
-  it('setStyle(nova) swaps the style class and saves it', () => {
-    mockMatchMedia(false);
-    const { appearance, doc } = create();
-    appearance.setStyle('nova');
-    TestBed.tick();
-    expect([...doc.body.classList].filter((c) => c.startsWith('style-'))).toEqual(['style-nova']);
-    expect(JSON.parse(localStorage.getItem(APPEARANCE_KEY)!).style).toBe('nova');
-  });
-
-  it('loads a non-default style sheet on demand and drops it for maia', () => {
-    mockMatchMedia(false);
-    const { appearance, doc } = create();
-    const link = () => doc.head.querySelector<HTMLLinkElement>('link#docs-style');
-    expect(link()).toBeNull();
-    appearance.setStyle('rhea');
-    TestBed.tick();
-    expect(link()?.getAttribute('href')).toBe('style-rhea.css');
-    appearance.setStyle('maia');
-    TestBed.tick();
-    expect(link()).toBeNull();
-  });
-
-  it('keeps a saved style that exists and drops one that does not', () => {
+  it('does not touch the body style class', () => {
     mockMatchMedia(false);
     localStorage.setItem(APPEARANCE_KEY, JSON.stringify({ mode: 'light', style: 'rhea' }));
-    expect(create().appearance.state().style).toBe('rhea');
-    TestBed.resetTestingModule();
-    localStorage.setItem(APPEARANCE_KEY, JSON.stringify({ mode: 'light', style: 'zzz' }));
-    expect(create().appearance.state().style).toBe('maia');
+    const { doc } = create();
+    expect(doc.body.className).toBe('');
   });
 });
