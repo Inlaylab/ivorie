@@ -55,7 +55,7 @@ export class IvEmptyHeader {
   selector: 'iv-empty-media',
   host: {
     'data-slot': 'empty-icon',
-    '[attr.data-variant]': 'variant()',
+    '[attr.data-variant]': 'variant() ?? "default"',
     '[class]': 'classes()',
   },
   changeDetection: ChangeDetectionStrategy.OnPush,

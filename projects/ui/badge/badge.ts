@@ -28,7 +28,7 @@ export type BadgeVariants = VariantProps<typeof badgeVariants>
   selector: 'iv-badge',
   host: {
     'data-slot': 'badge',
-    '[attr.data-variant]': 'variant()',
+    '[attr.data-variant]': 'variant() ?? "default"',
     '[class]': 'classes()',
   },
   changeDetection: ChangeDetectionStrategy.OnPush,

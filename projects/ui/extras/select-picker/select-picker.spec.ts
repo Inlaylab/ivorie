@@ -218,6 +218,18 @@ describe('IvSelectPicker', () => {
     expect(host.changes).toEqual([])
   })
 
+  it('Save after the control was disabled while open: nothing written, nothing emitted', async () => {
+    const { host, trigger, dialog, stable } = await render(FormHost)
+    trigger.click()
+    await stable()
+    host.control.disable()
+    await stable()
+    dialog.close(['g1'])
+    await stable()
+    expect(host.control.value).toEqual([])
+    expect(host.changes).toEqual([])
+  })
+
   describe('measuring (jsdom: mocked sizes, DECISIONS 2026-10-27)', () => {
     const observers: FakeResizeObserver[] = []
     class FakeResizeObserver {

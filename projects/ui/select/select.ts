@@ -115,6 +115,11 @@ export class IvSelect implements ControlValueAccessor {
     this.isOpen() ? this.close() : this.open()
   }
 
+  /** Leaving the closed trigger marks the control touched; while open, close() does it. */
+  onTriggerBlur() {
+    if (!this.isOpen()) this._onTouched()
+  }
+
   select(value: string) {
     this._value.set(value)
     this._onChange(value)
@@ -186,6 +191,7 @@ export class IvSelect implements ControlValueAccessor {
       [class]="classes()"
       (click)="parent.toggle()"
       (keydown)="parent.onKeydown($event)"
+      (blur)="parent.onTriggerBlur()"
     >
       <span
         data-slot="select-value"

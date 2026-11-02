@@ -8,7 +8,7 @@ import { IV_AVATAR_IMPORTS } from '@inlaylab/ivorie/avatar'
   template: `
     <iv-avatar-group>
       <iv-avatar [size]="size()" class="ml-1">
-        <iv-avatar-image src="/ada.png" alt="Ada" />
+        <iv-avatar-image [src]="src()" alt="Ada" />
         <iv-avatar-fallback>AL</iv-avatar-fallback>
         <iv-avatar-badge />
       </iv-avatar>
@@ -18,6 +18,7 @@ import { IV_AVATAR_IMPORTS } from '@inlaylab/ivorie/avatar'
 })
 class Host {
   size = signal<'default' | 'sm' | 'lg'>('default')
+  src = signal('/ada.png')
 }
 
 async function setup() {
@@ -42,6 +43,19 @@ describe('IvAvatar', () => {
     await fixture.whenStable()
     expect(img().hidden).toBe(false)
     expect(part('avatar-fallback').hidden).toBe(true)
+  })
+
+  it('a new src shows the fallback again until the new image loads', async () => {
+    const { fixture, part, img } = await setup()
+    img().dispatchEvent(new Event('load'))
+    await fixture.whenStable()
+    fixture.componentInstance.src.set('/grace.png')
+    await fixture.whenStable()
+    expect(img().hidden).toBe(true)
+    expect(part('avatar-fallback').hidden).toBe(false)
+    img().dispatchEvent(new Event('load'))
+    await fixture.whenStable()
+    expect(img().hidden).toBe(false)
   })
 
   it('hides the image and shows the fallback on error', async () => {

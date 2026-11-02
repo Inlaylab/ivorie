@@ -3,6 +3,7 @@
 import { spawnSync } from 'node:child_process';
 import { mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { DOM_GLOBALS, codeOf } from './dom-globals.ts';
 
 interface Step {
   name: string;
@@ -17,6 +18,8 @@ interface Rule {
   on?: 'line' | 'path';
   /** Files whose path matches are skipped. */
   exclude?: RegExp;
+  /** Test only the code part of each line, not comments. */
+  ignoreComments?: boolean;
 }
 
 export const steps: Step[] = [
@@ -75,9 +78,10 @@ export const rules: Rule[] = [
   // SSR safe: inject(DOCUMENT) and guard browser-only code. Specs run in jsdom and may use them.
   {
     name: 'no-dom-globals',
-    pattern: /(?<![\w.])(window|document)\./,
+    pattern: DOM_GLOBALS,
     paths: ['projects/ui'],
     exclude: /\.spec\.ts$/,
+    ignoreComments: true,
   },
 ];
 
@@ -102,7 +106,7 @@ function hits(rule: Rule): string[] {
     readFileSync(file, 'utf8')
       .split('\n')
       .forEach((line, i) => {
-        if (rule.pattern.test(line)) found.push(`${file}:${i + 1}: ${line.trim()}`);
+        if (rule.pattern.test(rule.ignoreComments ? codeOf(line) : line)) found.push(`${file}:${i + 1}: ${line.trim()}`);
       });
   }
   return found;

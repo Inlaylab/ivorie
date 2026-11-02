@@ -233,3 +233,31 @@ describe('IvTabs nested', () => {
     expect(tab('Outer A').getAttribute('aria-selected')).toBe('true')
   })
 })
+
+@Component({
+  imports: [IV_TABS_IMPORTS],
+  template: `
+    <iv-tabs defaultValue="a b">
+      <iv-tabs-list aria-label="Ids">
+        <iv-tabs-trigger value="a b">Space</iv-tabs-trigger>
+        <iv-tabs-trigger value="a_b">Underscore</iv-tabs-trigger>
+      </iv-tabs-list>
+      <iv-tabs-content value="a b">One</iv-tabs-content>
+      <iv-tabs-content value="a_b">Two</iv-tabs-content>
+    </iv-tabs>
+  `,
+})
+class IdHost {}
+
+describe('IvTabs ids', () => {
+  it('values that differ only in an unsafe char get different ids', async () => {
+    const fixture = TestBed.createComponent(IdHost)
+    await fixture.whenStable()
+    const el = fixture.nativeElement as HTMLElement
+    const tabs = [...el.querySelectorAll<HTMLElement>('[role="tab"]')]
+    const panels = [...el.querySelectorAll<HTMLElement>('[role="tabpanel"]')]
+    expect(tabs[0].id).not.toBe(tabs[1].id)
+    expect(panels[0].id).not.toBe(panels[1].id)
+    expect(tabs[1].getAttribute('aria-controls')).toBe(panels[1].id)
+  })
+})

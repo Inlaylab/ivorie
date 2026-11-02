@@ -30,6 +30,14 @@ function parse(css: string): Rule[] {
   return rules;
 }
 
+/** Top-level lines that open a rule parse() cannot read, e.g. `.cn-a, .cn-b {`. They are dropped. */
+export function unknownShapes(css: string): string[] {
+  return css
+    .split('\n')
+    .filter((l) => /^ {2}\S.*\{$/.test(l) && !/^ {2}\.(cn-[a-z0-9-]+) \{$/.test(l))
+    .map((l) => l.trim());
+}
+
 export function buildStyle(name: string, shadcnCss: string, hooks: Set<string>): string {
   const rules = parse(shadcnCss).filter((r) => hooks.has(r.hook));
   const covered = new Set(rules.map((r) => r.hook));
@@ -67,5 +75,6 @@ if (import.meta.main) {
   const name = process.argv[2];
   if (!/^[a-z]+$/.test(name ?? '')) throw new Error('usage: node tools/styles/sync.ts <style name>');
   const css = readFileSync(join(SHADCN_STYLES, `style-${name}.css`), 'utf8').replaceAll('\r\n', '\n');
+  for (const line of unknownShapes(css)) console.warn(`warn: skipped rule ${line}`);
   writeFileSync(join(STYLES, `style-${name}.css`), buildStyle(name, css, uiHooks()));
 }

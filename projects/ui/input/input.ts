@@ -161,8 +161,8 @@ type InputGroupButtonVariants = VariantProps<typeof inputGroupButtonVariants>
       [attr.type]="type()"
       [disabled]="disabled()"
       [attr.aria-label]="ariaLabel()"
-      [attr.data-variant]="variant()"
-      [attr.data-size]="size()"
+      [attr.data-variant]="variant() ?? 'default'"
+      [attr.data-size]="size() ?? 'xs'"
       [class]="classes()"
     >
       <ng-content />

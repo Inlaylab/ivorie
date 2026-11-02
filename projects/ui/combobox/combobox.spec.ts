@@ -117,6 +117,31 @@ class ReloadHost {
 })
 class LabelHost {}
 
+@Component({
+  imports: [IV_COMBOBOX_IMPORTS],
+  template: `
+    <iv-combobox [(value)]="fruit">
+      <iv-combobox-input aria-label="Fruit" />
+      <iv-combobox-content>
+        <iv-combobox-list id="fruit-list">
+          <iv-combobox-item value="apple" label="Apple">Apple</iv-combobox-item>
+        </iv-combobox-list>
+      </iv-combobox-content>
+    </iv-combobox>
+    <iv-combobox [multiple]="true">
+      <iv-combobox-chips aria-label="Fruits" />
+      <iv-combobox-content>
+        <iv-combobox-list id="fruits-list">
+          <iv-combobox-item value="apple" label="Apple">Apple</iv-combobox-item>
+        </iv-combobox-list>
+      </iv-combobox-content>
+    </iv-combobox>
+  `,
+})
+class ListIdHost {
+  fruit = signal<string | string[] | null>(null)
+}
+
 async function render<T>(host: new () => T) {
   const create = vi.spyOn(TestBed.inject(Overlay), 'create')
   const fixture = TestBed.createComponent(host)
@@ -148,6 +173,29 @@ async function render<T>(host: new () => T) {
 }
 
 describe('IvCombobox', () => {
+  it("the list's [id] is the one the input and chips control", async () => {
+    const { el, open, stable } = await render(ListIdHost)
+    await open()
+    expect(document.getElementById('fruit-list')?.getAttribute('role')).toBe('listbox')
+    const inputs = [...el.querySelectorAll('input[role="combobox"]')] as HTMLInputElement[]
+    expect(inputs[0].getAttribute('aria-controls')).toBe('fruit-list')
+    inputs[1].dispatchEvent(new Event('focus'))
+    await stable()
+    expect(inputs[1].getAttribute('aria-controls')).toBe('fruits-list')
+  })
+
+  it('a parent [(value)] reset after a pick clears the input', async () => {
+    const { fixture, input, open, item, host } = await render(ListIdHost)
+    await open()
+    item('apple').click()
+    await fixture.whenStable()
+    expect(host.fruit()).toBe('apple')
+    expect(input.value).toBe('Apple')
+    host.fruit.set(null)
+    await fixture.whenStable()
+    expect(input.value).toBe('')
+  })
+
   it('carries hooks and data-slots', async () => {
     const { el, input, open, panel, item, host, fixture } = await render(SingleModelHost)
     const group = el.querySelector('iv-combobox-input') as HTMLElement

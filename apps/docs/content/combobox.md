@@ -80,7 +80,6 @@ Search input in a group, with optional trigger and clear buttons. `class` goes o
 | `showTrigger` | `boolean` | `true` | Shows the chevron button. |
 | `showClear` | `boolean` | `false` | Shows a clear button when the search is not empty. |
 | `placeholder` | `string \| undefined` | root `placeholder` | Overrides the root placeholder. |
-| `listboxId` | `string \| undefined` | generated | Id of the list the input controls. |
 | `id` | `string \| null` | `null` | Set on the inner input, so `<label for>` works. |
 | `aria-label` | `string \| null` | `null` | Set on the inner input. |
 | `label` | `string` | `''` | Static prefix before the input, such as `User: All`. With a value, the input gets `data-active`. |
@@ -118,7 +117,7 @@ Scrollable listbox inside the content.
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| `id` | `string \| undefined` | generated | Id of the listbox. |
+| `id` | `string \| undefined` | generated | Id of the listbox. The input and chips point `aria-controls` at it. |
 
 ### iv-combobox-item
 

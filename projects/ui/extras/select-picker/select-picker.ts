@@ -182,8 +182,8 @@ export class IvSelectPicker<T = unknown> implements ControlValueAccessor {
       // defaultValue: a dialog disposed by navigation completes without a close event.
       const closed = await firstValueFrom(ref.afterClosed(), { defaultValue: undefined })
 
-      // Cancel / Escape close without a result: the value stays.
-      if (this.destroyed || !closed?.result) return
+      // Cancel / Escape close without a result: the value stays. A control disabled meanwhile takes no write.
+      if (this.destroyed || this.isDisabled() || !closed?.result) return
       this.value.set(closed.result)
       this.onChange(closed.result)
       this.selectionChange.emit(closed.result)

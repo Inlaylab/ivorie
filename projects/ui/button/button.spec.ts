@@ -35,6 +35,15 @@ describe('buttonVariants', () => {
 })
 
 describe('IvButton', () => {
+  it('null variant and size fall back to the defaults in data attributes', async () => {
+    const { fixture, el } = await setup()
+    fixture.componentInstance.variant.set(null)
+    fixture.componentInstance.size.set(null)
+    await fixture.whenStable()
+    expect(el('b').getAttribute('data-variant')).toBe('default')
+    expect(el('b').getAttribute('data-size')).toBe('default')
+  })
+
   it('puts hooks and data attributes on the native button', async () => {
     const { el } = await setup()
     const b = el('b')

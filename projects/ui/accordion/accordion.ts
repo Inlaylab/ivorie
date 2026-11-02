@@ -4,12 +4,16 @@ import {
   Component,
   Injector,
   Signal,
+  afterNextRender,
   computed,
   contentChildren,
+  effect,
   inject,
   input,
   linkedSignal,
   output,
+  signal,
+  untracked,
   viewChild,
   ElementRef,
 } from '@angular/core'
@@ -187,7 +191,9 @@ export class IvAccordionTrigger implements FocusableOption {
     '[id]': 'item.contentId',
     '[attr.aria-labelledby]': 'item.triggerId',
     '[attr.data-state]': 'item.state()',
-    '[hidden]': '!item.isOpen()',
+    // Stays visible while the close animation runs.
+    '[hidden]': '!item.isOpen() && !closing()',
+    '(animationend)': 'onAnimationEnd($event)',
   },
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `<div [class]="classes()"><ng-content /></div>`,
@@ -195,6 +201,40 @@ export class IvAccordionTrigger implements FocusableOption {
 export class IvAccordionContent {
   readonly class = input('')
   readonly item = inject(IvAccordionItem)
+  private readonly host: ElementRef<HTMLElement> = inject(ElementRef)
+  /** True while the close animation runs. */
+  protected readonly closing = signal(false)
+
+  constructor() {
+    const injector = inject(Injector)
+    let first = true
+    effect(() => {
+      const open = this.item.isOpen()
+      // The first render shows the start state without animating.
+      if (first) {
+        first = false
+        return
+      }
+      untracked(() => {
+        if (!open) this.closing.set(true)
+        afterNextRender(
+          () => {
+            const el = this.host.nativeElement
+            // The open and close keyframes animate to and from this height. Set here, before paint.
+            el.style.setProperty('--radix-accordion-content-height', `${(el.firstElementChild as HTMLElement).scrollHeight}px`)
+            // No animation (reduced motion, a style without one): hide now, animationend never comes.
+            if (!open && !el.getAnimations?.().length) this.closing.set(false)
+          },
+          { injector },
+        )
+      })
+    })
+  }
+
+  protected onAnimationEnd(event: Event) {
+    // Animations inside the panel bubble up here too.
+    if (event.target === this.host.nativeElement) this.closing.set(false)
+  }
 
   readonly classes = computed(() =>
     cn(

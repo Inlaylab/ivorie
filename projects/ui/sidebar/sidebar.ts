@@ -431,7 +431,7 @@ export type SidebarMenuButtonVariants = VariantProps<typeof sidebarMenuButtonVar
     'data-slot': 'sidebar-menu-button',
     'data-sidebar': 'menu-button',
     class: 'peer/menu-button relative block w-full',
-    '[attr.data-size]': 'size()',
+    '[attr.data-size]': 'size() ?? "default"',
     '[attr.data-active]': 'isActive() ? "" : null',
   },
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -440,7 +440,7 @@ export type SidebarMenuButtonVariants = VariantProps<typeof sidebarMenuButtonVar
       <button
         ivTooltipTrigger
         type="button"
-        [attr.data-size]="size()"
+        [attr.data-size]="size() ?? 'default'"
         [attr.data-active]="isActive() ? '' : null"
         [attr.aria-current]="isActive() ? 'page' : null"
         [class]="classes()"
