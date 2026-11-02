@@ -32,7 +32,7 @@ Publishing is public and cannot be undone. Ask before every publish.
 3. GitHub → Actions → **Release** → Run workflow on `main`. It runs `npm run check`, then publishes `./dist/ui` and `./dist/cli` with provenance.
 
 ## Trusted Publisher (one-time per package)
-npmjs.com → package → Settings → Trusted Publisher → GitHub Actions: repo `Inlaylab/ivorie`, workflow `release.yml`. Then the workflow needs no `NPM_TOKEN`.
+npmjs.com → package → Settings → Trusted Publisher → GitHub Actions: repo `Inlaylab/ivorie`, workflow `release.yml`. Done for both packages; `release.yml` uses no token. After the first OIDC publish works, delete the `NPM_TOKEN` repo secret and the npm token.
 
 ## Manual fallback
 `npm run publish:all` runs `npm run check`, then publishes both packages from your machine. It asks for your 2FA code. No provenance.
