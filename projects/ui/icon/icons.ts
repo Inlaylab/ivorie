@@ -3,7 +3,8 @@
 // All other copyright (c) for Lucide are held by Lucide Contributors 2022.
 // Shipping them here keeps @lucide/angular (one 10 MB file) out of apps: dev servers do not tree-shake it.
 
-export type IconNode = readonly (readonly ['path' | 'circle' | 'line' | 'rect', Readonly<Record<string, string>>])[]
+/** Same shape as Lucide's `IconNode`, so icons from the `lucide` package fit as they are. */
+export type IconNode = readonly (readonly [tag: string, attrs: Readonly<Record<string, string | number | undefined>>])[]
 
 export const ICONS = {
   'arrow-left': [['path', { d: 'm12 19-7-7 7-7' }], ['path', { d: 'M19 12H5' }]],
