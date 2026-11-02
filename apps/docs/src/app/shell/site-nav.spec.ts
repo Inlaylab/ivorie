@@ -1,3 +1,4 @@
+import { ApplicationRef } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { describe, expect, it } from 'vitest';
@@ -28,5 +29,21 @@ describe('SiteNav', () => {
   it('has no axe violations', async () => {
     const el = await render();
     await expect(el).toHaveNoViolations();
+  });
+});
+
+describe('SiteNav filter', () => {
+  it('shows only matching pages, and a message when none match', async () => {
+    const el = await render();
+    const input = el.querySelector<HTMLInputElement>('input[type="search"]')!;
+    input.value = 'dialog';
+    input.dispatchEvent(new Event('input'));
+    await TestBed.inject(ApplicationRef).whenStable();
+    const titles = [...el.querySelectorAll('li a')].map((a) => a.textContent!.trim());
+    expect(titles).toEqual(['Alert Dialog', 'Dialog']);
+    input.value = 'zzz';
+    input.dispatchEvent(new Event('input'));
+    await TestBed.inject(ApplicationRef).whenStable();
+    expect(el.textContent).toContain('No page matches');
   });
 });

@@ -1,198 +1,109 @@
-import { ChangeDetectionStrategy, Component, afterNextRender, computed, effect, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DOCUMENT,
+  ElementRef,
+  afterNextRender,
+  computed,
+  effect,
+  inject,
+  signal,
+  viewChild,
+} from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
+import { OverlayContainer } from '@angular/cdk/overlay';
 import { ActivatedRoute, Router } from '@angular/router';
 import { IvButton } from '@inlaylab/ivorie/button';
 import { IV_DIALOG_IMPORTS } from '@inlaylab/ivorie/dialog';
-import { IV_SELECT_IMPORTS } from '@inlaylab/ivorie/select';
-import { IvSeparator } from '@inlaylab/ivorie/separator';
 import { IV_SHEET_IMPORTS } from '@inlaylab/ivorie/sheet';
-import { BASE_COLORS, FONTS, RADII } from '../../generated/looks';
-import { Appearance, type ColorMode } from '../shell/appearance';
-import { STYLES } from '../shell/appearance-options';
 import { CopyButton } from '../ui/copy-button';
+import { LookControls } from './look-controls';
 import { PlaygroundLook } from './playground-look';
 import { PlaygroundPreview } from './playground-preview';
-import { DEFAULT_PRESET, encodePreset, type Preset } from './preset-code';
+import { DEFAULT_PRESET, encodePreset } from './preset-code';
 
 const DEFAULT_CODE = encodePreset(DEFAULT_PRESET);
-const RADIUS_LABELS: Record<string, string> = { default: 'Default', none: 'None', small: 'Small', medium: 'Medium', large: 'Large' };
-const FONT_GROUPS = (['sans', 'serif', 'mono'] as const).map((type) => ({
-  label: { sans: 'Sans', serif: 'Serif', mono: 'Mono' }[type],
-  fonts: FONTS.filter((f) => f.type === type),
-}));
+type Target = 'new' | 'existing';
 
 @Component({
   selector: 'docs-playground',
-  imports: [
-    NgTemplateOutlet,
-    IvButton,
-    IV_DIALOG_IMPORTS,
-    IV_SELECT_IMPORTS,
-    IvSeparator,
-    IV_SHEET_IMPORTS,
-    CopyButton,
-    PlaygroundPreview,
-  ],
+  imports: [NgTemplateOutlet, IvButton, IV_DIALOG_IMPORTS, IV_SHEET_IMPORTS, CopyButton, LookControls, PlaygroundPreview],
   providers: [PlaygroundLook],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  host: { class: 'block pb-24 lg:pb-0' },
+  host: { class: 'block lg:grid lg:grid-cols-[20rem_minmax(0,1fr)]' },
   template: `
-    <div class="flex flex-col gap-8 lg:flex-row lg:items-start">
-      <aside
-        aria-label="Look"
-        class="flex flex-col gap-6 lg:sticky lg:top-[calc(var(--header-height)+2rem)] lg:w-72 lg:shrink-0"
-      >
-        <div class="flex flex-col gap-1">
-          <h1 class="text-foreground text-2xl font-semibold tracking-tight">Playground</h1>
-          <p class="text-muted-foreground text-sm">Pick a look. Copy one command.</p>
-        </div>
-        <div class="hidden flex-col gap-6 lg:flex">
-          <ng-container [ngTemplateOutlet]="controls" [ngTemplateOutletContext]="{ $implicit: 'rail' }" />
-          <iv-separator />
-          <ng-container [ngTemplateOutlet]="install" />
-        </div>
-      </aside>
-      <docs-playground-preview class="min-w-0 flex-1" />
-    </div>
+    <!-- The rail: controls scroll, the install block and Reset stay at the bottom. -->
+    <aside
+      aria-labelledby="pg-title"
+      class="lg:bg-background flex flex-col lg:sticky lg:top-(--header-height) lg:h-[calc(100svh-var(--header-height))] lg:border-r"
+    >
+      <div class="flex flex-col gap-1.5 px-4 pt-6 pb-4 sm:px-6 lg:pt-8">
+        <h1 id="pg-title" class="text-foreground text-2xl font-semibold tracking-[-0.03em]">Playground</h1>
+        <p class="text-muted-foreground text-sm text-pretty">Pick a look. The preview is real components; the command installs the same look.</p>
+      </div>
+      <div class="hidden flex-1 overflow-y-auto px-6 pt-2 pb-6 lg:block">
+        <docs-look-controls [look]="look" name="rail" />
+      </div>
+      <div class="bg-muted/30 hidden border-t lg:block">
+        <ng-container [ngTemplateOutlet]="install" [ngTemplateOutletContext]="{ $implicit: 'rail' }" />
+      </div>
+    </aside>
+
+    <!-- The stage: a dotted canvas in the chosen look. Nothing outside it changes. -->
+    <section aria-label="Preview" class="min-w-0 pb-24 lg:pb-0">
+      <div #stage class="docs-stage bg-background min-h-full p-4 sm:p-6 lg:p-8">
+        <docs-playground-preview />
+      </div>
+    </section>
 
     <!-- Small screens: the controls open in a sheet; the command stays one tap away. -->
-    <div class="bg-background/90 supports-[backdrop-filter]:bg-background/75 fixed inset-x-0 bottom-0 z-20 flex gap-2 border-t p-3 backdrop-blur lg:hidden">
+    <div class="bg-background/85 supports-[backdrop-filter]:bg-background/70 fixed inset-x-0 bottom-0 z-20 flex gap-2 border-t p-3 backdrop-blur-md lg:hidden">
       <button ivButton class="flex-1" [ivSheetTrigger]="sheet" [ivSheetConfig]="{ side: 'bottom' }">Customize</button>
-      <docs-copy-button [text]="initCommand()" label="Copy install command" />
+      <docs-copy-button [text]="command()" label="Copy command" />
     </div>
     <ng-template #sheet>
       <iv-sheet-header>
         <iv-sheet-title>Customize</iv-sheet-title>
-        <iv-sheet-description>Changes show behind this panel.</iv-sheet-description>
+        <iv-sheet-description>The preview changes behind this panel.</iv-sheet-description>
       </iv-sheet-header>
-      <div class="flex max-h-[60vh] flex-col gap-6 overflow-y-auto px-4 pb-6">
-        <ng-container [ngTemplateOutlet]="controls" [ngTemplateOutletContext]="{ $implicit: 'sheet' }" />
-        <iv-separator />
-        <ng-container [ngTemplateOutlet]="install" />
+      <div class="flex max-h-[60svh] flex-col overflow-y-auto">
+        <docs-look-controls class="px-4 pb-6" [look]="look" name="sheet" />
+        <div class="border-t"><ng-container [ngTemplateOutlet]="install" [ngTemplateOutletContext]="{ $implicit: 'sheet' }" /></div>
       </div>
     </ng-template>
 
-    <ng-template #controls let-at>
-      <fieldset class="flex flex-col gap-2.5">
-        <legend class="text-foreground mb-2.5 text-sm font-medium">Style</legend>
-        <div class="flex flex-wrap gap-1.5">
-          @for (s of styles; track s.name) {
-            <label [class]="pill">
-              <input type="radio" class="sr-only" [name]="at + '-style'" [value]="s.name" [checked]="preset().style === s.name" (change)="set({ style: s.name })" />
-              {{ s.label }}
-            </label>
-          }
-        </div>
-      </fieldset>
-
-      <fieldset class="flex flex-col">
-        <legend class="mb-2.5 flex w-full items-baseline justify-between text-sm">
-          <span class="text-foreground font-medium">Base color</span>
-          <span class="text-muted-foreground" aria-hidden="true">{{ colorTitle() }}</span>
-        </legend>
-        <div class="flex flex-wrap gap-2">
-          @for (c of colors; track c.name) {
-            <label
-              class="has-checked:ring-foreground has-focus-visible:outline-ring ring-border flex size-8 cursor-pointer items-center justify-center rounded-full ring-1 ring-offset-2 ring-offset-background transition-shadow has-checked:ring-2 has-focus-visible:outline-2 has-focus-visible:outline-offset-4"
-              [title]="c.title"
-            >
-              <input type="radio" class="sr-only" [name]="at + '-color'" [value]="c.name" [attr.aria-label]="c.title" [checked]="preset().baseColor === c.name" (change)="set({ baseColor: c.name })" />
-              <span class="size-full rounded-full" [style.background]="swatch(c.light)" aria-hidden="true"></span>
-            </label>
-          }
-        </div>
-      </fieldset>
-
-      <div class="flex flex-col gap-2.5">
-        <span class="text-foreground text-sm font-medium" [id]="at + '-font-label'">Font</span>
-        <iv-select [value]="preset().font" (valueChange)="set({ font: $event ?? 'system' })">
-          <iv-select-trigger class="w-full" [aria-labelledby]="at + '-font-label'" />
-          <iv-select-content>
-            <iv-select-item value="system">System</iv-select-item>
-            @for (g of fontGroups; track g.label) {
-              <iv-select-separator />
-              <iv-select-group>
-                <iv-select-label>{{ g.label }}</iv-select-label>
-                @for (f of g.fonts; track f.name) {
-                  <iv-select-item [value]="f.name">{{ f.title }}</iv-select-item>
-                }
-              </iv-select-group>
+    <ng-template #install let-at>
+      <div class="flex flex-col gap-3 px-4 py-4 sm:px-6">
+        <div class="flex items-center justify-between gap-2">
+          <span class="text-foreground text-sm font-medium">Install</span>
+          <div role="radiogroup" aria-label="Install into" class="bg-muted flex gap-0.5 rounded-full p-0.5">
+            @for (t of targets; track t.value) {
+              <label class="has-checked:bg-background has-checked:text-foreground has-checked:shadow-xs text-muted-foreground has-focus-visible:outline-ring cursor-pointer rounded-full px-2.5 py-0.5 text-xs font-medium transition-colors has-focus-visible:outline-2">
+                <input type="radio" class="sr-only" [name]="at + '-target'" [value]="t.value" [checked]="target() === t.value" (change)="target.set(t.value)" />
+                {{ t.label }}
+              </label>
             }
-          </iv-select-content>
-        </iv-select>
-      </div>
-
-      <div class="flex flex-col gap-2.5">
-        <span class="text-foreground text-sm font-medium" [id]="at + '-heading-label'">Heading font</span>
-        <iv-select [value]="preset().fontHeading" (valueChange)="set({ fontHeading: $event ?? 'inherit' })">
-          <iv-select-trigger class="w-full" [aria-labelledby]="at + '-heading-label'" />
-          <iv-select-content>
-            <iv-select-item value="inherit">Same as font</iv-select-item>
-            @for (g of fontGroups; track g.label) {
-              <iv-select-separator />
-              <iv-select-group>
-                <iv-select-label>{{ g.label }}</iv-select-label>
-                @for (f of g.fonts; track f.name) {
-                  <iv-select-item [value]="f.name">{{ f.title }}</iv-select-item>
-                }
-              </iv-select-group>
-            }
-          </iv-select-content>
-        </iv-select>
-      </div>
-
-      <fieldset class="flex flex-col">
-        <legend class="text-foreground mb-2.5 text-sm font-medium">Radius</legend>
-        <div class="grid grid-cols-5 gap-1.5">
-          @for (r of radii; track r.name) {
-            <label [class]="tile">
-              <input type="radio" class="sr-only" [name]="at + '-radius'" [value]="r.name" [checked]="preset().radius === r.name" (change)="set({ radius: r.name })" />
-              <!-- One corner, drawn at twice the radius so small steps stay visible. -->
-              <span class="border-foreground/70 size-5 border-t-2 border-l-2" [style.border-top-left-radius]="r.corner" aria-hidden="true"></span>
-              <span class="text-[0.6875rem]">{{ r.label }}</span>
-            </label>
-          }
-        </div>
-      </fieldset>
-
-      <fieldset class="flex flex-col">
-        <legend class="text-foreground mb-2.5 text-sm font-medium">Mode</legend>
-        <div class="flex flex-wrap gap-1.5">
-          @for (m of modes; track m.value) {
-            <label [class]="pill">
-              <input type="radio" class="sr-only" [name]="at + '-mode'" [value]="m.value" [checked]="appearance.state().mode === m.value" (change)="setMode(m.value)" />
-              {{ m.label }}
-            </label>
-          }
-        </div>
-      </fieldset>
-    </ng-template>
-
-    <ng-template #install>
-      <div class="flex flex-col gap-4">
-        @for (c of commands(); track c.label) {
-          <div class="flex flex-col gap-1.5">
-            <span class="text-foreground text-sm font-medium">{{ c.label }}</span>
-            <div class="bg-muted/60 flex items-center gap-2 rounded-md border py-1 pr-1 pl-3 font-mono text-xs">
-              <span class="min-w-0 flex-1 truncate" [title]="c.command">{{ c.command }}</span>
-              <docs-copy-button [text]="c.command" [label]="'Copy ' + c.label.toLowerCase() + ' command'" />
-            </div>
           </div>
-        }
-        <div class="flex gap-2">
-          <button ivButton variant="outline" size="sm" class="flex-1" [ivDialogTrigger]="cssDialog">Show CSS</button>
-          <button ivButton variant="ghost" size="sm" class="flex-1" [disabled]="isDefault()" (click)="reset()">Reset</button>
         </div>
+        <div class="bg-background flex items-center gap-2 rounded-xl border py-0.5 pr-0.5 pl-3 font-mono text-xs">
+          <span class="min-w-0 flex-1 truncate" data-testid="command" [title]="command()">{{ command() }}</span>
+          <docs-copy-button [text]="command()" label="Copy command" />
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <button ivButton variant="outline" size="sm" [ivDialogTrigger]="cssDialog">View CSS</button>
+          <button ivButton variant="outline" size="sm" (click)="copyCode()">{{ codeCopied() ? 'Copied' : 'Copy preset code' }}</button>
+        </div>
+        <button ivButton variant="ghost" size="sm" class="text-muted-foreground mt-1 w-full" [disabled]="isDefault()" (click)="reset()">Reset to default</button>
       </div>
     </ng-template>
 
     <ng-template #cssDialog>
       <iv-dialog-header>
         <iv-dialog-title>theme.css variables</iv-dialog-title>
-        <iv-dialog-description>The commands write this for you. Paste it to change the look by hand.</iv-dialog-description>
+        <iv-dialog-description>The command writes this for you. Paste it to change the look by hand.</iv-dialog-description>
       </iv-dialog-header>
       <div class="relative min-w-0">
-        <pre class="bg-muted/60 max-h-[50vh] overflow-auto rounded-md border p-3 font-mono text-xs leading-relaxed"><code>{{ look.css() }}</code></pre>
+        <pre class="bg-muted/60 max-h-[50svh] overflow-auto rounded-lg border p-3 font-mono text-xs leading-relaxed"><code>{{ look.css() }}</code></pre>
         <docs-copy-button class="absolute top-2 right-2" [text]="look.css()" label="Copy CSS" />
       </div>
     </ng-template>
@@ -200,42 +111,32 @@ const FONT_GROUPS = (['sans', 'serif', 'mono'] as const).map((type) => ({
 })
 export default class PlaygroundPage {
   protected readonly look = inject(PlaygroundLook);
-  protected readonly appearance = inject(Appearance);
+  private readonly doc = inject(DOCUMENT);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
+  private readonly stage = viewChild.required<ElementRef<HTMLElement>>('stage');
   /** False until the URL preset is read in the browser, so the server markup and the first client render match. */
   private readonly ready = signal(false);
 
-  protected readonly preset = this.look.preset;
-  protected readonly styles = STYLES;
-  protected readonly colors = BASE_COLORS;
-  protected readonly fontGroups = FONT_GROUPS;
-  protected readonly radii = Object.keys(RADII).map((name) => ({
-    name,
-    label: RADIUS_LABELS[name] ?? name,
-    corner: `calc(${RADII[name] ?? '0.625rem'} * 2)`,
-  }));
-  protected readonly modes: { value: ColorMode; label: string }[] = [
-    { value: 'light', label: 'Light' },
-    { value: 'dark', label: 'Dark' },
-    { value: 'system', label: 'System' },
+  protected readonly targets: { value: Target; label: string }[] = [
+    { value: 'new', label: 'New app' },
+    { value: 'existing', label: 'Existing app' },
   ];
-  protected readonly pill =
-    'has-checked:bg-primary has-checked:text-primary-foreground has-checked:border-primary hover:bg-muted has-focus-visible:outline-ring flex h-8 cursor-pointer items-center rounded-full border px-3 text-sm transition-colors has-focus-visible:outline-2 has-focus-visible:outline-offset-2';
-  protected readonly tile =
-    'has-checked:border-foreground has-checked:bg-muted hover:bg-muted/60 has-focus-visible:outline-ring text-muted-foreground has-checked:text-foreground flex cursor-pointer flex-col items-center gap-1.5 rounded-md border px-1 pt-2.5 pb-1.5 transition-colors has-focus-visible:outline-2 has-focus-visible:outline-offset-2';
-
-  protected readonly colorTitle = computed(() => BASE_COLORS.find((c) => c.name === this.preset().baseColor)?.title);
+  protected readonly target = signal<Target>('new');
+  protected readonly codeCopied = signal(false);
   protected readonly isDefault = computed(() => this.look.code() === DEFAULT_CODE);
-  private readonly presetArg = computed(() => (this.isDefault() ? '' : ` --preset ${this.look.code()}`));
-  protected readonly initCommand = computed(() => `npx ivorie init${this.presetArg()}`);
-  protected readonly commands = computed(() => [
-    { label: 'New app', command: this.initCommand() },
-    { label: 'Existing app', command: `npx ivorie apply ${this.isDefault() ? 'default' : this.look.code()}` },
-  ]);
+  protected readonly command = computed(() => {
+    const code = this.isDefault() ? null : this.look.code();
+    if (this.target() === 'existing') return `npx ivorie apply ${code ?? 'default'}`;
+    return code ? `npx ivorie init --preset ${code}` : 'npx ivorie init';
+  });
 
   constructor() {
+    const overlays = inject(OverlayContainer);
     afterNextRender(() => {
+      // The look shows on the stage and on what it opens (dialogs, menus), not on the site.
+      this.look.attach(this.stage().nativeElement);
+      this.look.attach(overlays.getContainerElement());
       this.look.load(this.route.snapshot.queryParamMap.get('preset'));
       this.ready.set(true);
     });
@@ -247,20 +148,17 @@ export default class PlaygroundPage {
     });
   }
 
-  protected set(patch: Partial<Preset>): void {
-    this.look.set(patch);
-  }
-
-  protected setMode(mode: ColorMode): void {
-    this.appearance.setMode(mode);
-  }
-
   protected reset(): void {
     this.look.load(null);
   }
 
-  /** Light tint and mid tone of a base color, split on the diagonal. */
-  protected swatch(light: Record<string, string>): string {
-    return `linear-gradient(135deg, ${light['--secondary']} 50%, ${light['--muted-foreground']} 50%)`;
+  protected async copyCode(): Promise<void> {
+    try {
+      await this.doc.defaultView?.navigator.clipboard.writeText(this.look.code());
+      this.codeCopied.set(true);
+      setTimeout(() => this.codeCopied.set(false), 1500);
+    } catch {
+      // Clipboard blocked: the code is also in the URL and the command.
+    }
   }
 }

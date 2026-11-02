@@ -1,10 +1,12 @@
-// CLI end-to-end smoke (network): two fresh `ng new --ssr` apps, one set up with `ivorie init + add`,
-// one with the npm package. Both must build and render the same button classes and CSS rules.
+// CLI end-to-end smoke (network): fresh `ng new --ssr` apps. One set up with `ivorie init + add` and one
+// with the npm package must build and render the same button classes and CSS rules. A third, made with
+// `ivorie init --preset <playground code>`, must get that look, and `ivorie apply default` must undo it.
 // Usage: npm run smoke:cli
 import { execSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
+import { PRESET_GOLDEN } from '../../projects/cli/test/preset.fixture.ts';
 
 const ROOT = process.cwd();
 const SMOKE = resolve('.smoke');
@@ -68,11 +70,15 @@ function buttonClasses(app: string, name: string): string[] {
     .map((tag) => /\sclass="([^"]*)"/.exec(tag)?.[1] ?? '');
 }
 
-function cssRules(app: string, name: string): string[] {
+function stylesCss(app: string, name: string): string {
   const dir = browserDir(app, name);
   const file = readdirSync(dir).find((f) => /^styles-.*\.css$/.test(f));
   if (!file) throw new Error(`${name}: no styles-*.css`);
-  const css = readFileSync(join(dir, file), 'utf8');
+  return readFileSync(join(dir, file), 'utf8');
+}
+
+function cssRules(app: string, name: string): string[] {
+  const css = stylesCss(app, name);
   return [...css.matchAll(/\.cn-button(?:-variant-destructive)?\{[^}]*\}/g)].map((m) => m[0]);
 }
 
@@ -119,7 +125,37 @@ try {
   if (!ca.length) failures.push('cli-app: no .cn-button rules in CSS');
   if (JSON.stringify(ca) !== JSON.stringify(cb)) failures.push(`.cn-button rules differ:\n  cli: ${ca.join('\n')}\n  npm: ${cb.join('\n')}`);
 
-  // 3. shadcn compat: the registry items are shadcn items.
+  // 3. A playground preset in a fresh app gives that look; apply changes it back.
+  const presetApp = newApp('preset-app', cliMajor);
+  run(`npm i -D "${cliTgz}"`, presetApp);
+  run(`npx ivorie init --yes --preset ${PRESET_GOLDEN.code}`, presetApp);
+  run('npx ivorie add button dialog', presetApp);
+  writeApp(presetApp, './ui');
+  run('npx ng build', presetApp);
+  const look = (expect: Record<string, RegExp>, step: string) => {
+    const css = stylesCss(presetApp, 'preset-app');
+    const html = readFileSync(join(browserDir(presetApp, 'preset-app'), 'index.html'), 'utf8');
+    for (const [what, re] of Object.entries(expect)) {
+      if (!re.test(what === 'body' ? html : css)) failures.push(`preset-app ${step}: ${what} missing (${re})`);
+    }
+  };
+  // Olive light --primary is oklch(0.228 0.013 107.4); minifiers drop the leading 0.
+  look(
+    {
+      primary: /--primary:\s*oklch\(0?\.228 0?\.013 107\.4\)/,
+      radius: /--radius:\s*\.875rem/,
+      font: /Inter Variable/,
+      heading: /Lora Variable/,
+      style: /\.style-nova/,
+      body: /<body[^>]*class="[^"]*style-nova/,
+    },
+    'init --preset',
+  );
+  run('npx ivorie apply default', presetApp);
+  run('npx ng build', presetApp);
+  look({ primary: /--primary:\s*oklch\(0?\.205 0 0\)/, style: /\.style-maia/, body: /<body[^>]*class="[^"]*style-maia/ }, 'apply default');
+
+  // 4. shadcn compat: the registry items are shadcn items.
   try {
     run(`npx -y shadcn@latest add "${resolve('dist/registry/r/badge.json')}" --yes`, npmApp);
     if (!existsSync(join(npmApp, 'src/app/ui/badge/badge.ts'))) warnings.push('shadcn add ran but src/app/ui/badge/badge.ts is missing');

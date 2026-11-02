@@ -142,9 +142,9 @@
   }
 }
 
-/* Shell: the header spans the page, the sidebar sits below it (shadcn docs layout). */
+/* Shell: a floating header bar, the docs sidebar below it. */
 .docs-shell {
-  --header-height: 3.5rem;
+  --header-height: 4rem;
   /* Only the site sidebar: sidebars inside demo previews keep their own layout. */
   & [data-slot='sidebar-container']:not(.docs-preview *) {
     top: var(--header-height);
@@ -153,4 +153,45 @@
   & [data-slot='sidebar-inner']:not(.docs-preview *) {
     @apply bg-background;
   }
+}
+
+/* Playground and home preview: a dotted canvas in the preview's own colors. */
+.docs-stage {
+  background-image: radial-gradient(circle at 1px 1px, color-mix(in oklab, var(--foreground) 14%, transparent) 1px, transparent 0);
+  background-size: 18px 18px;
+  color: var(--foreground);
+}
+
+/* Ivorie brand: one soft three-stop gradient (ivory gold, rose, periwinkle). Used sparingly. */
+:root {
+  --brand-a: oklch(0.87 0.09 80);
+  --brand-b: oklch(0.78 0.12 350);
+  --brand-c: oklch(0.72 0.12 278);
+}
+.dark {
+  --brand-a: oklch(0.72 0.1 75);
+  --brand-b: oklch(0.62 0.14 350);
+  --brand-c: oklch(0.58 0.14 278);
+}
+.docs-brand-gradient {
+  background-image: linear-gradient(120deg, var(--brand-a), var(--brand-b) 55%, var(--brand-c));
+}
+/* Blurred light behind the hero. Decoration only: aria-hidden, pointer-events none. */
+.docs-aurora {
+  background:
+    radial-gradient(38% 46% at 22% 32%, color-mix(in oklab, var(--brand-a) 55%, transparent), transparent 70%),
+    radial-gradient(34% 42% at 72% 22%, color-mix(in oklab, var(--brand-b) 42%, transparent), transparent 70%),
+    radial-gradient(40% 48% at 62% 78%, color-mix(in oklab, var(--brand-c) 42%, transparent), transparent 70%);
+  filter: blur(48px);
+}
+/* A 1px gradient border: the fill in the padding box, the gradient in the border box. */
+.docs-gradient-border {
+  border: 1px solid transparent;
+  background:
+    linear-gradient(var(--card), var(--card)) padding-box,
+    linear-gradient(135deg, var(--brand-a), var(--brand-b), var(--brand-c)) border-box;
+}
+/* Text drawn by CSS, so it is not part of the element's text (select labels read text). */
+.docs-glyph::before {
+  content: attr(data-glyph);
 }

@@ -188,10 +188,11 @@ Scope:
 3. **Radius:** options none, small, default, large, full, mapped to `--radius`. The CLI applies it.
 4. **CLI `ivorie apply <preset|ivp1_…>`:** change the look of an existing app. Rewrites `theme.css`, the style file, the body class and `components.json`.
 5. **Docs `/playground`** (new top bar tab):
-   - Controls: style, base color, font, radius, light/dark.
+   - Controls: style, base color, font, heading font, radius. Light/dark is the site toggle.
    - Live preview: a wall of real components (cards, forms, table, dialogs).
    - Output: share code, `npx ivorie init --preset ivp1_…`, `npx ivorie apply ivp1_…`, copyable CSS.
-   - Reuse `apps/docs/src/app/shell/appearance.ts` (style class swap, lazy style links).
+   - The look shows only on the preview box and its overlays, never on the site. The home hero has a small version.
+   - Site: one light/dark button (no menu), always style maia; sidebar only on `/docs` pages.
    - Use the frontend-design skill.
 
 Tasks:

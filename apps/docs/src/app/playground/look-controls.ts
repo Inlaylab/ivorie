@@ -1,128 +1,229 @@
-import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, booleanAttribute, computed, input } from '@angular/core';
+import { NgTemplateOutlet } from '@angular/common';
 import { IV_SELECT_IMPORTS } from '@inlaylab/ivorie/select';
 import { BASE_COLORS, FONTS, RADII } from '../../generated/looks';
 import { STYLES } from '../shell/appearance-options';
 import type { PlaygroundLook } from './playground-look';
 import type { Preset } from './preset-code';
 
+/** One line per style, from shadcn/ui. */
+const STYLE_NOTES: Record<string, string> = {
+  vega: 'Clean, neutral and familiar.',
+  nova: 'Less padding and margin.',
+  maia: 'Rounded, with generous spacing.',
+  luma: 'Fluid, luminous and soft.',
+  rhea: 'Like Luma, but compact.',
+};
+/** Style pictures: a square with the corner feel of each style. */
+const STYLE_GLYPHS: Record<string, string> = { vega: '4px', nova: '2px', maia: '999px', luma: '7px', rhea: '5px' };
 const RADIUS_LABELS: Record<string, string> = { default: 'Default', none: 'None', small: 'Small', medium: 'Medium', large: 'Large' };
 const FONT_GROUPS = (['sans', 'serif', 'mono'] as const).map((type) => ({
   label: { sans: 'Sans', serif: 'Serif', mono: 'Mono' }[type],
+  glyph: { sans: 'Aa', serif: 'Ag', mono: '{}' }[type],
   fonts: FONTS.filter((f) => f.type === type),
 }));
 
-/** Native radios for visual choices (arrow keys, one tab stop), selects for long lists. */
+/** Full: one dropdown per choice, each with a picture. Compact (home hero): style chips and color swatches. */
 @Component({
   selector: 'docs-look-controls',
-  imports: [IV_SELECT_IMPORTS],
+  imports: [NgTemplateOutlet, IV_SELECT_IMPORTS],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  host: { class: 'flex flex-col gap-6' },
+  host: { class: 'flex flex-col gap-5' },
   template: `
-    <fieldset>
-      <legend class="text-foreground mb-2.5 text-sm font-medium">Style</legend>
-      <div class="bg-muted inline-flex flex-wrap gap-0.5 rounded-full p-0.5">
-        @for (s of styles; track s.name) {
-          <label
-            class="has-checked:bg-background has-checked:text-foreground has-checked:shadow-xs text-muted-foreground hover:text-foreground has-focus-visible:outline-ring cursor-pointer rounded-full px-3 py-1 text-sm font-medium transition-colors has-focus-visible:outline-2"
-          >
-            <input type="radio" class="sr-only" [name]="name() + '-style'" [value]="s.name" [checked]="preset().style === s.name" (change)="set({ style: s.name })" />
-            {{ s.label }}
-          </label>
-        }
-      </div>
-    </fieldset>
-
-    <fieldset>
-      <legend class="mb-2.5 flex w-full items-baseline justify-between gap-4 text-sm">
-        <span class="text-foreground font-medium">Base color</span>
-        <span class="text-muted-foreground" aria-hidden="true">{{ colorTitle() }}</span>
-      </legend>
-      <div class="flex flex-wrap gap-2">
-        @for (c of colors; track c.name) {
-          <label
-            class="ring-offset-background has-checked:ring-foreground has-focus-visible:outline-ring flex size-7 cursor-pointer rounded-full ring-1 ring-black/10 ring-offset-2 transition-shadow has-checked:ring-2 has-focus-visible:outline-2 has-focus-visible:outline-offset-4 dark:ring-white/15"
-            [title]="c.title"
-          >
-            <input type="radio" class="sr-only" [name]="name() + '-color'" [value]="c.name" [attr.aria-label]="c.title" [checked]="preset().baseColor === c.name" (change)="set({ baseColor: c.name })" />
-            <span class="size-full rounded-full" [style.background]="swatch(c.light)" aria-hidden="true"></span>
-          </label>
-        }
-      </div>
-    </fieldset>
-
-    @if (!compact()) {
-      <div class="flex flex-col gap-2.5">
-        <span class="text-foreground text-sm font-medium" [id]="name() + '-font-label'">Font</span>
-        <iv-select [value]="preset().font" (valueChange)="set({ font: $event ?? 'system' })">
-          <iv-select-trigger class="w-full" [aria-labelledby]="name() + '-font-label'" />
-          <iv-select-content>
-            <iv-select-item value="system">System</iv-select-item>
-            @for (g of fontGroups; track g.label) {
-              <iv-select-separator />
-              <iv-select-group>
-                <iv-select-label>{{ g.label }}</iv-select-label>
-                @for (f of g.fonts; track f.name) {
-                  <iv-select-item [value]="f.name">{{ f.title }}</iv-select-item>
-                }
-              </iv-select-group>
-            }
-          </iv-select-content>
-        </iv-select>
-      </div>
-
-      <div class="flex flex-col gap-2.5">
-        <span class="text-foreground text-sm font-medium" [id]="name() + '-heading-label'">Heading font</span>
-        <iv-select [value]="preset().fontHeading" (valueChange)="set({ fontHeading: $event ?? 'inherit' })">
-          <iv-select-trigger class="w-full" [aria-labelledby]="name() + '-heading-label'" />
-          <iv-select-content>
-            <iv-select-item value="inherit">Same as font</iv-select-item>
-            @for (g of fontGroups; track g.label) {
-              <iv-select-separator />
-              <iv-select-group>
-                <iv-select-label>{{ g.label }}</iv-select-label>
-                @for (f of g.fonts; track f.name) {
-                  <iv-select-item [value]="f.name">{{ f.title }}</iv-select-item>
-                }
-              </iv-select-group>
-            }
-          </iv-select-content>
-        </iv-select>
-      </div>
-
+    @if (compact()) {
       <fieldset>
-        <legend class="text-foreground mb-2.5 text-sm font-medium">Radius</legend>
-        <div class="grid grid-cols-5 gap-1.5">
-          @for (r of radii; track r.name) {
+        <legend class="text-foreground mb-2.5 text-sm font-medium">Style</legend>
+        <div class="bg-muted grid grid-cols-5 gap-0.5 rounded-full p-0.5">
+          @for (s of styles; track s.name) {
             <label
-              class="has-checked:border-foreground has-checked:text-foreground hover:bg-muted/60 has-focus-visible:outline-ring text-muted-foreground flex cursor-pointer flex-col items-center gap-1.5 rounded-lg border px-1 pt-2.5 pb-1.5 transition-colors has-focus-visible:outline-2 has-focus-visible:outline-offset-2"
+              class="has-checked:bg-background has-checked:text-foreground has-checked:shadow-xs text-muted-foreground hover:text-foreground has-focus-visible:outline-ring cursor-pointer rounded-full px-2.5 py-1 text-center text-sm font-medium transition-colors has-focus-visible:outline-2"
             >
-              <input type="radio" class="sr-only" [name]="name() + '-radius'" [value]="r.name" [checked]="preset().radius === r.name" (change)="set({ radius: r.name })" />
-              <!-- One corner, drawn at twice the radius so small steps stay visible. -->
-              <span class="size-5 border-t-2 border-l-2 border-current" [style.border-top-left-radius]="r.corner" aria-hidden="true"></span>
-              <span class="text-[0.6875rem]">{{ r.label }}</span>
+              <input type="radio" class="sr-only" [name]="name() + '-style'" [value]="s.name" [checked]="preset().style === s.name" (change)="set({ style: s.name })" />
+              {{ s.label }}
             </label>
           }
         </div>
       </fieldset>
+      <fieldset>
+        <legend class="mb-2.5 flex w-full items-baseline justify-between gap-4 text-sm">
+          <span class="text-foreground font-medium">Base color</span>
+          <span class="text-muted-foreground" aria-hidden="true">{{ colorTitle() }}</span>
+        </legend>
+        <div class="grid w-max grid-cols-7 gap-2">
+          @for (c of colors; track c.name) {
+            <label
+              class="ring-offset-background has-checked:ring-foreground has-focus-visible:outline-ring flex size-7 cursor-pointer rounded-full ring-1 ring-black/10 ring-offset-2 transition-shadow has-checked:ring-2 has-focus-visible:outline-2 has-focus-visible:outline-offset-4 dark:ring-white/15"
+              [title]="c.title"
+            >
+              <input type="radio" class="sr-only" [name]="name() + '-color'" [value]="c.name" [attr.aria-label]="c.title" [checked]="preset().baseColor === c.name" (change)="set({ baseColor: c.name })" />
+              <span class="size-full rounded-full" [style.background]="swatch(c.light)" aria-hidden="true"></span>
+            </label>
+          }
+        </div>
+      </fieldset>
+    } @else {
+      <!-- Every choice is a dropdown with a picture on the left; the trigger shows the chosen one.
+           Pictures have no text nodes, so the select still reads plain labels. -->
+      <div class="flex flex-col gap-2">
+        <span class="text-foreground text-sm font-medium" [id]="name() + '-style-label'">Style</span>
+        <iv-select [value]="preset().style" (valueChange)="set({ style: $event ?? 'maia' })">
+          <div class="relative">
+            <span class="pointer-events-none absolute top-1/2 left-3 z-10 -translate-y-1/2">
+              <ng-container [ngTemplateOutlet]="styleIcon" [ngTemplateOutletContext]="{ $implicit: preset().style }" />
+            </span>
+            <iv-select-trigger class="w-full pl-10" [aria-labelledby]="name() + '-style-label'" />
+          </div>
+          <iv-select-content>
+            @for (s of styles; track s.name) {
+              <iv-select-item [value]="s.name">
+                <ng-container [ngTemplateOutlet]="styleIcon" [ngTemplateOutletContext]="{ $implicit: s.name }" />
+                {{ s.label }}
+                <span class="docs-glyph text-muted-foreground ml-auto pl-3 text-xs" [attr.data-glyph]="notes[s.name]" aria-hidden="true"></span>
+              </iv-select-item>
+            }
+          </iv-select-content>
+        </iv-select>
+      </div>
+
+      <div class="flex flex-col gap-2">
+        <span class="text-foreground text-sm font-medium" [id]="name() + '-color-label'">Base color</span>
+        <iv-select [value]="preset().baseColor" (valueChange)="set({ baseColor: $event ?? 'neutral' })">
+          <div class="relative">
+            <span class="pointer-events-none absolute top-1/2 left-3 z-10 -translate-y-1/2">
+              <ng-container [ngTemplateOutlet]="colorIcon" [ngTemplateOutletContext]="{ $implicit: colorLight() }" />
+            </span>
+            <iv-select-trigger class="w-full pl-10" [aria-labelledby]="name() + '-color-label'" />
+          </div>
+          <iv-select-content>
+            @for (c of colors; track c.name) {
+              <iv-select-item [value]="c.name">
+                <ng-container [ngTemplateOutlet]="colorIcon" [ngTemplateOutletContext]="{ $implicit: c.light }" />
+                {{ c.title }}
+              </iv-select-item>
+            }
+          </iv-select-content>
+        </iv-select>
+      </div>
+
+      <div class="flex flex-col gap-2">
+        <span class="text-foreground text-sm font-medium" [id]="name() + '-font-label'">Font</span>
+        <iv-select [value]="preset().font" (valueChange)="set({ font: $event ?? 'system' })">
+          <div class="relative">
+            <span class="pointer-events-none absolute top-1/2 left-3 z-10 -translate-y-1/2">
+              <ng-container [ngTemplateOutlet]="fontIcon" [ngTemplateOutletContext]="{ $implicit: 'Aa' }" />
+            </span>
+            <iv-select-trigger class="w-full pl-10" [aria-labelledby]="name() + '-font-label'" />
+          </div>
+          <iv-select-content>
+            <iv-select-item value="system">
+              <ng-container [ngTemplateOutlet]="fontIcon" [ngTemplateOutletContext]="{ $implicit: 'Aa' }" />
+              System
+            </iv-select-item>
+            @for (g of fontGroups; track g.label) {
+              <iv-select-separator />
+              <iv-select-group>
+                <iv-select-label>{{ g.label }}</iv-select-label>
+                @for (f of g.fonts; track f.name) {
+                  <iv-select-item [value]="f.name">
+                    <ng-container [ngTemplateOutlet]="fontIcon" [ngTemplateOutletContext]="{ $implicit: g.glyph }" />
+                    {{ f.title }}
+                  </iv-select-item>
+                }
+              </iv-select-group>
+            }
+          </iv-select-content>
+        </iv-select>
+      </div>
+
+      <div class="flex flex-col gap-2">
+        <span class="text-foreground text-sm font-medium" [id]="name() + '-heading-label'">Heading font</span>
+        <iv-select [value]="preset().fontHeading" (valueChange)="set({ fontHeading: $event ?? 'inherit' })">
+          <div class="relative">
+            <span class="pointer-events-none absolute top-1/2 left-3 z-10 -translate-y-1/2">
+              <ng-container [ngTemplateOutlet]="fontIcon" [ngTemplateOutletContext]="{ $implicit: 'H' }" />
+            </span>
+            <iv-select-trigger class="w-full pl-10" [aria-labelledby]="name() + '-heading-label'" />
+          </div>
+          <iv-select-content>
+            <iv-select-item value="inherit">
+              <ng-container [ngTemplateOutlet]="fontIcon" [ngTemplateOutletContext]="{ $implicit: 'H' }" />
+              Same as font
+            </iv-select-item>
+            @for (g of fontGroups; track g.label) {
+              <iv-select-separator />
+              <iv-select-group>
+                <iv-select-label>{{ g.label }}</iv-select-label>
+                @for (f of g.fonts; track f.name) {
+                  <iv-select-item [value]="f.name">
+                    <ng-container [ngTemplateOutlet]="fontIcon" [ngTemplateOutletContext]="{ $implicit: g.glyph }" />
+                    {{ f.title }}
+                  </iv-select-item>
+                }
+              </iv-select-group>
+            }
+          </iv-select-content>
+        </iv-select>
+      </div>
+
+      <div class="flex flex-col gap-2">
+        <span class="text-foreground text-sm font-medium" [id]="name() + '-radius-label'">Radius</span>
+        <iv-select [value]="preset().radius" (valueChange)="set({ radius: $event ?? 'default' })">
+          <div class="relative">
+            <span class="pointer-events-none absolute top-1/2 left-3 z-10 -translate-y-1/2">
+              <ng-container [ngTemplateOutlet]="radiusIcon" [ngTemplateOutletContext]="{ $implicit: radiusCorner() }" />
+            </span>
+            <iv-select-trigger class="w-full pl-10" [aria-labelledby]="name() + '-radius-label'" />
+          </div>
+          <iv-select-content>
+            @for (r of radii; track r.name) {
+              <iv-select-item [value]="r.name">
+                <ng-container [ngTemplateOutlet]="radiusIcon" [ngTemplateOutletContext]="{ $implicit: r.corner }" />
+                {{ r.label }}
+                <span class="docs-glyph text-muted-foreground ml-auto pl-3 font-mono text-xs" [attr.data-glyph]="r.value" aria-hidden="true"></span>
+              </iv-select-item>
+            }
+          </iv-select-content>
+        </iv-select>
+      </div>
     }
+
+    <!-- Pictures. No text nodes: the select reads its labels from text. -->
+    <ng-template #styleIcon let-style>
+      <span class="border-foreground/70 bg-muted block size-4 shrink-0 border-[1.5px]" [style.border-radius]="glyphs[style]" aria-hidden="true"></span>
+    </ng-template>
+    <ng-template #colorIcon let-light>
+      <span class="block size-4 shrink-0 rounded-full ring-1 ring-black/10 dark:ring-white/20" [style.background]="swatch(light)" aria-hidden="true"></span>
+    </ng-template>
+    <ng-template #fontIcon let-glyph>
+      <span class="docs-glyph text-foreground/80 block w-4 shrink-0 text-center text-[0.8125rem] leading-none font-semibold" [attr.data-glyph]="glyph" aria-hidden="true"></span>
+    </ng-template>
+    <ng-template #radiusIcon let-corner>
+      <span class="border-foreground/70 block size-4 shrink-0 border-t-[1.5px] border-l-[1.5px]" [style.border-top-left-radius]="corner" aria-hidden="true"></span>
+    </ng-template>
   `,
 })
 export class LookControls {
   readonly look = input.required<PlaygroundLook>();
   /** Radio group names and label ids. Unique per instance on the page. */
   readonly name = input.required<string>();
-  /** Style and base color only. */
-  readonly compact = input(false);
+  /** Style chips and color swatches only. */
+  readonly compact = input(false, { transform: booleanAttribute });
 
   protected readonly preset = computed(() => this.look().preset());
   protected readonly styles = STYLES;
+  protected readonly notes = STYLE_NOTES;
+  protected readonly glyphs = STYLE_GLYPHS;
   protected readonly colors = BASE_COLORS;
   protected readonly fontGroups = FONT_GROUPS;
   protected readonly radii = Object.keys(RADII).map((name) => ({
     name,
     label: RADIUS_LABELS[name] ?? name,
-    corner: `calc(${RADII[name] ?? '0.625rem'} * 2)`,
+    value: RADII[name] ?? 'theme',
+    // Drawn at 1.6x so small steps stay visible in a 16px box.
+    corner: `calc(${RADII[name] ?? '0.625rem'} * 1.6)`,
   }));
+  protected readonly radiusCorner = computed(() => this.radii.find((r) => r.name === this.preset().radius)?.corner);
+  protected readonly colorLight = computed(() => BASE_COLORS.find((c) => c.name === this.preset().baseColor)!.light);
   protected readonly colorTitle = computed(() => BASE_COLORS.find((c) => c.name === this.preset().baseColor)?.title);
 
   protected set(patch: Partial<Preset>): void {

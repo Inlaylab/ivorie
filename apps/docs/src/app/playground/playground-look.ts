@@ -5,8 +5,8 @@ import { Appearance } from '../shell/appearance';
 import { DEFAULT_STYLE, STYLES } from '../shell/appearance-options';
 import { DEFAULT_PRESET, decodePreset, encodePreset, type Preset } from './preset-code';
 
-/** Tailwind's default sans stack: what `font: system` gives an app. */
-const SYSTEM_SANS = "ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'";
+/** Close to Tailwind's default sans stack: what `font: system` gives an app. */
+const SYSTEM_SANS = "system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'";
 // shortcut: unpinned CDN versions; pin per font if a release ever breaks a family name.
 const fontHref = (dependency: string) => `https://cdn.jsdelivr.net/npm/${dependency}/index.css`;
 const family = (name: string) => FONTS.find((f) => f.name === name)!.family;
