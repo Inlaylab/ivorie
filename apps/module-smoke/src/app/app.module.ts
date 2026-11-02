@@ -26,6 +26,11 @@ import { IV_SHEET_IMPORTS } from '@inlaylab/ivorie/sheet';
 import { IvSlider } from '@inlaylab/ivorie/slider';
 import { IvToggle } from '@inlaylab/ivorie/toggle';
 import { IV_TOGGLE_GROUP_IMPORTS } from '@inlaylab/ivorie/toggle-group';
+import { IV_CAROUSEL_IMPORTS } from '@inlaylab/ivorie/carousel';
+import { IV_COMMAND_IMPORTS } from '@inlaylab/ivorie/command';
+import { IV_DRAWER_IMPORTS } from '@inlaylab/ivorie/drawer';
+import { IV_INPUT_OTP_IMPORTS } from '@inlaylab/ivorie/input-otp';
+import { IV_RESIZABLE_IMPORTS } from '@inlaylab/ivorie/resizable';
 import { IV_DIALOG_IMPORTS } from '@inlaylab/ivorie/dialog';
 import { IV_DROPDOWN_MENU_IMPORTS } from '@inlaylab/ivorie/dropdown-menu';
 import { IV_EMPTY_IMPORTS } from '@inlaylab/ivorie/empty';
@@ -85,6 +90,11 @@ import { App } from './app';
     ...IV_TOGGLE_GROUP_IMPORTS,
     IvSlider,
     IvToggle,
+    ...IV_CAROUSEL_IMPORTS,
+    ...IV_COMMAND_IMPORTS,
+    ...IV_DRAWER_IMPORTS,
+    ...IV_INPUT_OTP_IMPORTS,
+    ...IV_RESIZABLE_IMPORTS,
     ...IV_PAGINATION_IMPORTS,
     ...IV_RADIO_GROUP_IMPORTS,
     ...IV_SCROLL_AREA_IMPORTS,

@@ -20,6 +20,7 @@ export class App {
   size = 'm';
   align: string | string[] | null = 'left';
   volume = [40];
+  otp = '';
   readonly fruits = ['Apple', 'Banana', 'Cherry'];
 
   notifySaved() {

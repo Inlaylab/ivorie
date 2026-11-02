@@ -12,6 +12,8 @@ export type DialogCloseReason =
   | 'programmatic'
   /** The overlay was disposed from outside, e.g. by navigation. */
   | 'navigation'
+  /** A drawer was dragged toward its edge. */
+  | 'drag'
 
 export interface DialogCloseEvent<R = unknown> {
   reason: DialogCloseReason

@@ -238,6 +238,43 @@
     </ul>
   </iv-navigation-menu>
 
+  <iv-command class="rounded-lg border">
+    <iv-command-input placeholder="Search" />
+    <iv-command-list>
+      <iv-command-empty>No results.</iv-command-empty>
+      <iv-command-item>Calendar</iv-command-item>
+    </iv-command-list>
+  </iv-command>
+
+  <iv-input-otp maxLength="4" aria-label="Code" [(ngModel)]="otp">
+    <iv-input-otp-group>
+      <iv-input-otp-slot index="0" />
+      <iv-input-otp-slot index="1" />
+      <iv-input-otp-slot index="2" />
+      <iv-input-otp-slot index="3" />
+    </iv-input-otp-group>
+  </iv-input-otp>
+
+  <iv-resizable-panel-group class="h-24 rounded-lg border">
+    <iv-resizable-panel defaultSize="50">One</iv-resizable-panel>
+    <iv-resizable-handle [withHandle]="true" />
+    <iv-resizable-panel>Two</iv-resizable-panel>
+  </iv-resizable-panel-group>
+
+  <button ivButton variant="outline" [ivDrawerTrigger]="drawer">Open drawer</button>
+  <ng-template #drawer>
+    <iv-drawer-header><iv-drawer-title>Drawer</iv-drawer-title></iv-drawer-header>
+  </ng-template>
+
+  <iv-carousel class="w-48" aria-label="Slides">
+    <iv-carousel-content>
+      <iv-carousel-item>One</iv-carousel-item>
+      <iv-carousel-item>Two</iv-carousel-item>
+    </iv-carousel-content>
+    <button ivCarouselPrevious></button>
+    <button ivCarouselNext></button>
+  </iv-carousel>
+
   <button ivButton (click)="notifySaved()">Save</button>
   <iv-toast-container />
 

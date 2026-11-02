@@ -30,8 +30,8 @@ const imports = [
 
 const source = existsSync(MODULE) ? readFileSync(MODULE, 'utf8') : '';
 
-test('finds the 33 IMPORTS arrays', () => {
-  assert.equal(imports.length, 33);
+test('finds the 38 IMPORTS arrays', () => {
+  assert.equal(imports.length, 38);
 });
 
 test('module imports every IV_*_IMPORTS', () => {
