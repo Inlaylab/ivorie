@@ -16,13 +16,13 @@ Fixed choices:
 More detail: [PLAN](docs/PLAN.md) · [ARCHITECTURE](docs/ARCHITECTURE.md) · [CONVENTIONS](docs/CONVENTIONS.md) · [COMPAT](docs/COMPAT.md) · [DECISIONS](docs/DECISIONS.md) · [DEPLOY](docs/DEPLOY.md).
 
 ## Status
-**Next:** Phase 8, task T0 (release hygiene), then T7 (release 1.1.0). Done: T1–T6. T0 runs last.
-Shipped: 1.0.0 (both packages). Docs initial bundle is ~800 kB, mostly lucide icons (fixed in Phase 11).
+**Next:** Phase 9, task T1 (base colors as data).
+Shipped: 1.0.0, 1.1.0 (both packages). Docs initial bundle is ~800 kB, mostly lucide icons (fixed in Phase 11).
 
 | # | Release | What | Status |
 |---|---|---|---|
-| 8 | 1.1.0 | Components + quick wins | next |
-| 9 | 1.2.0 | Playground: themes, colors, fonts | planned |
+| 8 | 1.1.0 | Components + quick wins | done |
+| 9 | 1.2.0 | Playground: themes, colors, fonts | next |
 | 10 | 1.3.0 | Blocks | planned |
 | 11 | 1.4.0 | Icon libraries as plugins | planned |
 | 12 | 1.5.0 | Charts | planned |
@@ -189,6 +189,15 @@ Scope:
    - Output: share code, `npx ivorie init --preset ivp1_…`, `npx ivorie apply ivp1_…`, copyable CSS.
    - Reuse `apps/docs/src/app/shell/appearance.ts` (style class swap, lazy style links).
    - Use the frontend-design skill.
+
+Tasks:
+- **T1** Base colors as data: 7 JSON var maps, `theme-<name>` registry items.
+- **T2** Fonts (27, `font-<name>` items), heading font (`fontHeading` in the preset, `.cn-font-heading`), radius map.
+- **T3** CLI `renderLook`: one function renders the look; `init` applies font, heading font and radius.
+- **T4** CLI `ivorie apply <preset|ivp1_…>`.
+- **T5** Docs look data (generated) and playground state (page-only, URL `?preset=`).
+- **T6** Docs `/playground` page: control rail, preview wall, copy commands and CSS.
+- **T7** `smoke:cli` preset app, release 1.2.0.
 
 **Exit gate:**
 - A preset made in the Playground, installed with `ivorie init --preset` in a fresh app, gives the same look (extend `smoke:cli`).
