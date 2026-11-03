@@ -162,16 +162,16 @@
   color: var(--foreground);
 }
 
-/* Ivorie brand: one soft three-stop gradient (ivory gold, rose, periwinkle). Used sparingly. */
+/* Ivorie brand: the logo's violet. Lavender #F5F3FF, primary violet #7C3AED, deep indigo. Used sparingly. */
 :root {
-  --brand-a: oklch(0.87 0.09 80);
-  --brand-b: oklch(0.78 0.12 350);
-  --brand-c: oklch(0.72 0.12 278);
+  --brand-a: oklch(0.84 0.1 305);
+  --brand-b: oklch(0.6 0.23 293);
+  --brand-c: oklch(0.5 0.22 275);
 }
 .dark {
-  --brand-a: oklch(0.72 0.1 75);
-  --brand-b: oklch(0.62 0.14 350);
-  --brand-c: oklch(0.58 0.14 278);
+  --brand-a: oklch(0.72 0.14 305);
+  --brand-b: oklch(0.58 0.23 293);
+  --brand-c: oklch(0.48 0.2 275);
 }
 .docs-brand-gradient {
   background-image: linear-gradient(120deg, var(--brand-a), var(--brand-b) 55%, var(--brand-c));
