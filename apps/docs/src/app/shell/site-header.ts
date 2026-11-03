@@ -55,7 +55,9 @@ import { Appearance } from './appearance';
           [class]="link + ' hidden md:inline-block'"
           >Components</a
         >
+        <a routerLink="/blocks" routerLinkActive="!text-foreground bg-muted" ariaCurrentWhenActive="page" [class]="link + ' hidden md:inline-block'">Blocks</a>
         <a routerLink="/playground" routerLinkActive="!text-foreground bg-muted" ariaCurrentWhenActive="page" [class]="link">Playground</a>
+        <a routerLink="/roadmap" routerLinkActive="!text-foreground bg-muted" ariaCurrentWhenActive="page" [class]="link + ' hidden md:inline-block'">Roadmap</a>
       </nav>
       <span class="flex-1"></span>
       <a

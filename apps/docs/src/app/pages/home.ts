@@ -219,7 +219,11 @@ const DEFAULT_CODE = encodePreset(DEFAULT_PRESET);
           <span class="docs-brand-gradient size-1.5 rounded-full" aria-hidden="true"></span>
           <span>Ivorie is made by <a href="https://github.com/Inlaylab" target="_blank" rel="noreferrer" class="text-foreground font-medium hover:underline">Inlaylab</a>. MIT license.</span>
         </span>
-        <a href="https://github.com/Inlaylab/ivorie" target="_blank" rel="noreferrer" class="hover:text-foreground">Source on GitHub</a>
+        <nav aria-label="Footer" class="flex flex-wrap gap-x-5 gap-y-2">
+          <a routerLink="/blocks" class="hover:text-foreground">Blocks</a>
+          <a routerLink="/roadmap" class="hover:text-foreground">Roadmap</a>
+          <a href="https://github.com/Inlaylab/ivorie" target="_blank" rel="noreferrer" class="hover:text-foreground">Source on GitHub</a>
+        </nav>
       </div>
     </footer>
   `,
