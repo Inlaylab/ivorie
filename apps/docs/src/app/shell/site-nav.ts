@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
+import { IvBadge } from '@inlaylab/ivorie/badge';
 import {
   IvSidebarGroup, IvSidebarGroupContent, IvSidebarGroupLabel, IvSidebarMenu, IvSidebarMenuItem,
   IvSidebarService,
@@ -10,13 +11,13 @@ const GROUPS = [
   { label: 'Getting started', pages: PAGES.filter((p) => p.section === 'guide') },
   {
     label: 'Components',
-    pages: [{ slug: 'components', title: 'Overview' }, ...PAGES.filter((p) => p.section === 'component')],
+    pages: [{ slug: 'components', title: 'Overview', soon: false }, ...PAGES.filter((p) => p.section === 'component')],
   },
 ];
 
 @Component({
   selector: 'docs-site-nav',
-  imports: [RouterLink, RouterLinkActive, IvSidebarGroup, IvSidebarGroupContent, IvSidebarGroupLabel, IvSidebarMenu, IvSidebarMenuItem],
+  imports: [RouterLink, RouterLinkActive, IvBadge, IvSidebarGroup, IvSidebarGroupContent, IvSidebarGroupLabel, IvSidebarMenu, IvSidebarMenuItem],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <nav aria-label="Docs" class="flex flex-col gap-2 px-2">
@@ -50,6 +51,9 @@ const GROUPS = [
                     <!-- The brand dot marks the open page. -->
                     <span class="docs-brand-gradient hidden size-1.5 shrink-0 rounded-full group-[.docs-nav-active]:block" aria-hidden="true"></span>
                     {{ page.title }}
+                    @if (page.soon) {
+                      <iv-badge variant="secondary" class="ml-auto">Soon</iv-badge>
+                    }
                   </a>
                 </li>
               }

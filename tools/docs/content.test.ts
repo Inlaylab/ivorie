@@ -30,6 +30,13 @@ test('frontmatter: guide order is a number', () => {
   assert.equal(data.order, 2);
 });
 
+test('frontmatter: soon is true only when set to true', () => {
+  const guide = 'title: A\ndescription: B\nsection: guide\norder: 4';
+  assert.equal(parseFrontmatter(md(`${guide}\nsoon: true`), 'x.md').data.soon, true);
+  assert.equal(parseFrontmatter(md(`${guide}\nsoon: false`), 'x.md').data.soon, undefined);
+  assert.equal(parseFrontmatter(md(guide), 'x.md').data.soon, undefined);
+});
+
 test('frontmatter: no title throws', () => {
   assert.throws(() => parseFrontmatter(md('description: B\nsection: guide'), 'x.md'), {
     message: 'x.md: missing title',

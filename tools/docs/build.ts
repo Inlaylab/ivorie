@@ -34,12 +34,15 @@ for (const file of demoFiles) {
 const render = createRenderer(await createHighlighter());
 const pages: DocPage[] = [];
 const orders = new Map<string, number>();
+const soon = new Set<string>();
 for (const file of readdirSync(CONTENT).filter((f) => f.endsWith('.md') && !f.startsWith('_'))) {
   const slug = basename(file, '.md');
   const md = readFileSync(join(CONTENT, file), 'utf8');
   try {
     pages.push(buildPage({ slug, file: `${CONTENT}/${file}`, md, demos, render }));
-    orders.set(slug, parseFrontmatter(md, file).data.order ?? 0);
+    const { data } = parseFrontmatter(md, file);
+    orders.set(slug, data.order ?? 0);
+    if (data.soon) soon.add(slug);
   } catch (e) {
     errors.push((e as Error).message);
   }
@@ -76,6 +79,7 @@ const entries = pages.map((p) => {
   const fields = Object.entries(meta).map(([k, v]) => `${k}: ${JSON.stringify(v)}`);
   return (
     `  {\n    ${fields.join(',\n    ')},\n    order: ${orders.get(p.slug)},\n` +
+    (soon.has(p.slug) ? '    soon: true,\n' : '') +
     `    load: () => import('./pages/${p.slug}').then((m) => m.default),\n  },`
   );
 });

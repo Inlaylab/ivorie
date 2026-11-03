@@ -15,6 +15,8 @@ export interface Frontmatter {
   section: DocSection;
   entry?: string;
   order?: number;
+  /** `soon: true`: the page is a placeholder; the nav marks it. */
+  soon?: boolean;
 }
 
 export type Render = (md: string, slugs?: Map<string, number>) => { html: string; toc: TocItem[] };
@@ -49,6 +51,7 @@ export function parseFrontmatter(md: string, file: string): { data: Frontmatter;
     data.order = Number(need('order'));
     if (Number.isNaN(data.order)) throw new Error(`${file}: order must be a number`);
   }
+  if (raw['soon'] === 'true') data.soon = true;
   return { data, body: md.slice(m[0].length) };
 }
 

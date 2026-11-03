@@ -34,6 +34,8 @@ export interface PageEntry {
   description: string;
   section: DocSection;
   order: number;
+  /** A placeholder page: the nav shows a "Soon" badge. */
+  soon?: boolean;
   load: () => Promise<DocPage>;
 }
 export type DemoLoader = () => Promise<Type<unknown>>;
