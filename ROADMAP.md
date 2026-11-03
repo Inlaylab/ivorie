@@ -1,6 +1,6 @@
 # Ivorie — Roadmap
 
-Single source for plan, status and next work. Updated 2026-10-31.
+Single source for plan, status and next work. Updated 2026-11-03.
 
 ## Goal
 Ship the Ivorie Angular components as open source.
@@ -16,16 +16,19 @@ Fixed choices:
 More detail: [PLAN](docs/PLAN.md) · [ARCHITECTURE](docs/ARCHITECTURE.md) · [CONVENTIONS](docs/CONVENTIONS.md) · [COMPAT](docs/COMPAT.md) · [DECISIONS](docs/DECISIONS.md) · [DEPLOY](docs/DEPLOY.md).
 
 ## Status
-**Next:** Phase 9 T7: `smoke:cli`, PR, then publish 1.2.0 (ask first). Done: T1–T6, version bump.
-Shipped: 1.0.0, 1.1.0 (both packages). 1.2.0 bumped, not yet published. Docs initial bundle is ~800 kB, mostly lucide icons (fixed in Phase 11).
+**Next:** Phase 10 (Blocks): expand the outline into tasks, get an OK. Before it: branch `chore/site-polish` (docs site only, no release): Blocks and Roadmap pages, MCP page (coming soon), cleaner Installation and Playground.
+Shipped: 1.0.0, 1.1.0, 1.2.0 (both packages). Docs initial bundle is ~800 kB, mostly lucide icons (fixed in Phase 11).
 
 | # | Release | What | Status |
 |---|---|---|---|
 | 8 | 1.1.0 | Components + quick wins | done |
-| 9 | 1.2.0 | Playground: themes, colors, fonts | next |
-| 10 | 1.3.0 | Blocks | planned |
+| 9 | 1.2.0 | Playground: themes, colors, fonts | done |
+| 10 | 1.3.0 | Blocks | next |
 | 11 | 1.4.0 | Icon libraries as plugins | planned |
-| 12 | 1.5.0 | Charts | planned |
+| 12 | 1.5.0 | Data table: sort and pagination | planned |
+| 13 | 1.6.0 | More themes (glass and others) | planned |
+| 14 | 1.7.0 | AI-ready: AGENTS.md and MCP server | planned |
+| 15 | 1.8.0 | Charts | planned |
 
 Order is by benefit to users. New features ship as minor releases (1.x.0). A patch (1.x.y) is for bug fixes only.
 
@@ -221,7 +224,7 @@ Scope:
 1. **Registry:** new `ItemKind` `block`. Files go to `<path>/blocks/<name>/`. `add --all` still adds components only (`add.ts:60`).
 2. **Source:** blocks live in the repo (folder decided at expand time), built and tested like the docs app.
 3. **Docs `/blocks`** (new top bar tab): full-width preview, desktop/tablet/mobile width toggle, file tree + code, `npx ivorie add <block>`. Use the frontend-design skill.
-4. **First set** (port from `.ref/shadcn/apps/v4/registry/bases/radix/blocks/`): login-01…05, signup-01…05, sidebar-01…08. `dashboard-01` waits for charts (Phase 12).
+4. **First set** (port from `.ref/shadcn/apps/v4/registry/bases/radix/blocks/`): login-01…05, signup-01…05, sidebar-01…08. `dashboard-01` waits for charts (Phase 15).
 
 **Exit gate:**
 - `ivorie add login-01` in a fresh app builds and renders (extend `smoke:cli`).
@@ -251,7 +254,60 @@ Scope:
 
 ---
 
-## Phase 12 — Release 1.5.0: Charts
+## Phase 12 — Release 1.5.0: Data table (sort and pagination)
+Branch `feat/data-table`. Outline: expand into tasks and get an OK first.
+
+**Goal:** a table that sorts, pages and filters its rows, like the shadcn data table, without TanStack.
+
+Today: `@inlaylab/ivorie/table` is markup only. `@inlaylab/ivorie/pagination` is links only.
+
+Scope:
+1. **Data table:** signals state (sort key and direction, page, page size, filter) on top of `IV_TABLE_IMPORTS`. Entry decided at expand time (new entry or part of `table`).
+2. **Sortable headers:** button in the header cell, `aria-sort`, keyboard.
+3. **Pagination:** page size select, previous/next, "page X of Y", wired to the table state.
+4. **Row selection:** checkbox column, select all on the page.
+5. **Docs:** examples ported from `.ref/shadcn/apps/v4/registry/bases/radix/examples/` data-table demos.
+
+**Exit gate:**
+- Sort, page and filter specs (Vitest + axe). SSR renders the first page.
+- `npm run check` green. 1.5.0 on npm.
+
+---
+
+## Phase 13 — Release 1.6.0: More themes
+Branch `feat/more-themes`. Outline: expand into tasks and get an OK first.
+
+**Goal:** new looks beyond the five shadcn styles, for example Glass (translucent surfaces with backdrop blur).
+
+Scope:
+1. **Styles:** new `style-<name>.css` files. Glass first; the rest are picked at expand time.
+2. **Pipeline:** same tokens and `.cn-*` rules as the synced styles. Hand-written styles live beside the synced ones and are not overwritten by `tools/styles/sync.ts`.
+3. **Registry and CLI:** each new style is a registry item and a preset value. `ivorie init --style` and `ivorie apply` accept it.
+4. **Playground:** the new styles show in the style picker.
+
+**Exit gate:**
+- Every component renders in every new style (spec per style). Axe contrast clean in light and dark.
+- `npm run check` green. 1.6.0 on npm.
+
+---
+
+## Phase 14 — Release 1.7.0: AI-ready (AGENTS.md and MCP server)
+Branch `feat/ai-ready`. Outline: expand into tasks and get an OK first.
+
+**Goal:** AI coding agents use Ivorie the right way: right imports, right selectors, components added with the CLI.
+
+Scope:
+1. **AGENTS.md:** a short guide for apps that use Ivorie. `ivorie init` writes it (or adds a section to an existing one).
+2. **llms.txt:** the docs site publishes `llms.txt` with every page in plain text.
+3. **MCP server:** agents browse the registry, read a component's docs and run `add`. Reference: shadcn `packages/shadcn/src/mcp/`. The docs page `/docs/mcp` says coming soon until then.
+
+**Exit gate:**
+- An MCP client lists and adds a component in a fresh app (extend `smoke:cli`).
+- `npm run check` green. 1.7.0 on npm.
+
+---
+
+## Phase 15 — Release 1.8.0: Charts
 Branch `feat/charts`. Outline: expand into tasks and get an OK first.
 
 **Goal:** line, area, bar and pie charts that follow the theme, like shadcn charts.
@@ -265,7 +321,7 @@ Scope:
 
 **Exit gate:**
 - Charts render in SSR and hydrate with no warnings. Axe clean.
-- `npm run check` green. 1.5.0 on npm.
+- `npm run check` green. 1.8.0 on npm.
 
 ---
 

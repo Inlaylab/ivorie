@@ -52,7 +52,7 @@ Repo: https://github.com/shadcn-ui/ui (MIT). Our components copy its classes, va
 - `projects/cli/` — the `ivorie` CLI.
 - `apps/docs/` — docs + playground app (SSR, prerender). `apps/module-smoke/` — NgModule smoke app.
 - `tools/` — scripts: check, docs build, registry, styles sync, smoke tests, rename map.
-- `ROADMAP.md` — status, must do, phases 8–12 (releases 1.1–1.5) with tasks, backlog.
+- `ROADMAP.md` — status, must do, phases 8–15 (releases 1.1–1.8) with tasks, backlog.
 - `CHANGELOG.md` — release notes. `.changeset/` — pending version notes (from Phase 8 T0).
 - `.github/workflows/` — `ci.yml` (checks), `release.yml` (manual npm publish), `docs.yml` (GitHub Pages).
 - `docs/` — PLAN (why), ARCHITECTURE, CONVENTIONS, COMPAT, DECISIONS, DEPLOY.

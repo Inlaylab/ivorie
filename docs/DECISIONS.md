@@ -47,3 +47,4 @@ One line per decision. Newest at the bottom. Format: `date — decision — why`
 - 2026-11-02 — The preset gains `fontHeading` (`inherit` = same as font). It is left out of the share code when `inherit`, so 1.1 codes and the default code do not change.
 - 2026-11-02 — The docs site is always style maia; the header has one light/dark button. The playground and the home preview show a look only on their preview box and its overlays (vars + style class on those elements), never on the site.
 - 2026-11-02 — Menus are solid. shadcn's `.cn-menu-translucent` is an opt-in look (translucent menu color); the style sync keeps it empty.
+- 2026-11-03 — Phase order after 1.2: Blocks, icon libraries, data table, more themes, AI-ready (AGENTS.md + MCP server), charts. Blocks and icons help every user first; charts are the largest new surface, so they go last.
