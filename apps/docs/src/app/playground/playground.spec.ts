@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { Router, provideRouter } from '@angular/router';
 import { afterEach, describe, expect, it } from 'vitest';
-import PlaygroundPage from './playground';
+import PlaygroundPage, { SCENES } from './playground';
 import { PlaygroundLook } from './playground-look';
 import { encodePreset } from './preset-code';
 
@@ -39,11 +39,21 @@ describe('PlaygroundPage', () => {
     localStorage.clear();
   });
 
-  it('the rail has one labelled dropdown per choice', async () => {
+  it('the rail shows style, color and radius as options, and the fonts as dropdowns', async () => {
     const { el } = await render();
-    const labels = [...rail(el).querySelectorAll('docs-look-controls span[id$="-label"]')].map((s) => s.textContent!.trim());
-    expect(labels).toEqual(['Style', 'Base color', 'Font', 'Heading font', 'Radius']);
-    expect(rail(el).querySelectorAll('docs-look-controls [data-slot="select-trigger"]').length).toBe(5);
+    const legends = [...rail(el).querySelectorAll('docs-look-controls legend')].map((l) => (l.querySelector('span') ?? l).textContent!.trim());
+    expect(legends).toEqual(['Style', 'Base color', 'Radius']);
+    const dropdowns = [...rail(el).querySelectorAll('docs-look-controls span[id$="-label"]')].map((s) => s.textContent!.trim());
+    expect(dropdowns).toEqual(['Font', 'Heading font']);
+    expect(rail(el).querySelectorAll('docs-look-controls [data-slot="select-trigger"]').length).toBe(2);
+  });
+
+  it('picking a style or radius option changes the look', async () => {
+    const { el, fixture } = await render();
+    const look = fixture.debugElement.injector.get(PlaygroundLook);
+    rail(el).querySelector<HTMLInputElement>('input[name="rail-style"][value="nova"]')!.click();
+    rail(el).querySelector<HTMLInputElement>('input[name="rail-radius"][value="large"]')!.click();
+    expect(look.preset()).toMatchObject({ style: 'nova', radius: 'large' });
   });
 
   it('the default look gives the plain commands', async () => {
@@ -82,6 +92,27 @@ describe('PlaygroundPage', () => {
     await fixture.whenStable();
     expect(el.querySelector<HTMLElement>('.docs-stage')!.style.getPropertyValue('--primary')).not.toBe('');
     expect(document.documentElement.style.getPropertyValue('--primary')).toBe('');
+  });
+
+  it('every scene renders when picked, with its description, and goes in the URL', async () => {
+    const { el, fixture, router } = await render();
+    for (const s of SCENES) {
+      el.querySelector<HTMLInputElement>(`input[name="scene"][value="${s.value}"]`)!.click();
+      await fixture.whenStable();
+      fixture.detectChanges();
+      const tag = s.value === 'dashboard' ? 'docs-playground-preview' : `docs-scene-${s.value}`;
+      expect(el.querySelector(`.docs-stage ${tag}`), s.value).not.toBeNull();
+      expect(el.querySelector('[data-testid="scene-description"]')!.textContent!.trim()).toBe(s.description);
+    }
+    expect(router.url).toBe('/playground?scene=checkout');
+  });
+
+  it('a scene in the URL is opened; an unknown one gives the dashboard', async () => {
+    const good = await render('/playground?scene=team');
+    expect(good.el.querySelector('.docs-stage docs-scene-team')).not.toBeNull();
+    TestBed.resetTestingModule();
+    const bad = await render('/playground?scene=nope');
+    expect(bad.el.querySelector('.docs-stage docs-playground-preview')).not.toBeNull();
   });
 
   it('has no axe violations', async () => {
