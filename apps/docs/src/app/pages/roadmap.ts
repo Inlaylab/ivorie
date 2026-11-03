@@ -95,14 +95,14 @@ const STATE_LABEL: Record<State, string> = { shipped: 'Shipped', next: 'Up next'
                   </span>
                 }
                 @default {
-                  <span class="bg-background ring-border mt-1.5 size-3 shrink-0 rounded-full ring-2 ring-inset"></span>
+                  <span class="bg-background ring-muted-foreground/45 mt-1.5 size-3 shrink-0 rounded-full ring-2 ring-inset"></span>
                 }
               }
               @if (!last) {
                 @if (item.state === 'shipped') {
                   <span class="docs-brand-gradient my-1 w-px flex-1"></span>
                 } @else {
-                  <span class="border-border my-1 flex-1 border-l border-dashed"></span>
+                  <span class="border-muted-foreground/35 my-1 flex-1 border-l-2 border-dotted"></span>
                 }
               }
             </div>
