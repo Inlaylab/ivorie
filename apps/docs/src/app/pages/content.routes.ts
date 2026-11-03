@@ -16,6 +16,8 @@ export const contentRoutes: Routes = [
         loadComponent: () => import('../playground/playground'),
         title: 'Playground · Ivorie',
       },
+      { path: 'blocks', loadComponent: () => import('./blocks'), title: 'Blocks · Ivorie' },
+      { path: 'roadmap', loadComponent: () => import('./roadmap'), title: 'Roadmap · Ivorie' },
       {
         path: 'docs/:slug',
         loadComponent: () => import('./doc-page'),

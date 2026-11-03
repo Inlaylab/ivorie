@@ -195,3 +195,19 @@
 .docs-glyph::before {
   content: attr(data-glyph);
 }
+/* Roadmap: the "up next" ring grows and fades twice on load, then rests. */
+@media (prefers-reduced-motion: no-preference) {
+  .docs-ring-once {
+    animation: docs-ring 1.4s ease-out 0.4s 2 both;
+  }
+}
+@keyframes docs-ring {
+  from {
+    transform: scale(1);
+    opacity: 1;
+  }
+  to {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+}
