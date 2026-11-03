@@ -5,24 +5,44 @@ section: guide
 order: 1
 ---
 
-Ivorie needs Angular 22 and Tailwind 4.
+Ivorie needs Angular 22 and Tailwind 4. There are two ways to add it:
 
-## 1. Install packages
+- **The CLI** copies component source into your app. You own the code and edit it freely.
+- **The npm package** keeps components in `node_modules`. You get fixes with `npm update`.
+
+Both give the same components and the same look. Not sure? Start with the CLI.
+
+## Quick start with the CLI
+
+Run these in your Angular workspace:
+
+```bash
+npx ivorie init
+npx ivorie add button
+```
+
+`init` sets up the theme, the style and Tailwind, and installs what they need. `add` copies the component into `src/app/ui/`. Then use it as shown in [Use a component](docs/installation#use-a-component).
+
+Want a custom look? Build one in the [playground](playground) and copy its `init` command. See [CLI](docs/cli) for every option.
+
+## Install the package
+
+### 1. Install
 
 ```bash
 npm i @inlaylab/ivorie @angular/cdk
 npm i -D tailwindcss @tailwindcss/postcss tw-animate-css
 ```
 
-## 2. Configure PostCSS
+### 2. Add PostCSS
 
-Create `.postcssrc.json` in the project root.
+Create `.postcssrc.json` in the project root:
 
 ```json
 { "plugins": { "@tailwindcss/postcss": {} } }
 ```
 
-## 3. Import the styles
+### 3. Import the styles
 
 In `src/styles.css`:
 
@@ -33,13 +53,9 @@ In `src/styles.css`:
 
 `theme.css` already imports `tailwindcss` and `tw-animate-css`. Do not import them again.
 
-Maia is one of five styles: `vega`, `nova`, `maia`, `luma` and `rhea`. See [Theming](docs/theming).
+### 4. Set the style class
 
-## 4. Set the style class
-
-Use the class that matches the style file you imported.
-
-In `src/index.html`:
+In `src/index.html`, use the class that matches the style file:
 
 ```html
 <body class="style-maia">
@@ -47,49 +63,9 @@ In `src/index.html`:
 </body>
 ```
 
-## 5. Provide defaults (optional)
+Maia is one of five styles: `vega`, `nova`, `maia`, `luma` and `rhea`. See [Theming](docs/theming).
 
-```ts
-import { ApplicationConfig } from '@angular/core';
-import { provideIvorie } from '@inlaylab/ivorie/core';
-
-export const appConfig: ApplicationConfig = {
-  providers: [provideIvorie({ tooltipDelay: 200, sidebarMobile: false })],
-};
-```
-
-Options:
-
-- `tooltipDelay`: tooltip open delay in ms. Default `0`.
-- `sidebarMobile`: start the sidebar in mobile mode before the viewport is known. Default `false`.
-
-NgModule apps use `IvorieModule.forRoot()` with the same options:
-
-```ts
-import { IvorieModule } from '@inlaylab/ivorie/core';
-
-@NgModule({ imports: [IvorieModule.forRoot({ tooltipDelay: 200 })] })
-export class AppModule {}
-```
-
-In an NgModule, spread the import arrays. They are readonly, and NgModule `imports` takes only plain arrays:
-
-```ts
-import { IV_TABS_IMPORTS } from '@inlaylab/ivorie/tabs';
-
-@NgModule({ imports: [...IV_TABS_IMPORTS] })
-export class AppModule {}
-```
-
-For toasts, add `provideIvToast()`:
-
-```ts
-import { provideIvToast } from '@inlaylab/ivorie/toast';
-
-providers: [provideIvToast()];
-```
-
-## 6. Use a component
+## Use a component
 
 ```ts
 import { Component } from '@angular/core';
@@ -103,13 +79,48 @@ import { IvButton } from '@inlaylab/ivorie/button';
 export class App {}
 ```
 
-## CLI
+With the CLI, import from your own folder instead: `./ui/button/public-api`.
 
-Prefer to own the source? Copy components into your app instead of installing the package:
+## Optional setup
 
-```bash
-npx ivorie init
-npx ivorie add button
+### Defaults
+
+```ts
+import { ApplicationConfig } from '@angular/core';
+import { provideIvorie } from '@inlaylab/ivorie/core';
+
+export const appConfig: ApplicationConfig = {
+  providers: [provideIvorie({ tooltipDelay: 200, sidebarMobile: false })],
+};
 ```
 
-`init` sets up the theme, the style and Tailwind. `add` copies the component into `src/app/ui/`. See [CLI](docs/cli).
+- `tooltipDelay`: tooltip open delay in ms. Default `0`.
+- `sidebarMobile`: start the sidebar in mobile mode before the viewport is known. Default `false`.
+
+### Toasts
+
+```ts
+import { provideIvToast } from '@inlaylab/ivorie/toast';
+
+providers: [provideIvToast()];
+```
+
+### NgModule apps
+
+Use `IvorieModule.forRoot()` with the same options as `provideIvorie`:
+
+```ts
+import { IvorieModule } from '@inlaylab/ivorie/core';
+
+@NgModule({ imports: [IvorieModule.forRoot({ tooltipDelay: 200 })] })
+export class AppModule {}
+```
+
+Spread the import arrays. They are readonly, and NgModule `imports` takes only plain arrays:
+
+```ts
+import { IV_TABS_IMPORTS } from '@inlaylab/ivorie/tabs';
+
+@NgModule({ imports: [...IV_TABS_IMPORTS] })
+export class AppModule {}
+```
