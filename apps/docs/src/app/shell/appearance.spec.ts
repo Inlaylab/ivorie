@@ -93,4 +93,17 @@ describe('Appearance', () => {
     const { doc } = create();
     expect(doc.body.className).toBe('');
   });
+
+  // The playground preview is an iframe on the same origin: the parent's toggle reaches it this way.
+  it('follows a storage event from another page of the site', () => {
+    mockMatchMedia(false);
+    const { appearance, doc } = create();
+    window.dispatchEvent(new StorageEvent('storage', { key: APPEARANCE_KEY, newValue: '{"mode":"dark"}' }));
+    TestBed.tick();
+    expect(appearance.dark()).toBe(true);
+    expect(doc.documentElement.classList.contains('dark')).toBe(true);
+    window.dispatchEvent(new StorageEvent('storage', { key: 'other-key', newValue: '{"mode":"light"}' }));
+    TestBed.tick();
+    expect(appearance.dark()).toBe(true);
+  });
 });

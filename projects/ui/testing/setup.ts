@@ -7,8 +7,9 @@ vi.setConfig({ testTimeout: 20_000 });
 
 expect.extend({
   async toHaveNoViolations(received: Element) {
-    // jsdom has no layout, so contrast cannot be measured.
-    const { violations } = await axe.run(received, { rules: { 'color-contrast': { enabled: false } } });
+    // jsdom has no layout, so contrast cannot be measured. It cannot run axe inside an iframe either:
+    // a framed page (the docs /preview routes) gets its own spec.
+    const { violations } = await axe.run(received, { iframes: false, rules: { 'color-contrast': { enabled: false } } });
     return {
       pass: violations.length === 0,
       message: () =>

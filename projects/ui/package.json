@@ -55,6 +55,21 @@
     },
     "./styles/style-rhea.css": {
       "default": "./styles/style-rhea.css"
+    },
+    "./styles/style-glass.css": {
+      "default": "./styles/style-glass.css"
+    },
+    "./styles/style-brutal.css": {
+      "default": "./styles/style-brutal.css"
+    },
+    "./styles/style-aurora.css": {
+      "default": "./styles/style-aurora.css"
+    },
+    "./styles/style-bento.css": {
+      "default": "./styles/style-bento.css"
+    },
+    "./styles/style-mono.css": {
+      "default": "./styles/style-mono.css"
     }
   },
   "sideEffects": [

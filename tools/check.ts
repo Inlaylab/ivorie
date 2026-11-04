@@ -8,6 +8,8 @@ import { DOM_GLOBALS, codeOf } from './dom-globals.ts';
 interface Step {
   name: string;
   cmd: string;
+  /** Extra environment for this step only. */
+  env?: Record<string, string>;
 }
 
 interface Rule {
@@ -30,7 +32,7 @@ export const steps: Step[] = [
   // Angular packages are ESM-only. The styles are CSS exports, not JS entries.
   {
     name: 'attw',
-    cmd: 'npx attw --pack dist/ui --profile esm-only --exclude-entrypoints ./styles/theme.css ./styles/style-vega.css ./styles/style-nova.css ./styles/style-maia.css ./styles/style-luma.css ./styles/style-rhea.css',
+    cmd: 'npx attw --pack dist/ui --profile esm-only --exclude-entrypoints ./styles/theme.css ./styles/style-vega.css ./styles/style-nova.css ./styles/style-maia.css ./styles/style-luma.css ./styles/style-rhea.css ./styles/style-glass.css ./styles/style-brutal.css ./styles/style-aurora.css ./styles/style-bento.css ./styles/style-mono.css',
   },
   { name: 'test-ui', cmd: 'npx ng test ui --watch=false' },
   { name: 'test-cli', cmd: 'node --test "projects/cli/**/*.test.ts"' },
@@ -44,6 +46,8 @@ export const steps: Step[] = [
   {
     name: 'smoke-ssr',
     cmd: 'npx ng build docs -c development --output-path dist/docs-dev && node tools/smoke/ssr.ts dist/docs-dev',
+    // Dev-mode prerender is slow. One worker per core starves each render past its timeout (seen on 12 cores).
+    env: { NG_BUILD_MAX_WORKERS: '2' },
   },
   // Docs specs import the generated pages, so they run after build-docs.
   { name: 'test-docs', cmd: 'npx ng test docs --watch=false' },
@@ -116,7 +120,7 @@ mkdirSync(LOG_DIR, { recursive: true });
 let failed = false;
 
 for (const step of steps) {
-  const run = spawnSync(step.cmd, { shell: true, encoding: 'utf8' });
+  const run = spawnSync(step.cmd, { shell: true, encoding: 'utf8', env: { ...process.env, ...step.env } });
   const log = join(LOG_DIR, `${step.name}.log`);
   writeFileSync(log, `${run.stdout ?? ''}${run.stderr ?? ''}`);
   if (run.status === 0) {

@@ -1,18 +1,22 @@
-<iv-sidebar-provider class="docs-shell flex-col">
-  <docs-site-header [docs]="docs()" />
-  <div class="flex flex-1">
-    <!-- Class, not @if: the server and the client must render the same markup. -->
-    <div class="contents" [class.hidden]="!docs()">
-      <iv-sidebar>
-        <iv-sidebar-content class="no-scrollbar py-4">
-          <docs-site-nav />
-        </iv-sidebar-content>
-      </iv-sidebar>
+@if (preview()) {
+  <router-outlet />
+} @else {
+  <iv-sidebar-provider class="docs-shell flex-col">
+    <docs-site-header [docs]="docs()" />
+    <div class="flex flex-1">
+      <!-- Class, not @if: the server and the client must render the same markup. -->
+      <div class="contents" [class.hidden]="!docs()">
+        <iv-sidebar>
+          <iv-sidebar-content class="no-scrollbar py-4">
+            <docs-site-nav />
+          </iv-sidebar-content>
+        </iv-sidebar>
+      </div>
+      <div ivSidebarInset class="min-w-0">
+        <main class="w-full" [class]="docs() ? 'mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-10 lg:py-10' : ''">
+          <router-outlet />
+        </main>
+      </div>
     </div>
-    <div ivSidebarInset class="min-w-0">
-      <main class="w-full" [class]="docs() ? 'mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-10 lg:py-10' : ''">
-        <router-outlet />
-      </main>
-    </div>
-  </div>
-</iv-sidebar-provider>
+  </iv-sidebar-provider>
+}

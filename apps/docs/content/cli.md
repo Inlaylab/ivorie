@@ -31,7 +31,7 @@ It does this, and never overwrites a file you changed:
 | `--path <dir>` | `src/app/ui` | Where components go. |
 | `--prefix <prefix>` | `iv` | Selector and class prefix: `acme` gives `<acme-tabs>`, `acmeButton`, `AcmeButton`. |
 | `--preset <name\|code>` | `default` | Theme preset. |
-| `--style <name>` | from the preset | `vega`, `nova`, `maia`, `luma` or `rhea`. |
+| `--style <name>` | from the preset | `vega`, `nova`, `maia`, `luma`, `rhea`, `glass`, `brutal`, `aurora`, `bento` or `mono`. |
 | `--base-color <name>` | from the preset | `neutral`, `stone`, `zinc`, `mauve`, `olive`, `mist` or `taupe`. |
 | `--font <name>` | from the preset | `system` or a font name, for example `inter`. |
 | `--font-heading <name>` | from the preset | `inherit` (same as `--font`) or a font name. |

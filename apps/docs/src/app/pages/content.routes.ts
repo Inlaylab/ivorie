@@ -18,6 +18,7 @@ export const contentRoutes: Routes = [
       },
       { path: 'blocks', loadComponent: () => import('./blocks'), title: 'Blocks · Ivorie' },
       { path: 'roadmap', loadComponent: () => import('./roadmap'), title: 'Roadmap · Ivorie' },
+      { path: 'preview/:kind/:name', loadComponent: () => import('../preview/preview'), title: 'Preview · Ivorie' },
       {
         path: 'docs/:slug',
         loadComponent: () => import('./doc-page'),

@@ -1,0 +1,249 @@
+/* @base vega */
+/*
+ * Aurora: crisp surfaces with gradient hairline edges, a violet-to-cyan glow on focus and on primary
+ * actions, and a faint aurora over the top of the page. It brings its own hues: --primary stays yours
+ * for the component-set fills (calendar days), the aurora tokens drive the look.
+ * Vega gives the layout; these blocks only add to it.
+ */
+
+& {
+  --aurora-1: oklch(0.62 0.21 285);
+  --aurora-2: oklch(0.7 0.14 215);
+  --aurora-3: oklch(0.68 0.19 340);
+  /* Text on tinted fills and the deep gradient behind white text (contrast >= 5 with white). */
+  --aurora-ink: oklch(0.45 0.2 285);
+  --aurora-deep-from: oklch(0.5 0.22 285);
+  --aurora-deep-to: oklch(0.5 0.17 255);
+  --aurora-tint: color-mix(in oklab, var(--aurora-1) 9%, transparent);
+  --aurora-tint-strong: color-mix(in oklab, var(--aurora-1) 15%, transparent);
+  --aurora-edge: linear-gradient(
+    135deg,
+    color-mix(in oklab, var(--aurora-1) 45%, var(--border)),
+    color-mix(in oklab, var(--aurora-2) 35%, var(--border)) 50%,
+    color-mix(in oklab, var(--aurora-3) 40%, var(--border))
+  );
+  --aurora-glow: color-mix(in oklab, var(--aurora-1) 22%, transparent);
+  background-image: radial-gradient(64rem 26rem at 50% -10rem, var(--aurora-glow), transparent 72%);
+}
+
+.dark & {
+  --aurora-1: oklch(0.7 0.19 285);
+  --aurora-2: oklch(0.78 0.13 215);
+  --aurora-3: oklch(0.72 0.17 340);
+  --aurora-ink: oklch(0.84 0.11 285);
+  --aurora-tint: color-mix(in oklab, var(--aurora-1) 14%, transparent);
+  --aurora-tint-strong: color-mix(in oklab, var(--aurora-1) 24%, transparent);
+  --aurora-glow: color-mix(in oklab, var(--aurora-1) 30%, transparent);
+}
+
+/* On the root's children, not the root: the playground sets these inline on the root. */
+& > :where(*) {
+  --ring: var(--aurora-1);
+  --sidebar-ring: var(--aurora-1);
+}
+
+/* Surfaces: a gradient hairline instead of a gray ring, and a long violet-tinted shadow. */
+.cn-card,
+.cn-alert,
+.cn-item-variant-outline {
+  border: 1px solid transparent;
+  background: linear-gradient(var(--card), var(--card)) padding-box, var(--aurora-edge) border-box;
+  @apply ring-0 shadow-[0_1px_2px_color-mix(in_oklab,black_5%,transparent),0_16px_40px_-20px_var(--aurora-glow)];
+}
+
+.cn-popover-content,
+.cn-hover-card-content,
+.cn-dialog-content,
+.cn-alert-dialog-content,
+.cn-dropdown-menu-content,
+.cn-select-content,
+.cn-combobox-content,
+.cn-command,
+.cn-navigation-menu-viewport,
+.cn-toast {
+  border: 1px solid transparent;
+  background: linear-gradient(var(--popover), var(--popover)) padding-box, var(--aurora-edge) border-box;
+  @apply ring-0 shadow-[0_2px_4px_color-mix(in_oklab,black_6%,transparent),0_24px_56px_-20px_var(--aurora-glow)];
+}
+
+/* A command list inside a dialog is part of that surface. */
+& .cn-dialog-content .cn-command {
+  border: 0;
+  background: transparent;
+  @apply shadow-none;
+}
+
+.cn-sheet-content,
+.cn-drawer-content {
+  @apply border-[color-mix(in_oklab,var(--aurora-1)_35%,var(--border))] shadow-[0_0_60px_-20px_var(--aurora-glow)];
+}
+
+& .cn-sidebar-inner {
+  @apply group-data-[variant=floating]:ring-[color-mix(in_oklab,var(--aurora-1)_35%,var(--border))];
+}
+
+& .cn-empty {
+  @apply border-[color-mix(in_oklab,var(--aurora-1)_40%,var(--border))] bg-(--aurora-tint);
+}
+
+& .cn-card-title {
+  @apply font-semibold tracking-tight;
+}
+
+& .cn-tooltip-content {
+  @apply bg-linear-to-br from-(--aurora-deep-from) to-(--aurora-deep-to) text-white;
+}
+
+.cn-dialog-overlay,
+.cn-sheet-overlay {
+  @apply bg-[color-mix(in_oklab,oklch(0.2_0.06_285)_35%,transparent)] backdrop-blur-sm;
+}
+
+/* Primary actions: the deep aurora gradient, white text, a glow. */
+& .cn-button-variant-default {
+  @apply bg-linear-to-br from-(--aurora-deep-from) to-(--aurora-deep-to) text-white inset-shadow-[0_1px_0_0_color-mix(in_oklab,white_22%,transparent)] shadow-[0_8px_24px_-10px_var(--aurora-1)] hover:brightness-110;
+}
+
+& .cn-button-variant-secondary {
+  @apply bg-(--aurora-tint) text-(--aurora-ink) hover:bg-(--aurora-tint-strong) aria-expanded:bg-(--aurora-tint-strong) aria-expanded:text-(--aurora-ink);
+}
+
+& .cn-button-variant-outline {
+  @apply hover:border-[color-mix(in_oklab,var(--aurora-1)_45%,var(--border))] hover:bg-(--aurora-tint) dark:hover:bg-(--aurora-tint);
+}
+
+& .cn-button-variant-ghost {
+  @apply hover:bg-(--aurora-tint) aria-expanded:bg-(--aurora-tint) dark:hover:bg-(--aurora-tint);
+}
+
+& .cn-pagination-link {
+  @apply aria-[current=page]:border-[color-mix(in_oklab,var(--aurora-1)_50%,var(--border))] aria-[current=page]:text-(--aurora-ink);
+}
+
+/* Fields: a violet edge on hover, the aurora glow on focus (through --ring). */
+.cn-input,
+.cn-textarea,
+.cn-input-group,
+.cn-select-trigger,
+.cn-native-select {
+  @apply hover:border-[color-mix(in_oklab,var(--aurora-1)_40%,var(--input))] focus-visible:shadow-[0_0_18px_-4px_var(--aurora-glow)];
+}
+
+& .cn-input-otp-slot {
+  @apply data-[active=true]:shadow-[0_0_18px_-4px_var(--aurora-glow)];
+}
+
+.cn-checkbox,
+.cn-radio-group-item {
+  @apply data-checked:border-(--aurora-1) data-checked:bg-(--aurora-1) data-checked:text-white dark:data-checked:bg-(--aurora-1);
+}
+
+& .cn-switch {
+  @apply data-checked:bg-linear-to-r data-checked:from-(--aurora-1) data-checked:to-(--aurora-2);
+}
+
+& .cn-switch-thumb {
+  @apply shadow-[0_1px_3px_color-mix(in_oklab,black_20%,transparent)] dark:data-checked:bg-white;
+}
+
+& .cn-slider-track,
+& .cn-progress {
+  @apply bg-(--aurora-tint);
+}
+
+.cn-slider-range,
+.cn-progress-indicator {
+  @apply bg-linear-to-r from-(--aurora-1) to-(--aurora-2);
+}
+
+& .cn-slider-thumb {
+  @apply border-(--aurora-1) shadow-[0_0_12px_-2px_var(--aurora-glow)];
+}
+
+.cn-toggle,
+.cn-toggle-group-item {
+  @apply hover:bg-(--aurora-tint) aria-pressed:bg-(--aurora-tint-strong) aria-pressed:text-(--aurora-ink) data-[state=on]:bg-(--aurora-tint-strong) data-[state=on]:text-(--aurora-ink);
+}
+
+/* Lists and menus: a violet tint for the highlight. */
+.cn-dropdown-menu-item,
+.cn-select-item {
+  @apply focus:bg-(--aurora-tint) focus:text-foreground not-data-[variant=destructive]:focus:**:text-foreground;
+}
+
+& .cn-combobox-item {
+  @apply data-highlighted:bg-(--aurora-tint) data-highlighted:text-foreground;
+}
+
+& .cn-command-item {
+  @apply data-selected:bg-(--aurora-tint);
+}
+
+& .cn-sidebar-menu-button {
+  @apply hover:bg-(--aurora-tint) data-active:bg-(--aurora-tint-strong) data-active:font-medium data-active:text-(--aurora-ink);
+}
+
+.cn-navigation-menu-trigger,
+.cn-menubar-trigger {
+  @apply hover:bg-(--aurora-tint) focus:bg-(--aurora-tint) aria-expanded:bg-(--aurora-tint) data-open:bg-(--aurora-tint) data-open:hover:bg-(--aurora-tint);
+}
+
+/* Tabs: the active tab (its fill is the component's) gets a violet hairline. */
+& .cn-tabs-list {
+  @apply data-[variant=line]:border-b data-[variant=line]:border-[color-mix(in_oklab,var(--aurora-1)_25%,var(--border))];
+}
+
+& .cn-tabs-trigger {
+  @apply data-active:shadow-[0_0_0_1px_color-mix(in_oklab,var(--aurora-1)_35%,transparent),0_4px_12px_-6px_var(--aurora-glow)];
+}
+
+& .cn-calendar-day-button {
+  @apply hover:bg-(--aurora-tint);
+}
+
+/* Data. */
+& .cn-table-head {
+  @apply text-muted-foreground font-medium;
+}
+
+& .cn-table-row {
+  @apply hover:bg-(--aurora-tint) data-[state=selected]:bg-(--aurora-tint-strong);
+}
+
+& .cn-accordion-item {
+  @apply border-[color-mix(in_oklab,var(--aurora-1)_20%,var(--border))];
+}
+
+& .cn-badge {
+  @apply font-medium;
+}
+
+& .cn-badge-variant-default {
+  @apply bg-linear-to-br from-(--aurora-deep-from) to-(--aurora-deep-to) text-white;
+}
+
+.cn-badge-variant-secondary,
+.cn-badge-variant-outline {
+  @apply border-[color-mix(in_oklab,var(--aurora-1)_30%,var(--border))] bg-(--aurora-tint) text-(--aurora-ink);
+}
+
+& .cn-avatar {
+  @apply ring-2 ring-[color-mix(in_oklab,var(--aurora-1)_35%,transparent)];
+}
+
+& .cn-kbd {
+  @apply bg-(--aurora-tint) text-(--aurora-ink);
+}
+
+& .cn-skeleton {
+  @apply bg-linear-to-r from-muted via-(--aurora-tint) to-muted;
+}
+
+/* The field separator label masks its line with --background; on a card the line is two halves. */
+& .cn-field-separator {
+  @apply flex items-center gap-2 before:h-px before:flex-1 before:bg-border after:h-px after:flex-1 after:bg-border [&>div]:hidden;
+}
+
+& .cn-field-separator-content {
+  @apply bg-transparent px-0;
+}

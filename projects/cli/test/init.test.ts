@@ -58,6 +58,16 @@ test('fresh ng-app: config, theme, style, imports, body class, postcss, core', a
   assert.ok(existsSync(join(cwd, 'src/app/ui/core/public-api.ts')));
 });
 
+// Ivorie's own styles (tools/styles/own) ship like the synced ones: a registry item each.
+test('init --style glass writes the glass style, its import and the body class', async () => {
+  const cwd = app();
+  await runInit({ cwd, registry, skipInstall: true, yes: true, style: 'glass' });
+  assert.equal(JSON.parse(read(cwd, 'components.json')).style, 'glass');
+  assert.equal(read(cwd, 'src/app/ui/styles/style-glass.css'), item('style-glass').files[0].content);
+  assert.ok(read(cwd, 'src/styles.css').includes('@import "./app/ui/styles/style-glass.css";'));
+  assert.match(read(cwd, 'src/index.html'), /<body class="style-glass">/);
+});
+
 test('a second run needs --force; with force nothing is duplicated', async () => {
   const cwd = app();
   await runInit({ cwd, registry, skipInstall: true, yes: true });

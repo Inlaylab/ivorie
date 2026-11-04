@@ -155,10 +155,157 @@
   }
 }
 
-/* Playground and home preview: a dotted canvas in the preview's own colors. */
+/* Preview pages and the home preview: a dotted canvas in the preview's own colors. */
 .docs-stage {
   background-image: radial-gradient(circle at 1px 1px, color-mix(in oklab, var(--foreground) 14%, transparent) 1px, transparent 0);
   background-size: 18px 18px;
+  color: var(--foreground);
+}
+
+/* Playground style tiles: a tiny specimen of each look, drawn in CSS with the site colors.
+   One card and one button; each style changes only what makes it itself. */
+.docs-specimen {
+  --sp-card-r: 6px;
+  --sp-btn-r: 5px;
+  position: relative;
+  display: block;
+  height: 3.5rem;
+  overflow: hidden;
+  border-radius: 0.5rem;
+  background: color-mix(in oklab, var(--muted) 70%, var(--background));
+}
+.docs-specimen-sm {
+  height: 2.5rem;
+}
+.docs-specimen-card,
+.docs-specimen-button {
+  position: absolute;
+  display: block;
+}
+.docs-specimen-card {
+  inset: 0.5rem 34% 0.5rem 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: var(--sp-card-r);
+  background: var(--background);
+  box-shadow: 0 1px 2px color-mix(in oklab, black 6%, transparent);
+}
+.docs-specimen-button {
+  right: 0.5rem;
+  bottom: 0.5rem;
+  width: 22%;
+  height: 0.75rem;
+  border-radius: var(--sp-btn-r);
+  background: var(--foreground);
+}
+.docs-specimen[data-style='nova'] {
+  --sp-card-r: 4px;
+  --sp-btn-r: 3px;
+}
+.docs-specimen[data-style='nova'] .docs-specimen-card {
+  inset: 0.625rem 36% 0.625rem 0.625rem;
+}
+.docs-specimen[data-style='maia'] {
+  --sp-card-r: 14px;
+  --sp-btn-r: 999px;
+}
+.docs-specimen[data-style='luma'] {
+  --sp-card-r: 16px;
+  --sp-btn-r: 999px;
+}
+.docs-specimen[data-style='luma'] .docs-specimen-card {
+  border-color: transparent;
+  box-shadow: 0 4px 12px color-mix(in oklab, black 12%, transparent);
+}
+.docs-specimen[data-style='rhea'] {
+  --sp-card-r: 10px;
+  --sp-btn-r: 999px;
+}
+/* Glass: a frosted pane over a color field. */
+.docs-specimen[data-style='glass'] {
+  background:
+    radial-gradient(circle at 20% 20%, oklch(0.78 0.14 290), transparent 60%),
+    radial-gradient(circle at 85% 80%, oklch(0.82 0.12 205), transparent 60%),
+    radial-gradient(circle at 80% 10%, oklch(0.84 0.12 350), transparent 55%),
+    var(--background);
+}
+.dark .docs-specimen[data-style='glass'] {
+  background:
+    radial-gradient(circle at 20% 20%, oklch(0.45 0.17 290), transparent 60%),
+    radial-gradient(circle at 85% 80%, oklch(0.47 0.12 210), transparent 60%),
+    radial-gradient(circle at 80% 10%, oklch(0.44 0.16 350), transparent 55%),
+    var(--background);
+}
+.docs-specimen[data-style='glass'] .docs-specimen-card {
+  --sp-card-r: 10px;
+  border-color: color-mix(in oklab, white 60%, transparent);
+  background: color-mix(in oklab, var(--background) 45%, transparent);
+  backdrop-filter: blur(6px) saturate(1.8);
+  box-shadow: inset 0 1px 0 color-mix(in oklab, white 70%, transparent);
+}
+/* Brutal: an ink frame, a hard shadow, an acid-yellow button. */
+.docs-specimen[data-style='brutal'] {
+  --sp-card-r: 3px;
+  --sp-btn-r: 2px;
+  background: var(--background);
+}
+.docs-specimen[data-style='brutal'] .docs-specimen-card {
+  border: 2px solid var(--foreground);
+  box-shadow: 3px 3px 0 var(--foreground);
+}
+.docs-specimen[data-style='brutal'] .docs-specimen-button {
+  border: 2px solid var(--foreground);
+  background: oklch(0.89 0.18 98);
+  box-shadow: 2px 2px 0 var(--foreground);
+}
+/* Aurora: a gradient hairline, a violet glow, a gradient button. */
+.docs-specimen[data-style='aurora'] {
+  --sp-card-r: 8px;
+  --sp-btn-r: 5px;
+  background: radial-gradient(120% 80% at 50% -30%, color-mix(in oklab, oklch(0.62 0.21 285) 22%, transparent), transparent 70%), var(--background);
+}
+.docs-specimen[data-style='aurora'] .docs-specimen-card {
+  border-color: transparent;
+  background:
+    linear-gradient(var(--background), var(--background)) padding-box,
+    linear-gradient(135deg, oklch(0.62 0.21 285), oklch(0.7 0.14 215), oklch(0.68 0.19 340)) border-box;
+  box-shadow: 0 6px 16px -8px oklch(0.62 0.21 285);
+}
+.docs-specimen[data-style='aurora'] .docs-specimen-button {
+  background: linear-gradient(135deg, oklch(0.5 0.22 285), oklch(0.5 0.17 255));
+  box-shadow: 0 3px 8px -2px oklch(0.62 0.21 285);
+}
+/* Bento: tonal tiles on a toned page, no lines. */
+.docs-specimen[data-style='bento'] {
+  --sp-card-r: 12px;
+  --sp-btn-r: 8px;
+  background: color-mix(in oklab, var(--muted), var(--foreground) 6%);
+}
+.docs-specimen[data-style='bento'] .docs-specimen-card {
+  border-color: transparent;
+  box-shadow: none;
+}
+.docs-specimen[data-style='bento'] .docs-specimen-button {
+  top: 0.5rem;
+  width: 26%;
+  height: auto;
+  background: var(--background);
+}
+/* Mono: square, flat, a terminal caret. */
+.docs-specimen[data-style='mono'] {
+  --sp-card-r: 0;
+  --sp-btn-r: 0;
+}
+.docs-specimen[data-style='mono'] .docs-specimen-card {
+  box-shadow: none;
+}
+.docs-specimen[data-style='mono'] .docs-specimen-card::after {
+  content: '>_';
+  position: absolute;
+  top: 0.2rem;
+  left: 0.35rem;
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  font-weight: 600;
   color: var(--foreground);
 }
 

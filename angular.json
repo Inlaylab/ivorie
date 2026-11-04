@@ -99,6 +99,31 @@
                 "input": "apps/docs/src/styles/style-rhea.css",
                 "bundleName": "style-rhea",
                 "inject": false
+              },
+              {
+                "input": "apps/docs/src/styles/style-glass.css",
+                "bundleName": "style-glass",
+                "inject": false
+              },
+              {
+                "input": "apps/docs/src/styles/style-brutal.css",
+                "bundleName": "style-brutal",
+                "inject": false
+              },
+              {
+                "input": "apps/docs/src/styles/style-aurora.css",
+                "bundleName": "style-aurora",
+                "inject": false
+              },
+              {
+                "input": "apps/docs/src/styles/style-bento.css",
+                "bundleName": "style-bento",
+                "inject": false
+              },
+              {
+                "input": "apps/docs/src/styles/style-mono.css",
+                "bundleName": "style-mono",
+                "inject": false
               }
             ],
             "server": "apps/docs/src/main.server.ts",

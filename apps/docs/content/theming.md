@@ -56,7 +56,7 @@ Add the class `dark` to `<html>`.
 
 ## Style class
 
-A style class on `<body>` selects the component look: spacing, radius, borders and shadows. Ivorie ships the shadcn/ui styles, copied rule for rule:
+A style class on `<body>` selects the component look: spacing, radius, borders and shadows. Ivorie ships the five shadcn/ui styles, copied rule for rule, and five of its own:
 
 | Style | Class | Look |
 |---|---|---|
@@ -65,6 +65,11 @@ A style class on `<body>` selects the component look: spacing, radius, borders a
 | Maia | `style-maia` | Rounded, with generous spacing. |
 | Luma | `style-luma` | Fluid, luminous and soft. |
 | Rhea | `style-rhea` | Like Luma, but compact. |
+| Glass | `style-glass` | Frosted, see-through surfaces over a soft color field. Solid when the browser has no backdrop blur or the user asks for less transparency. |
+| Brutal | `style-brutal` | Ink borders, hard offset shadows, buttons that press down. |
+| Aurora | `style-aurora` | Gradient hairline edges, a soft glow on focus and primary actions. Brings its own accent hues. |
+| Bento | `style-bento` | Tonal tiles on a toned page, no outlines, big type. |
+| Mono | `style-mono` | Monospace, square and flat, with a block caret. Ignores the preset font and radius. |
 
 Import the file for each style you use, then set its class:
 

@@ -1,5 +1,6 @@
 import { RenderMode, ServerRoute } from '@angular/ssr';
 import { PAGES } from '../generated/pages';
+import { SCENES } from './playground/scenes';
 
 export const serverRoutes: ServerRoute[] = [
   { path: '', renderMode: RenderMode.Prerender },
@@ -11,6 +12,11 @@ export const serverRoutes: ServerRoute[] = [
     path: 'docs/:slug',
     renderMode: RenderMode.Prerender,
     getPrerenderParams: async () => PAGES.map((p) => ({ slug: p.slug })),
+  },
+  {
+    path: 'preview/:kind/:name',
+    renderMode: RenderMode.Prerender,
+    getPrerenderParams: async () => SCENES.map((s) => ({ kind: 'scene', name: s.value })),
   },
   { path: 'not-found', renderMode: RenderMode.Prerender },
   // Redirect to docs/installation; must not get the 404 status of '**'.

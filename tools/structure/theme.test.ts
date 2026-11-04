@@ -57,6 +57,18 @@ test('every shadcn style has a source file and a package export', () => {
   }
 });
 
+// Hand-made styles: tools/styles/own/<name>.css, derived over a synced style by tools/styles/derive.ts.
+const OWN_STYLES = ['glass', 'brutal', 'aurora', 'bento', 'mono'];
+
+test('every own style has a source file and a package export', () => {
+  const pkg = JSON.parse(readFileSync('projects/ui/package.json', 'utf8'));
+  for (const name of OWN_STYLES) {
+    assert.ok(existsSync(`tools/styles/own/${name}.css`), name);
+    assert.ok(existsSync(`projects/ui/styles/style-${name}.css`), name);
+    assert.equal(pkg.exports[`./styles/style-${name}.css`]?.default, `./styles/style-${name}.css`, name);
+  }
+});
+
 // The published package ships .mjs, not .ts: without it Tailwind finds no library classes.
 test('theme @source covers the shipped .mjs files', () => {
   assert.ok(theme.includes('@source "../**/*.{html,ts,mjs}";'));

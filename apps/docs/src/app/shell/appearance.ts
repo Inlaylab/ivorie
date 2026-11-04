@@ -55,6 +55,13 @@ export class Appearance {
       query.addEventListener('change', onChange);
       inject(DestroyRef).onDestroy(() => query.removeEventListener('change', onChange));
     }
+    // Another page of the site saved a choice (the playground's preview iframe follows its parent this way).
+    const win = this.win;
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === APPEARANCE_KEY) this._state.set(parse(e.newValue));
+    };
+    win.addEventListener('storage', onStorage);
+    inject(DestroyRef).onDestroy(() => win.removeEventListener('storage', onStorage));
     effect(() => {
       const html = this.doc.documentElement;
       const dark = this.dark();

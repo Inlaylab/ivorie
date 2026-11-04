@@ -99,7 +99,7 @@ try {
     at = `/docs/${slug}`;
     await visit(page, at);
   }
-  for (const path of ['/playground', '/blocks', '/roadmap']) {
+  for (const path of ['/playground', '/preview/scene/dashboard', '/blocks', '/roadmap']) {
     at = path;
     await visit(page, at);
   }

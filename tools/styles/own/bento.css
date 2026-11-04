@@ -1,0 +1,239 @@
+/* @base maia */
+/*
+ * Bento: tonal tiles instead of outlines. The page is a soft tone; cards are lighter tiles on it;
+ * fields and tracks are wells pressed into the tile. No borders, no rings, big calm type.
+ * Maia gives the round, roomy layout; these blocks only add to it.
+ */
+
+& {
+  --bento-page: color-mix(in oklab, var(--muted), var(--foreground) 4%);
+  --bento-muted-mix: 0.62;
+  --bento-tile: var(--card);
+  --bento-well: color-mix(in oklab, var(--muted) 85%, var(--card));
+  --bento-well-hover: color-mix(in oklab, var(--muted), var(--foreground) 7%);
+  --bento-float-shadow: color-mix(in oklab, black 16%, transparent);
+  background-color: var(--bento-page);
+}
+
+.dark & {
+  --bento-page: var(--background);
+  --bento-muted-mix: 0.7;
+  --bento-tile: color-mix(in oklab, var(--card), white 3%);
+  --bento-well: color-mix(in oklab, var(--muted), white 4%);
+  --bento-well-hover: color-mix(in oklab, var(--muted), white 10%);
+  --bento-float-shadow: color-mix(in oklab, black 60%, transparent);
+}
+
+/* Muted text sits on the toned page too: mixed a little darker. On every element, not the root,
+   because the playground sets the base colors inline on the root. */
+& :where(*) {
+  --muted-foreground: color-mix(in oklab, var(--foreground) calc(var(--bento-muted-mix) * 100%), var(--background));
+}
+
+/* Tiles: tone, not lines. */
+.cn-card,
+.cn-alert,
+.cn-item-variant-outline {
+  @apply rounded-3xl border-0 bg-(--bento-tile) ring-0 shadow-none;
+}
+
+.cn-card-title,
+.cn-dialog-title,
+.cn-sheet-title {
+  @apply text-lg font-semibold tracking-tight;
+}
+
+& .cn-empty {
+  @apply rounded-3xl border-0 bg-(--bento-well);
+}
+
+/* Floating tiles: a soft lift instead of a ring. */
+.cn-popover-content,
+.cn-hover-card-content,
+.cn-dialog-content,
+.cn-alert-dialog-content,
+.cn-dropdown-menu-content,
+.cn-select-content,
+.cn-combobox-content,
+.cn-command,
+.cn-navigation-menu-viewport,
+.cn-toast {
+  @apply rounded-3xl ring-0 shadow-[0_16px_48px_-12px_var(--bento-float-shadow)];
+}
+
+& .cn-dialog-content .cn-command {
+  @apply rounded-none shadow-none;
+}
+
+& .cn-sheet-content {
+  @apply border-0 data-[side=bottom]:rounded-t-3xl data-[side=left]:rounded-r-3xl data-[side=right]:rounded-l-3xl data-[side=top]:rounded-b-3xl;
+}
+
+& .cn-drawer-content {
+  @apply border-0;
+}
+
+/* The sidebar sits on the page tone; its floating variant is a tile. */
+& .cn-sidebar-inner {
+  @apply bg-transparent group-data-[variant=floating]:rounded-3xl group-data-[variant=floating]:bg-(--bento-tile) group-data-[variant=floating]:ring-0 group-data-[variant=floating]:shadow-none;
+}
+
+& .cn-tooltip-content {
+  @apply rounded-xl;
+}
+
+.cn-dialog-overlay,
+.cn-sheet-overlay {
+  @apply bg-[color-mix(in_oklab,black_22%,transparent)] backdrop-blur-[2px];
+}
+
+/* Wells: fields and tracks are a darker tone, no border; focus brings a soft ring. */
+.cn-input,
+.cn-textarea,
+.cn-input-group,
+.cn-select-trigger,
+.cn-native-select {
+  @apply rounded-2xl border-transparent bg-(--bento-well) shadow-none focus-visible:border-transparent focus-visible:ring-2 focus-visible:ring-ring/25 dark:bg-(--bento-well) dark:hover:bg-(--bento-well-hover);
+}
+
+& .cn-input-group {
+  @apply has-[[data-slot=input-group-control]:focus-visible]:border-transparent has-[[data-slot=input-group-control]:focus-visible]:ring-2 has-[[data-slot=input-group-control]:focus-visible]:ring-ring/25;
+}
+
+& .cn-input-otp-slot {
+  @apply border-transparent bg-(--bento-well) first:rounded-l-2xl last:rounded-r-2xl data-[active=true]:ring-2 data-[active=true]:ring-ring/25 dark:bg-(--bento-well);
+}
+
+.cn-checkbox,
+.cn-radio-group-item {
+  @apply border-transparent bg-(--bento-well-hover) dark:bg-(--bento-well-hover);
+}
+
+/* Buttons: tonal, pill-shaped (from maia); only the primary is filled with color. */
+.cn-button-variant-outline,
+.cn-button-variant-secondary {
+  @apply border-transparent bg-(--bento-well) shadow-none hover:bg-(--bento-well-hover) aria-expanded:bg-(--bento-well-hover) dark:bg-(--bento-well) dark:hover:bg-(--bento-well-hover);
+}
+
+& .cn-button-variant-ghost {
+  @apply hover:bg-(--bento-well) aria-expanded:bg-(--bento-well) dark:hover:bg-(--bento-well);
+}
+
+& .cn-button-variant-default {
+  @apply shadow-none;
+}
+
+& .cn-pagination-link {
+  @apply rounded-xl;
+}
+
+& .cn-switch {
+  @apply border-transparent data-unchecked:bg-(--bento-well-hover) dark:data-unchecked:bg-(--bento-well-hover);
+}
+
+& .cn-switch-thumb {
+  @apply shadow-sm;
+}
+
+& .cn-slider-track,
+& .cn-progress {
+  @apply bg-(--bento-well-hover);
+}
+
+& .cn-slider-range,
+& .cn-progress-indicator {
+  @apply rounded-full;
+}
+
+& .cn-slider-thumb {
+  @apply size-5 border-0 bg-background shadow-md;
+}
+
+.cn-toggle,
+.cn-toggle-group-item {
+  @apply hover:bg-(--bento-well) aria-pressed:bg-(--bento-well-hover) data-[state=on]:bg-(--bento-well-hover);
+}
+
+/* Lists and menus: a tonal highlight, rounded like a tile. */
+.cn-dropdown-menu-item,
+.cn-select-item {
+  @apply rounded-xl focus:bg-(--bento-well);
+}
+
+& .cn-combobox-item {
+  @apply rounded-xl data-highlighted:bg-(--bento-well);
+}
+
+& .cn-command-item {
+  @apply rounded-xl data-selected:bg-(--bento-well);
+}
+
+/* The active page is a tile lifted off the page tone. */
+& .cn-sidebar-menu-button {
+  @apply rounded-xl hover:bg-(--bento-well) data-active:bg-(--bento-tile) data-active:font-medium data-active:shadow-sm;
+}
+
+.cn-navigation-menu-trigger,
+.cn-menubar-trigger {
+  @apply rounded-xl hover:bg-(--bento-well) focus:bg-(--bento-well) aria-expanded:bg-(--bento-well) data-open:bg-(--bento-well) data-open:hover:bg-(--bento-well);
+}
+
+& .cn-tabs-list {
+  @apply rounded-2xl bg-(--bento-well) data-[variant=line]:bg-transparent;
+}
+
+& .cn-tabs-trigger {
+  @apply rounded-xl data-active:shadow-sm;
+}
+
+& .cn-calendar-day-button {
+  @apply rounded-xl hover:bg-(--bento-well);
+}
+
+/* Data: no row lines; quiet stripes carry the rows. */
+& .cn-table-head {
+  @apply text-muted-foreground font-medium;
+}
+
+& .cn-table-header {
+  @apply [&_tr]:border-b-0;
+}
+
+& .cn-table-row {
+  @apply border-0 even:bg-[color-mix(in_oklab,var(--bento-well)_55%,transparent)] hover:bg-(--bento-well) data-[state=selected]:bg-(--bento-well-hover);
+}
+
+/* Accordion items are tiles of their own. */
+& .cn-accordion-item {
+  @apply mb-2 rounded-2xl border-0 bg-(--bento-well) px-4 not-last:border-b-0;
+}
+
+& .cn-badge {
+  @apply border-0;
+}
+
+.cn-badge-variant-secondary,
+.cn-badge-variant-outline {
+  @apply bg-(--bento-well-hover);
+}
+
+& .cn-avatar {
+  @apply ring-0;
+}
+
+& .cn-kbd {
+  @apply rounded-md bg-(--bento-well-hover);
+}
+
+& .cn-skeleton {
+  @apply rounded-xl bg-(--bento-well-hover);
+}
+
+/* The field separator label masks its line with --background, which is not the tile tone. */
+& .cn-field-separator {
+  @apply flex items-center gap-2 before:h-px before:flex-1 before:bg-(--bento-well-hover) after:h-px after:flex-1 after:bg-(--bento-well-hover) [&>div]:hidden;
+}
+
+& .cn-field-separator-content {
+  @apply bg-transparent px-0;
+}

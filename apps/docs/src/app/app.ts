@@ -26,6 +26,8 @@ export class App {
   );
   /** Only /docs pages have the sidebar; the others use the full width. Works under a base path too. */
   protected readonly docs = computed(() => /(^|\/)docs(\/|$)/.test(this.url().split(/[?#]/)[0]));
+  /** /preview pages fill an iframe: no header, no sidebar. Server and client both read it from the URL. */
+  protected readonly preview = computed(() => /(^|\/)preview\//.test(this.url().split(/[?#]/)[0]));
 
   constructor() {
     // Start syncing the saved light/dark mode with <html>.

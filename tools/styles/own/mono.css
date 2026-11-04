@@ -1,0 +1,44 @@
+/* @base nova */
+/*
+ * Mono: a terminal. Monospace everywhere, square corners, flat surfaces with hairlines, a block caret.
+ * Nova gives the compact layout; these blocks only add to it.
+ * Font and radius go on the root and its children (:where keeps them weak). The children matter
+ * when a preview sets --radius or font-family inline on the root; below them, inheritance works as usual.
+ */
+
+&,
+& > :where(*) {
+  --radius: 0px;
+  font-family: var(--font-mono);
+}
+
+/* Flat: hairline frames, no shadows. */
+.cn-card,
+.cn-dialog-content,
+.cn-alert-dialog-content,
+.cn-popover-content,
+.cn-hover-card-content,
+.cn-dropdown-menu-content,
+.cn-select-content,
+.cn-combobox-content,
+.cn-tooltip-content {
+  @apply shadow-none ring-1 ring-border;
+}
+
+.cn-button-variant-outline,
+.cn-button-variant-default,
+.cn-button-variant-secondary {
+  @apply shadow-none;
+}
+
+& .cn-card-title,
+& .cn-dialog-title {
+  @apply font-semibold tracking-tight;
+}
+
+/* The caret is a block in the primary color. */
+.cn-input,
+.cn-textarea {
+  caret-color: var(--primary);
+  caret-shape: block;
+}

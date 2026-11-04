@@ -1,0 +1,257 @@
+/* @base vega */
+/*
+ * Brutal: neo-brutalism. Ink frames, hard offset shadows, buttons that press down, and one loud
+ * accent (acid yellow) for hover, selected and secondary.
+ * Vega gives the layout; these blocks only add to it. The ink is --foreground, so it follows every
+ * base color and turns light in dark mode. Every line in the app (--border, --input, --ring) is ink.
+ * Component templates set a few fills themselves (the active tab); those stay as they are.
+ */
+
+& {
+  --brutal-ink: var(--foreground);
+  --brutal-accent: oklch(0.89 0.18 98);
+  --brutal-accent-ink: oklch(0.18 0 0);
+  --brutal-shadow: 4px 4px 0 0 var(--brutal-ink);
+  --brutal-shadow-lg: 6px 6px 0 0 var(--brutal-ink);
+  --brutal-shadow-sm: 3px 3px 0 0 var(--brutal-ink);
+  --brutal-shadow-xs: 2px 2px 0 0 var(--brutal-ink);
+}
+
+.dark & {
+  --brutal-accent: oklch(0.86 0.17 98);
+}
+
+/* On the root's children, not the root: the playground sets these inline on the root. */
+& > :where(*) {
+  --border: var(--brutal-ink);
+  --input: var(--brutal-ink);
+  --ring: var(--brutal-ink);
+  --sidebar-border: var(--brutal-ink);
+  --sidebar-ring: var(--brutal-ink);
+}
+
+/* Surfaces: a thick ink frame and a hard shadow instead of a soft ring. */
+.cn-card,
+.cn-alert,
+.cn-item-variant-outline,
+.cn-popover-content,
+.cn-hover-card-content,
+.cn-dropdown-menu-content,
+.cn-select-content,
+.cn-combobox-content,
+.cn-command,
+.cn-navigation-menu-viewport,
+.cn-toast {
+  @apply rounded-md border-2 border-(--brutal-ink) ring-0 shadow-(--brutal-shadow);
+}
+
+.cn-dialog-content,
+.cn-alert-dialog-content {
+  @apply rounded-md border-2 border-(--brutal-ink) ring-0 shadow-(--brutal-shadow-lg);
+}
+
+/* A command list inside a dialog is part of that frame. */
+& .cn-dialog-content .cn-command {
+  @apply border-0 shadow-none;
+}
+
+& .cn-sheet-content {
+  @apply border-(--brutal-ink) shadow-none data-[side=bottom]:border-t-2 data-[side=left]:border-r-2 data-[side=right]:border-l-2 data-[side=top]:border-b-2;
+}
+
+& .cn-drawer-content {
+  @apply border-(--brutal-ink) data-[vaul-drawer-direction=bottom]:border-t-2 data-[vaul-drawer-direction=left]:border-r-2 data-[vaul-drawer-direction=right]:border-l-2 data-[vaul-drawer-direction=top]:border-b-2;
+}
+
+& .cn-sidebar-inner {
+  @apply group-data-[variant=floating]:rounded-md group-data-[variant=floating]:border-2 group-data-[variant=floating]:border-(--brutal-ink) group-data-[variant=floating]:ring-0 group-data-[variant=floating]:shadow-(--brutal-shadow);
+}
+
+& .cn-empty {
+  @apply border-2 border-dashed border-(--brutal-ink);
+}
+
+.cn-dialog-overlay,
+.cn-sheet-overlay {
+  @apply bg-[color-mix(in_oklab,var(--brutal-ink)_35%,transparent)] backdrop-blur-none supports-backdrop-filter:backdrop-blur-none;
+}
+
+& .cn-tooltip-content {
+  @apply rounded-sm border-2 border-(--brutal-ink) font-semibold shadow-[3px_3px_0_0_var(--brutal-accent)];
+}
+
+.cn-card-title,
+.cn-dialog-title,
+.cn-alert-dialog-title,
+.cn-sheet-title,
+.cn-alert-title {
+  @apply font-bold tracking-tight;
+}
+
+/* Buttons with a fill press into their shadow. Ghost and link stay flat. */
+.cn-button-variant-default,
+.cn-button-variant-outline,
+.cn-button-variant-secondary,
+.cn-button-variant-destructive {
+  @apply border-2 border-(--brutal-ink) shadow-(--brutal-shadow-sm) transition-[translate,box-shadow,background-color] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[1px_1px_0_0_var(--brutal-ink)] dark:border-(--brutal-ink);
+}
+
+& .cn-button {
+  @apply rounded-md font-bold;
+}
+
+& .cn-button-variant-default {
+  @apply hover:bg-(--brutal-accent) hover:text-(--brutal-accent-ink);
+}
+
+& .cn-button-variant-secondary {
+  @apply bg-(--brutal-accent) text-(--brutal-accent-ink) hover:bg-[color-mix(in_oklab,var(--brutal-accent),black_10%)] aria-expanded:bg-(--brutal-accent) aria-expanded:text-(--brutal-accent-ink);
+}
+
+& .cn-button-variant-outline {
+  @apply bg-background hover:bg-(--brutal-accent) hover:text-(--brutal-accent-ink) aria-expanded:bg-(--brutal-accent) aria-expanded:text-(--brutal-accent-ink) dark:bg-background dark:hover:bg-(--brutal-accent);
+}
+
+& .cn-button-variant-ghost {
+  @apply hover:bg-(--brutal-accent) hover:text-(--brutal-accent-ink) aria-expanded:bg-(--brutal-accent) aria-expanded:text-(--brutal-accent-ink) dark:hover:bg-(--brutal-accent);
+}
+
+& .cn-pagination-link {
+  @apply aria-[current=page]:bg-(--brutal-accent) aria-[current=page]:text-(--brutal-accent-ink);
+}
+
+/* Fields: the same ink frame, no shadow until focus; focus lifts them onto a hard shadow. */
+.cn-input,
+.cn-textarea,
+.cn-select-trigger,
+.cn-native-select {
+  @apply border-2 bg-background shadow-none focus-visible:ring-0 focus-visible:shadow-(--brutal-shadow-sm) dark:bg-background;
+}
+
+& .cn-input-group {
+  @apply border-2 bg-background shadow-none has-[[data-slot=input-group-control]:focus-visible]:ring-0 has-[[data-slot=input-group-control]:focus-visible]:shadow-(--brutal-shadow-sm) dark:bg-background;
+}
+
+& .cn-input-otp-slot {
+  @apply border-y-2 border-r-2 bg-background first:border-l-2 data-[active=true]:bg-(--brutal-accent) data-[active=true]:text-(--brutal-accent-ink) data-[active=true]:ring-0 dark:bg-background;
+}
+
+.cn-checkbox,
+.cn-radio-group-item {
+  @apply border-2 bg-background data-checked:border-(--brutal-ink) data-checked:bg-(--brutal-accent) data-checked:text-(--brutal-accent-ink) dark:bg-background dark:data-checked:bg-(--brutal-accent);
+}
+
+& .cn-switch {
+  @apply border-2 border-(--brutal-ink) data-checked:bg-(--brutal-accent) data-unchecked:bg-background dark:data-unchecked:bg-background;
+}
+
+& .cn-switch-thumb {
+  @apply bg-(--brutal-ink) dark:data-checked:bg-(--brutal-accent-ink) dark:data-unchecked:bg-(--brutal-ink) data-checked:bg-(--brutal-accent-ink);
+}
+
+& .cn-slider-track {
+  @apply bg-background ring-2 ring-(--brutal-ink);
+}
+
+& .cn-slider-range {
+  @apply bg-(--brutal-accent);
+}
+
+& .cn-slider-thumb {
+  @apply rounded-sm border-2 border-(--brutal-ink) bg-(--brutal-accent) shadow-(--brutal-shadow-xs) hover:ring-0 focus-visible:ring-0 focus-visible:shadow-(--brutal-shadow-sm);
+}
+
+& .cn-progress {
+  @apply h-3 rounded-sm border-2 border-(--brutal-ink) bg-background;
+}
+
+& .cn-progress-indicator {
+  @apply bg-(--brutal-accent);
+}
+
+.cn-toggle,
+.cn-toggle-group-item {
+  @apply font-semibold hover:bg-[color-mix(in_oklab,var(--brutal-accent)_45%,transparent)] aria-pressed:bg-(--brutal-accent) aria-pressed:text-(--brutal-accent-ink) data-[state=on]:bg-(--brutal-accent) data-[state=on]:text-(--brutal-accent-ink);
+}
+
+& .cn-toggle-variant-outline {
+  @apply border-2 border-(--brutal-ink) shadow-(--brutal-shadow-xs);
+}
+
+/* Lists and menus: the highlight is the accent, in ink. */
+.cn-dropdown-menu-item,
+.cn-select-item {
+  @apply rounded-sm focus:bg-(--brutal-accent) focus:text-(--brutal-accent-ink) not-data-[variant=destructive]:focus:**:text-(--brutal-accent-ink);
+}
+
+& .cn-combobox-item {
+  @apply rounded-sm data-highlighted:bg-(--brutal-accent) data-highlighted:text-(--brutal-accent-ink);
+}
+
+& .cn-command-item {
+  @apply rounded-sm data-selected:bg-(--brutal-accent) data-selected:text-(--brutal-accent-ink) data-selected:**:[svg]:text-(--brutal-accent-ink);
+}
+
+& .cn-sidebar-menu-button {
+  @apply hover:bg-(--brutal-accent) hover:text-(--brutal-accent-ink) active:bg-(--brutal-accent) data-active:bg-(--brutal-accent) data-active:font-bold data-active:text-(--brutal-accent-ink) data-active:shadow-(--brutal-shadow-xs) data-active:ring-2 data-active:ring-(--brutal-ink);
+}
+
+.cn-navigation-menu-trigger,
+.cn-menubar-trigger {
+  @apply font-semibold hover:bg-(--brutal-accent) hover:text-(--brutal-accent-ink) focus:bg-(--brutal-accent) aria-expanded:bg-(--brutal-accent) aria-expanded:text-(--brutal-accent-ink) data-open:bg-(--brutal-accent) data-open:hover:bg-(--brutal-accent);
+}
+
+/* Tabs: an ink track; the active tab gets a frame and a small shadow (its fill is the component's). */
+& .cn-tabs-list {
+  @apply rounded-md border-2 border-(--brutal-ink) bg-background data-[variant=line]:border-0 data-[variant=line]:bg-transparent;
+}
+
+& .cn-tabs-trigger {
+  @apply rounded-sm font-semibold data-active:border-(--brutal-ink) data-active:shadow-(--brutal-shadow-xs);
+}
+
+& .cn-calendar-day-button {
+  @apply rounded-sm hover:bg-(--brutal-accent) hover:text-(--brutal-accent-ink);
+}
+
+/* Data. */
+& .cn-table-head {
+  @apply bg-(--brutal-accent) font-bold text-(--brutal-accent-ink);
+}
+
+& .cn-table-row {
+  @apply hover:bg-[color-mix(in_oklab,var(--brutal-accent)_30%,transparent)] data-[state=selected]:bg-[color-mix(in_oklab,var(--brutal-accent)_55%,transparent)];
+}
+
+& .cn-accordion-item {
+  @apply border-b-2;
+}
+
+& .cn-badge {
+  @apply rounded-sm border-2 border-(--brutal-ink) font-bold;
+}
+
+& .cn-badge-variant-secondary {
+  @apply bg-(--brutal-accent) text-(--brutal-accent-ink);
+}
+
+& .cn-avatar {
+  @apply ring-2 ring-(--brutal-ink);
+}
+
+& .cn-kbd {
+  @apply rounded-sm border-2 border-(--brutal-ink) bg-background font-bold text-foreground shadow-(--brutal-shadow-xs);
+}
+
+& .cn-skeleton {
+  @apply rounded-sm bg-[color-mix(in_oklab,var(--brutal-ink)_12%,transparent)];
+}
+
+/* A field separator masks its line with a solid label; here the line is two ink halves instead. */
+& .cn-field-separator {
+  @apply flex items-center gap-2 font-semibold before:h-0.5 before:flex-1 before:bg-(--brutal-ink) after:h-0.5 after:flex-1 after:bg-(--brutal-ink) [&>div]:hidden;
+}
+
+& .cn-field-separator-content {
+  @apply bg-transparent px-0;
+}

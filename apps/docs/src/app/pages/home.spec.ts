@@ -32,6 +32,18 @@ describe('HomePage', () => {
     expect(el.querySelector('a[href^="/playground?preset=ivp1_"]')).not.toBeNull();
   });
 
+  it('the install command follows the picked style', async () => {
+    const { el, fixture } = await render();
+    const command = () => el.querySelector('[data-testid="home-command"]')!.textContent!.trim();
+    expect(command()).toBe('$ npx ivorie init');
+    el.querySelector<HTMLInputElement>('input[name="home-style"][value="glass"]')!.click();
+    await fixture.whenStable();
+    expect(command()).toMatch(/^\$ npx ivorie init --preset ivp1_/);
+    expect(el.querySelector('[data-testid="style-note"]')!.textContent!.trim()).toBe(
+      'Frosted, see-through surfaces.',
+    );
+  });
+
   it('has no axe violations', async () => {
     const { el } = await render();
     await expect(el).toHaveNoViolations();

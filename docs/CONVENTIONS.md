@@ -65,9 +65,15 @@ No `readme.md` in the library. Docs live in `apps/docs`.
 - Main demo `apps/docs/src/app/demos/<name>/<name>.ts` is required. It shows at the top, then install, then `## Examples`.
 - Each example: a `### Title` and a `<!-- demo: <name>-<example> -->` marker. It renders as preview on top, code below.
 
+## Own styles
+- Glass, brutal, aurora, bento and mono are own styles: `tools/styles/own/<name>.css`. Line 1 names a synced base: `/* @base nova */`.
+- A lone `.cn-x {` rule replaces the base rule for that hook. Every other block (`& {`, `.dark & {`, `& .cn-x {`, selector lists, `@supports`, `@media`) is added after the base rules.
+- `node tools/styles/derive.ts <name>|--all` writes `projects/ui/styles/style-<name>.css`. Never edit that file. `derive.test.ts` fails when it is stale.
+- New own style: add it to `package.json` exports, `tools/check.ts` (attw), `OWN_STYLES` in `tools/structure/theme.test.ts`, and the docs style lists (`appearance-options.ts`, `look-controls.ts`, `apps/docs/src/styles/`, `angular.json`). `contrast.test.ts` must pass.
+
 ## Add a component
 1. `projects/ui/<name>/`: `ng-package.json` (copy from `badge`), `public-api.ts`, `<name>.ts`, `<name>.spec.ts` (Vitest + axe).
-2. Style hooks: `node tools/styles/sync.ts <style>` for vega, nova, maia, luma, rhea. `tools/styles/coverage.test.ts` must pass.
+2. Style hooks: `node tools/styles/sync.ts <style>` for vega, nova, maia, luma, rhea, then `node tools/styles/derive.ts --all`. `tools/styles/coverage.test.ts` must pass.
 3. Count bumps: `tools/registry/items.test.ts` (entry count); `tools/smoke/module-imports.test.ts` (only with `IV_<NAME>_IMPORTS`).
 4. Module smoke: `apps/module-smoke/src/app/app.module.ts`, `app.html`, and the `data-slot` in `app.spec.ts`.
 5. Docs: page + main demo + example demos (see Docs). `npm run docs:content` regenerates `apps/docs/src/generated/`.
