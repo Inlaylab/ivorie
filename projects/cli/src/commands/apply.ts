@@ -2,13 +2,14 @@
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { CONFIG_FILE, readConfig, type ComponentsJson } from '../config.ts';
-import { ensureCssImports, setBodyStyleClass } from '../edit.ts';
+import { ensureCssImports, relativeImport, setBodyStyleClass, setIconProvider } from '../edit.ts';
+import { ICON_PACKAGES, type IconLibrary } from '../icons.ts';
 import { installCommand, runInstall } from '../install.ts';
 import { renderLook } from '../look.ts';
 import { resolvePreset } from '../preset.ts';
-import { detectProject } from '../project.ts';
+import { detectProject, type Project } from '../project.ts';
 import { bundledRegistry, openRegistry, packageName } from '../registry.ts';
-import { writeFile } from './add.ts';
+import { runAdd, writeFile } from './add.ts';
 import { emptyReport, type CommonOptions, type Report } from './report.ts';
 
 export interface ApplyOptions extends CommonOptions {
@@ -30,6 +31,35 @@ function dropLookImports(css: string, keep: string[]): string {
       return !t || wanted.has(t) || !(STYLE_IMPORT.test(t) || FONT_IMPORT.test(t));
     })
     .join(eol);
+}
+
+/**
+ * Copies the icon set (none for lucide) and points app.config.ts at it.
+ * Returns the @ng-icons packages the app draws its own icons with.
+ */
+export async function setIconLibrary(
+  lib: IconLibrary,
+  o: CommonOptions,
+  config: ComponentsJson,
+  project: Project,
+  report: Report,
+  edit: (file: string, change: (text: string) => string) => void,
+): Promise<string[]> {
+  if (lib !== 'lucide') await runAdd([`icons-${lib}`], { ...o, config, deps: false, overwrite: true }, report);
+  const appConfig = `${project.sourceRoot}/app/app.config.ts`;
+  const from = (dir: string) => relativeImport(appConfig, `${config.path}/${dir}/public-api`);
+  if (existsSync(join(o.cwd, appConfig))) {
+    edit(appConfig, (ts) => {
+      const next = setIconProvider(ts, from('icon'), lib === 'lucide' ? undefined : from(`icons-${lib}`));
+      if (lib !== 'lucide' && !next.includes('provideIvIcons(COMPONENT_ICONS)')) {
+        report.notes.push(`add provideIvIcons(COMPONENT_ICONS) to the providers in ${appConfig}`);
+      }
+      return next;
+    });
+  } else if (lib !== 'lucide') {
+    report.notes.push(`add provideIvIcons(COMPONENT_ICONS) to your app providers (no ${appConfig})`);
+  }
+  return ['@ng-icons/core', ICON_PACKAGES[lib].split('/').slice(0, 2).join('/')];
 }
 
 export async function runApply(input: string | undefined, o: ApplyOptions): Promise<Report> {
@@ -60,6 +90,7 @@ export async function runApply(input: string | undefined, o: ApplyOptions): Prom
     font: preset.font,
     ...(preset.fontHeading !== 'inherit' && { fontHeading: preset.fontHeading }),
     radius: preset.radius,
+    iconLibrary: preset.iconLibrary as IconLibrary,
   };
   edit(CONFIG_FILE, (text) => (JSON.stringify(JSON.parse(text), null, 2) === JSON.stringify(next, null, 2) ? text : JSON.stringify(next, null, 2) + '\n'));
   write(`${config.path}/styles/theme.css`, look.themeCss);
@@ -79,7 +110,12 @@ export async function runApply(input: string | undefined, o: ApplyOptions): Prom
     report.notes.push(`style-${config.style}.css is no longer used; delete it if you did not change it`);
   }
 
-  const missing = look.dependencies.filter((d) => !project.deps.has(packageName(d)));
+  const iconDeps = await setIconLibrary(next.iconLibrary, o, next, project, report, edit);
+  if (config.iconLibrary !== next.iconLibrary) {
+    report.notes.push(`your own icons: npx ivorie migrate icons --from ${config.iconLibrary} --to ${next.iconLibrary}`);
+  }
+
+  const missing = [...look.dependencies, ...iconDeps].filter((d) => !project.deps.has(packageName(d)));
   if (missing.length) {
     if (o.skipInstall || o.dryRun) report.notes.push(installCommand(project.pm, missing, false).join(' '));
     else {

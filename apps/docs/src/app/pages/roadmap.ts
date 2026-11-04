@@ -29,15 +29,17 @@ export const ROADMAP: { title: string; summary: string; state: State; version?: 
     link: '/playground',
   },
   {
-    title: 'Blocks',
-    summary: 'Ready-made sign-in, sign-up and sidebar layouts. Add one with a single command, then change it however you like.',
+    title: 'Icon libraries',
+    summary: 'Pick Lucide, Tabler, Phosphor, Hugeicons or Remix in the playground or with the CLI, and every component follows. npx ivorie migrate icons moves your own icons too.',
     state: 'next',
-    link: '/blocks',
+    version: '1.3',
+    link: '/docs/icon',
   },
   {
-    title: 'Icon libraries',
-    summary: 'Use Lucide, Tabler, Phosphor, Hugeicons or Remix. Pick one like you pick a theme, and every component follows.',
+    title: 'Blocks',
+    summary: 'Ready-made sign-in, sign-up and sidebar layouts. Add one with a single command, then change it however you like.',
     state: 'planned',
+    link: '/blocks',
   },
   {
     title: 'Data table',

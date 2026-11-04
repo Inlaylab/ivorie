@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { IvIcon } from '@inlaylab/ivorie/icon';
 import { IV_ALERT_DIALOG_IMPORTS } from '@inlaylab/ivorie/alert-dialog';
 import { IV_AVATAR_IMPORTS } from '@inlaylab/ivorie/avatar';
 import { IvBadge } from '@inlaylab/ivorie/badge';
@@ -18,6 +19,7 @@ import { IvSlider } from '@inlaylab/ivorie/slider';
 import { IvSwitch } from '@inlaylab/ivorie/switch';
 import { IV_TABLE_IMPORTS } from '@inlaylab/ivorie/table';
 import { IV_TOGGLE_GROUP_IMPORTS } from '@inlaylab/ivorie/toggle-group';
+import { PlaygroundLook } from './playground-look';
 
 /**
  * A small product dashboard built from real components, on a 12-column grid. Container queries,
@@ -45,6 +47,7 @@ import { IV_TOGGLE_GROUP_IMPORTS } from '@inlaylab/ivorie/toggle-group';
     IvSwitch,
     IV_TABLE_IMPORTS,
     IV_TOGGLE_GROUP_IMPORTS,
+    IvIcon,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: '@container block' },
@@ -62,7 +65,7 @@ import { IV_TOGGLE_GROUP_IMPORTS } from '@inlaylab/ivorie/toggle-group';
             <button ivToggleGroupItem value="week">Week</button>
             <button ivToggleGroupItem value="month">Month</button>
           </iv-toggle-group>
-          <button ivButton [ivDialogTrigger]="deploy">Deploy</button>
+          <button ivButton [ivDialogTrigger]="deploy"><svg [ivIcon]="icons().cloudUpload"></svg>Deploy</button>
         </div>
       </div>
 
@@ -73,7 +76,7 @@ import { IV_TOGGLE_GROUP_IMPORTS } from '@inlaylab/ivorie/toggle-group';
             <iv-card-title class="text-2xl tabular-nums">{{ s.value }}</iv-card-title>
           </iv-card-header>
           <iv-card-content class="flex items-center gap-2 text-xs">
-            <iv-badge [variant]="s.good ? 'secondary' : 'destructive'">{{ s.delta }}</iv-badge>
+            <iv-badge [variant]="s.good ? 'secondary' : 'destructive'"><svg [ivIcon]="s.up ? icons().trendingUp : icons().trendingDown"></svg>{{ s.delta }}</iv-badge>
             <span class="text-muted-foreground">{{ s.note }}</span>
           </iv-card-content>
         </iv-card>
@@ -81,7 +84,7 @@ import { IV_TOGGLE_GROUP_IMPORTS } from '@inlaylab/ivorie/toggle-group';
 
       <iv-card class="@2xl:col-span-2 @5xl:col-span-8">
         <iv-card-header>
-          <iv-card-title>Requests</iv-card-title>
+          <iv-card-title class="flex items-center gap-2"><svg [ivIcon]="icons().chartLine" class="text-muted-foreground size-4"></svg>Requests</iv-card-title>
           <iv-card-description>Per day, last 14 days. Chart colors come from --chart-1 to --chart-3.</iv-card-description>
         </iv-card-header>
         <iv-card-content class="flex flex-1 flex-col gap-3">
@@ -104,7 +107,7 @@ import { IV_TOGGLE_GROUP_IMPORTS } from '@inlaylab/ivorie/toggle-group';
 
       <iv-card class="@5xl:col-span-4">
         <iv-card-header>
-          <iv-card-title>Team</iv-card-title>
+          <iv-card-title class="flex items-center gap-2"><svg [ivIcon]="icons().users" class="text-muted-foreground size-4"></svg>Team</iv-card-title>
           <iv-card-description>Who can change production.</iv-card-description>
         </iv-card-header>
         <iv-card-content class="flex flex-1 flex-col gap-4">
@@ -128,13 +131,13 @@ import { IV_TOGGLE_GROUP_IMPORTS } from '@inlaylab/ivorie/toggle-group';
         </iv-card-content>
         <iv-card-footer class="gap-2">
           <input ivInput type="email" aria-label="Email to invite" placeholder="Email" class="min-w-0 flex-1" />
-          <button ivButton variant="secondary">Invite</button>
+          <button ivButton variant="secondary"><svg [ivIcon]="icons().send"></svg>Invite</button>
         </iv-card-footer>
       </iv-card>
 
       <iv-card class="@2xl:col-span-2 @5xl:col-span-8">
         <iv-card-header>
-          <iv-card-title>Recent deploys</iv-card-title>
+          <iv-card-title class="flex items-center gap-2"><svg [ivIcon]="icons().cloudUpload" class="text-muted-foreground size-4"></svg>Recent deploys</iv-card-title>
           <iv-card-description>The last five changes to production.</iv-card-description>
         </iv-card-header>
         <iv-card-content>
@@ -156,7 +159,7 @@ import { IV_TOGGLE_GROUP_IMPORTS } from '@inlaylab/ivorie/toggle-group';
                       <span class="text-muted-foreground font-mono text-xs">{{ row.sha }}</span>
                     </span>
                   </td>
-                  <td ivTableCell><iv-badge variant="outline">{{ row.branch }}</iv-badge></td>
+                  <td ivTableCell><iv-badge variant="outline"><svg [ivIcon]="icons().gitBranch"></svg>{{ row.branch }}</iv-badge></td>
                   <td ivTableCell>
                     <iv-badge [variant]="row.status === 'Failed' ? 'destructive' : row.status === 'Building' ? 'outline' : 'secondary'">{{ row.status }}</iv-badge>
                   </td>
@@ -170,7 +173,7 @@ import { IV_TOGGLE_GROUP_IMPORTS } from '@inlaylab/ivorie/toggle-group';
 
       <iv-card class="@5xl:col-span-4">
         <iv-card-header>
-          <iv-card-title>Notifications</iv-card-title>
+          <iv-card-title class="flex items-center gap-2"><svg [ivIcon]="icons().bell" class="text-muted-foreground size-4"></svg>Notifications</iv-card-title>
           <iv-card-description>Choose what reaches your inbox.</iv-card-description>
         </iv-card-header>
         <iv-card-content class="flex flex-1 flex-col gap-5">
@@ -192,7 +195,7 @@ import { IV_TOGGLE_GROUP_IMPORTS } from '@inlaylab/ivorie/toggle-group';
 
       <iv-card class="@5xl:col-span-5">
         <iv-card-header>
-          <iv-card-title>New project</iv-card-title>
+          <iv-card-title class="flex items-center gap-2"><svg [ivIcon]="icons().folderPlus" class="text-muted-foreground size-4"></svg>New project</iv-card-title>
           <iv-card-description>Deploys from your main branch.</iv-card-description>
         </iv-card-header>
         <iv-card-content class="flex flex-1 flex-col gap-4">
@@ -219,13 +222,13 @@ import { IV_TOGGLE_GROUP_IMPORTS } from '@inlaylab/ivorie/toggle-group';
         </iv-card-content>
         <iv-card-footer class="justify-end gap-2">
           <button ivButton variant="ghost">Cancel</button>
-          <button ivButton>Create project</button>
+          <button ivButton><svg [ivIcon]="icons().plus"></svg>Create project</button>
         </iv-card-footer>
       </iv-card>
 
       <iv-card class="@5xl:col-span-4">
         <iv-card-header>
-          <iv-card-title>Maintenance window</iv-card-title>
+          <iv-card-title class="flex items-center gap-2"><svg [ivIcon]="icons().clock" class="text-muted-foreground size-4"></svg>Maintenance window</iv-card-title>
           <iv-card-description>Pick a day. We notify the team.</iv-card-description>
         </iv-card-header>
         <iv-card-content class="flex flex-1 items-center justify-center">
@@ -235,7 +238,7 @@ import { IV_TOGGLE_GROUP_IMPORTS } from '@inlaylab/ivorie/toggle-group';
 
       <iv-card class="@2xl:col-span-2 @5xl:col-span-3">
         <iv-card-header>
-          <iv-card-title>Storage</iv-card-title>
+          <iv-card-title class="flex items-center gap-2"><svg [ivIcon]="icons().database" class="text-muted-foreground size-4"></svg>Storage</iv-card-title>
           <iv-card-description>68 GB of 100 GB used.</iv-card-description>
         </iv-card-header>
         <iv-card-content class="flex flex-1 flex-col gap-5">
@@ -245,9 +248,9 @@ import { IV_TOGGLE_GROUP_IMPORTS } from '@inlaylab/ivorie/toggle-group';
             <button ivToggleGroupItem value="grid">Grid</button>
           </iv-toggle-group>
           <div class="flex flex-wrap gap-2 border-t pt-4">
-            <button ivButton variant="outline" size="sm" [ivSheetTrigger]="sheet">Filters</button>
+            <button ivButton variant="outline" size="sm" [ivSheetTrigger]="sheet"><svg [ivIcon]="icons().settings"></svg>Filters</button>
             <iv-popover>
-              <button ivButton ivPopoverTrigger variant="outline" size="sm">Share</button>
+              <button ivButton ivPopoverTrigger variant="outline" size="sm"><svg [ivIcon]="icons().share"></svg>Share</button>
               <iv-popover-content class="w-64">
                 <iv-popover-header>
                   <iv-popover-title>Share link</iv-popover-title>
@@ -256,7 +259,7 @@ import { IV_TOGGLE_GROUP_IMPORTS } from '@inlaylab/ivorie/toggle-group';
                 <input ivInput aria-label="Share link" value="acme.dev/s/9f2k" readonly />
               </iv-popover-content>
             </iv-popover>
-            <button ivButton variant="destructive" size="sm" [ivAlertDialogTrigger]="confirm">Delete</button>
+            <button ivButton variant="destructive" size="sm" [ivAlertDialogTrigger]="confirm"><svg [ivIcon]="icons().trash"></svg>Delete</button>
           </div>
         </iv-card-content>
       </iv-card>
@@ -270,7 +273,7 @@ import { IV_TOGGLE_GROUP_IMPORTS } from '@inlaylab/ivorie/toggle-group';
       <label class="flex items-center gap-2 text-sm"><iv-checkbox [checked]="true" /> Run the smoke tests first</label>
       <iv-dialog-footer>
         <button ivButton variant="outline" ivDialogClose>Cancel</button>
-        <button ivButton ivDialogClose>Deploy</button>
+        <button ivButton ivDialogClose><svg [ivIcon]="icons().cloudUpload"></svg>Deploy</button>
       </iv-dialog-footer>
     </ng-template>
     <ng-template #sheet>
@@ -296,12 +299,13 @@ import { IV_TOGGLE_GROUP_IMPORTS } from '@inlaylab/ivorie/toggle-group';
   `,
 })
 export class PlaygroundPreview {
+  protected readonly icons = inject(PlaygroundLook).icons;
   protected readonly date = signal<Date | null>(new Date(2026, 10, 14));
   protected readonly stats = [
-    { label: 'Deploys today', value: '128', delta: '+12%', note: 'vs. last Monday', good: true },
-    { label: 'Median build', value: '1m 42s', delta: '-8s', note: 'faster this week', good: true },
-    { label: 'Uptime', value: '99.98%', delta: '30 days', note: 'one short outage', good: true },
-    { label: 'Open incidents', value: '2', delta: '1 urgent', note: 'needs an owner', good: false },
+    { label: 'Deploys today', value: '128', delta: '+12%', note: 'vs. last Monday', good: true, up: true },
+    { label: 'Median build', value: '1m 42s', delta: '-8s', note: 'faster this week', good: true, up: false },
+    { label: 'Uptime', value: '99.98%', delta: '30 days', note: 'one short outage', good: true, up: true },
+    { label: 'Open incidents', value: '2', delta: '1 urgent', note: 'needs an owner', good: false, up: true },
   ];
   /** [success, cached, error] heights per day, in % of the bar. */
   protected readonly traffic = [

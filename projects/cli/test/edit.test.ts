@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import path from 'node:path';
-import { ensureCssImports, relativeImport, setBodyStyleClass } from '../src/edit.ts';
+import { ensureCssImports, relativeImport, setBodyStyleClass, setIconProvider } from '../src/edit.ts';
 
 const IMPORTS = ['@import "tailwindcss";', '@import "tw-animate-css";'];
 
@@ -49,4 +49,18 @@ test('setBodyStyleClass adds, appends and replaces the style class', () => {
 test('relativeImport uses / and ./ on every OS', () => {
   assert.equal(relativeImport('src\\styles.css', 'src\\app\\ui\\styles\\theme.css', path.win32), './app/ui/styles/theme.css');
   assert.equal(relativeImport('src/a/styles.css', 'src/x/y.css', path.posix), '../x/y.css');
+});
+
+test('setIconProvider adds, swaps and removes the icon set provider', () => {
+  const base = "import { ApplicationConfig } from '@angular/core';\n\nexport const appConfig: ApplicationConfig = {\n  providers: [provideRouter(routes)],\n};\n";
+  const tabler = setIconProvider(base, './ui/icon/public-api', './ui/icons-tabler/public-api');
+  assert.equal(
+    tabler,
+    "import { ApplicationConfig } from '@angular/core';\nimport { provideIvIcons } from './ui/icon/public-api';\nimport { COMPONENT_ICONS } from './ui/icons-tabler/public-api';\n\nexport const appConfig: ApplicationConfig = {\n  providers: [provideIvIcons(COMPONENT_ICONS), provideRouter(routes)],\n};\n",
+  );
+  assert.equal(setIconProvider(tabler, './ui/icon/public-api', './ui/icons-tabler/public-api'), tabler);
+  assert.match(setIconProvider(tabler, './ui/icon/public-api', './ui/icons-remix/public-api'), /from '\.\/ui\/icons-remix\/public-api';\n\n/);
+  assert.equal(setIconProvider(tabler, './ui/icon/public-api'), base);
+  assert.equal(setIconProvider('providers: []', 'a', 'b').endsWith('providers: [provideIvIcons(COMPONENT_ICONS)]'), true);
+  assert.equal(setIconProvider('export const x = 1;\n', 'a', 'b'), 'export const x = 1;\n');
 });

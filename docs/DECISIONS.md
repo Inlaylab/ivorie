@@ -48,3 +48,9 @@ One line per decision. Newest at the bottom. Format: `date — decision — why`
 - 2026-11-02 — The docs site is always style maia; the header has one light/dark button. The playground and the home preview show a look only on their preview box and its overlays (vars + style class on those elements), never on the site.
 - 2026-11-02 — Menus are solid. shadcn's `.cn-menu-translucent` is an opt-in look (translucent menu color); the style sync keeps it empty.
 - 2026-11-03 — Phase order after 1.2: Blocks, icon libraries, data table, more themes, AI-ready (AGENTS.md + MCP server), charts. Blocks and icons help every user first; charts are the largest new surface, so they go last.
+- 2026-11-04 — Phase order: icon libraries (1.3) before Blocks (1.4).
+- 2026-11-04 — Icons: every icon draws with `IvIcon`. Five vendored sets (`@inlaylab/ivorie/icons/<lib>`) export the same names; an app switches with one re-export file. Data is generated from `@ng-icons/*` dev deps. No runtime deps (zardui and ng-primitives ship `@ng-icons` at runtime; we only read its data).
+- 2026-11-04 — `IvIcon` renders shapes with static attribute bindings, no effects: faster render, same markup on server and client.
+- 2026-11-04 — The preset gains `iconLibrary`. It is left out of the share code when `lucide`, so older codes do not change.
+- 2026-11-04 — Icons, simpler (replaces the first icon line above): each `icons/<lib>` entry holds only the 18 component icons, copied once, no generator. Apps draw their own icons with `<ng-icon>` (`@ng-icons/*`). Components keep `<svg ivIcon>`: `ng-icon` host styles are unlayered and beat Tailwind `size-*` and shadcn `[&_svg]` rules. `ivorie migrate icons` renames `@ng-icons` names between libraries via `names.json`.
+- 2026-11-04 — Default style is nova, not maia: CLI default preset, docs site and playground. Share codes always carry the style, so old codes do not change.

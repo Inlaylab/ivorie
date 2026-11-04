@@ -84,7 +84,7 @@ Declare your values after the imports. Use `:root` for light and `.dark` for dar
 
 ```css
 @import "@inlaylab/ivorie/styles/theme.css";
-@import "@inlaylab/ivorie/styles/style-maia.css";
+@import "@inlaylab/ivorie/styles/style-nova.css";
 
 :root {
   --primary: oklch(0.55 0.2 260);

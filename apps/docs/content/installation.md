@@ -48,7 +48,7 @@ In `src/styles.css`:
 
 ```css
 @import "@inlaylab/ivorie/styles/theme.css";
-@import "@inlaylab/ivorie/styles/style-maia.css";
+@import "@inlaylab/ivorie/styles/style-nova.css";
 ```
 
 `theme.css` already imports `tailwindcss` and `tw-animate-css`. Do not import them again.
@@ -58,12 +58,12 @@ In `src/styles.css`:
 In `src/index.html`, use the class that matches the style file:
 
 ```html
-<body class="style-maia">
+<body class="style-nova">
   <app-root></app-root>
 </body>
 ```
 
-Maia is one of five styles: `vega`, `nova`, `maia`, `luma` and `rhea`. See [Theming](docs/theming).
+Nova is one of five styles: `vega`, `nova`, `maia`, `luma` and `rhea`. See [Theming](docs/theming).
 
 ## Use a component
 

@@ -1,17 +1,20 @@
-import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, signal, inject } from '@angular/core';
 import { IV_ALERT_DIALOG_IMPORTS } from '@inlaylab/ivorie/alert-dialog';
 import { IvButton } from '@inlaylab/ivorie/button';
+import { IvIcon } from '@inlaylab/ivorie/icon';
 import { IV_CARD_IMPORTS } from '@inlaylab/ivorie/card';
 import { IV_FIELD_IMPORTS } from '@inlaylab/ivorie/field';
 import { IV_INPUT_IMPORTS } from '@inlaylab/ivorie/input';
 import { IV_NATIVE_SELECT_IMPORTS } from '@inlaylab/ivorie/native-select';
 import { IV_RADIO_GROUP_IMPORTS } from '@inlaylab/ivorie/radio-group';
 import { IvSeparator } from '@inlaylab/ivorie/separator';
+import { PlaygroundLook } from '../playground-look';
 
 /** Playground scene: a checkout form beside an order summary, with a confirm step. */
 @Component({
   selector: 'docs-scene-checkout',
   imports: [
+    IvIcon,
     IV_ALERT_DIALOG_IMPORTS,
     IvButton,
     IV_CARD_IMPORTS,
@@ -27,7 +30,7 @@ import { IvSeparator } from '@inlaylab/ivorie/separator';
     <div class="mx-auto grid max-w-5xl items-start gap-4 @3xl:grid-cols-[minmax(0,1fr)_20rem]">
       <iv-card>
         <iv-card-header>
-          <iv-card-title class="cn-font-heading text-xl">Checkout</iv-card-title>
+          <iv-card-title class="cn-font-heading flex items-center gap-2 text-xl"><svg [ivIcon]="icons().shoppingCart" class="text-muted-foreground size-5"></svg>Checkout</iv-card-title>
           <iv-card-description>Ships in 2 to 4 days. You can change the address until then.</iv-card-description>
         </iv-card-header>
         <iv-card-content>
@@ -78,7 +81,7 @@ import { IvSeparator } from '@inlaylab/ivorie/separator';
 
       <iv-card>
         <iv-card-header>
-          <iv-card-title>Order summary</iv-card-title>
+          <iv-card-title class="flex items-center gap-2"><svg [ivIcon]="icons().shoppingBag" class="text-muted-foreground size-4"></svg>Order summary</iv-card-title>
         </iv-card-header>
         <iv-card-content class="flex flex-col gap-3 text-sm">
           @for (item of items; track item.name) {
@@ -92,7 +95,7 @@ import { IvSeparator } from '@inlaylab/ivorie/separator';
           <div class="flex justify-between font-medium"><span>Total</span><span class="tabular-nums">\${{ total() }}</span></div>
         </iv-card-content>
         <iv-card-footer>
-          <button ivButton class="w-full" [ivAlertDialogTrigger]="confirm">Pay \${{ total() }}</button>
+          <button ivButton class="w-full" [ivAlertDialogTrigger]="confirm"><svg [ivIcon]="icons().lock"></svg>Pay \${{ total() }}</button>
         </iv-card-footer>
       </iv-card>
     </div>
@@ -110,6 +113,7 @@ import { IvSeparator } from '@inlaylab/ivorie/separator';
   `,
 })
 export class SceneCheckout {
+  protected readonly icons = inject(PlaygroundLook).icons;
   protected readonly items = [
     { name: 'Desk lamp', qty: 1, price: 64 },
     { name: 'Linen notebook', qty: 2, price: 18 },

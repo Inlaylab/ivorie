@@ -17,10 +17,10 @@ npm i -D tailwindcss @tailwindcss/postcss tw-animate-css
 ```css
 /* src/styles.css */
 @import "@inlaylab/ivorie/styles/theme.css";
-@import "@inlaylab/ivorie/styles/style-maia.css";
+@import "@inlaylab/ivorie/styles/style-nova.css";
 ```
 
-Add `class="style-maia"` to `<body>`, then import what you need:
+Add `class="style-nova"` to `<body>`, then import what you need:
 
 ```ts
 import { IvButton } from '@inlaylab/ivorie/button';

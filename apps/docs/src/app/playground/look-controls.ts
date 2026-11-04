@@ -1,9 +1,10 @@
 import { ChangeDetectionStrategy, Component, booleanAttribute, computed, input } from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
+import { IvIcon } from '@inlaylab/ivorie/icon';
 import { IV_SELECT_IMPORTS } from '@inlaylab/ivorie/select';
 import { BASE_COLORS, FONTS, RADII } from '../../generated/looks';
 import { STYLES } from '../shell/appearance-options';
-import type { PlaygroundLook } from './playground-look';
+import { ICON_LIBRARIES, type PlaygroundLook } from './playground-look';
 import type { Preset } from './preset-code';
 
 /** One line per style, from shadcn/ui. */
@@ -23,10 +24,15 @@ const FONT_GROUPS = (['sans', 'serif', 'mono'] as const).map((type) => ({
   fonts: FONTS.filter((f) => f.type === type),
 }));
 
-/** Full: style, color and radius as tiles, fonts as dropdowns. Compact (home hero): style chips and color swatches. */
+/** Light tint and mid tone of a base color, split on the diagonal. */
+function swatch(light: Record<string, string>): string {
+  return `linear-gradient(135deg, ${light['--secondary']} 50%, ${light['--muted-foreground']} 50%)`;
+}
+
+/** Full: every axis as a dropdown. Compact (home hero): style chips and color swatches. */
 @Component({
   selector: 'docs-look-controls',
-  imports: [NgTemplateOutlet, IV_SELECT_IMPORTS],
+  imports: [NgTemplateOutlet, IV_SELECT_IMPORTS, IvIcon],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'flex flex-col gap-5' },
   template: `
@@ -46,35 +52,16 @@ const FONT_GROUPS = (['sans', 'serif', 'mono'] as const).map((type) => ({
       </fieldset>
       <ng-container [ngTemplateOutlet]="swatches" />
     } @else {
-      <!-- Look: every option is visible, so a glance shows what is picked and what else there is. -->
+      <!-- Look: one dropdown per axis, like the fonts. Each option shows a picture of itself. -->
       <section class="flex flex-col gap-5" [attr.aria-labelledby]="name() + '-look'">
         <h2 class="text-muted-foreground text-xs font-medium" [id]="name() + '-look'">Look</h2>
-        <fieldset>
-          <legend class="text-foreground mb-2.5 text-sm font-medium">Style</legend>
-          <div class="grid grid-cols-5 gap-1.5">
-            @for (s of styles; track s.name) {
-              <label [class]="tile">
-                <input type="radio" class="sr-only" [name]="name() + '-style'" [value]="s.name" [checked]="preset().style === s.name" (change)="set({ style: s.name })" />
-                <ng-container [ngTemplateOutlet]="styleIcon" [ngTemplateOutletContext]="{ $implicit: s.name }" />
-                {{ s.label }}
-              </label>
-            }
-          </div>
-          <p class="text-muted-foreground mt-2 text-xs">{{ notes[preset().style] }}</p>
-        </fieldset>
-        <ng-container [ngTemplateOutlet]="swatches" />
-        <fieldset>
-          <legend class="text-foreground mb-2.5 text-sm font-medium">Radius</legend>
-          <div class="grid grid-cols-5 gap-1.5">
-            @for (r of radii; track r.name) {
-              <label [class]="tile" [title]="r.value">
-                <input type="radio" class="sr-only" [name]="name() + '-radius'" [value]="r.name" [checked]="preset().radius === r.name" (change)="set({ radius: r.name })" />
-                <ng-container [ngTemplateOutlet]="radiusIcon" [ngTemplateOutletContext]="{ $implicit: r.corner }" />
-                {{ r.label }}
-              </label>
-            }
-          </div>
-        </fieldset>
+        <div class="flex flex-col gap-2">
+          <ng-container [ngTemplateOutlet]="picker" [ngTemplateOutletContext]="{ key: 'style', label: 'Style', options: styleOptions, picture: styleIcon }" />
+          <p class="text-muted-foreground text-xs">{{ notes[preset().style] }}</p>
+        </div>
+        <ng-container [ngTemplateOutlet]="picker" [ngTemplateOutletContext]="{ key: 'baseColor', label: 'Base color', options: colorOptions, picture: swatchIcon }" />
+        <ng-container [ngTemplateOutlet]="picker" [ngTemplateOutletContext]="{ key: 'radius', label: 'Radius', options: radii, picture: radiusIcon }" />
+        <ng-container [ngTemplateOutlet]="picker" [ngTemplateOutletContext]="{ key: 'iconLibrary', label: 'Icons', options: iconOptions, picture: libraryIcon }" />
       </section>
 
       <!-- Type: 27 fonts are too many to lay out, so these stay dropdowns. -->
@@ -162,12 +149,41 @@ const FONT_GROUPS = (['sans', 'serif', 'mono'] as const).map((type) => ({
       </fieldset>
     </ng-template>
 
+    <!-- One labelled dropdown. The trigger shows the picked option's picture. -->
+    <ng-template #picker let-key="key" let-label="label" let-options="options" let-picture="picture">
+      <div class="flex flex-col gap-2">
+        <span class="text-foreground text-sm font-medium" [id]="name() + '-' + key + '-label'">{{ label }}</span>
+        <iv-select [value]="valueOf(key)" (valueChange)="pick(key, $event)">
+          <div class="relative">
+            <span class="pointer-events-none absolute top-1/2 left-3 z-10 -translate-y-1/2">
+              <ng-container [ngTemplateOutlet]="picture" [ngTemplateOutletContext]="{ $implicit: pictureOf(options, valueOf(key)) }" />
+            </span>
+            <iv-select-trigger class="w-full pl-10" [aria-labelledby]="name() + '-' + key + '-label'" />
+          </div>
+          <iv-select-content>
+            @for (o of options; track o.name) {
+              <iv-select-item [value]="o.name">
+                <ng-container [ngTemplateOutlet]="picture" [ngTemplateOutletContext]="{ $implicit: o.picture }" />
+                {{ o.label }}
+              </iv-select-item>
+            }
+          </iv-select-content>
+        </iv-select>
+      </div>
+    </ng-template>
+
     <!-- Pictures. No text nodes: the select reads its labels from text. -->
-    <ng-template #styleIcon let-style>
-      <span class="border-foreground/70 bg-muted block size-4 shrink-0 border-[1.5px]" [style.border-radius]="glyphs[style]" aria-hidden="true"></span>
+    <ng-template #styleIcon let-radius>
+      <span class="border-foreground/70 bg-muted block size-4 shrink-0 border-[1.5px]" [style.border-radius]="radius" aria-hidden="true"></span>
     </ng-template>
     <ng-template #fontIcon let-glyph>
       <span class="docs-glyph text-foreground/80 block w-4 shrink-0 text-center text-[0.8125rem] leading-none font-semibold" [attr.data-glyph]="glyph" aria-hidden="true"></span>
+    </ng-template>
+    <ng-template #swatchIcon let-background>
+      <span class="block size-4 shrink-0 rounded-full ring-1 ring-black/10 dark:ring-white/15" [style.background]="background" aria-hidden="true"></span>
+    </ng-template>
+    <ng-template #libraryIcon let-icon>
+      <svg [ivIcon]="icon" class="text-foreground/80 size-4 shrink-0"></svg>
     </ng-template>
     <ng-template #radiusIcon let-corner>
       <span class="border-foreground/70 block size-4 shrink-0 border-t-[1.5px] border-l-[1.5px]" [style.border-top-left-radius]="corner" aria-hidden="true"></span>
@@ -182,29 +198,37 @@ export class LookControls {
   readonly compact = input(false, { transform: booleanAttribute });
 
   protected readonly preset = computed(() => this.look().preset());
-  /** One option in a tile grid: a picture over its name. */
-  protected readonly tile =
-    'has-checked:border-foreground/60 has-checked:bg-muted has-checked:text-foreground text-muted-foreground hover:bg-muted/50 hover:text-foreground has-focus-visible:outline-ring flex cursor-pointer flex-col items-center gap-1.5 rounded-xl border px-0.5 py-2.5 text-xs font-medium transition-colors has-focus-visible:outline-2';
   protected readonly styles = STYLES;
   protected readonly notes = STYLE_NOTES;
-  protected readonly glyphs = STYLE_GLYPHS;
   protected readonly colors = BASE_COLORS;
   protected readonly fontGroups = FONT_GROUPS;
+  // Dropdown options: value, label, and what the option's picture template takes.
+  protected readonly styleOptions = STYLES.map((s) => ({ name: s.name, label: s.label, picture: STYLE_GLYPHS[s.name] }));
+  protected readonly colorOptions = BASE_COLORS.map((c) => ({ name: c.name, label: c.title, picture: swatch(c.light) }));
   protected readonly radii = Object.keys(RADII).map((name) => ({
     name,
     label: RADIUS_LABELS[name] ?? name,
-    value: RADII[name] ?? 'theme',
     // Drawn at 1.6x so small steps stay visible in a 16px box.
-    corner: `calc(${RADII[name] ?? '0.625rem'} * 1.6)`,
+    picture: `calc(${RADII[name] ?? '0.625rem'} * 1.6)`,
   }));
+  protected readonly iconOptions = ICON_LIBRARIES.map((l) => ({ name: l.name, label: l.label, picture: l.set['circle-check'] }));
+  protected pictureOf(options: { name: string; picture: unknown }[], value: string): unknown {
+    return options.find((o) => o.name === value)?.picture;
+  }
+
+  protected valueOf(key: keyof Preset): string {
+    return this.preset()[key];
+  }
+
+  protected pick(key: keyof Preset, value: string | null): void {
+    if (value) this.set({ [key]: value });
+  }
+
   protected readonly colorTitle = computed(() => BASE_COLORS.find((c) => c.name === this.preset().baseColor)?.title);
 
   protected set(patch: Partial<Preset>): void {
     this.look().set(patch);
   }
 
-  /** Light tint and mid tone of a base color, split on the diagonal. */
-  protected swatch(light: Record<string, string>): string {
-    return `linear-gradient(135deg, ${light['--secondary']} 50%, ${light['--muted-foreground']} 50%)`;
-  }
+  protected readonly swatch = swatch;
 }

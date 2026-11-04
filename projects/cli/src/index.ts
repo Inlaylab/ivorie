@@ -6,6 +6,7 @@ import { runAdd } from './commands/add.ts';
 import { runApply } from './commands/apply.ts';
 import { runInit } from './commands/init.ts';
 import { runMigrate } from './commands/migrate.ts';
+import { runMigrateIcons } from './commands/migrate-icons.ts';
 import { printReport, red } from './log.ts';
 
 const HELP = `Usage: ivorie <command> [options]
@@ -15,6 +16,8 @@ Commands:
   add <names...>     Copy components into your app (add --all for every one)
   apply <preset>     Change the look: a preset name or an ivp1_ code from the playground
   migrate [paths...] Update code written for the old ui-* components (default: src)
+  migrate icons --from <lib> --to <lib> [paths...]
+                     Rename your @ng-icons icons to another library (default: src)
 
 Common options:
   --registry <dir|url>  Use another registry (default: the bundled one)
@@ -33,6 +36,7 @@ init options:
   --font <name>         Override the preset font
   --font-heading <name> Override the preset heading font (inherit = same as font)
   --radius <name>       Override the preset radius (default, none, small, medium, large)
+  --icon-library <name> Override the preset icons (lucide, tabler, phosphor, hugeicons, remix)
   --force               Run again over an existing setup
   -y, --yes             No prompts, use the defaults
 
@@ -45,6 +49,7 @@ add options:
 
 migrate options:
   --rename-map <file>   Use another rename map
+  --from, --to <lib>    migrate icons: the libraries (lucide, tabler, phosphor, hugeicons, remix)
 `;
 
 const common = {
@@ -66,12 +71,19 @@ const OPTIONS = {
     font: { type: 'string' },
     'font-heading': { type: 'string' },
     radius: { type: 'string' },
+    'icon-library': { type: 'string' },
     force: { type: 'boolean' },
     yes: { type: 'boolean', short: 'y' },
   },
   apply: { ...common, project: { type: 'string' } },
   add: { ...common, overwrite: { type: 'boolean' }, all: { type: 'boolean' } },
-  migrate: { 'dry-run': { type: 'boolean' }, 'rename-map': { type: 'string' }, help: { type: 'boolean', short: 'h' } },
+  migrate: {
+    'dry-run': { type: 'boolean' },
+    'rename-map': { type: 'string' },
+    from: { type: 'string' },
+    to: { type: 'string' },
+    help: { type: 'boolean', short: 'h' },
+  },
 } as const satisfies Record<string, ParseArgsConfig['options']>;
 
 function version(): string {
@@ -119,6 +131,7 @@ async function main(argv: string[]): Promise<number> {
       font: v['font'] as string | undefined,
       fontHeading: v['font-heading'] as string | undefined,
       radius: v['radius'] as string | undefined,
+      iconLibrary: v['icon-library'] as string | undefined,
       force: v['force'] === true,
       yes: v['yes'] === true,
     });
@@ -128,6 +141,9 @@ async function main(argv: string[]): Promise<number> {
     printReport(r, dryRun);
   } else if (command === 'add') {
     const r = await runAdd(positionals, { ...common, overwrite: v['overwrite'] === true, all: v['all'] === true });
+    printReport(r, dryRun);
+  } else if (positionals[0] === 'icons') {
+    const r = await runMigrateIcons(positionals.slice(1), { cwd, dryRun, from: v['from'] as string | undefined, to: v['to'] as string | undefined });
     printReport(r, dryRun);
   } else {
     const r = await runMigrate(positionals, { cwd, dryRun, renameMap: v['rename-map'] as string | undefined });

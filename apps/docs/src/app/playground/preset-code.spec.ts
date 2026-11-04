@@ -6,12 +6,19 @@ const CODE_1_1 =
   'ivp1_eyJiYXNlQ29sb3IiOiJuZXV0cmFsIiwiZm9udCI6InN5c3RlbSIsInJhZGl1cyI6ImRlZmF1bHQiLCJzdHlsZSI6Im1haWEifQ';
 
 describe('preset code', () => {
-  it('the default preset gives the 1.1 code', () => {
-    expect(encodePreset(DEFAULT_PRESET)).toBe(CODE_1_1);
-    expect(decodePreset(CODE_1_1)).toEqual(DEFAULT_PRESET);
+  it('the 1.1 default (maia) still gives the 1.1 code', () => {
+    const maia = { ...DEFAULT_PRESET, style: 'maia' };
+    expect(encodePreset(maia)).toBe(CODE_1_1);
+    expect(decodePreset(CODE_1_1)).toEqual(maia);
   });
 
   it('bad input gives null, never throws', () => {
     for (const bad of ['ivp1_!!', 'ivp1_e30', 'nope', '', 'ivp1_' + btoa('[1]')]) expect(decodePreset(bad)).toBeNull();
+  });
+
+  it('iconLibrary is left out at lucide and kept otherwise', () => {
+    const tabler = { ...DEFAULT_PRESET, iconLibrary: 'tabler' };
+    expect(encodePreset(tabler)).not.toBe(CODE_1_1);
+    expect(decodePreset(encodePreset(tabler))).toEqual(tabler);
   });
 });

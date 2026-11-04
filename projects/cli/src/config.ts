@@ -1,6 +1,7 @@
 // components.json: where components go and how they are named.
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { ICON_LIBRARIES, type IconLibrary } from './icons.ts';
 
 export interface ComponentsJson {
   $schema: string;
@@ -12,7 +13,7 @@ export interface ComponentsJson {
   /** Left out when the heading font is the body font. */
   fontHeading?: string;
   radius: string;
-  iconLibrary: 'lucide';
+  iconLibrary: IconLibrary;
   registry?: string;
 }
 
@@ -50,7 +51,9 @@ export function validateConfig(value: unknown): ComponentsJson {
   if (!tw || typeof tw !== 'object') throw new Error('components.json: "tailwind" must be an object');
   str(tw as Record<string, unknown>, 'css', 'tailwind.css');
   str(tw as Record<string, unknown>, 'baseColor', 'tailwind.baseColor');
-  if (v['iconLibrary'] !== 'lucide') throw new Error('components.json: "iconLibrary" must be "lucide"');
+  if (!ICON_LIBRARIES.includes(v['iconLibrary'] as IconLibrary)) {
+    throw new Error(`components.json: "iconLibrary" must be one of ${ICON_LIBRARIES.join(', ')}`);
+  }
   if (v['registry'] !== undefined) str(v, 'registry');
   if (v['fontHeading'] !== undefined) str(v, 'fontHeading');
   return v as unknown as ComponentsJson;

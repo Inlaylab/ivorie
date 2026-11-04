@@ -3,7 +3,9 @@ import { TestBed } from '@angular/core/testing';
 import { afterEach, describe, expect, it } from 'vitest';
 import { BASE_COLORS } from '../../generated/looks';
 import { Appearance } from '../shell/appearance';
-import { PlaygroundLook } from './playground-look';
+import { IV_ICONS } from '@inlaylab/ivorie/icon';
+import { COMPONENT_ICONS as TABLER } from '@inlaylab/ivorie/icons/tabler';
+import { PREVIEW_ICONS, PlaygroundLook } from './playground-look';
 import { DEFAULT_PRESET, encodePreset } from './preset-code';
 
 const olive = BASE_COLORS.find((c) => c.name === 'olive')!;
@@ -68,14 +70,14 @@ describe('PlaygroundLook', () => {
     expect(() => links[0].dispatchEvent(new Event('error'))).not.toThrow();
   });
 
-  it('puts the style class on the element and loads its sheet; <body> keeps maia', () => {
-    document.body.className = 'style-maia';
+  it('puts the style class on the element and loads its sheet; <body> keeps nova', () => {
+    document.body.className = 'style-nova';
     const { look, stage } = create();
-    look.set({ style: 'nova' });
+    look.set({ style: 'maia' });
     TestBed.tick();
-    expect([...stage.classList]).toEqual(['style-nova']);
-    expect(document.body.className).toBe('style-maia');
-    expect(document.getElementById('docs-style-nova')?.getAttribute('href')).toBe('style-nova.css');
+    expect([...stage.classList]).toEqual(['style-maia']);
+    expect(document.body.className).toBe('style-nova');
+    expect(document.getElementById('docs-style-maia')?.getAttribute('href')).toBe('style-maia.css');
   });
 
   it('cleans up on destroy: no vars, no style class, no links', () => {
@@ -90,7 +92,7 @@ describe('PlaygroundLook', () => {
 
   it('load(): a valid code, a bad code, an unknown value', () => {
     const { look } = create();
-    const golden = { style: 'nova', baseColor: 'olive', font: 'inter', fontHeading: 'lora', radius: 'large' };
+    const golden = { style: 'nova', baseColor: 'olive', font: 'inter', fontHeading: 'lora', radius: 'large', iconLibrary: 'lucide' };
     look.load(encodePreset(golden));
     expect(look.preset()).toEqual(golden);
     look.load('ivp1_!!');
@@ -116,5 +118,15 @@ describe('PlaygroundLook', () => {
     look.set({ baseColor: 'olive' });
     TestBed.tick();
     expect(inlineVars(stage)).toEqual([]);
+  });
+
+  it('PREVIEW_ICONS follows the picked icon library; unknown libraries load as defaults', () => {
+    const { look } = create([PREVIEW_ICONS]);
+    const icons = TestBed.inject(IV_ICONS);
+    expect(icons.check).not.toBe(TABLER.check);
+    look.set({ iconLibrary: 'tabler' });
+    expect(icons.check).toBe(TABLER.check);
+    look.load(encodePreset({ ...DEFAULT_PRESET, iconLibrary: 'feather' }));
+    expect(look.preset().iconLibrary).toBe('lucide');
   });
 });

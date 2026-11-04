@@ -10,6 +10,8 @@ import { detectProject } from '../project.ts';
 import { bundledRegistry, openRegistry, packageName } from '../registry.ts';
 import { renderLook } from '../look.ts';
 import { runAdd, writeFile } from './add.ts';
+import { setIconLibrary } from './apply.ts';
+import type { IconLibrary } from '../icons.ts';
 import { emptyReport, type CommonOptions, type Report } from './report.ts';
 
 export interface InitOptions extends CommonOptions {
@@ -22,6 +24,7 @@ export interface InitOptions extends CommonOptions {
   font?: string;
   fontHeading?: string;
   radius?: string;
+  iconLibrary?: string;
   force?: boolean;
   yes?: boolean;
 }
@@ -61,6 +64,7 @@ export async function runInit(o: InitOptions): Promise<Report> {
   if (o.font) preset.font = o.font;
   if (o.fontHeading) preset.fontHeading = o.fontHeading;
   if (o.radius) preset.radius = o.radius;
+  if (o.iconLibrary) preset.iconLibrary = o.iconLibrary;
   checkPreset(preset, index);
 
   const interactive = process.stdin.isTTY && !o.yes && !o.dryRun;
@@ -76,7 +80,7 @@ export async function runInit(o: InitOptions): Promise<Report> {
     font: preset.font,
     ...(preset.fontHeading !== 'inherit' && { fontHeading: preset.fontHeading }),
     radius: preset.radius,
-    iconLibrary: 'lucide',
+    iconLibrary: preset.iconLibrary as IconLibrary,
   });
   const write = (file: string, content: string) =>
     writeFile(report, o.cwd, join(o.cwd, file), content, { overwrite: o.force, dryRun: o.dryRun });
@@ -103,6 +107,8 @@ export async function runInit(o: InitOptions): Promise<Report> {
   if (existsSync(join(o.cwd, project.indexHtml))) edit(project.indexHtml, (html) => setBodyStyleClass(html, preset.style));
   else report.notes.push(`add class="style-${preset.style}" to <body> (no ${project.indexHtml})`);
 
+  const iconDeps = await setIconLibrary(config.iconLibrary, o, config, project, report, edit);
+
   if (!hasTailwindPostcss(o.cwd)) {
     if (existsSync(join(o.cwd, '.postcssrc.json'))) {
       report.notes.push('add "@tailwindcss/postcss": {} to the plugins in .postcssrc.json');
@@ -110,7 +116,7 @@ export async function runInit(o: InitOptions): Promise<Report> {
   }
 
   const missing = (deps: string[]) => deps.filter((d) => !project.deps.has(packageName(d)));
-  const deps = missing([...new Set([...(core.dependencies ?? []), ...RUNTIME_DEPS, ...look.dependencies])].sort());
+  const deps = missing([...new Set([...(core.dependencies ?? []), ...RUNTIME_DEPS, ...look.dependencies, ...iconDeps])].sort());
   const devDeps = missing(TAILWIND_DEPS);
   for (const [list, dev] of [
     [deps, false],

@@ -48,6 +48,8 @@ const file = (path: string, content: string): File => ({
 });
 
 function docsMeta(name: string): { title: string; description: string } {
+  const lib = /^icons-(.+)$/.exec(name)?.[1];
+  if (lib) return { title: `Icons ${lib}`, description: `The component icons drawn with ${lib}.` };
   const md = `apps/docs/content/${name}.md`;
   if (!existsSync(md)) return { title: 'Core', description: 'cn, ids, positions and the Ivorie config.' };
   const { data } = parseFrontmatter(readFileSync(md, 'utf8'), md);
@@ -81,7 +83,7 @@ export function buildItems(): Item[] {
       ...(deps.length && { dependencies: deps }),
       ...(reg.length && { registryDependencies: reg }),
       files: e.files.map((f) => file(`ui/${e.name}/${f.name}`, rewriteImports(f.content))),
-      meta: { ivorie: { kind: e.name === 'core' ? 'lib' : 'component' } },
+      meta: { ivorie: { kind: e.name === 'core' || e.name.startsWith('icons-') ? 'lib' : 'component' } },
     };
   });
 

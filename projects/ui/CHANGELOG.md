@@ -1,5 +1,13 @@
 # @inlaylab/ivorie
 
+## 1.3.0
+
+### Minor Changes
+
+- 513aca1: Icon libraries. Components draw Lucide by default; `provideIvIcons(COMPONENT_ICONS)` from `@inlaylab/ivorie/icons/{tabler,phosphor,hugeicons,remix}` switches them. The CLI preset gains `iconLibrary` (`init --icon-library`, `apply`), and `ivorie migrate icons --from <lib> --to <lib>` renames your own `@ng-icons` icons.
+
+  The default style is now nova (was maia). `npx ivorie init` with no preset and `apply default` give nova. Old share codes keep their style.
+
 ## 1.2.0
 
 ### Minor Changes

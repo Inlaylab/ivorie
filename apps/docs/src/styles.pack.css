@@ -3,7 +3,7 @@
 /* theme.css already imports tailwindcss and tw-animate-css. */
 @import "@inlaylab/ivorie/styles/theme.css";
 /* Default style. The others are separate bundles: src/styles/style-*.css. */
-@import "@inlaylab/ivorie/styles/style-maia.css";
+@import "@inlaylab/ivorie/styles/style-nova.css";
 @plugin "@tailwindcss/typography";
 /* Tailwind scans from the repo root; plans, tools and markdown are not UI. */
 /* Prove the package alone feeds Tailwind: never scan the library source. */

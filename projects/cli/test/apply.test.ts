@@ -6,6 +6,7 @@ import { join } from 'node:path';
 import { build } from '../../../tools/registry/build.ts';
 import { runApply } from '../src/commands/apply.ts';
 import { runInit } from '../src/commands/init.ts';
+import { encodePreset } from '../src/preset.ts';
 import { PRESET_GOLDEN } from './preset.fixture.ts';
 
 const temps: string[] = [];
@@ -46,7 +47,8 @@ test('apply the golden code: config, theme, style file, imports, body class', as
   assert.match(css, /@import "@fontsource-variable\/inter";/);
   assert.match(css, /@import "@fontsource-variable\/lora";/);
   assert.match(read(cwd, 'src/index.html'), /<body class="style-nova">/);
-  assert.ok(report.notes.some((n) => n.includes('style-maia.css is no longer used')));
+  const back = await runApply(encodePreset({ ...PRESET_GOLDEN.preset, style: 'maia' }), opts(cwd));
+  assert.ok(back.notes.some((n) => n.includes('style-nova.css is no longer used')));
   assert.ok(report.notes.some((n) => n.includes('@fontsource-variable/inter')));
 });
 
@@ -62,8 +64,8 @@ test('apply default after the golden code drops the font imports', async () => {
   await runApply(PRESET_GOLDEN.code, opts(cwd));
   await runApply('default', opts(cwd));
   const css = read(cwd, 'src/styles.css');
-  assert.doesNotMatch(css, /fontsource|style-nova/);
-  assert.match(css, /style-maia\.css/);
+  assert.doesNotMatch(css, /fontsource/);
+  assert.match(css, /style-nova\.css/);
   assert.equal('fontHeading' in JSON.parse(read(cwd, 'components.json')), false);
 });
 
@@ -86,4 +88,18 @@ test('no components.json throws', async () => {
   const cwd = mkdtempSync(join(tmpdir(), 'ivorie-apply-'));
   temps.push(cwd);
   await assert.rejects(runApply('default', opts(cwd)), { message: 'components.json not found — run "ivorie init"' });
+});
+
+test('apply a tabler code: copies the set, wires app.config.ts, notes migrate icons; again changes nothing', async () => {
+  const cwd = await initApp();
+  writeFileSync(join(cwd, 'src/app/app.config.ts'), 'export const appConfig = {\n  providers: [],\n};\n');
+  const code = encodePreset({ ...PRESET_GOLDEN.preset, iconLibrary: 'tabler' });
+  const report = await runApply(code, opts(cwd));
+  assert.equal(JSON.parse(read(cwd, 'components.json')).iconLibrary, 'tabler');
+  assert.match(read(cwd, 'src/app/ui/icons-tabler/icons.ts'), /COMPONENT_ICONS/);
+  assert.match(read(cwd, 'src/app/app.config.ts'), /providers: \[provideIvIcons\(COMPONENT_ICONS\)\]/);
+  assert.ok(report.notes.some((n) => n.includes('migrate icons --from lucide --to tabler')));
+  assert.deepEqual((await runApply(code, opts(cwd))).written, []);
+  await runApply(PRESET_GOLDEN.code, opts(cwd));
+  assert.doesNotMatch(read(cwd, 'src/app/app.config.ts'), /provideIvIcons/);
 });

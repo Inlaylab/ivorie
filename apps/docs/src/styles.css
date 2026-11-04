@@ -1,7 +1,7 @@
 /* theme.css already imports tailwindcss and tw-animate-css. */
 @import "../../../projects/ui/styles/theme.css";
 /* Default style. The others are separate bundles: src/styles/style-*.css. */
-@import "../../../projects/ui/styles/style-maia.css";
+@import "../../../projects/ui/styles/style-nova.css";
 /* Geist, self-hosted: the check and the SSR smoke run without network. */
 @import "@fontsource-variable/geist";
 @import "@fontsource-variable/geist-mono";

@@ -23,18 +23,18 @@ const item = (name: string) => JSON.parse(readFileSync(join(dir, 'r', `${name}.j
 const look = (patch: Partial<typeof DEFAULT_PRESET>) =>
   renderLook({ ...DEFAULT_PRESET, ...patch }, reg, 'src/app/ui', 'src/styles.css');
 
-test('default preset: plain theme, maia, no fonts', async () => {
+test('default preset: plain theme, nova, no fonts', async () => {
   const l = await look({});
   const expected = renderTheme({ base: item('theme-base').files[0].content, ...item('theme-neutral').cssVars }, { imports: false });
   assert.equal(l.themeCss, expected);
-  assert.equal(l.styleFile, 'style-maia.css');
-  assert.equal(l.styleCss, item('style-maia').files[0].content);
+  assert.equal(l.styleFile, 'style-nova.css');
+  assert.equal(l.styleCss, item('style-nova').files[0].content);
   assert.deepEqual(l.dependencies, []);
   assert.deepEqual(l.imports, [
     '@import "tailwindcss";',
     '@import "tw-animate-css";',
     '@import "./app/ui/styles/theme.css";',
-    '@import "./app/ui/styles/style-maia.css";',
+    '@import "./app/ui/styles/style-nova.css";',
   ]);
 });
 

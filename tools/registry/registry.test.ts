@@ -51,7 +51,7 @@ test('index.json lists every item and the preset axes', () => {
   assert.equal(index.items.length, items.length);
   assert.ok(index.styles.includes('maia'));
   assert.deepEqual(index.baseColors, ['mauve', 'mist', 'neutral', 'olive', 'stone', 'taupe', 'zinc']);
-  assert.equal(index.presets.default.style, 'maia');
+  assert.equal(index.presets.default.style, 'nova');
   assert.equal(index.fonts.length, 27);
   assert.equal(index.fonts[0], 'system');
   assert.deepEqual(index.radii, ['default', 'none', 'small', 'medium', 'large']);

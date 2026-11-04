@@ -7,21 +7,25 @@ export interface Preset {
   font: string;
   fontHeading: string;
   radius: string;
+  iconLibrary: string;
 }
 
 export const DEFAULT_PRESET: Preset = {
-  style: 'maia',
+  style: 'nova',
   baseColor: 'neutral',
   font: 'system',
   fontHeading: 'inherit',
   radius: 'default',
+  iconLibrary: 'lucide',
 };
 
 const PREFIX = 'ivp1_';
-const KEYS = ['baseColor', 'font', 'fontHeading', 'radius', 'style'] as const;
+const KEYS = ['baseColor', 'font', 'fontHeading', 'iconLibrary', 'radius', 'style'] as const;
+// Left out of the code at these values, so older codes stay valid.
+const OPTIONAL: Partial<Record<keyof Preset, string>> = { fontHeading: 'inherit', iconLibrary: 'lucide' };
 
 export function encodePreset(p: Preset): string {
-  const keys = KEYS.filter((k) => k !== 'fontHeading' || p.fontHeading !== 'inherit');
+  const keys = KEYS.filter((k) => !(k in OPTIONAL) || p[k] !== OPTIONAL[k]);
   const json = JSON.stringify(Object.fromEntries(keys.map((k) => [k, p[k]])));
   const bin = String.fromCharCode(...new TextEncoder().encode(json));
   return PREFIX + btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
@@ -34,9 +38,9 @@ export function decodePreset(code: string): Preset | null {
     if (!/^[A-Za-z0-9_-]+$/.test(raw)) return null;
     const bin = atob(raw.replace(/-/g, '+').replace(/_/g, '/'));
     const v = JSON.parse(new TextDecoder().decode(Uint8Array.from(bin, (c) => c.charCodeAt(0))));
-    const ok = KEYS.every((k) => typeof v?.[k] === 'string' || (k === 'fontHeading' && v?.[k] === undefined));
+    const ok = KEYS.every((k) => typeof v?.[k] === 'string' || (k in OPTIONAL && v?.[k] === undefined));
     if (!ok) return null;
-    return { style: v.style, baseColor: v.baseColor, font: v.font, fontHeading: v.fontHeading ?? 'inherit', radius: v.radius };
+    return { style: v.style, baseColor: v.baseColor, font: v.font, fontHeading: v.fontHeading ?? 'inherit', radius: v.radius, iconLibrary: v.iconLibrary ?? 'lucide' };
   } catch {
     return null;
   }

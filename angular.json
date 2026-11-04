@@ -86,8 +86,8 @@
                 "inject": false
               },
               {
-                "input": "apps/docs/src/styles/style-nova.css",
-                "bundleName": "style-nova",
+                "input": "apps/docs/src/styles/style-maia.css",
+                "bundleName": "style-maia",
                 "inject": false
               },
               {

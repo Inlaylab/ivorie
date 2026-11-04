@@ -18,10 +18,10 @@ npx ivorie init
 It does this, and never overwrites a file you changed:
 
 1. Writes `components.json`.
-2. Writes `<path>/styles/theme.css` and the style file, for example `style-maia.css`.
+2. Writes `<path>/styles/theme.css` and the style file, for example `style-nova.css`.
 3. Copies `core` (`cn`, ids, positions, the Ivorie config).
 4. Adds `@import` lines to your styles file: Tailwind, `tw-animate-css`, the preset fonts, the theme and the style.
-5. Adds `class="style-maia"` to `<body>` in `index.html`.
+5. Adds `class="style-nova"` to `<body>` in `index.html`.
 6. Writes `.postcssrc.json` for `@tailwindcss/postcss`, if no PostCSS config loads it yet.
 7. Installs `@angular/cdk`, `tw-animate-css`, the `core` deps, the font packages and Tailwind.
 
@@ -36,6 +36,7 @@ It does this, and never overwrites a file you changed:
 | `--font <name>` | from the preset | `system` or a font name, for example `inter`. |
 | `--font-heading <name>` | from the preset | `inherit` (same as `--font`) or a font name. |
 | `--radius <name>` | from the preset | `default`, `none`, `small`, `medium` or `large`. |
+| `--icon-library <name>` | from the preset | `lucide`, `tabler`, `phosphor`, `hugeicons` or `remix`. |
 | `--force` | off | Run again over an existing setup. |
 | `-y`, `--yes` | off | No prompts. |
 | `--skip-install` | off | Print the install commands instead of running them. |
@@ -72,6 +73,19 @@ npx ivorie migrate src
 - Lists what it cannot fix as `file:line note`, for example `IvTabs.setActive → select`.
 - Running it twice changes nothing. `--dry-run` lists the files.
 
+### migrate icons
+
+Moves your own `<ng-icon>` icons to another library:
+
+```bash
+npx ivorie migrate icons --from lucide --to tabler src
+```
+
+- Renames `@ng-icons` names everywhere in `.ts` and `.html` files (`lucideHouse` → `tablerHome`), and the `@ng-icons/<set>` import.
+- Covers 185 common icons. An icon with no match stays as is and is listed.
+- Install the new set: `npm i @ng-icons/tabler-icons`.
+- The component icons switch with `apply`, not with this command.
+
 ## apply
 
 Change the look of an app that ran `init`. Pass a preset name or a code from the [playground](playground):
@@ -80,7 +94,7 @@ Change the look of an app that ran `init`. Pass a preset name or a code from the
 npx ivorie apply ivp1_…
 ```
 
-It rewrites `theme.css`, writes the new style file, swaps the style and font `@import` lines, sets the `<body>` style class, updates `components.json` and installs new font packages. Run it again with the same code and nothing changes. The old style file stays; delete it if you did not change it.
+It rewrites `theme.css`, writes the new style file, swaps the style and font `@import` lines, sets the `<body>` style class, updates `components.json` and installs new font packages. When the code picks another icon library, it copies that set to `<path>/icons-<lib>/`, adds `provideIvIcons(COMPONENT_ICONS)` to `app.config.ts`, installs `@ng-icons/<set>` and tells you the `migrate icons` command for your own icons. Run it again with the same code and nothing changes. The old style file stays; delete it if you did not change it.
 
 | Flag | Default | Description |
 |---|---|---|
@@ -101,12 +115,12 @@ It rewrites `theme.css`, writes the new style file, swaps the style and font `@i
 | `font` | `system` or a font name. |
 | `fontHeading` | Optional. The heading font. Left out: same as `font`. |
 | `radius` | `default`, `none`, `small`, `medium` or `large`. |
-| `iconLibrary` | `lucide`. |
+| `iconLibrary` | `lucide`, `tabler`, `phosphor`, `hugeicons` or `remix`. Set by `init` and `apply`. |
 | `registry` | Optional. A registry dir or URL for `add`. |
 
 ## Presets
 
-A preset names a style, a base color, a font, a heading font and a radius. Make one in the [playground](playground) and copy its code (`ivp1_…`). `--preset default` is maia, neutral, the system font and the default radius.
+A preset names a style, a base color, a font, a heading font, a radius and an icon library. Make one in the [playground](playground) and copy its code (`ivp1_…`). `--preset default` is nova, neutral, the system font, the default radius and lucide icons. Before 1.3 the default style was maia; old codes keep their style.
 
 ## Registry
 

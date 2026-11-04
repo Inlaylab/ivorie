@@ -32,7 +32,7 @@ function parse(raw: string | null): AppearanceState {
   }
 }
 
-/** Light / dark / system on <html>. Browser only; the server renders light. The site style is always maia. */
+/** Light / dark / system on <html>. Browser only; the server renders light. The site style is always nova. */
 @Injectable({ providedIn: 'root' })
 export class Appearance {
   private readonly doc = inject(DOCUMENT);

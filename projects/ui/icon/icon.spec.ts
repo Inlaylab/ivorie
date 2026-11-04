@@ -1,14 +1,16 @@
 import { Component, signal } from '@angular/core'
 import { TestBed } from '@angular/core/testing'
 import { describe, expect, it } from 'vitest'
-import { ICONS, IconName, IconNode, IvIcon } from '@inlaylab/ivorie/icon'
+import { ICONS, IconData, IconName, IconNode, IconSet, IconSvg, IvIcon, provideIvIcons } from '@inlaylab/ivorie/icon'
+
+const FILL_SVG: IconSvg = { viewBox: '0 0 256 256', fill: 'currentColor' }
 
 @Component({
   imports: [IvIcon],
   template: `<button type="button" aria-label="Open"><svg [ivIcon]="name()" class="size-4" [size]="size()"></svg></button>`,
 })
 class Host {
-  name = signal<IconName | IconNode>('chevron-down')
+  name = signal<IconName | IconData | IconNode>('chevron-down')
   size = signal(24)
 }
 
@@ -79,6 +81,17 @@ describe('IvIcon', () => {
     expect(svg().querySelector('path')!.hasAttribute('fill')).toBe(false)
   })
 
+  it('draws IconData with its own svg attributes', async () => {
+    const { fixture, svg } = await setup()
+    fixture.componentInstance.name.set({ svg: FILL_SVG, nodes: [['path', { d: 'M0 0h256' }]] })
+    await fixture.whenStable()
+    expect(svg().getAttribute('viewBox')).toBe('0 0 256 256')
+    expect(svg().getAttribute('fill')).toBe('currentColor')
+    expect(svg().hasAttribute('stroke')).toBe(false)
+    expect(svg().hasAttribute('stroke-width')).toBe(false)
+    expect(svg().querySelector('path')!.getAttribute('d')).toBe('M0 0h256')
+  })
+
   it('every icon has at least one shape', () => {
     for (const [name, node] of Object.entries(ICONS)) expect(node.length, name).toBeGreaterThan(0)
   })
@@ -86,5 +99,54 @@ describe('IvIcon', () => {
   it('has no axe violations', async () => {
     const { fixture } = await setup()
     await expect(fixture.nativeElement).toHaveNoViolations()
+  })
+})
+
+describe('provideIvIcons', () => {
+  const fillSet = Object.fromEntries(
+    Object.keys(ICONS).map((name) => [name, { svg: FILL_SVG, nodes: [['path', { d: `M0 0 ${name}` }], ['circle', { cx: 8, cy: 8, r: 4, fill: 'none', stroke: 'currentColor' }]] }]),
+  ) as unknown as IconSet
+
+  async function provided() {
+    TestBed.configureTestingModule({ providers: [provideIvIcons(fillSet)] })
+    return setup()
+  }
+
+  it('named icons come from the provided set, with its svg attributes', async () => {
+    const { svg } = await provided()
+    expect(svg().getAttribute('viewBox')).toBe('0 0 256 256')
+    expect(svg().getAttribute('fill')).toBe('currentColor')
+    expect(svg().hasAttribute('stroke')).toBe(false)
+    expect(svg().getAttribute('data-icon')).toBe('chevron-down')
+    expect(svg().querySelector('path')!.getAttribute('d')).toBe('M0 0 chevron-down')
+  })
+
+  it("a shape's own fill and stroke win over the svg attributes", async () => {
+    const { svg } = await provided()
+    const circle = svg().querySelector('circle')!
+    expect(circle.getAttribute('fill')).toBe('none')
+    expect(circle.getAttribute('stroke')).toBe('currentColor')
+  })
+
+  it('a raw Lucide IconNode keeps the Lucide stroke under a fill set', async () => {
+    const { fixture, svg } = await provided()
+    fixture.componentInstance.name.set([['path', { d: 'M1 1' }]])
+    await fixture.whenStable()
+    expect(svg().getAttribute('viewBox')).toBe('0 0 24 24')
+    expect(svg().getAttribute('fill')).toBe('none')
+    expect(svg().getAttribute('stroke')).toBe('currentColor')
+    expect(svg().getAttribute('stroke-width')).toBe('2')
+  })
+
+  it('a component providers array scopes the set', async () => {
+    @Component({ selector: 'iv-scoped', imports: [IvIcon], providers: [provideIvIcons(fillSet)], template: `<svg ivIcon="x"></svg>` })
+    class Scoped {}
+    @Component({ imports: [IvIcon, Scoped], template: `<svg ivIcon="x" id="outer"></svg><iv-scoped />` })
+    class Page {}
+    const fixture = TestBed.createComponent(Page)
+    await fixture.whenStable()
+    const el = fixture.nativeElement as HTMLElement
+    expect(el.querySelector('#outer')!.getAttribute('viewBox')).toBe('0 0 24 24')
+    expect(el.querySelector('iv-scoped svg')!.getAttribute('viewBox')).toBe('0 0 256 256')
   })
 })

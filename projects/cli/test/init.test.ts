@@ -1,6 +1,6 @@
 import { after, before, test } from 'node:test';
 import assert from 'node:assert/strict';
-import { cpSync, existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { build } from '../../../tools/registry/build.ts';
@@ -30,7 +30,7 @@ const IMPORTS = [
   '@import "tailwindcss";',
   '@import "tw-animate-css";',
   '@import "./app/ui/styles/theme.css";',
-  '@import "./app/ui/styles/style-maia.css";',
+  '@import "./app/ui/styles/style-nova.css";',
 ];
 
 test('fresh ng-app: config, theme, style, imports, body class, postcss, core', async () => {
@@ -42,7 +42,7 @@ test('fresh ng-app: config, theme, style, imports, body class, postcss, core', a
     $schema: 'https://ivorie.dev/schema/components.json',
     path: 'src/app/ui',
     prefix: 'iv',
-    style: 'maia',
+    style: 'nova',
     tailwind: { css: 'src/styles.css', baseColor: 'neutral' },
     font: 'system',
     radius: 'default',
@@ -51,9 +51,9 @@ test('fresh ng-app: config, theme, style, imports, body class, postcss, core', a
   const base = item('theme-base').files[0].content;
   const vars = item('theme-neutral').cssVars;
   assert.equal(read(cwd, 'src/app/ui/styles/theme.css'), renderTheme({ base, ...vars }, { imports: false }));
-  assert.equal(read(cwd, 'src/app/ui/styles/style-maia.css'), item('style-maia').files[0].content);
+  assert.equal(read(cwd, 'src/app/ui/styles/style-nova.css'), item('style-nova').files[0].content);
   assert.equal(read(cwd, 'src/styles.css'), IMPORTS.join('\n') + '\n' + userCss);
-  assert.match(read(cwd, 'src/index.html'), /<body class="style-maia">/);
+  assert.match(read(cwd, 'src/index.html'), /<body class="style-nova">/);
   assert.deepEqual(JSON.parse(read(cwd, '.postcssrc.json')), { plugins: { '@tailwindcss/postcss': {} } });
   assert.ok(existsSync(join(cwd, 'src/app/ui/core/public-api.ts')));
 });
@@ -108,7 +108,7 @@ test('ng-objstyles: imports land in the object styles entry', async () => {
   const cwd = app('ng-objstyles');
   await runInit({ cwd, registry, skipInstall: true, yes: true });
   assert.ok(read(cwd, 'src/global.css').startsWith('@import "tailwindcss";'));
-  assert.match(read(cwd, 'src/main.html'), /<body class="style-maia">/);
+  assert.match(read(cwd, 'src/main.html'), /<body class="style-nova">/);
 });
 
 test('notes list the deps and the missing tailwind trio', async () => {
@@ -153,4 +153,17 @@ test('the default preset writes no fontHeading in components.json', async () => 
   const cwd = app();
   await runInit({ cwd, registry, skipInstall: true, yes: true });
   assert.equal('fontHeading' in JSON.parse(read(cwd, 'components.json')), false);
+});
+
+test('--icon-library tabler: copies the set, wires app.config.ts, installs @ng-icons', async () => {
+  const cwd = app();
+  mkdirSync(join(cwd, 'src/app'), { recursive: true });
+  writeFileSync(join(cwd, 'src/app/app.config.ts'), "import { ApplicationConfig } from '@angular/core';\n\nexport const appConfig: ApplicationConfig = {\n  providers: [],\n};\n");
+  const r = await runInit({ cwd, registry, skipInstall: true, yes: true, iconLibrary: 'tabler' });
+  assert.equal(JSON.parse(read(cwd, 'components.json')).iconLibrary, 'tabler');
+  assert.match(read(cwd, 'src/app/ui/icons-tabler/icons.ts'), /from '\.\.\/icon\/public-api'/);
+  const ts = read(cwd, 'src/app/app.config.ts');
+  assert.match(ts, /import \{ COMPONENT_ICONS \} from '\.\/ui\/icons-tabler\/public-api';/);
+  assert.match(ts, /providers: \[provideIvIcons\(COMPONENT_ICONS\)\]/);
+  assert.ok(r.notes.some((n) => n.includes('@ng-icons/core') && n.includes('@ng-icons/tabler-icons')));
 });

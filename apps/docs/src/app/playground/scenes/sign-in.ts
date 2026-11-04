@@ -1,15 +1,17 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { IvButton } from '@inlaylab/ivorie/button';
+import { IvIcon } from '@inlaylab/ivorie/icon';
 import { IV_CARD_IMPORTS } from '@inlaylab/ivorie/card';
 import { IvCheckbox } from '@inlaylab/ivorie/checkbox';
 import { IV_FIELD_IMPORTS } from '@inlaylab/ivorie/field';
 import { IV_INPUT_IMPORTS } from '@inlaylab/ivorie/input';
 import { IV_INPUT_OTP_IMPORTS } from '@inlaylab/ivorie/input-otp';
+import { PlaygroundLook } from '../playground-look';
 
 /** Playground scene: a sign-in card and the one-time code step after it. */
 @Component({
   selector: 'docs-scene-sign-in',
-  imports: [IvButton, IV_CARD_IMPORTS, IvCheckbox, IV_FIELD_IMPORTS, IV_INPUT_IMPORTS, IV_INPUT_OTP_IMPORTS],
+  imports: [IvIcon, IvButton, IV_CARD_IMPORTS, IvCheckbox, IV_FIELD_IMPORTS, IV_INPUT_IMPORTS, IV_INPUT_OTP_IMPORTS],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: '@container block' },
   template: `
@@ -38,7 +40,7 @@ import { IV_INPUT_OTP_IMPORTS } from '@inlaylab/ivorie/input-otp';
               <input ivInput id="sc-password" type="password" value="correct-horse" />
             </iv-field>
             <label class="flex items-center gap-2 text-sm"><iv-checkbox [checked]="true" /> Keep me signed in</label>
-            <button ivButton class="w-full">Sign in</button>
+            <button ivButton class="w-full">Sign in<svg [ivIcon]="icons().arrowRight"></svg></button>
           </iv-field-group>
         </iv-card-content>
         <iv-card-footer class="text-muted-foreground justify-center gap-1 text-sm">
@@ -49,7 +51,7 @@ import { IV_INPUT_OTP_IMPORTS } from '@inlaylab/ivorie/input-otp';
 
       <iv-card>
         <iv-card-header>
-          <iv-card-title class="cn-font-heading text-xl">Check your email</iv-card-title>
+          <iv-card-title class="cn-font-heading flex items-center gap-2 text-xl"><svg [ivIcon]="icons().mail" class="text-muted-foreground size-5"></svg>Check your email</iv-card-title>
           <iv-card-description>We sent a 6-digit code to ada&#64;acme.dev. It expires in 10 minutes.</iv-card-description>
         </iv-card-header>
         <iv-card-content class="flex flex-col items-center gap-4">
@@ -73,10 +75,12 @@ import { IV_INPUT_OTP_IMPORTS } from '@inlaylab/ivorie/input-otp';
         </iv-card-content>
         <iv-card-footer class="gap-2">
           <button ivButton variant="ghost" class="flex-1">Back</button>
-          <button ivButton class="flex-1">Verify</button>
+          <button ivButton class="flex-1"><svg [ivIcon]="icons().check"></svg>Verify</button>
         </iv-card-footer>
       </iv-card>
     </div>
   `,
 })
-export class SceneSignIn {}
+export class SceneSignIn {
+  protected readonly icons = inject(PlaygroundLook).icons;
+}

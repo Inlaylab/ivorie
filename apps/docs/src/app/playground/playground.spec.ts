@@ -39,21 +39,28 @@ describe('PlaygroundPage', () => {
     localStorage.clear();
   });
 
-  it('the rail shows style, color and radius as options, and the fonts as dropdowns', async () => {
+  it('the rail has no visible title and shows every look axis as a dropdown', async () => {
     const { el } = await render();
-    const legends = [...rail(el).querySelectorAll('docs-look-controls legend')].map((l) => (l.querySelector('span') ?? l).textContent!.trim());
-    expect(legends).toEqual(['Style', 'Base color', 'Radius']);
+    expect(rail(el).querySelector('h1')!.classList).toContain('sr-only');
+    expect(rail(el).querySelectorAll('docs-look-controls legend').length).toBe(0);
     const dropdowns = [...rail(el).querySelectorAll('docs-look-controls span[id$="-label"]')].map((s) => s.textContent!.trim());
-    expect(dropdowns).toEqual(['Font', 'Heading font']);
-    expect(rail(el).querySelectorAll('docs-look-controls [data-slot="select-trigger"]').length).toBe(2);
+    expect(dropdowns).toEqual(['Style', 'Base color', 'Radius', 'Icons', 'Font', 'Heading font']);
+    expect(rail(el).querySelectorAll('docs-look-controls [data-slot="select-trigger"]').length).toBe(6);
   });
 
-  it('picking a style or radius option changes the look', async () => {
+  it('picking style, radius and icons from the dropdowns changes the look', async () => {
     const { el, fixture } = await render();
     const look = fixture.debugElement.injector.get(PlaygroundLook);
-    rail(el).querySelector<HTMLInputElement>('input[name="rail-style"][value="nova"]')!.click();
-    rail(el).querySelector<HTMLInputElement>('input[name="rail-radius"][value="large"]')!.click();
-    expect(look.preset()).toMatchObject({ style: 'nova', radius: 'large' });
+    const pick = async (label: string, text: string) => {
+      rail(el).querySelector<HTMLElement>(`[aria-labelledby="rail-${label}-label"]`)!.click();
+      await fixture.whenStable();
+      [...document.querySelectorAll<HTMLElement>('[role="option"]')].find((o) => o.textContent!.trim() === text)!.click();
+      await fixture.whenStable();
+    };
+    await pick('style', 'Nova');
+    await pick('radius', 'Large');
+    await pick('iconLibrary', 'Phosphor');
+    expect(look.preset()).toMatchObject({ style: 'nova', radius: 'large', iconLibrary: 'phosphor' });
   });
 
   it('the default look gives the plain commands', async () => {
@@ -69,7 +76,7 @@ describe('PlaygroundPage', () => {
     fixture.debugElement.injector.get(PlaygroundLook).set({ baseColor: 'olive' });
     await fixture.whenStable();
     fixture.detectChanges();
-    const code = encodePreset({ style: 'maia', baseColor: 'olive', font: 'system', fontHeading: 'inherit', radius: 'default' });
+    const code = encodePreset({ style: 'nova', baseColor: 'olive', font: 'system', fontHeading: 'inherit', radius: 'default', iconLibrary: 'lucide' });
     expect(command(el)).toBe(`npx ivorie init --preset ${code}`);
     existing(el).click();
     fixture.detectChanges();
@@ -78,7 +85,7 @@ describe('PlaygroundPage', () => {
   });
 
   it('a preset in the URL is applied; a bad one gives the defaults', async () => {
-    const code = encodePreset({ style: 'nova', baseColor: 'olive', font: 'inter', fontHeading: 'lora', radius: 'large' });
+    const code = encodePreset({ style: 'nova', baseColor: 'olive', font: 'inter', fontHeading: 'lora', radius: 'large', iconLibrary: 'lucide' });
     const good = await render(`/playground?preset=${code}`);
     expect(good.fixture.debugElement.injector.get(PlaygroundLook).preset().baseColor).toBe('olive');
     TestBed.resetTestingModule();

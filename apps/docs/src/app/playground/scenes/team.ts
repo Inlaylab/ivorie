@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, signal, inject } from '@angular/core';
 import { IV_AVATAR_IMPORTS } from '@inlaylab/ivorie/avatar';
 import { IvBadge } from '@inlaylab/ivorie/badge';
 import { IvButton } from '@inlaylab/ivorie/button';
@@ -8,6 +8,7 @@ import { IvIcon } from '@inlaylab/ivorie/icon';
 import { IV_INPUT_IMPORTS } from '@inlaylab/ivorie/input';
 import { IV_PAGINATION_IMPORTS } from '@inlaylab/ivorie/pagination';
 import { IV_TABLE_IMPORTS } from '@inlaylab/ivorie/table';
+import { PlaygroundLook } from '../playground-look';
 
 const MEMBERS = [
   { name: 'Ada Lovelace', email: 'ada@acme.dev', role: 'Owner', status: 'Active' },
@@ -40,10 +41,10 @@ const PAGE_SIZE = 4;
   template: `
     <iv-card class="mx-auto max-w-4xl">
       <iv-card-header>
-        <iv-card-title class="cn-font-heading text-xl">Team</iv-card-title>
+        <iv-card-title class="cn-font-heading flex items-center gap-2 text-xl"><svg [ivIcon]="icons().users" class="text-muted-foreground size-5"></svg>Team</iv-card-title>
         <iv-card-description>{{ members.length }} people in Acme. Admins can invite and remove members.</iv-card-description>
         <iv-card-action>
-          <button ivButton size="sm">Invite</button>
+          <button ivButton size="sm"><svg [ivIcon]="icons().send"></svg>Invite</button>
         </iv-card-action>
       </iv-card-header>
       <iv-card-content class="flex flex-col gap-4">
@@ -113,6 +114,7 @@ const PAGE_SIZE = 4;
   `,
 })
 export class SceneTeam {
+  protected readonly icons = inject(PlaygroundLook).icons;
   protected readonly members = MEMBERS;
   protected readonly query = signal('');
   protected readonly page = signal(1);

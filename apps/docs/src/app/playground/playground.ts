@@ -18,7 +18,7 @@ import { IV_DIALOG_IMPORTS } from '@inlaylab/ivorie/dialog';
 import { IV_SHEET_IMPORTS } from '@inlaylab/ivorie/sheet';
 import { CopyButton } from '../ui/copy-button';
 import { LookControls } from './look-controls';
-import { PlaygroundLook } from './playground-look';
+import { PREVIEW_ICONS, PlaygroundLook } from './playground-look';
 import { PlaygroundPreview } from './playground-preview';
 import { DEFAULT_PRESET, encodePreset } from './preset-code';
 import { SceneCheckout } from './scenes/checkout';
@@ -58,7 +58,7 @@ export const SCENES: { value: Scene; label: string; description: string }[] = [
     SceneSignIn,
     SceneTeam,
   ],
-  providers: [PlaygroundLook],
+  providers: [PlaygroundLook, PREVIEW_ICONS],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'block lg:grid lg:grid-cols-[20rem_minmax(0,1fr)]' },
   template: `
@@ -67,11 +67,9 @@ export const SCENES: { value: Scene; label: string; description: string }[] = [
       aria-labelledby="pg-title"
       class="lg:bg-background flex flex-col lg:sticky lg:top-(--header-height) lg:h-[calc(100svh-var(--header-height))] lg:border-r"
     >
-      <div class="flex flex-col gap-1.5 px-4 pt-6 pb-4 sm:px-6 lg:pt-8">
-        <h1 id="pg-title" class="text-foreground text-2xl font-semibold tracking-[-0.03em]">Playground</h1>
-        <p class="text-muted-foreground text-sm text-pretty">Pick a look. The preview is real components; the command installs the same look.</p>
-      </div>
-      <div class="hidden flex-1 overflow-y-auto px-6 pt-2 pb-6 lg:block">
+      <!-- The header nav already marks this page, so the title is for screen readers only. -->
+      <h1 id="pg-title" class="sr-only">Playground</h1>
+      <div class="hidden flex-1 overflow-y-auto px-6 pt-6 pb-6 lg:block">
         <docs-look-controls [look]="look" name="rail" />
       </div>
       <div class="bg-muted/30 hidden border-t lg:block">

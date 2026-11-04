@@ -1,4 +1,5 @@
 // A preset names one choice per theme axis. Shared as a short code: 'ivp1_' + base64url(JSON).
+import { ICON_LIBRARIES } from './icons.ts';
 import type { RegistryIndex } from './registry.ts';
 
 export interface Preset {
@@ -8,14 +9,17 @@ export interface Preset {
   /** 'inherit' = same as font. Left out of the code when 'inherit', so 1.1 codes stay valid. */
   fontHeading: string;
   radius: string;
+  /** Left out of the code when 'lucide', so older codes stay valid. */
+  iconLibrary: string;
 }
 
 export const DEFAULT_PRESET: Preset = {
-  style: 'maia',
+  style: 'nova',
   baseColor: 'neutral',
   font: 'system',
   fontHeading: 'inherit',
   radius: 'default',
+  iconLibrary: 'lucide',
 };
 
 /** --radius per radius name. null keeps the theme value (0.625rem). Names and values from shadcn/ui. */
@@ -28,8 +32,10 @@ export const RADII: Record<string, string | null> = {
 };
 
 const PREFIX = 'ivp1_';
-const KEYS = ['baseColor', 'font', 'fontHeading', 'radius', 'style'] as const;
-const OPTIONS: Record<Exclude<keyof Preset, 'fontHeading'>, 'styles' | 'baseColors' | 'fonts' | 'radii'> = {
+const KEYS = ['baseColor', 'font', 'fontHeading', 'iconLibrary', 'radius', 'style'] as const;
+// Optional keys and the value they take when left out.
+const OPTIONAL: Partial<Record<keyof Preset, string>> = { fontHeading: 'inherit', iconLibrary: 'lucide' };
+const OPTIONS: Record<Exclude<keyof Preset, 'fontHeading' | 'iconLibrary'>, 'styles' | 'baseColors' | 'fonts' | 'radii'> = {
   style: 'styles',
   baseColor: 'baseColors',
   font: 'fonts',
@@ -37,7 +43,7 @@ const OPTIONS: Record<Exclude<keyof Preset, 'fontHeading'>, 'styles' | 'baseColo
 };
 
 export function encodePreset(p: Preset): string {
-  const keys = KEYS.filter((k) => k !== 'fontHeading' || (p.fontHeading ?? 'inherit') !== 'inherit');
+  const keys = KEYS.filter((k) => !(k in OPTIONAL) || (p[k] ?? OPTIONAL[k]) !== OPTIONAL[k]);
   const sorted = Object.fromEntries(keys.map((k) => [k, p[k]]));
   return PREFIX + Buffer.from(JSON.stringify(sorted)).toString('base64url');
 }
@@ -47,11 +53,11 @@ export function decodePreset(code: string): Preset {
     const raw = code.startsWith(PREFIX) ? code.slice(PREFIX.length) : '';
     if (!/^[A-Za-z0-9_-]+$/.test(raw)) throw new Error();
     const value = JSON.parse(Buffer.from(raw, 'base64url').toString('utf8'));
-    if (!KEYS.every((k) => typeof value?.[k] === 'string' || (k === 'fontHeading' && value?.[k] === undefined))) {
+    if (!KEYS.every((k) => typeof value?.[k] === 'string' || (k in OPTIONAL && value?.[k] === undefined))) {
       throw new Error();
     }
-    const { style, baseColor, font, fontHeading = 'inherit', radius } = value;
-    return { style, baseColor, font, fontHeading, radius };
+    const { style, baseColor, font, fontHeading = 'inherit', radius, iconLibrary = 'lucide' } = value;
+    return { style, baseColor, font, fontHeading, radius, iconLibrary };
   } catch {
     throw new Error('invalid preset code');
   }
@@ -66,8 +72,8 @@ export function resolvePreset(input: string | undefined, index: RegistryIndex): 
         ? decodePreset(input)
         : index.presets[input];
   if (!preset) throw new Error(`unknown preset "${input}"`);
-  // Named presets from a 1.1 registry have no fontHeading.
-  const full = { ...preset, fontHeading: preset.fontHeading ?? 'inherit' };
+  // Named presets from older registries have no fontHeading or iconLibrary.
+  const full = { ...preset, fontHeading: preset.fontHeading ?? 'inherit', iconLibrary: preset.iconLibrary ?? 'lucide' };
   checkPreset(full, index);
   return full;
 }
@@ -76,9 +82,9 @@ export function resolvePreset(input: string | undefined, index: RegistryIndex): 
 export function checkPreset(p: Preset, index: RegistryIndex): void {
   const axes = Object.entries(OPTIONS).map(([axis, key]) => [axis, index[key]] as const);
   const headings = ['inherit', ...index.fonts.filter((f) => f !== 'system')];
-  for (const [axis, available] of [...axes, ['fontHeading', headings] as const]) {
+  for (const [axis, available] of [...axes, ['fontHeading', headings] as const, ['iconLibrary', ICON_LIBRARIES] as const]) {
     const value = p[axis as keyof Preset];
-    if (!available.includes(value)) {
+    if (!(available as readonly string[]).includes(value)) {
       throw new Error(`unknown ${axis} "${value}" (available: ${available.join(', ')})`);
     }
   }

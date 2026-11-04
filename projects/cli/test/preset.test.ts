@@ -7,7 +7,7 @@ import type { RegistryIndex } from '../src/registry.ts';
 const index = {
   version: '0.0.0',
   items: [],
-  styles: ['maia'],
+  styles: ['nova'],
   baseColors: ['neutral'],
   fonts: ['system'],
   radii: ['default'],
@@ -27,7 +27,7 @@ test('undefined and "default" resolve to the default preset', () => {
 
 test('a code with an unknown style throws with the options', () => {
   const code = encodePreset({ ...DEFAULT_PRESET, style: 'luma' });
-  assert.throws(() => resolvePreset(code, index), { message: 'unknown style "luma" (available: maia)' });
+  assert.throws(() => resolvePreset(code, index), { message: 'unknown style "luma" (available: nova)' });
 });
 
 test('an unknown name throws', () => {
@@ -43,12 +43,12 @@ test('a bad code throws', () => {
 const CODE_1_1 =
   'ivp1_eyJiYXNlQ29sb3IiOiJuZXV0cmFsIiwiZm9udCI6InN5c3RlbSIsInJhZGl1cyI6ImRlZmF1bHQiLCJzdHlsZSI6Im1haWEifQ';
 
-test('the default code is the same as in 1.1', () => {
-  assert.equal(encodePreset(DEFAULT_PRESET), CODE_1_1);
+test('the 1.1 default (maia) still gives the 1.1 code', () => {
+  assert.equal(encodePreset({ ...DEFAULT_PRESET, style: 'maia' }), CODE_1_1);
 });
 
 test('a 1.1 code decodes with fontHeading inherit', () => {
-  assert.deepEqual(decodePreset(CODE_1_1), { ...DEFAULT_PRESET, fontHeading: 'inherit' });
+  assert.deepEqual(decodePreset(CODE_1_1), { ...DEFAULT_PRESET, style: 'maia', fontHeading: 'inherit' });
   assert.equal(DEFAULT_PRESET.fontHeading, 'inherit');
 });
 
@@ -77,4 +77,13 @@ test('fontHeading must be inherit or a real font, not system', () => {
 
 test('RADII: default keeps the style radius, the rest set --radius', () => {
   assert.deepEqual(RADII, { default: null, none: '0', small: '0.45rem', medium: '0.625rem', large: '0.875rem' });
+});
+
+test('iconLibrary: left out of the code when lucide, kept otherwise, checked', () => {
+  assert.equal(encodePreset(DEFAULT_PRESET), encodePreset({ ...DEFAULT_PRESET, iconLibrary: undefined as unknown as string }));
+  const tabler = encodePreset({ ...DEFAULT_PRESET, iconLibrary: 'tabler' });
+  assert.notEqual(tabler, encodePreset(DEFAULT_PRESET));
+  assert.equal(resolvePreset(tabler, index).iconLibrary, 'tabler');
+  const bad = encodePreset({ ...DEFAULT_PRESET, iconLibrary: 'feather' });
+  assert.throws(() => resolvePreset(bad, index), /unknown iconLibrary "feather"/);
 });

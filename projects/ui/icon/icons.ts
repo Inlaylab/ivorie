@@ -6,6 +6,16 @@
 /** Same shape as Lucide's `IconNode`, so icons from the `lucide` package fit as they are. */
 export type IconNode = readonly (readonly [tag: string, attrs: Readonly<Record<string, string | number | undefined>>])[]
 
+/** Lucide's `<svg>` attributes: 24px grid, 2px round stroke, currentColor. */
+export const LUCIDE_SVG = {
+  'viewBox': '0 0 24 24',
+  'fill': 'none',
+  'stroke': 'currentColor',
+  'stroke-width': '2',
+  'stroke-linecap': 'round',
+  'stroke-linejoin': 'round',
+} as const
+
 export const ICONS = {
   'arrow-left': [['path', { d: 'm12 19-7-7 7-7' }], ['path', { d: 'M19 12H5' }]],
   'arrow-right': [['path', { d: 'M5 12h14' }], ['path', { d: 'm12 5 7 7-7 7' }]],

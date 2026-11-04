@@ -109,10 +109,10 @@ try {
   writeFileSync(join(npmApp, '.postcssrc.json'), '{ "plugins": { "@tailwindcss/postcss": {} } }\n');
   writeFileSync(
     join(npmApp, 'src/styles.css'),
-    '@import "@inlaylab/ivorie/styles/theme.css";\n@import "@inlaylab/ivorie/styles/style-maia.css";\n',
+    '@import "@inlaylab/ivorie/styles/theme.css";\n@import "@inlaylab/ivorie/styles/style-nova.css";\n',
   );
   const index = join(npmApp, 'src/index.html');
-  writeFileSync(index, readFileSync(index, 'utf8').replace('<body>', '<body class="style-maia">'));
+  writeFileSync(index, readFileSync(index, 'utf8').replace('<body>', '<body class="style-nova">'));
   writeApp(npmApp, '@inlaylab/ivorie');
 
   run('npx ng build', cliApp);
@@ -153,9 +153,21 @@ try {
   );
   run('npx ivorie apply default', presetApp);
   run('npx ng build', presetApp);
-  look({ primary: /--primary:\s*oklch\(0?\.205 0 0\)/, style: /\.style-maia/, body: /<body[^>]*class="[^"]*style-maia/ }, 'apply default');
+  look({ primary: /--primary:\s*oklch\(0?\.205 0 0\)/, style: /\.style-nova/, body: /<body[^>]*class="[^"]*style-nova/ }, 'apply default');
 
-  // 4. shadcn compat: the registry items are shadcn items.
+  // 4. A tabler app: the set is copied, wired into app.config.ts and the app builds with @ng-icons installed.
+  const tablerApp = newApp('tabler-app', cliMajor);
+  run(`npm i -D "${cliTgz}"`, tablerApp);
+  run('npx ivorie init --yes --icon-library tabler', tablerApp);
+  run('npx ivorie add button dialog', tablerApp);
+  writeApp(tablerApp, './ui');
+  run('npx ng build', tablerApp);
+  const config = readFileSync(join(tablerApp, 'src/app/app.config.ts'), 'utf8');
+  if (!config.includes('provideIvIcons(COMPONENT_ICONS)')) failures.push('tabler-app: app.config.ts has no provideIvIcons(COMPONENT_ICONS)');
+  if (!existsSync(join(tablerApp, 'src/app/ui/icons-tabler/icons.ts'))) failures.push('tabler-app: icons-tabler was not copied');
+  if (!existsSync(join(tablerApp, 'node_modules/@ng-icons/tabler-icons'))) failures.push('tabler-app: @ng-icons/tabler-icons was not installed');
+
+  // 5. shadcn compat: the registry items are shadcn items.
   try {
     run(`npx -y shadcn@latest add "${resolve('dist/registry/r/badge.json')}" --yes`, npmApp);
     if (!existsSync(join(npmApp, 'src/app/ui/badge/badge.ts'))) warnings.push('shadcn add ran but src/app/ui/badge/badge.ts is missing');

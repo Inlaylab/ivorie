@@ -7,5 +7,5 @@ export const STYLES = [
   { name: 'rhea', label: 'Rhea' },
 ] as const;
 export type StyleName = (typeof STYLES)[number]['name'];
-/** Matches `<body class="style-maia">` in index.html, the server default. */
-export const DEFAULT_STYLE: StyleName = 'maia';
+/** Matches `<body class="style-nova">` in index.html, the server default. */
+export const DEFAULT_STYLE: StyleName = 'nova';

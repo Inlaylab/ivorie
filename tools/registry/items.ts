@@ -25,7 +25,7 @@ function readEntry(name: string, dir: string): Entry {
   return { name, dir, files };
 }
 
-/** Every entry with a public-api.ts, plus extras/select-picker (as `select-picker`), sorted. */
+/** Every entry with a public-api.ts, plus extras/select-picker (as `select-picker`) and icons/<lib> (as `icons-<lib>`), sorted. */
 export function listEntries(root = UI): Entry[] {
   const top = readdirSync(root)
     .filter((d) => !SKIP.has(d) && existsSync(join(root, d, 'public-api.ts')))
@@ -33,7 +33,10 @@ export function listEntries(root = UI): Entry[] {
   const extras = readdirSync(join(root, 'extras'))
     .filter((d) => existsSync(join(root, 'extras', d, 'public-api.ts')))
     .map((d) => readEntry(d, join(root, 'extras', d)));
-  return [...top, ...extras].sort((a, b) => a.name.localeCompare(b.name));
+  const icons = readdirSync(join(root, 'icons'))
+    .filter((d) => existsSync(join(root, 'icons', d, 'public-api.ts')))
+    .map((d) => readEntry(`icons-${d}`, join(root, 'icons', d)));
+  return [...top, ...extras, ...icons].sort((a, b) => a.name.localeCompare(b.name));
 }
 
 /** `@inlaylab/ivorie/<x>` and `@inlaylab/ivorie/extras/<x>` → `../<x>/public-api` (copied folders are siblings). */

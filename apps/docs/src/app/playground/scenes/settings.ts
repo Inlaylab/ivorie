@@ -1,5 +1,6 @@
-import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal, inject } from '@angular/core';
 import { IvButton } from '@inlaylab/ivorie/button';
+import { IvIcon } from '@inlaylab/ivorie/icon';
 import { IV_CARD_IMPORTS } from '@inlaylab/ivorie/card';
 import { IV_FIELD_IMPORTS } from '@inlaylab/ivorie/field';
 import { IV_INPUT_IMPORTS } from '@inlaylab/ivorie/input';
@@ -8,11 +9,13 @@ import { IV_RADIO_GROUP_IMPORTS } from '@inlaylab/ivorie/radio-group';
 import { IvSlider } from '@inlaylab/ivorie/slider';
 import { IvSwitch } from '@inlaylab/ivorie/switch';
 import { IV_TABS_IMPORTS } from '@inlaylab/ivorie/tabs';
+import { PlaygroundLook } from '../playground-look';
 
 /** Playground scene: account settings in two tabs. Text fields, toggles and choices. */
 @Component({
   selector: 'docs-scene-settings',
   imports: [
+    IvIcon,
     IvButton,
     IV_CARD_IMPORTS,
     IV_FIELD_IMPORTS,
@@ -67,7 +70,7 @@ import { IV_TABS_IMPORTS } from '@inlaylab/ivorie/tabs';
             </iv-card-content>
             <iv-card-footer class="justify-end gap-2">
               <button ivButton variant="ghost">Cancel</button>
-              <button ivButton>Save changes</button>
+              <button ivButton><svg [ivIcon]="icons().save"></svg>Save changes</button>
             </iv-card-footer>
           </iv-card>
         </iv-tabs-content>
@@ -103,6 +106,7 @@ import { IV_TABS_IMPORTS } from '@inlaylab/ivorie/tabs';
   `,
 })
 export class SceneSettings {
+  protected readonly icons = inject(PlaygroundLook).icons;
   protected readonly quiet = signal(22);
   protected readonly notifications = [
     { label: 'Mentions', hint: 'When someone tags you.', on: true },

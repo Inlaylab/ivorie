@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.3.0
+
+Both packages: `@inlaylab/ivorie` and `ivorie` 1.3.0. Per-package notes: `projects/ui/CHANGELOG.md`, `projects/cli/CHANGELOG.md`.
+
+- Icon libraries: Lucide, Tabler, Phosphor, Hugeicons or Remix. Components draw Lucide by default; `provideIvIcons(COMPONENT_ICONS)` from `@inlaylab/ivorie/icons/<lib>` switches them.
+- CLI: the preset gains `iconLibrary` (`init --icon-library`, `apply`). New `ivorie migrate icons --from <lib> --to <lib>` renames your own `@ng-icons` icons (185 shared icons).
+- Default style is now nova (was maia). Old share codes keep their style.
+- Docs: the playground picks the icon library and shows icons in every scene; look options are dropdowns.
+
 ## 1.2.0
 
 Both packages: `@inlaylab/ivorie` and `ivorie` 1.2.0. Per-package notes: `projects/ui/CHANGELOG.md`, `projects/cli/CHANGELOG.md`.

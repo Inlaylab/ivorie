@@ -29,7 +29,7 @@ const MANUAL: [RegExp, string][] = [
 
 const escape = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
-function files(dir: string): string[] {
+export function files(dir: string): string[] {
   if (!existsSync(dir)) return [];
   if (statSync(dir).isFile()) return /\.(ts|html)$/.test(dir) ? [dir] : [];
   return readdirSync(dir)

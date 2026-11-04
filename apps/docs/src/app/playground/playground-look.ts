@@ -1,9 +1,34 @@
-import { DOCUMENT, DestroyRef, Injectable, PLATFORM_ID, computed, effect, inject, signal } from '@angular/core';
+import { DOCUMENT, DestroyRef, Injectable, PLATFORM_ID, Provider, computed, effect, inject, signal } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
+import { IV_ICONS, LUCIDE_ICONS, type IconName, type IconSet } from '@inlaylab/ivorie/icon';
+import { COMPONENT_ICONS as HUGEICONS } from '@inlaylab/ivorie/icons/hugeicons';
+import { COMPONENT_ICONS as PHOSPHOR } from '@inlaylab/ivorie/icons/phosphor';
+import { COMPONENT_ICONS as REMIX } from '@inlaylab/ivorie/icons/remix';
+import { COMPONENT_ICONS as TABLER } from '@inlaylab/ivorie/icons/tabler';
 import { BASE_COLORS, FONTS, RADII } from '../../generated/looks';
 import { Appearance } from '../shell/appearance';
 import { DEFAULT_STYLE, STYLES } from '../shell/appearance-options';
 import { DEFAULT_PRESET, decodePreset, encodePreset, type Preset } from './preset-code';
+import { SCENE_ICONS } from './scene-icons';
+
+/** The component icon sets the preview can draw, in picker order. */
+export const ICON_LIBRARIES: { name: string; label: string; set: IconSet }[] = [
+  { name: 'lucide', label: 'Lucide', set: LUCIDE_ICONS },
+  { name: 'tabler', label: 'Tabler', set: TABLER },
+  { name: 'phosphor', label: 'Phosphor', set: PHOSPHOR },
+  { name: 'hugeicons', label: 'Hugeicons', set: HUGEICONS },
+  { name: 'remix', label: 'Remix', set: REMIX },
+];
+
+/** IV_ICONS for the preview. IvIcon reads it inside a computed, so picking a library redraws every icon. */
+export const PREVIEW_ICONS: Provider = {
+  provide: IV_ICONS,
+  useFactory: () => {
+    const look = inject(PlaygroundLook);
+    const sets = Object.fromEntries(ICON_LIBRARIES.map((l) => [l.name, l.set]));
+    return new Proxy(LUCIDE_ICONS, { get: (_, name) => sets[look.preset().iconLibrary][name as IconName] });
+  },
+};
 
 /** Close to Tailwind's default sans stack: what `font: system` gives an app. */
 const SYSTEM_SANS = "system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji'";
@@ -18,7 +43,8 @@ function valid(p: Preset): boolean {
     BASE_COLORS.some((c) => c.name === p.baseColor) &&
     (p.font === 'system' || fonts.includes(p.font)) &&
     (p.fontHeading === 'inherit' || fonts.includes(p.fontHeading)) &&
-    p.radius in RADII
+    p.radius in RADII &&
+    ICON_LIBRARIES.some((l) => l.name === p.iconLibrary)
   );
 }
 
@@ -39,7 +65,7 @@ function themeCss(p: Preset): string {
 /**
  * A preset shown on the elements it is attached to (a preview area, the overlay container), never on
  * the rest of the site. Detached elements, font links and style sheets are cleaned up on destroy.
- * shortcut: the site keeps `style-maia` on <body>, so a previewed style wins only where both styles set
+ * shortcut: the site keeps `style-nova` on <body>, so a previewed style wins only where both styles set
  * the same property (its sheet loads later). Exact isolation would need an iframe.
  */
 @Injectable()
@@ -53,6 +79,8 @@ export class PlaygroundLook {
   readonly preset = this._preset.asReadonly();
   readonly code = computed(() => encodePreset(this._preset()));
   readonly css = computed(() => themeCss(this._preset()));
+  /** The scene icons in the picked library. */
+  readonly icons = computed(() => SCENE_ICONS[this._preset().iconLibrary] ?? SCENE_ICONS['lucide']);
 
   constructor() {
     if (!this.browser) return;
