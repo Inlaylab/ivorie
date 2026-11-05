@@ -23,6 +23,7 @@ const SLOTS = [
   'combobox',
   'command',
   'context-menu',
+  'data-table-pagination',
   'dialog-trigger',
   'drawer-trigger',
   'dropdown-menu',

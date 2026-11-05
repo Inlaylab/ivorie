@@ -20,7 +20,7 @@ More detail: [PLAN](docs/PLAN.md) · [ARCHITECTURE](docs/ARCHITECTURE.md) · [CO
 
 ## Status
 
-**Next:** Phase 10 (1.4.0), branch `feat/v1.4.0`: T1 styles done; T2 data table next. 1.3.0 bumped, not yet published (ask first).
+**Next:** Phase 10 (1.4.0), branch `feat/v1.4.0`: T1 styles done; T2 data table done; T3 blocks next. 1.3.0 bumped, not yet published (ask first).
 Shipped: 1.0.0, 1.1.0, 1.2.0 (both packages). Docs initial bundle is ~800 kB, mostly lucide icons (backlog: docs drop `@lucide/angular`).
 
 | #   | Release | What                               | Status  |

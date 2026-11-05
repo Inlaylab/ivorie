@@ -52,6 +52,7 @@ import { IvSkeleton } from '@inlaylab/ivorie/skeleton';
 import { IvSpinner } from '@inlaylab/ivorie/spinner';
 import { IvSwitch } from '@inlaylab/ivorie/switch';
 import { IV_TABLE_IMPORTS } from '@inlaylab/ivorie/table';
+import { IV_DATA_TABLE_IMPORTS } from '@inlaylab/ivorie/data-table';
 import { IV_TABS_IMPORTS } from '@inlaylab/ivorie/tabs';
 import { IvToast, IvToastContainer, provideIvToast } from '@inlaylab/ivorie/toast';
 import { IV_TOOLTIP_IMPORTS } from '@inlaylab/ivorie/tooltip';
@@ -103,6 +104,7 @@ import { App } from './app';
     ...IV_SELECT_IMPORTS,
     ...IV_SIDEBAR_IMPORTS,
     ...IV_TABLE_IMPORTS,
+    ...IV_DATA_TABLE_IMPORTS,
     ...IV_TABS_IMPORTS,
     ...IV_TOOLTIP_IMPORTS,
     ...IV_SELECT_PICKER_IMPORTS,

@@ -1191,6 +1191,10 @@
     .cn-combobox-input {}
     .cn-combobox-item-indicator-icon {}
     .cn-command-item-indicator {}
+    .cn-data-table-empty {}
+    .cn-data-table-pagination {}
+    .cn-data-table-sort {}
+    .cn-data-table-view-options {}
     .cn-field-orientation-horizontal {}
     .cn-field-orientation-responsive {}
     .cn-field-orientation-vertical {}

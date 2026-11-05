@@ -11,6 +11,9 @@ const ChevronDownIcon: IconData = { svg: SVG, nodes: [['path', { d: 'M18 9.00005
 const ChevronLeftIcon: IconData = { svg: SVG, nodes: [['path', { d: 'M15 6C15 6 9.00001 10.4189 9 12C8.99999 13.5812 15 18 15 18', 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-width': '1.5' }]] }
 const ChevronRightIcon: IconData = { svg: SVG, nodes: [['path', { d: 'M9.00005 6C9.00005 6 15 10.4189 15 12C15 13.5812 9 18 9 18', 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-width': '1.5' }]] }
 const ChevronUpIcon: IconData = { svg: SVG, nodes: [['path', { d: 'M18 15C18 15 13.5811 9.00001 12 9C10.4188 8.99999 6 15 6 15', 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-width': '1.5' }]] }
+const ChevronsUpDownIcon: IconData = { svg: SVG, nodes: [['path', { d: 'M18 14C18 14 13.5811 19 12 19C10.4188 19 6 14 6 14', 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-width': '1.5' }], ['path', { d: 'M18 9.99996C18 9.99996 13.5811 5.00001 12 5C10.4188 4.99999 6 10 6 10', 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-width': '1.5' }]] }
+const ChevronsLeftIcon: IconData = { svg: SVG, nodes: [['path', { d: 'M11.5 18C11.5 18 5.50001 13.5811 5.5 12C5.49999 10.4188 11.5 6 11.5 6', 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-width': '1.5' }], ['path', { d: 'M18.5 18C18.5 18 12.5 13.5811 12.5 12C12.5 10.4188 18.5 6 18.5 6', 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-width': '1.5' }]] }
+const ChevronsRightIcon: IconData = { svg: SVG, nodes: [['path', { d: 'M12.5 18C12.5 18 18.5 13.5811 18.5 12C18.5 10.4188 12.5 6 12.5 6', 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-width': '1.5' }], ['path', { d: 'M5.50005 18C5.50005 18 11.5 13.5811 11.5 12C11.5 10.4188 5.5 6 5.5 6', 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-width': '1.5' }]] }
 const CircleAlertIcon: IconData = { svg: SVG, nodes: [['circle', { cx: '12', cy: '12', r: '10', 'stroke-width': '1.5' }], ['path', { d: 'M11.992 15H12.001', 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-width': '2' }], ['path', { d: 'M12 12L12 8', 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-width': '1.5' }]] }
 const CircleCheckIcon: IconData = { svg: SVG, nodes: [['path', { d: 'M22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22C17.5228 22 22 17.5228 22 12Z', 'stroke-width': '1.5' }], ['path', { d: 'M8 12.5L10.5 15L16 9', 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-width': '1.5' }]] }
 const EllipsisIcon: IconData = { svg: SVG, nodes: [['path', { d: 'M21 12C21 11.1716 20.3284 10.5 19.5 10.5C18.6716 10.5 18 11.1716 18 12C18 12.8284 18.6716 13.5 19.5 13.5C20.3284 13.5 21 12.8284 21 12Z', 'stroke-width': '1.5' }], ['path', { d: 'M13.5 12C13.5 11.1716 12.8284 10.5 12 10.5C11.1716 10.5 10.5 11.1716 10.5 12C10.5 12.8284 11.1716 13.5 12 13.5C12.8284 13.5 13.5 12.8284 13.5 12Z', 'stroke-width': '1.5' }], ['path', { d: 'M6 12C6 11.1716 5.32843 10.5 4.5 10.5C3.67157 10.5 3 11.1716 3 12C3 12.8284 3.67157 13.5 4.5 13.5C5.32843 13.5 6 12.8284 6 12Z', 'stroke-width': '1.5' }]] }
@@ -32,6 +35,9 @@ export const COMPONENT_ICONS: IconSet = {
   'chevron-left': ChevronLeftIcon,
   'chevron-right': ChevronRightIcon,
   'chevron-up': ChevronUpIcon,
+  'chevrons-left': ChevronsLeftIcon,
+  'chevrons-right': ChevronsRightIcon,
+  'chevrons-up-down': ChevronsUpDownIcon,
   'circle-alert': CircleAlertIcon,
   'circle-check': CircleCheckIcon,
   ellipsis: EllipsisIcon,

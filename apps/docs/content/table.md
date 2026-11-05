@@ -86,4 +86,4 @@ Each directive goes on the matching native element. They have no inputs besides 
 
 - A row gets a muted background on hover, when `data-state="selected"`, and when it contains an element with `aria-expanded="true"`.
 - The last row in `tbody` has no bottom border.
-- There is no sorting, pagination or virtualization. Add them around the table.
+- For sorting, filtering, pagination and selection, see [Data Table](docs/data-table). There is no virtualization.

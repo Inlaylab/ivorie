@@ -11,6 +11,9 @@ const ChevronDownIcon: IconData = { svg: SVG, nodes: [['path', { d: 'M213.66,101
 const ChevronLeftIcon: IconData = { svg: SVG, nodes: [['path', { d: 'M165.66,202.34a8,8,0,0,1-11.32,11.32l-80-80a8,8,0,0,1,0-11.32l80-80a8,8,0,0,1,11.32,11.32L91.31,128Z' }]] }
 const ChevronRightIcon: IconData = { svg: SVG, nodes: [['path', { d: 'M181.66,133.66l-80,80a8,8,0,0,1-11.32-11.32L164.69,128,90.34,53.66a8,8,0,0,1,11.32-11.32l80,80A8,8,0,0,1,181.66,133.66Z' }]] }
 const ChevronUpIcon: IconData = { svg: SVG, nodes: [['path', { d: 'M213.66,165.66a8,8,0,0,1-11.32,0L128,91.31,53.66,165.66a8,8,0,0,1-11.32-11.32l80-80a8,8,0,0,1,11.32,0l80,80A8,8,0,0,1,213.66,165.66Z' }]] }
+const ChevronsUpDownIcon: IconData = { svg: SVG, nodes: [['path', { d: 'M181.66,170.34a8,8,0,0,1,0,11.32l-48,48a8,8,0,0,1-11.32,0l-48-48a8,8,0,0,1,11.32-11.32L128,212.69l42.34-42.35A8,8,0,0,1,181.66,170.34Zm-96-84.68L128,43.31l42.34,42.35a8,8,0,0,0,11.32-11.32l-48-48a8,8,0,0,0-11.32,0l-48,48A8,8,0,0,0,85.66,85.66Z' }]] }
+const ChevronsLeftIcon: IconData = { svg: SVG, nodes: [['path', { d: 'M205.66,202.34a8,8,0,0,1-11.32,11.32l-80-80a8,8,0,0,1,0-11.32l80-80a8,8,0,0,1,11.32,11.32L131.31,128ZM51.31,128l74.35-74.34a8,8,0,0,0-11.32-11.32l-80,80a8,8,0,0,0,0,11.32l80,80a8,8,0,0,0,11.32-11.32Z' }]] }
+const ChevronsRightIcon: IconData = { svg: SVG, nodes: [['path', { d: 'M141.66,133.66l-80,80a8,8,0,0,1-11.32-11.32L124.69,128,50.34,53.66A8,8,0,0,1,61.66,42.34l80,80A8,8,0,0,1,141.66,133.66Zm80-11.32-80-80a8,8,0,0,0-11.32,11.32L204.69,128l-74.35,74.34a8,8,0,0,0,11.32,11.32l80-80A8,8,0,0,0,221.66,122.34Z' }]] }
 const CircleAlertIcon: IconData = { svg: SVG, nodes: [['path', { d: 'M128,24A104,104,0,1,0,232,128,104.11,104.11,0,0,0,128,24Zm0,192a88,88,0,1,1,88-88A88.1,88.1,0,0,1,128,216Zm-8-80V80a8,8,0,0,1,16,0v56a8,8,0,0,1-16,0Zm20,36a12,12,0,1,1-12-12A12,12,0,0,1,140,172Z' }]] }
 const CircleCheckIcon: IconData = { svg: SVG, nodes: [['path', { d: 'M173.66,98.34a8,8,0,0,1,0,11.32l-56,56a8,8,0,0,1-11.32,0l-24-24a8,8,0,0,1,11.32-11.32L112,148.69l50.34-50.35A8,8,0,0,1,173.66,98.34ZM232,128A104,104,0,1,1,128,24,104.11,104.11,0,0,1,232,128Zm-16,0a88,88,0,1,0-88,88A88.1,88.1,0,0,0,216,128Z' }]] }
 const EllipsisIcon: IconData = { svg: SVG, nodes: [['path', { d: 'M128,96a32,32,0,1,0,32,32A32,32,0,0,0,128,96Zm0,48a16,16,0,1,1,16-16A16,16,0,0,1,128,144ZM48,96a32,32,0,1,0,32,32A32,32,0,0,0,48,96Zm0,48a16,16,0,1,1,16-16A16,16,0,0,1,48,144ZM208,96a32,32,0,1,0,32,32A32,32,0,0,0,208,96Zm0,48a16,16,0,1,1,16-16A16,16,0,0,1,208,144Z' }]] }
@@ -32,6 +35,9 @@ export const COMPONENT_ICONS: IconSet = {
   'chevron-left': ChevronLeftIcon,
   'chevron-right': ChevronRightIcon,
   'chevron-up': ChevronUpIcon,
+  'chevrons-left': ChevronsLeftIcon,
+  'chevrons-right': ChevronsRightIcon,
+  'chevrons-up-down': ChevronsUpDownIcon,
   'circle-alert': CircleAlertIcon,
   'circle-check': CircleCheckIcon,
   ellipsis: EllipsisIcon,

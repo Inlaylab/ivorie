@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ivDataTable } from '@inlaylab/ivorie/data-table';
 import { IvToastService } from '@inlaylab/ivorie/toast';
 
 @Component({
@@ -8,6 +9,14 @@ import { IvToastService } from '@inlaylab/ivorie/toast';
   templateUrl: './app.html',
 })
 export class App {
+  readonly people = ivDataTable({
+    data: signal([{ name: 'Grace' }, { name: 'Ada' }, { name: 'Alan' }]),
+    columns: [
+      { id: 'name', header: 'Name', accessor: (p: { name: string }) => p.name, sortable: true },
+    ],
+    getRowId: (p) => p.name,
+  });
+
   private readonly toast = inject(IvToastService);
 
   plan = 'pro';
