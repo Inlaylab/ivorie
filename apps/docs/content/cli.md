@@ -60,6 +60,17 @@ Import the copy from its folder:
 import { IvButton } from './ui/button/public-api';
 ```
 
+### Blocks
+
+```bash
+npx ivorie add login-01
+```
+
+- A block lands in `src/app/blocks/<name>/`, next to `path`. Set `blocksPath` in `components.json` to put blocks elsewhere.
+- The components it uses are added too. Each `@inlaylab/ivorie/<name>` import is rewritten to your copy.
+- Icons are renamed to your `iconLibrary`. Blocks draw app icons with `@ng-icons/core`, which is installed.
+- `--all` adds components only, never blocks.
+
 ## migrate
 
 Updates code written for the old `ui-*` components:

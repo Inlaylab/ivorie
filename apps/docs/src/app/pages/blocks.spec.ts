@@ -11,11 +11,12 @@ async function render() {
 }
 
 describe('BlocksPage', () => {
-  it('says coming soon and links to the roadmap', async () => {
+  it('the index lists 19 blocks in 4 groups', async () => {
     const el = await render();
     expect(el.querySelector('h1')?.textContent).toContain('Blocks');
-    expect(el.textContent).toContain('Coming soon');
-    expect(el.querySelector('a[href="/roadmap"]')).not.toBeNull();
+    expect([...el.querySelectorAll('h2')].map((h) => h.textContent!.trim())).toEqual(['Login', 'Sign up', 'Sidebar', 'Dashboard']);
+    expect(el.querySelectorAll('a[href^="/blocks/"]').length).toBe(19);
+    expect(el.querySelector('a[href="/blocks/login-01"]')!.textContent).toContain('Login 01');
   });
 
   it('has no axe violations', async () => {

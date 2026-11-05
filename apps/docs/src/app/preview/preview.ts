@@ -1,9 +1,11 @@
-import { ChangeDetectionStrategy, Component, DOCUMENT, DestroyRef, afterNextRender, computed, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DOCUMENT, DestroyRef, afterNextRender, computed, inject, resource } from '@angular/core';
+import { NgComponentOutlet } from '@angular/common';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { OverlayContainer } from '@angular/cdk/overlay';
 import { Meta } from '@angular/platform-browser';
 import { ActivatedRoute } from '@angular/router';
 import { map } from 'rxjs';
+import { BLOCKS } from '../../generated/blocks';
 import { PREVIEW_ICONS, PlaygroundLook } from '../playground/playground-look';
 import { PlaygroundPreview } from '../playground/playground-preview';
 import { SCENES } from '../playground/scenes';
@@ -31,10 +33,11 @@ export interface ReadyMessage {
  */
 @Component({
   selector: 'docs-preview',
-  imports: [PlaygroundPreview, SceneCheckout, SceneSettings, SceneSignIn, SceneTeam],
+  imports: [NgComponentOutlet, PlaygroundPreview, SceneCheckout, SceneSettings, SceneSignIn, SceneTeam],
   providers: [PlaygroundLook, PREVIEW_ICONS],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  host: { class: 'docs-stage block min-h-svh p-4 sm:p-6 lg:p-8' },
+  // A block is a whole page: no stage padding or dots around it.
+  host: { '[class]': "blockEntry() ? 'block min-h-svh bg-background' : 'docs-stage block min-h-svh p-4 sm:p-6 lg:p-8'" },
   template: `
     @switch (scene()) {
       @case ('dashboard') {
@@ -61,7 +64,13 @@ export interface ReadyMessage {
         }
       }
       @default {
-        <p class="text-muted-foreground text-sm">Unknown preview.</p>
+        @if (blockEntry()) {
+          @if (block.value(); as b) {
+            <ng-container *ngComponentOutlet="b" />
+          }
+        } @else {
+          <p class="text-muted-foreground text-sm">Unknown preview.</p>
+        }
       }
     }
   `,
@@ -73,6 +82,12 @@ export default class PreviewPage {
     const p = this.params();
     return p?.kind === 'scene' ? SCENES.find((s) => s.value === p.name)?.value : undefined;
   });
+  protected readonly blockEntry = computed(() => {
+    const p = this.params();
+    return p?.kind === 'block' ? BLOCKS.find((b) => b.name === p.name) : undefined;
+  });
+  /** The block's page component, loaded lazily (the server waits for it). */
+  protected readonly block = resource({ params: () => this.blockEntry(), loader: ({ params }) => params.load() });
 
   constructor() {
     const look = inject(PlaygroundLook);

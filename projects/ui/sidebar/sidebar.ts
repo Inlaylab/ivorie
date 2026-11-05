@@ -5,6 +5,7 @@ import {
   Component,
   DestroyRef,
   DOCUMENT,
+  Directive,
   ElementRef,
   OnInit,
   computed,
@@ -477,6 +478,35 @@ export class IvSidebarMenuButton {
   )
 }
 
+/**
+ * A menu button on your own element: a link (`<a ivSidebarMenuButton routerLink="/inbox">`) or a
+ * native button, for example a dropdown or collapsible trigger. Same look as `iv-sidebar-menu-button`;
+ * the element is the peer and carries the look. Bind `isActive` from `routerLinkActive`.
+ * No tooltip: give icon-only items an `aria-label`.
+ */
+@Directive({
+  selector: 'a[ivSidebarMenuButton], button[ivSidebarMenuButton]',
+  standalone: true,
+  host: {
+    'data-slot': 'sidebar-menu-button',
+    'data-sidebar': 'menu-button',
+    '[class]': 'classes()',
+    '[attr.data-size]': 'size() ?? "default"',
+    '[attr.data-active]': 'isActive() ? "" : null',
+    '[attr.aria-current]': 'isActive() ? "page" : null',
+  },
+})
+export class IvSidebarMenuLink {
+  readonly isActive = input(false)
+  readonly variant = input<SidebarMenuButtonVariants['variant']>('default')
+  readonly size = input<SidebarMenuButtonVariants['size']>('default')
+  readonly class = input('')
+
+  readonly classes = computed(() =>
+    cn(sidebarMenuButtonVariants({ variant: this.variant(), size: this.size() }), 'peer/menu-button', this.class()),
+  )
+}
+
 @Component({
   selector: 'iv-sidebar-menu-action',
   standalone: true,
@@ -611,6 +641,7 @@ export const IV_SIDEBAR_IMPORTS = [
   IvSidebarMenu,
   IvSidebarMenuItem,
   IvSidebarMenuButton,
+  IvSidebarMenuLink,
   IvSidebarMenuAction,
   IvSidebarMenuBadge,
   IvSidebarMenuSkeleton,

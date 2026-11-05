@@ -4,7 +4,7 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { Preset } from './preset.ts';
 
-export type ItemKind = 'component' | 'lib' | 'style' | 'base-color' | 'theme-base' | 'font';
+export type ItemKind = 'component' | 'lib' | 'style' | 'base-color' | 'theme-base' | 'font' | 'block';
 
 export interface RegistryIndex {
   version: string;

@@ -14,6 +14,8 @@ export interface ComponentsJson {
   fontHeading?: string;
   radius: string;
   iconLibrary: IconLibrary;
+  /** Where blocks go. Default: next to `path` (`src/app/ui` → `src/app/blocks`). */
+  blocksPath?: string;
   registry?: string;
 }
 

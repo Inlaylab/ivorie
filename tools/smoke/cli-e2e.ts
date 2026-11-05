@@ -60,6 +60,22 @@ function writeApp(app: string, from: string) {
   writeFileSync(join(app, 'src/app/app.html'), APP_HTML);
 }
 
+/** Renders a copied block in the app: `<app-login-01 />` next to the buttons. */
+function withBlock(app: string, name: string, cls: string) {
+  const ts = join(app, 'src/app/app.ts');
+  writeFileSync(
+    ts,
+    `import { ${cls} } from './blocks/${name}/${name}';
+` + readFileSync(ts, 'utf8').replace('imports: [', `imports: [${cls}, `),
+  );
+  writeFileSync(join(app, 'src/app/app.html'), readFileSync(join(app, 'src/app/app.html'), 'utf8') + `<app-${name} />
+`);
+}
+
+/** Every file under dir, recursively. */
+const filesIn = (dir: string): string[] =>
+  readdirSync(dir, { withFileTypes: true }).flatMap((d) => (d.isDirectory() ? filesIn(join(dir, d.name)) : [join(dir, d.name)]));
+
 const browserDir = (app: string, name: string) => join(app, 'dist', name, 'browser');
 
 function buttonClasses(app: string, name: string): string[] {
@@ -99,8 +115,9 @@ try {
   const cliApp = newApp('cli-app', cliMajor);
   run(`npm i -D "${cliTgz}"`, cliApp);
   run('npx ivorie init --yes', cliApp);
-  run('npx ivorie add button dialog', cliApp);
+  run('npx ivorie add button dialog login-01 dashboard-01', cliApp);
   writeApp(cliApp, './ui');
+  withBlock(cliApp, 'login-01', 'Login01');
 
   // 2. npm package, following installation.md.
   const npmApp = newApp('npm-app', cliMajor);
@@ -159,13 +176,18 @@ try {
   const tablerApp = newApp('tabler-app', cliMajor);
   run(`npm i -D "${cliTgz}"`, tablerApp);
   run('npx ivorie init --yes --icon-library tabler', tablerApp);
-  run('npx ivorie add button dialog', tablerApp);
+  // sidebar-07 has icons: the rename check below must have names to check.
+  run('npx ivorie add button dialog login-01 sidebar-07', tablerApp);
   writeApp(tablerApp, './ui');
+  withBlock(tablerApp, 'login-01', 'Login01');
   run('npx ng build', tablerApp);
   const config = readFileSync(join(tablerApp, 'src/app/app.config.ts'), 'utf8');
   if (!config.includes('provideIvIcons(COMPONENT_ICONS)')) failures.push('tabler-app: app.config.ts has no provideIvIcons(COMPONENT_ICONS)');
   if (!existsSync(join(tablerApp, 'src/app/ui/icons-tabler/icons.ts'))) failures.push('tabler-app: icons-tabler was not copied');
   if (!existsSync(join(tablerApp, 'node_modules/@ng-icons/tabler-icons'))) failures.push('tabler-app: @ng-icons/tabler-icons was not installed');
+  for (const f of filesIn(join(tablerApp, 'src/app/blocks'))) {
+    if (readFileSync(f, 'utf8').includes('lucide')) failures.push(`tabler-app: ${f} still names lucide`);
+  }
 
   // 5. shadcn compat: the registry items are shadcn items.
   try {

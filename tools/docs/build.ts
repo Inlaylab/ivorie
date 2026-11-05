@@ -6,6 +6,7 @@ import { basename, join } from 'node:path';
 import { buildPage, createHighlighter, createRenderer, parseFrontmatter } from './content.ts';
 import type { DocPage } from '../../apps/docs/src/app/content/types.ts';
 import { build as buildRegistry } from '../registry/build.ts';
+import { blockMeta, listBlocks } from '../registry/items.ts';
 import { looksModule } from './looks.ts';
 
 const CONTENT = 'apps/docs/content';
@@ -100,6 +101,34 @@ writeFileSync(
 );
 
 writeFileSync(join(OUT, 'looks.ts'), looksModule());
+
+// Blocks: meta and a lazy page loader in blocks.ts; the highlighted files per block in blocks/<name>.ts,
+// so the code loads only on its block page.
+const GROUPS: Record<string, string> = { login: 'Login', signup: 'Sign up', sidebar: 'Sidebar', dashboard: 'Dashboard' };
+const pascal = (name: string) => name.split('-').map((p) => p[0].toUpperCase() + p.slice(1)).join('');
+const blocks = listBlocks();
+mkdirSync(join(OUT, 'blocks'), { recursive: true });
+for (const b of blocks) {
+  const files = b.files.map((f) => {
+    const fence = '`'.repeat(Math.max(3, ...(f.content.match(/`+/g) ?? []).map((r) => r.length + 1)));
+    return { path: f.name, code: f.content, html: render(`${fence}ts\n${f.content}\n${fence}`).html };
+  });
+  writeFileSync(join(OUT, 'blocks', `${b.name}.ts`), `${HEADER}export default ${JSON.stringify(files, null, 2)};\n`);
+}
+const blockEntries = blocks.map((b) => {
+  const { title, description } = blockMeta(b);
+  return (
+    `  {\n    name: '${b.name}',\n    title: ${JSON.stringify(title)},\n    description: ${JSON.stringify(description)},\n` +
+    `    group: '${GROUPS[b.name.split('-')[0]]}',\n` +
+    `    load: () => import('../../../../projects/blocks/${b.name}/${b.name}').then((m) => m.${pascal(b.name)}),\n` +
+    `    files: () => import('./blocks/${b.name}').then((m) => m.default),\n  },`
+  );
+});
+writeFileSync(
+  join(OUT, 'blocks.ts'),
+  `${HEADER}import type { BlockEntry } from '../app/content/types';\n\n` +
+    `export const BLOCKS: BlockEntry[] = [\n${blockEntries.join('\n')}\n];\n`,
+);
 
 buildRegistry('apps/docs/public/r');
 mkdirSync('apps/docs/public/schema', { recursive: true });

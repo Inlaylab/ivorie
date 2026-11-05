@@ -1,5 +1,6 @@
 import { RenderMode, ServerRoute } from '@angular/ssr';
 import { PAGES } from '../generated/pages';
+import { BLOCKS } from '../generated/blocks';
 import { SCENES } from './playground/scenes';
 
 export const serverRoutes: ServerRoute[] = [
@@ -16,7 +17,17 @@ export const serverRoutes: ServerRoute[] = [
   {
     path: 'preview/:kind/:name',
     renderMode: RenderMode.Prerender,
-    getPrerenderParams: async () => SCENES.map((s) => ({ kind: 'scene', name: s.value })),
+    getPrerenderParams: async () => [
+      ...SCENES.map((s) => ({ kind: 'scene', name: s.value })),
+      ...BLOCKS.map((b) => ({ kind: 'block', name: b.name })),
+    ],
+  },
+  // A block's own nav, inside the preview frame: rendered in the browser only.
+  { path: 'preview/:kind/:name/**', renderMode: RenderMode.Client },
+  {
+    path: 'blocks/:name',
+    renderMode: RenderMode.Prerender,
+    getPrerenderParams: async () => BLOCKS.map((b) => ({ name: b.name })),
   },
   { path: 'not-found', renderMode: RenderMode.Prerender },
   // Redirect to docs/installation; must not get the 404 status of '**'.

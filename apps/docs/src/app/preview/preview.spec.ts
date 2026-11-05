@@ -71,6 +71,23 @@ describe('PreviewPage', () => {
     post.mockRestore();
   });
 
+  it('a block preview renders the block page, full bleed', async () => {
+    const { el, fixture } = await open(`/preview/block/login-01?preset=${glass}`);
+    await new Promise((r) => setTimeout(r, 50));
+    await fixture.whenStable();
+    expect(el.querySelector('app-login-01')).not.toBeNull();
+    expect(el.querySelector('docs-preview')!.classList).not.toContain('docs-stage');
+  }, 60_000);
+
+  it('a link inside a block stays in the frame route', async () => {
+    const { el, fixture } = await open('/preview/block/sidebar-01/data-fetching');
+    await new Promise((r) => setTimeout(r, 50));
+    await fixture.whenStable();
+    const active = el.querySelector('a[ivSidebarMenuButton][data-active]')!;
+    expect(active.textContent!.trim()).toBe('Data Fetching');
+    expect(active.getAttribute('href')).toBe('/preview/block/sidebar-01/data-fetching');
+  }, 60_000);
+
   it('an unknown scene shows a not-found line', async () => {
     const { el } = await open('/preview/scene/nope');
     expect(el.textContent).toContain('Unknown preview');

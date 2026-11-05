@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url';
 import { parseFrontmatter } from '../docs/content.ts';
 import { parseTheme } from '../../projects/cli/src/theme.ts';
 import { DEFAULT_PRESET, RADII } from '../../projects/cli/src/preset.ts';
-import { collectDeps, listEntries, registryDeps, rewriteImports } from './items.ts';
+import { blockMeta, collectDeps, listBlocks, listEntries, registryDeps, rewriteImports } from './items.ts';
 
 const ITEM_SCHEMA = 'https://ui.shadcn.com/schema/registry-item.json';
 const REGISTRY_SCHEMA = 'https://ui.shadcn.com/schema/registry.json';
@@ -19,7 +19,7 @@ const FONTS: { name: string; title: string; type: string; family: string; import
   readFileSync('tools/registry/fonts.json', 'utf8'),
 );
 
-type Kind = 'component' | 'lib' | 'style' | 'base-color' | 'theme-base' | 'font';
+type Kind = 'component' | 'lib' | 'style' | 'base-color' | 'theme-base' | 'font' | 'block';
 interface File {
   path: string;
   type: 'registry:file';
@@ -86,6 +86,21 @@ export function buildItems(): Item[] {
       meta: { ivorie: { kind: e.name === 'core' || e.name.startsWith('icons-') ? 'lib' : 'component' } },
     };
   });
+
+  // Blocks keep their @inlaylab/ivorie imports: add rewrites them per file, to the app's copied components.
+  for (const b of listBlocks()) {
+    const deps = collectDeps(b);
+    items.push({
+      $schema: ITEM_SCHEMA,
+      name: b.name,
+      type: 'registry:item',
+      ...blockMeta(b),
+      ...(deps.length && { dependencies: deps }),
+      registryDependencies: registryDeps(b),
+      files: b.files.map((f) => file(`blocks/${b.name}/${f.name}`, f.content)),
+      meta: { ivorie: { kind: 'block' } },
+    });
+  }
 
   for (const f of readdirSync(STYLES_DIR).filter((f) => /^style-[a-z]+\.css$/.test(f)).sort()) {
     const style = f.slice('style-'.length, -'.css'.length);
@@ -158,6 +173,7 @@ export function build(out: string): void {
         kind: i.meta.ivorie.kind,
         registryDependencies: i.registryDependencies ?? [],
       })),
+      blocks: kinds('block'),
       styles: kinds('style').map((n) => n.slice('style-'.length)),
       baseColors: kinds('base-color').map((n) => n.slice('theme-'.length)),
       fonts: ['system', ...FONTS.map((f) => f.name)],

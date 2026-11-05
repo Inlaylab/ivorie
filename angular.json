@@ -241,6 +241,24 @@
           }
         }
       }
+    },
+    "blocks": {
+      "projectType": "library",
+      "root": "projects/blocks",
+      "sourceRoot": "projects/blocks",
+      "prefix": "app",
+      "architect": {
+        "test": {
+          "builder": "@angular/build:unit-test",
+          "options": {
+            "buildTarget": "module-smoke:build:development",
+            "tsConfig": "projects/blocks/tsconfig.spec.json",
+            "setupFiles": [
+              "projects/ui/testing/setup.ts"
+            ]
+          }
+        }
+      }
     }
   }
 }

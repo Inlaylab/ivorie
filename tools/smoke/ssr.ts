@@ -3,7 +3,7 @@
 // Usage: node tools/smoke/ssr.ts [distDir] (default dist/docs). Env: SMOKE_PORT (4310), SMOKE_BROWSER (chrome | msedge).
 // Use a development build to catch hydration mismatches: Angular checks DOM nodes (NG0500) only in dev mode.
 import { spawn } from 'node:child_process';
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { chromium, type Browser, type Page } from 'playwright-core';
 import { failureOf, serverFailure } from './ssr-rules.ts';
 
@@ -99,7 +99,8 @@ try {
     at = `/docs/${slug}`;
     await visit(page, at);
   }
-  for (const path of ['/playground', '/preview/scene/dashboard', '/blocks', '/roadmap']) {
+  const blocks = readdirSync('projects/blocks').filter((d) => existsSync(`projects/blocks/${d}/${d}.ts`));
+  for (const path of ['/playground', '/preview/scene/dashboard', '/blocks', '/roadmap', ...blocks.flatMap((b) => [`/blocks/${b}`, `/preview/block/${b}`])]) {
     at = path;
     await visit(page, at);
   }

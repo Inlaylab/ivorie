@@ -39,3 +39,13 @@ export interface PageEntry {
   load: () => Promise<DocPage>;
 }
 export type DemoLoader = () => Promise<Type<unknown>>;
+
+/** One block from projects/blocks (generated/blocks.ts). */
+export interface BlockEntry {
+  name: string;
+  title: string;
+  description: string;
+  group: 'Login' | 'Sign up' | 'Sidebar' | 'Dashboard';
+  load: () => Promise<Type<unknown>>;
+  files: () => Promise<{ path: string; code: string; html: string }[]>;
+}

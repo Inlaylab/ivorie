@@ -1,8 +1,10 @@
 // ivorie add <names…>: copies component source (and what it needs) into the app.
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
-import { dirname, join, relative } from 'node:path';
+import { dirname, join, posix, relative } from 'node:path';
 import { readConfig, type ComponentsJson } from '../config.ts';
+import { ICON_PACKAGES } from '../icons.ts';
 import { installCommand, runInstall } from '../install.ts';
+import { createIconMigrator } from './migrate-icons.ts';
 import { rewritePrefix } from '../prefix.ts';
 import { detectProject } from '../project.ts';
 import { bundledRegistry, openRegistry, packageName, resolveTree, type RegistryIndex } from '../registry.ts';
@@ -29,7 +31,7 @@ function distance(a: string, b: string): number {
 }
 
 function checkNames(names: string[], index: RegistryIndex): void {
-  const copyable = index.items.filter((i) => i.kind === 'component' || i.kind === 'lib');
+  const copyable = index.items.filter((i) => i.kind === 'component' || i.kind === 'lib' || i.kind === 'block');
   for (const name of names) {
     const item = index.items.find((i) => i.name === name);
     if (item && copyable.includes(item)) continue;
@@ -53,6 +55,14 @@ export function writeFile(r: Report, cwd: string, file: string, content: string,
   writeFileSync(file, content);
 }
 
+/** `@inlaylab/ivorie/x` → the relative path from this block file to the app's copy of x. */
+function blockImports(content: string, file: string, uiDir: string): string {
+  return content.replace(/'@inlaylab\/ivorie\/(?:extras\/)?([a-z-]+)'/g, (_m, name: string) => {
+    const rel = relative(dirname(file), join(uiDir, name, 'public-api')).split('\\').join('/');
+    return `'${rel.startsWith('.') ? rel : `./${rel}`}'`;
+  });
+}
+
 export async function runAdd(names: string[], o: AddOptions, report: Report = emptyReport()): Promise<Report> {
   const config = o.config ?? readConfig(o.cwd);
   const reg = openRegistry(o.registry ?? config.registry ?? bundledRegistry());
@@ -62,16 +72,29 @@ export async function runAdd(names: string[], o: AddOptions, report: Report = em
   checkNames(wanted, index);
 
   const items = await resolveTree(reg, wanted);
+  const blocksPath = config.blocksPath ?? posix.join(posix.dirname(config.path), 'blocks');
+  const icons = config.iconLibrary !== 'lucide' ? createIconMigrator('lucide', config.iconLibrary) : null;
   for (const item of items) {
+    const block = item.meta?.ivorie.kind === 'block';
     for (const f of item.files ?? []) {
-      const target = join(o.cwd, config.path, f.path.replace(/^ui\//, ''));
-      writeFile(report, o.cwd, target, rewritePrefix(f.content, config.prefix), o);
+      const target = block
+        ? join(o.cwd, blocksPath, f.path.replace(/^blocks\//, ''))
+        : join(o.cwd, config.path, f.path.replace(/^ui\//, ''));
+      let content = f.content;
+      if (block) {
+        content = blockImports(content, target, join(o.cwd, config.path));
+        if (icons) content = icons(content);
+      }
+      writeFile(report, o.cwd, target, rewritePrefix(content, config.prefix), o);
     }
   }
 
   if (o.deps === false) return report;
   const project = detectProject(o.cwd);
+  // Blocks draw icons with @ng-icons/lucide; another library swaps in its package.
+  const iconPkg = ICON_PACKAGES[config.iconLibrary].split('/').slice(0, 2).join('/');
   const deps = [...new Set(items.flatMap((i) => i.dependencies ?? []))]
+    .map((d) => d.replace(/^@ng-icons\/lucide@/, `${iconPkg}@`))
     .filter((d) => !project.deps.has(packageName(d)))
     .sort();
   if (deps.length) {

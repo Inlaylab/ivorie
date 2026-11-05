@@ -131,6 +131,14 @@ Menu list and item. No inputs, no `class`.
 | `size` | `'default' \| 'sm' \| 'lg'` | `'default'` | Height. |
 | `tooltip` | `string` | `''` | Label shown on hover only while the sidebar is collapsed to icons on desktop. |
 
+### a[ivSidebarMenuButton], button[ivSidebarMenuButton]
+
+The same look on your own element: a link for `routerLink`, or a native button for a dropdown or collapsible trigger. Takes `isActive`, `variant` and `size`, no `tooltip`.
+
+```html
+<a ivSidebarMenuButton routerLink="/inbox" routerLinkActive #rla="routerLinkActive" [isActive]="rla.isActive">Inbox</a>
+```
+
 ### iv-sidebar-menu-action
 
 | Name | Type | Default | Description |

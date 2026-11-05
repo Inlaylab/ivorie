@@ -58,12 +58,42 @@ const pkgOf = (spec: string) => spec.split('/').slice(0, spec.startsWith('@') ? 
 let ranges: Record<string, string> | undefined;
 function rangeOf(pkg: string): string {
   if (!ranges) {
-    const json = JSON.parse(readFileSync(join(UI, 'package.json'), 'utf8'));
-    ranges = { ...json.peerDependencies, ...json.dependencies };
+    const ui = JSON.parse(readFileSync(join(UI, 'package.json'), 'utf8'));
+    // Blocks also use app packages (@ng-icons/*) that only the workspace root lists.
+    const root = JSON.parse(readFileSync('package.json', 'utf8'));
+    ranges = { ...root.devDependencies, ...root.dependencies, ...ui.peerDependencies, ...ui.dependencies };
   }
   const range = ranges![pkg];
-  if (!range) throw new Error(`registry: ${pkg} is imported but not in projects/ui/package.json`);
+  if (!range) throw new Error(`registry: ${pkg} is imported but not in projects/ui/package.json or package.json`);
   return normalizeRange(range);
+}
+
+const BLOCKS = 'projects/blocks';
+
+/** Every block: a folder in projects/blocks with `<name>/<name>.ts`. Files are read recursively, specs left out. */
+export function listBlocks(root = BLOCKS): Entry[] {
+  const read = (dir: string, rel = ''): EntryFile[] =>
+    readdirSync(join(dir, rel), { withFileTypes: true })
+      .sort((a, b) => a.name.localeCompare(b.name))
+      .flatMap((d) => {
+        const path = rel ? `${rel}/${d.name}` : d.name;
+        if (d.isDirectory()) return read(dir, path);
+        if (!/\.(ts|html)$/.test(d.name) || d.name.endsWith('.spec.ts')) return [];
+        return [{ name: path, content: readFileSync(join(dir, path), 'utf8').replace(/\r\n/g, '\n') }];
+      });
+  return readdirSync(root)
+    .filter((d) => existsSync(join(root, d, `${d}.ts`)))
+    .sort()
+    .map((d) => ({ name: d, dir: join(root, d), files: read(join(root, d)) }));
+}
+
+/** `export const meta = { title: '…', description: '…' }` from a block's page file. */
+export function blockMeta(e: Entry): { title: string; description: string } {
+  const page = e.files.find((f) => f.name === `${e.name}.ts`)!.content;
+  const title = /title: '([^']+)'/.exec(page)?.[1];
+  const description = /description: '([^']+)'/.exec(page)?.[1];
+  if (!title || !description) throw new Error(`registry: ${e.name}.ts needs export const meta = { title, description }`);
+  return { title, description };
 }
 
 /** npm deps as `pkg@range`, sorted. */

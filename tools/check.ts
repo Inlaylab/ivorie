@@ -1,5 +1,5 @@
 // Runs every gate and prints one PASS/FAIL line each. Full logs go to .check/<name>.log.
-// Usage: npm run check
+// Usage: npm run check, or npm run check -- --only <name>[,<name>] for some steps and rules.
 import { spawnSync } from 'node:child_process';
 import { mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -35,6 +35,7 @@ export const steps: Step[] = [
     cmd: 'npx attw --pack dist/ui --profile esm-only --exclude-entrypoints ./styles/theme.css ./styles/style-vega.css ./styles/style-nova.css ./styles/style-maia.css ./styles/style-luma.css ./styles/style-rhea.css ./styles/style-glass.css ./styles/style-brutal.css ./styles/style-aurora.css ./styles/style-bento.css ./styles/style-mono.css',
   },
   { name: 'test-ui', cmd: 'npx ng test ui --watch=false' },
+  { name: 'test-blocks', cmd: 'npx ng test blocks --watch=false' },
   { name: 'test-cli', cmd: 'node --test "projects/cli/**/*.test.ts"' },
   { name: 'build-registry', cmd: 'node tools/registry/build.ts' },
   { name: 'build-cli', cmd: 'node tools/cli/build.ts' },
@@ -71,20 +72,21 @@ export const rules: Rule[] = [
   // Docs live in apps/docs. Lowercase only: the package README.md stays.
   { name: 'no-lib-readme', pattern: /[\\/]readme\.md$/, paths: ['projects/ui'], on: 'path' },
   // Signal inputs only.
-  { name: 'no-input-decorator', pattern: /@Input\(/, paths: ['projects/ui'] },
+  { name: 'no-input-decorator', pattern: /@Input\(/, paths: ['projects/ui', 'projects/blocks'] },
   // The "No" list in docs/COMPAT.md.
   {
     name: 'no-deprecated-api',
     pattern:
       /@(Input|Output|ViewChild|ViewChildren|ContentChild|ContentChildren|HostBinding|HostListener)\(|\*ng(If|For|Switch)|\bng(Class|Style)\b|Ng(Class|Style|Zone)\b|@angular\/animations|ɵ|new EventEmitter/,
-    paths: ['projects/ui'],
+    paths: ['projects/ui', 'projects/blocks'],
   },
   // SSR safe: inject(DOCUMENT) and guard browser-only code. Specs run in jsdom and may use them.
   {
     name: 'no-dom-globals',
     pattern: DOM_GLOBALS,
-    paths: ['projects/ui'],
-    exclude: /\.spec\.ts$/,
+    paths: ['projects/ui', 'projects/blocks'],
+    // Specs and the blocks' shared spec helpers run in jsdom.
+    exclude: /\.spec\.ts$|[\\/]blocks[\\/]testing[\\/]/,
     ignoreComments: true,
   },
 ];
@@ -118,8 +120,15 @@ function hits(rule: Rule): string[] {
 
 mkdirSync(LOG_DIR, { recursive: true });
 let failed = false;
+const only = process.argv.includes('--only') ? new Set(process.argv[process.argv.indexOf('--only') + 1]?.split(',')) : null;
+const picked = (name: string) => !only || only.has(name);
+const unknown = [...(only ?? [])].filter((n) => ![...steps, ...rules].some((x) => x.name === n));
+if (only && (!only.size || unknown.length)) {
+  console.log(`FAIL --only: unknown ${unknown.join(', ') || '(none given)'}`);
+  process.exit(1);
+}
 
-for (const step of steps) {
+for (const step of steps.filter((s) => picked(s.name))) {
   const run = spawnSync(step.cmd, { shell: true, encoding: 'utf8', env: { ...process.env, ...step.env } });
   const log = join(LOG_DIR, `${step.name}.log`);
   writeFileSync(log, `${run.stdout ?? ''}${run.stderr ?? ''}`);
@@ -131,7 +140,7 @@ for (const step of steps) {
   }
 }
 
-for (const rule of rules) {
+for (const rule of rules.filter((r) => picked(r.name))) {
   const found = hits(rule);
   if (found.length === 0) {
     console.log(`PASS ${rule.name}`);

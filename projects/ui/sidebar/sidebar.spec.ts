@@ -4,6 +4,7 @@ import { InteractivityChecker } from '@angular/cdk/a11y'
 import { BreakpointObserver } from '@angular/cdk/layout'
 import { BehaviorSubject } from 'rxjs'
 import { Injectable } from '@angular/core'
+import { Router, RouterLink, RouterLinkActive, provideRouter } from '@angular/router'
 import { afterEach, describe, expect, it } from 'vitest'
 import { provideIvorie } from '@inlaylab/ivorie/core'
 import { IV_SIDEBAR_IMPORTS, sidebarMenuButtonVariants } from './sidebar'
@@ -402,6 +403,53 @@ describe('IvSidebar', () => {
 
   it('axe passes on desktop', async () => {
     const { fixture } = await render()
+    await expect(fixture.nativeElement).toHaveNoViolations()
+  })
+})
+
+@Component({ template: '' })
+class Blank {}
+
+@Component({
+  imports: [IV_SIDEBAR_IMPORTS, RouterLink, RouterLinkActive],
+  template: `
+    <iv-sidebar-provider cookieName="">
+      <iv-sidebar>
+        <iv-sidebar-content>
+          <ul ivSidebarMenu>
+            <li ivSidebarMenuItem>
+              <a ivSidebarMenuButton routerLink="/inbox" routerLinkActive #inbox="routerLinkActive" [isActive]="inbox.isActive">Inbox</a>
+            </li>
+            <li ivSidebarMenuItem>
+              <button ivSidebarMenuButton type="button" variant="outline">Menu</button>
+            </li>
+            <li ivSidebarMenuItem>
+              <a ivSidebarMenuButton size="sm" routerLink="/team" routerLinkActive #team="routerLinkActive" [isActive]="team.isActive">Team</a>
+            </li>
+          </ul>
+        </iv-sidebar-content>
+      </iv-sidebar>
+    </iv-sidebar-provider>
+  `,
+})
+class LinkHost {}
+
+describe('a[ivSidebarMenuButton]', () => {
+  it('a link menu button has the look, the size and the active route', async () => {
+    TestBed.configureTestingModule({ providers: [provideRouter([{ path: '**', component: Blank }])] })
+    await TestBed.inject(Router).navigateByUrl('/inbox')
+    const fixture = TestBed.createComponent(LinkHost)
+    await fixture.whenStable()
+    const [inbox, team] = [...(fixture.nativeElement as HTMLElement).querySelectorAll<HTMLAnchorElement>('a[ivSidebarMenuButton]')]
+    expect(inbox.getAttribute('data-slot')).toBe('sidebar-menu-button')
+    expect(inbox.classList).toContain('cn-sidebar-menu-button')
+    expect(inbox.getAttribute('href')).toBe('/inbox')
+    expect(inbox.hasAttribute('data-active')).toBe(true)
+    expect(inbox.getAttribute('aria-current')).toBe('page')
+    expect(team.hasAttribute('data-active')).toBe(false)
+    expect(team.getAttribute('data-size')).toBe('sm')
+    const native = (fixture.nativeElement as HTMLElement).querySelector('button[ivSidebarMenuButton]')!
+    expect(native.classList).toContain('cn-sidebar-menu-button-variant-outline')
     await expect(fixture.nativeElement).toHaveNoViolations()
   })
 })

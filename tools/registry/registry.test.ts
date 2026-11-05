@@ -18,7 +18,8 @@ const items = names.map((f) => JSON.parse(readFileSync(join(dirA, 'r', f), 'utf8
 test('no library import paths and no test or build files', () => {
   for (const item of items) {
     for (const f of item.files ?? []) {
-      assert.doesNotMatch(f.content, /@inlaylab\/ivorie/, f.path);
+      // Blocks keep them: add rewrites each import to the app's copied component.
+      if (item.meta.ivorie.kind !== 'block') assert.doesNotMatch(f.content, /@inlaylab\/ivorie/, f.path);
       assert.doesNotMatch(f.path, /\.spec\.ts$|ng-package\.json$/);
     }
   }
