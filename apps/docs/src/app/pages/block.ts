@@ -129,7 +129,7 @@ export default class BlockPage {
   protected readonly files = resource({ params: () => this.entry(), loader: ({ params }) => params.files() });
   /** The open file: the page file first. */
   protected readonly current = linkedSignal(() => this.entry()?.name + '.ts');
-  protected readonly file = computed(() => {
+  protected readonly file = computed((): { path: string; code: string; html: string } | undefined => {
     const list = this.files.value() ?? [];
     return list.find((f) => f.path === this.current()) ?? list[0];
   });

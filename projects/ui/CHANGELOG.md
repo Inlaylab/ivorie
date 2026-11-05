@@ -1,5 +1,13 @@
 # @inlaylab/ivorie
 
+## 1.4.0
+
+### Minor Changes
+
+- c638813: Blocks: 19 ready-made login, sign-up, sidebar and dashboard pages, wired with reactive forms and typed outputs. Add one with `ivorie add login-01`; imports and icons follow your app. The sidebar gains `a[ivSidebarMenuButton]` and `button[ivSidebarMenuButton]` for router links and menu triggers.
+- 7d4ac1f: New data table: sort, pagination, filter, row selection and column visibility. Use one feature or all, in the browser or on your server.
+- 15bb87e: Five new styles: glass, brutal, aurora, bento and mono. `ivorie init --style glass` and `ivorie apply` accept them. The playground previews each look in an isolated frame, with a desktop, tablet and mobile width toggle.
+
 ## 1.3.0
 
 ### Minor Changes

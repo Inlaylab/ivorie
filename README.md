@@ -4,8 +4,8 @@ Angular components with the [shadcn/ui](https://github.com/shadcn-ui/ui) look an
 Accessibility and keyboard patterns follow [Radix UI](https://github.com/radix-ui/primitives).
 Built for Angular 22 and Tailwind CSS 4: signals, zoneless, server rendering and keyboard support.
 
-- **`@inlaylab/ivorie`**: the npm package. 34 components, one entry point each (`@inlaylab/ivorie/button`). Works in standalone, NgModule, SSR and zoneless apps.
-- **`ivorie`**: a CLI that copies component source into your app, so you own and edit it.
+- **`@inlaylab/ivorie`**: the npm package. 53 components, one entry point each (`@inlaylab/ivorie/button`), and 10 styles. Works in standalone, NgModule, SSR and zoneless apps.
+- **`ivorie`**: a CLI that copies component source into your app, so you own and edit it. It also adds 19 ready-made blocks: login, sign-up, sidebar and dashboard pages.
 
 ## Use the package
 
@@ -33,6 +33,7 @@ The full steps are on the Installation page of the docs.
 ```bash
 npx ivorie init
 npx ivorie add button dialog
+npx ivorie add login-01        # a block: lands in src/app/blocks/
 ```
 
 ## Develop
@@ -41,6 +42,7 @@ npx ivorie add button dialog
 npm install
 npm start          # docs at http://localhost:4200
 npm run check      # every build, test and lint gate
+npm run check -- --only test-blocks,test-docs   # just some gates
 ```
 
 | Script | What it does |
@@ -50,13 +52,12 @@ npm run check      # every build, test and lint gate
 | `npm run smoke:cli` | Two fresh `ng new --ssr` apps: CLI copy vs npm package must match. Needs network. |
 | `npm run docs:build` | Static docs in `dist/docs/browser`. See [docs/DEPLOY.md](docs/DEPLOY.md). |
 
-## What's next
+## Releases
 
 - **1.1** More components (popover, sheet, slider, toggle, command, …) and a docs page that lists every example.
 - **1.2** Playground: pick style, base color, font and radius, then install that look.
-- **1.3** Blocks: ready-made login, signup and sidebar layouts.
-- **1.4** Icon libraries as plugins: lucide, tabler, phosphor, hugeicons, remix.
-- **1.5** Charts: line, area, bar, pie.
+- **1.4** Icon libraries (lucide, tabler, phosphor, hugeicons, remix), five new styles (glass, brutal, aurora, bento, mono), a data table and 19 blocks.
+- Next: **1.5** AI-ready (AGENTS.md, MCP server), then **1.6** charts (line, area, bar, pie).
 
 Details: [ROADMAP.md](ROADMAP.md).
 

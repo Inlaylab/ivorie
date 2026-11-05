@@ -1,6 +1,6 @@
 # Ivorie — Roadmap
 
-Single source for plan, status and next work. Updated 2026-11-03.
+Single source for plan, status and next work. Updated 2026-11-05.
 
 ## Goal
 
@@ -20,16 +20,17 @@ More detail: [PLAN](docs/PLAN.md) · [ARCHITECTURE](docs/ARCHITECTURE.md) · [CO
 
 ## Status
 
-**Next:** Phase 10 (1.4.0), branch `feat/v1.4.0`: T1 styles, T2 data table and T3 blocks done; T4 release next. 1.3.0 bumped, not yet published (ask first).
+**Next:** Phase 10 (1.4.0), branch `feat/v1.4.0`: T1–T3 done, versions bumped to 1.4.0 (`chore: release 1.4.0`). Left: `npm run smoke:pack`, `npm run smoke:cli`, PR → `main`, tag `v1.4.0`, publish (ask first). 1.3.0 was bumped but never published: its icon libraries ship in 1.4.0.
+Then Phase 14 (1.5.0, AI-ready): expand the outline into tasks and get an OK.
 Shipped: 1.0.0, 1.1.0, 1.2.0 (both packages). Docs initial bundle is ~800 kB, mostly lucide icons (backlog: docs drop `@lucide/angular`).
 
 | #   | Release | What                               | Status  |
 | --- | ------- | ---------------------------------- | ------- |
 | 8   | 1.1.0   | Components + quick wins            | done    |
 | 9   | 1.2.0   | Playground: themes, colors, fonts  | done    |
-| 11  | 1.3.0   | Icon libraries as plugins          | publish |
-| 10  | 1.4.0   | Styles, data table, blocks         | next    |
-| 14  | 1.5.0   | AI-ready: AGENTS.md and MCP server | planned |
+| 11  | 1.3.0   | Icon libraries as plugins          | in 1.4  |
+| 10  | 1.4.0   | Styles, data table, blocks         | publish |
+| 14  | 1.5.0   | AI-ready: AGENTS.md and MCP server | next    |
 | 15  | 1.6.0   | Charts                             | planned |
 
 Order is by benefit to users. New features ship as minor releases (1.x.0). A patch (1.x.y) is for bug fixes only.
@@ -54,7 +55,7 @@ Owner in brackets. Items marked "user" need a person, not code.
 - A phase is done only when its exit gate passes. Run the commands and show the output.
 - The last task of each phase: Changesets version bump, CHANGELOG entry, release.
 - **Publishing is public and cannot be undone. Ask the user before every publish.**
-- New components follow the "Add a component" checklist in [CONVENTIONS](docs/CONVENTIONS.md).
+- New components follow the "Add a component" checklist in [CONVENTIONS](docs/CONVENTIONS.md). Blocks live in `projects/blocks/<name>/` (page `<name>.ts` with `export const meta`, `components/`, optional `data.ts`, spec).
 - Docs site UI work: use the frontend-design skill.
 - A new big choice gets one line in [DECISIONS.md](docs/DECISIONS.md).
 - No AI attribution lines in commits or PRs.
@@ -64,6 +65,8 @@ Owner in brackets. Items marked "user" need a person, not code.
 | -------------------------- | ----------------------------------- |
 | Build library              | `npx ng build ui`                   |
 | Unit tests                 | `npx ng test ui --watch=false`      |
+| Block tests                | `npx ng test blocks --watch=false`  |
+| Some gates only            | `npm run check -- --only <name>,…`  |
 | Docs app                   | `npm start` (http://localhost:4200) |
 | All gates (no network)     | `npm run check`                     |
 | Package smoke              | `npm run smoke:pack`                |
@@ -73,7 +76,7 @@ Owner in brackets. Items marked "user" need a person, not code.
 
 `npm run check` runs these steps:
 
-- build-ui, test-tools, publint, attw, test-ui
+- build-ui, test-tools, publint, attw, test-ui, test-blocks
 - test-cli, build-registry, build-cli, test-cli-bin, publint-cli
 - build-docs, smoke-ssr, test-docs, build-module-smoke, test-module-smoke
 

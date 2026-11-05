@@ -41,7 +41,7 @@ export const ROADMAP: {
     title: 'Icon libraries',
     summary:
       'Pick Lucide, Tabler, Phosphor, Hugeicons or Remix in the playground or with the CLI, and every component follows. npx ivorie migrate icons moves your own icons too.',
-    state: 'next',
+    state: 'shipped',
     version: '1.3',
     link: '/docs/icon',
   },
@@ -49,7 +49,7 @@ export const ROADMAP: {
     title: 'More styles',
     summary:
       "Five new looks next to shadcn's five: Glass (frosted panes), Brutal (ink frames), Aurora (gradient glow), Bento (tonal tiles) and Mono (monospace, square).",
-    state: 'planned',
+    state: 'shipped',
     version: '1.4',
     link: '/playground',
   },
@@ -57,14 +57,15 @@ export const ROADMAP: {
     title: 'Data table',
     summary:
       'Sort, page and filter rows, and select them, in the browser or on your server. Built on the table you already use.',
-    state: 'planned',
+    state: 'shipped',
     version: '1.4',
+    link: '/docs/data-table',
   },
   {
     title: 'Blocks',
     summary:
       'Ready-made sign-in, sign-up, sidebar and dashboard pages, wired to forms and the data table. Add one with a single command, then change it however you like.',
-    state: 'planned',
+    state: 'shipped',
     version: '1.4',
     link: '/blocks',
   },
@@ -72,7 +73,7 @@ export const ROADMAP: {
     title: 'Ready for AI coding tools',
     summary:
       'An AGENTS.md guide and an MCP server, so your AI assistant uses the right imports and adds components for you.',
-    state: 'planned',
+    state: 'next',
     version: '1.5',
     link: '/docs/mcp',
   },

@@ -31,8 +31,9 @@ Latest only: Angular 22, Tailwind 4.3, zoneless, Vitest, `@lucide/angular`. No d
 |---|---|
 | Build library | `npx ng build ui` |
 | Unit tests (Vitest) | `npx ng test ui --watch=false` |
+| Block tests | `npx ng test blocks --watch=false` |
 | Run docs app | `npm start` (or `npx ng serve docs`) |
-| All checks (no network) | `npm run check` |
+| All checks (no network) | `npm run check` (`-- --only <name>,…` for some) |
 | Package smoke | `npm run smoke:pack` |
 | CLI smoke (network) | `npm run smoke:cli` |
 | Static docs | `npm run docs:build` |
@@ -49,10 +50,11 @@ Repo: https://github.com/shadcn-ui/ui (MIT). Our components copy its classes, va
 
 ## Where things live
 - `projects/ui/` — the library. `projects/ui/styles/` — `theme.css` tokens + `style-<name>.css` looks.
+- `projects/blocks/` — blocks (login, signup, sidebar, dashboard): app source that `ivorie add <block>` copies. Self-contained; `testing/` holds shared spec helpers.
 - `projects/cli/` — the `ivorie` CLI.
 - `apps/docs/` — docs + playground app (SSR, prerender). `apps/module-smoke/` — NgModule smoke app.
 - `tools/` — scripts: check, docs build, registry, styles sync, smoke tests, rename map.
-- `ROADMAP.md` — status, must do, phases 8–15 (releases 1.1–1.8) with tasks, backlog.
+- `ROADMAP.md` — status, must do, phases 8–15 (releases 1.1–1.6) with tasks, backlog.
 - `CHANGELOG.md` — release notes. `.changeset/` — pending version notes (from Phase 8 T0).
 - `.github/workflows/` — `ci.yml` (checks), `release.yml` (manual npm publish), `docs.yml` (GitHub Pages).
 - `docs/` — PLAN (why), ARCHITECTURE, CONVENTIONS, COMPAT, DECISIONS, DEPLOY.

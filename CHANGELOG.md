@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.4.0
+
+Both packages: `@inlaylab/ivorie` and `ivorie` 1.4.0. Per-package notes: `projects/ui/CHANGELOG.md`, `projects/cli/CHANGELOG.md`.
+
+- Five new styles: glass, brutal, aurora, bento and mono, next to shadcn's five. Glass turns solid without `backdrop-filter` or with reduced transparency. Every style is tested for compile and text contrast, light and dark.
+- Data table (`@inlaylab/ivorie/data-table`): sort, pagination, filter, row selection and column visibility as five standalone features. Use one or all, in the browser or on your server (`manual`, `query()`). Parts: sort header, pagination, view options, row checkboxes, loading and empty rows.
+- Blocks: 19 ready-made pages (login-01…05, signup-01…05, sidebar-01…08, dashboard-01), wired with reactive forms and typed outputs. `ivorie add login-01` writes them to `src/app/blocks/`, rewrites imports and renames icons to your library.
+- Sidebar: `a[ivSidebarMenuButton]` and `button[ivSidebarMenuButton]` for router links and menu triggers.
+- Docs: `/blocks` with live previews and code, a style gallery in the playground with an isolated preview frame and width toggle, a live install command on the home page.
+
 ## 1.3.0
 
 Both packages: `@inlaylab/ivorie` and `ivorie` 1.3.0. Per-package notes: `projects/ui/CHANGELOG.md`, `projects/cli/CHANGELOG.md`.
