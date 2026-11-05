@@ -70,6 +70,7 @@ jobs:
 
   # Early warning for the next Angular release. Allowed to fail.
   angular-next:
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     continue-on-error: true
     steps:
