@@ -26,7 +26,7 @@ jobs:
       - run: node tools/docs/build.ts
       - run: npx ng build docs --base-href /${{ github.event.repository.name }}/
       - run: node tools/docs/postbuild.ts --verify
-      - uses: actions/upload-pages-artifact@v4
+      - uses: actions/upload-pages-artifact@v5
         with:
           path: dist/docs/browser
 
