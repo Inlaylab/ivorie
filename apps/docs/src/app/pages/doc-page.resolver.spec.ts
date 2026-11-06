@@ -26,7 +26,7 @@ describe('docPageResolver', () => {
     const data = (await resolve('tabs')) as DocPageData;
     expect(data.page.slug).toBe('tabs');
     expect(typeof data.demos['tabs']).toBe('function');
-  }, 120_000); // First lazy demo import compiles its chunk.
+  }, 300_000); // First lazy demo import compiles its chunk.
 
   it('redirects a case variant to the canonical lowercase URL, status 301 (H9)', async () => {
     const responseInit: ResponseInit = {};

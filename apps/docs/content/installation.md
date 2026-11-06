@@ -12,6 +12,18 @@ Ivorie needs Angular 22 and Tailwind 4. There are two ways to add it:
 
 Both give the same components and the same look. Not sure? Start with the CLI.
 
+## Requirements
+
+| What | Minimum |
+|---|---|
+| Angular (`core`, `common`, `forms`, `cdk`) | 22.0 (`>=22.0.0 <23.0.0`) |
+| Node | 22.22.3, or 24.15 and up |
+| TypeScript | 6.0 (what Angular 22 needs) |
+| Tailwind CSS | 4.0 |
+| `tw-animate-css` | 1.0 |
+
+Angular 21 and older are not supported. The components are tested without zone.js.
+
 ## Quick start with the CLI
 
 Run these in your Angular workspace:

@@ -4,9 +4,11 @@ Angular UI components in the style of [shadcn/ui](https://github.com/shadcn-ui/u
 
 ## Needs
 
-- Angular 22
+- Angular 22 (`>=22.0.0 <23.0.0`): `core`, `common`, `forms` and `@angular/cdk`
+- Node 22.22.3+ or 24.15+, TypeScript 6.0+
 - Tailwind CSS 4 + `tw-animate-css`
-- `@angular/cdk`
+
+Angular 21 and older are not supported.
 
 ## Setup
 

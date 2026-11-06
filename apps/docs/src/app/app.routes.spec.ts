@@ -21,7 +21,7 @@ describe('docs routes', () => {
   it('serves /docs/tabs/ (trailing slash) as the tabs page', async () => {
     const { el } = await open('/docs/tabs/');
     expect(el.querySelector('h1')?.textContent).toContain('Tabs');
-  }, 120_000); // First lazy demo import compiles its chunk.
+  }, 300_000); // First lazy demo import compiles its chunk.
 
   it('serves /docs/components as the components index, not a doc page', async () => {
     const { el } = await open('/docs/components');

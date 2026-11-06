@@ -5,7 +5,7 @@ section: guide
 order: 3
 ---
 
-The `ivorie` CLI copies component source into your app, so you own and edit it. It needs Angular 22 and Node 22.22.3+ or 24.15+. It has no runtime dependencies.
+The `ivorie` CLI copies component source into your app, so you own and edit it. It needs Angular 22 or newer and Node 22.22.3+ or 24.15+. See [Requirements](docs/installation#requirements). It has no runtime dependencies.
 
 ## init
 

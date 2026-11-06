@@ -135,7 +135,8 @@ try {
   run('npx ng build', cliApp);
   run('npx ng build', npmApp);
 
-  const [a, b] = [buttonClasses(cliApp, 'cli-app'), buttonClasses(npmApp, 'npm-app')];
+  // The login-01 block adds buttons after the app's own three; compare only those three.
+  const [a, b] = [buttonClasses(cliApp, 'cli-app').slice(0, 3), buttonClasses(npmApp, 'npm-app')];
   if (a.length !== 3) failures.push(`cli-app: expected 3 buttons, found ${a.length}`);
   if (JSON.stringify(a) !== JSON.stringify(b)) failures.push(`button classes differ:\n  cli: ${a.join(' | ')}\n  npm: ${b.join(' | ')}`);
   const [ca, cb] = [cssRules(cliApp, 'cli-app'), cssRules(npmApp, 'npm-app')];
