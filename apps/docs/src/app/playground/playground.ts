@@ -12,13 +12,15 @@ import { NgTemplateOutlet } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { IvButton } from '@inlaylab/ivorie/button';
 import { IV_DIALOG_IMPORTS } from '@inlaylab/ivorie/dialog';
+import { IV_SELECT_IMPORTS } from '@inlaylab/ivorie/select';
 import { IV_SHEET_IMPORTS } from '@inlaylab/ivorie/sheet';
 import { PREVIEW_WIDTHS, PreviewFrame, type PreviewWidth } from '../preview/preview-frame';
 import { CopyButton } from '../ui/copy-button';
 import { LookControls } from './look-controls';
 import { PREVIEW_ICONS, PlaygroundLook } from './playground-look';
 import { DEFAULT_PRESET, encodePreset } from './preset-code';
-import { SCENES, type Scene } from './scenes';
+import { BASE_COLORS, FONTS, RADII } from '../../generated/looks';
+import { STYLES } from '../shell/appearance-options';
 
 const DEFAULT_CODE = encodePreset(DEFAULT_PRESET);
 type Target = 'new' | 'existing';
@@ -29,6 +31,7 @@ type Target = 'new' | 'existing';
     NgTemplateOutlet,
     IvButton,
     IV_DIALOG_IMPORTS,
+    IV_SELECT_IMPORTS,
     IV_SHEET_IMPORTS,
     CopyButton,
     LookControls,
@@ -36,187 +39,128 @@ type Target = 'new' | 'existing';
   ],
   providers: [PlaygroundLook, PREVIEW_ICONS],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  host: { class: 'block lg:grid lg:grid-cols-[20rem_minmax(0,1fr)]' },
+  host: { class: 'block gap-4 p-3 sm:p-4 lg:grid lg:h-[calc(100svh-var(--header-height))] lg:grid-cols-[18rem_minmax(0,1fr)]' },
   template: `
-    <!-- The rail: controls scroll, the install block and Reset stay at the bottom. -->
-    <aside
-      aria-labelledby="pg-title"
-      class="lg:bg-background flex flex-col lg:sticky lg:top-(--header-height) lg:h-[calc(100svh-var(--header-height))] lg:border-r"
-    >
-      <!-- The header nav already marks this page, so the title is for screen readers only. -->
-      <h1 id="pg-title" class="sr-only">Playground</h1>
-      <div class="hidden flex-1 overflow-y-auto px-6 pt-6 pb-6 lg:block">
-        <docs-look-controls [look]="look" name="rail" />
+    <!-- The panel: a floating card. Rows on top, the command and actions at the bottom. -->
+    <aside aria-labelledby="pg-title" class="docs-pane hidden min-h-0 flex-col overflow-hidden rounded-2xl lg:flex">
+      <div class="flex items-center justify-between border-b py-2 pr-2 pl-4">
+        <h1 id="pg-title" class="text-foreground text-sm font-semibold">Customize</h1>
+        <button ivButton variant="ghost" size="icon-sm" aria-label="Reset to default" [disabled]="isDefault()" (click)="reset()" data-testid="reset">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" /><path d="M3 3v5h5" />
+          </svg>
+        </button>
       </div>
-      <div class="bg-muted/30 hidden border-t lg:block">
-        <ng-container
-          [ngTemplateOutlet]="install"
-          [ngTemplateOutletContext]="{ $implicit: 'rail' }"
-        />
+      <div class="min-h-0 flex-1 overflow-y-auto p-1.5">
+        <docs-look-controls [look]="look" name="rail" />
+        <div class="docs-panel mt-0.5 hidden md:block">
+          <hr class="mb-2 mt-1" />
+          <ng-container [ngTemplateOutlet]="widthRow" />
+        </div>
+      </div>
+      <div class="flex flex-col gap-2 border-t p-2">
+        <div class="bg-background/50 flex items-center gap-1 rounded-lg border py-0.5 pr-0.5 pl-2.5 font-mono text-xs">
+          <span class="min-w-0 flex-1 truncate" data-testid="panel-command" [title]="command()">{{ command() }}</span>
+          <docs-copy-button [text]="command()" label="Copy command" />
+        </div>
+        <button ivButton variant="outline" class="w-full" (click)="shuffle()">
+          <ng-container [ngTemplateOutlet]="shuffleIcon" />
+          Shuffle
+        </button>
+        <button ivButton class="w-full" [ivDialogTrigger]="codeDialog">Get code</button>
       </div>
     </aside>
 
-    <!-- The stage: the scene in an iframe, in the chosen look. Nothing of the site leaks into it.
-         The scene bar above it is site chrome, so it keeps the site look. -->
-    <section aria-label="Preview" class="flex min-w-0 flex-col pb-24 lg:pb-0">
-      <div class="bg-background flex flex-col gap-2 border-b px-4 py-3 sm:px-6 lg:px-8">
-        <div class="flex flex-wrap items-center justify-between gap-2">
-          <div
-            role="radiogroup"
-            aria-label="Example"
-            class="no-scrollbar bg-muted flex max-w-full gap-0.5 self-start overflow-x-auto rounded-full p-0.5"
-          >
-            @for (s of scenes; track s.value) {
-              <label [class]="pill + ' shrink-0 px-3 py-1 text-sm'">
-                <input
-                  type="radio"
-                  class="sr-only"
-                  name="scene"
-                  [value]="s.value"
-                  [checked]="scene() === s.value"
-                  (change)="scene.set(s.value)"
-                />
-                {{ s.label }}
-              </label>
-            }
-          </div>
-          <!-- Only where there is room for a wider frame than the smallest one. -->
-          <div
-            role="radiogroup"
-            aria-label="Preview width"
-            class="bg-muted hidden gap-0.5 rounded-full p-0.5 md:flex"
-          >
-            @for (w of widths; track w.value) {
-              <label [class]="pill + ' px-3 py-1 text-sm'">
-                <input
-                  type="radio"
-                  class="sr-only"
-                  name="width"
-                  [value]="w.value"
-                  [checked]="width() === w.value"
-                  (change)="width.set(w.value)"
-                />
-                {{ w.label }}
-              </label>
-            }
-          </div>
-        </div>
-        <p
-          class="text-muted-foreground max-w-[75ch] text-sm text-pretty"
-          data-testid="scene-description"
-        >
-          {{ sceneInfo().description }}
-        </p>
-      </div>
-      <div class="docs-stage bg-muted/40 flex flex-1 flex-col p-2 sm:p-4 lg:p-6">
-        <docs-preview-frame
-          class="flex-1"
-          [path]="'preview/scene/' + scene()"
-          [code]="look.code()"
-          [width]="width()"
-          label="Preview"
-        />
-      </div>
+    <!-- The stage: the wall in an iframe, in the picked look, on a big canvas. Nothing of the site leaks into it. -->
+    <section aria-label="Preview" class="docs-pane docs-stage flex min-h-[80svh] min-w-0 flex-col overflow-hidden rounded-3xl p-2 pb-20 sm:p-3 lg:min-h-0 lg:pb-3">
+      <docs-preview-frame class="min-h-0 flex-1" path="preview/scene/wall" [code]="look.code()" [width]="width()" label="Preview" />
     </section>
 
-    <!-- Small screens: the controls open in a sheet; the command stays one tap away. -->
-    <div
-      class="bg-background/85 supports-[backdrop-filter]:bg-background/70 fixed inset-x-0 bottom-0 z-20 flex gap-2 border-t p-3 backdrop-blur-md lg:hidden"
-    >
-      <button ivButton class="flex-1" [ivSheetTrigger]="sheet" [ivSheetConfig]="{ side: 'bottom' }">
-        Customize
-      </button>
-      <docs-copy-button [text]="command()" label="Copy command" />
+    <!-- Small screens: the controls open in a sheet; the actions stay in a bar. -->
+    <div class="docs-pane docs-pane-blur fixed inset-x-3 bottom-3 z-20 flex items-center gap-1 rounded-full p-1 lg:hidden">
+      <button ivButton variant="ghost" class="rounded-full" [ivSheetTrigger]="sheet" [ivSheetConfig]="{ side: 'bottom' }">Customize</button>
+      <span class="flex-1"></span>
+      <ng-container [ngTemplateOutlet]="actions" />
     </div>
     <ng-template #sheet>
       <iv-sheet-header>
         <iv-sheet-title>Customize</iv-sheet-title>
         <iv-sheet-description>The preview changes behind this panel.</iv-sheet-description>
       </iv-sheet-header>
-      <div class="flex max-h-[60svh] flex-col overflow-y-auto">
-        <docs-look-controls class="px-4 pb-6" [look]="look" name="sheet" />
-        <div class="border-t">
-          <ng-container
-            [ngTemplateOutlet]="install"
-            [ngTemplateOutletContext]="{ $implicit: 'sheet' }"
-          />
-        </div>
+      <div class="flex max-h-[60svh] flex-col overflow-y-auto px-2 pb-6">
+        <docs-look-controls [look]="look" name="sheet" />
       </div>
     </ng-template>
 
-    <ng-template #install let-at>
-      <div class="flex flex-col gap-3 px-4 py-4 sm:px-6">
-        <div class="flex items-center justify-between gap-2">
-          <span class="text-foreground text-sm font-medium">Install</span>
-          <div
-            role="radiogroup"
-            aria-label="Install into"
-            class="bg-muted flex gap-0.5 rounded-full p-0.5"
-          >
-            @for (t of targets; track t.value) {
-              <label [class]="pill + ' px-2.5 py-0.5 text-xs whitespace-nowrap'">
-                <input
-                  type="radio"
-                  class="sr-only"
-                  [name]="at + '-target'"
-                  [value]="t.value"
-                  [checked]="target() === t.value"
-                  (change)="target.set(t.value)"
-                />
-                {{ t.label }}
-              </label>
+    <ng-template #widthRow>
+      <div class="docs-panel-row">
+        <span class="docs-row-label" id="pg-width-label">Preview width</span>
+        <iv-select [value]="width()" (valueChange)="width.set($any($event) ?? 'desktop')">
+          <iv-select-trigger aria-labelledby="pg-width-label" />
+          <iv-select-content>
+            @for (w of widths; track w.value) {
+              <iv-select-item [value]="w.value">{{ w.label }}</iv-select-item>
             }
-          </div>
+          </iv-select-content>
+        </iv-select>
+      </div>
+    </ng-template>
+
+    <ng-template #shuffleIcon>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="m18 14 4 4-4 4" /><path d="m18 2 4 4-4 4" /><path d="M2 18h1.97a4 4 0 0 0 3.3-1.7l5.45-8.6a4 4 0 0 1 3.3-1.7H22" /><path d="M2 6h1.97a4 4 0 0 1 3.3 1.7l.4.63" /><path d="M22 18h-6.04a4 4 0 0 1-3.3-1.8l-.36-.45" />
+      </svg>
+    </ng-template>
+
+    <ng-template #actions>
+      <button ivButton variant="ghost" class="rounded-full" (click)="copyLink()" aria-label="Copy link" data-testid="copy-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" /><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+        </svg>
+      </button>
+      <button ivButton variant="ghost" class="rounded-full" (click)="shuffle()" aria-label="Shuffle the look" data-testid="shuffle">
+        <ng-container [ngTemplateOutlet]="shuffleIcon" />
+      </button>
+      <button ivButton class="rounded-full px-5" [ivDialogTrigger]="codeDialog" data-testid="get-code">Get code</button>
+      <span class="sr-only" aria-live="polite">{{ linkCopied() ? 'Link copied' : '' }}</span>
+    </ng-template>
+
+    <ng-template #codeDialog>
+      <iv-dialog-header>
+        <iv-dialog-title>Get the code</iv-dialog-title>
+        <iv-dialog-description>{{
+          target() === 'new'
+            ? 'Run it in your Angular app. It sets up Tailwind, the theme and this look.'
+            : 'Run it in an app that has Ivorie. It rewrites the theme and the style.'
+        }}</iv-dialog-description>
+      </iv-dialog-header>
+      <div class="flex min-w-0 flex-col gap-4">
+        <div role="radiogroup" aria-label="Install into" class="bg-muted flex gap-0.5 self-start rounded-full p-0.5">
+          @for (t of targets; track t.value) {
+            <label [class]="pillMuted + ' px-3 py-1 text-sm whitespace-nowrap'">
+              <input type="radio" class="sr-only" name="code-target" [value]="t.value" [checked]="target() === t.value" (change)="target.set(t.value)" />
+              {{ t.label }}
+            </label>
+          }
         </div>
-        <div
-          class="bg-background flex items-center gap-2 rounded-xl border py-0.5 pr-0.5 pl-3 font-mono text-xs"
-        >
-          <span class="min-w-0 flex-1 truncate" data-testid="command" [title]="command()">{{
-            command()
-          }}</span>
+        <div class="bg-muted/50 flex items-center gap-2 rounded-xl border py-0.5 pr-0.5 pl-3 font-mono text-xs">
+          <span class="min-w-0 flex-1 truncate" data-testid="command" [title]="command()">{{ command() }}</span>
           <docs-copy-button [text]="command()" label="Copy command" />
         </div>
-        <p class="text-muted-foreground -mt-1 text-xs text-pretty">
-          {{
-            target() === 'new'
-              ? 'Run it in your Angular app. It sets up Tailwind, the theme and this look.'
-              : 'Run it in an app that has Ivorie. It rewrites the theme and the style.'
-          }}
-        </p>
-        <div class="grid grid-cols-2 gap-2">
-          <button ivButton variant="outline" size="sm" [ivDialogTrigger]="cssDialog">
-            View CSS
-          </button>
-          <button ivButton variant="outline" size="sm" (click)="copyCode()">
-            {{ codeCopied() ? 'Copied' : 'Copy preset code' }}
-          </button>
+        <div class="flex flex-col gap-1.5">
+          <span class="text-sm font-medium">Preset code</span>
+          <div class="bg-muted/50 flex items-center gap-2 rounded-xl border py-0.5 pr-0.5 pl-3 font-mono text-xs">
+            <span class="min-w-0 flex-1 truncate" data-testid="preset-code">{{ look.code() }}</span>
+            <docs-copy-button [text]="look.code()" label="Copy preset code" />
+          </div>
         </div>
-        <button
-          ivButton
-          variant="ghost"
-          size="sm"
-          class="text-muted-foreground mt-1 w-full"
-          [disabled]="isDefault()"
-          (click)="reset()"
-        >
-          Reset to default
-        </button>
-      </div>
-    </ng-template>
-
-    <ng-template #cssDialog>
-      <iv-dialog-header>
-        <iv-dialog-title>theme.css variables</iv-dialog-title>
-        <iv-dialog-description
-          >The command writes this for you. Paste it to change the look by
-          hand.</iv-dialog-description
-        >
-      </iv-dialog-header>
-      <div class="relative min-w-0">
-        <pre
-          class="bg-muted/60 max-h-[50svh] overflow-auto rounded-lg border p-3 font-mono text-xs leading-relaxed"
-        ><code>{{ look.css() }}</code></pre>
-        <docs-copy-button class="absolute top-2 right-2" [text]="look.css()" label="Copy CSS" />
+        <div class="flex min-w-0 flex-col gap-1.5">
+          <span class="text-sm font-medium">theme.css variables</span>
+          <div class="relative min-w-0">
+            <pre class="bg-muted/50 max-h-[40svh] overflow-auto rounded-xl border p-3 font-mono text-xs leading-relaxed"><code>{{ look.css() }}</code></pre>
+            <docs-copy-button class="absolute top-2 right-2" [text]="look.css()" label="Copy CSS" />
+          </div>
+        </div>
       </div>
     </ng-template>
   `,
@@ -234,15 +178,12 @@ export default class PlaygroundPage {
     { value: 'existing', label: 'Existing app' },
   ];
   protected readonly target = signal<Target>('new');
-  protected readonly scenes = SCENES;
-  protected readonly scene = signal<Scene>('dashboard');
-  protected readonly sceneInfo = computed(() => SCENES.find((s) => s.value === this.scene())!);
   protected readonly widths = PREVIEW_WIDTHS;
   protected readonly width = signal<PreviewWidth>('desktop');
-  /** One option in a pill radio group. */
-  protected readonly pill =
+  /** The same inside a dialog, on a muted track. */
+  protected readonly pillMuted =
     'has-checked:bg-background has-checked:text-foreground has-checked:shadow-xs text-muted-foreground hover:text-foreground has-focus-visible:outline-ring cursor-pointer rounded-full font-medium transition-colors has-focus-visible:outline-2';
-  protected readonly codeCopied = signal(false);
+  protected readonly linkCopied = signal(false);
   protected readonly isDefault = computed(() => this.look.code() === DEFAULT_CODE);
   protected readonly command = computed(() => {
     const code = this.isDefault() ? null : this.look.code();
@@ -254,18 +195,15 @@ export default class PlaygroundPage {
     afterNextRender(() => {
       const query = this.route.snapshot.queryParamMap;
       this.look.load(query.get('preset'));
-      const scene = SCENES.find((s) => s.value === query.get('scene'));
-      if (scene) this.scene.set(scene.value);
       this.ready.set(true);
     });
-    // The look and the scene live in the URL, so a link shares them. The defaults have no query.
+    // The look lives in the URL, so a link shares it. The default look has no query.
     effect(() => {
       const preset = this.isDefault() ? null : this.look.code();
-      const scene = this.scene() === 'dashboard' ? null : this.scene();
       if (!this.ready()) return;
       void this.router.navigate([], {
         relativeTo: this.route,
-        queryParams: { preset, scene },
+        queryParams: { preset },
         replaceUrl: true,
       });
     });
@@ -275,13 +213,32 @@ export default class PlaygroundPage {
     this.look.load(null);
   }
 
-  protected async copyCode(): Promise<void> {
+  /** The URL already holds the preset. */
+  protected async copyLink(): Promise<void> {
     try {
-      await this.doc.defaultView?.navigator.clipboard.writeText(this.look.code());
-      this.codeCopied.set(true);
-      setTimeout(() => this.codeCopied.set(false), 1500);
+      const win = this.doc.defaultView!;
+      await win.navigator.clipboard.writeText(win.location.href);
+      this.linkCopied.set(true);
+      setTimeout(() => this.linkCopied.set(false), 1500);
     } catch {
-      // Clipboard blocked: the code is also in the URL and the command.
+      // Clipboard blocked: the link is in the address bar.
+    }
+  }
+
+  /** A random style, base color, radius and fonts. The icon set stays. Never the look already showing. */
+  shuffle(random: () => number = Math.random): void {
+    const any = <T>(list: readonly T[]) => list[Math.floor(random() * list.length)];
+    const fonts = FONTS.map((f) => f.name);
+    const before = this.look.code();
+    for (let i = 0; i < 10 && this.look.code() === before; i++) {
+      this.look.set({
+        style: any(STYLES).name,
+        baseColor: any(BASE_COLORS).name,
+        radius: any(Object.keys(RADII)),
+        font: any(['system', ...fonts]),
+        // Half the time the headings keep the body font.
+        fontHeading: random() < 0.5 ? 'inherit' : any(fonts),
+      });
     }
   }
 }

@@ -1,16 +1,10 @@
 /* @base nova */
 /*
- * Mono: a terminal. Monospace everywhere, square corners, flat surfaces with hairlines, a block caret.
+ * Mono: a terminal. Flat surfaces with hairlines, a block caret.
  * Nova gives the compact layout; these blocks only add to it.
- * Font and radius go on the root and its children (:where keeps them weak). The children matter
- * when a preview sets --radius or font-family inline on the root; below them, inheritance works as usual.
+ * Font and radius come from the theme like every style: pair it with a mono font and radius none
+ * (the playground picks Geist Mono when you switch to it).
  */
-
-&,
-& > :where(*) {
-  --radius: 0px;
-  font-family: var(--font-mono);
-}
 
 /* Flat: hairline frames, no shadows. */
 .cn-card,

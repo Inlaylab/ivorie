@@ -1137,12 +1137,6 @@
     }
 
     /* MARK: Style extras */
-    &,
-    & > :where(*) {
-      --radius: 0px;
-      font-family: var(--font-mono);
-    }
-
     .cn-card,
     .cn-dialog-content,
     .cn-alert-dialog-content,

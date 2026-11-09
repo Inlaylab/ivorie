@@ -100,7 +100,7 @@ try {
     await visit(page, at);
   }
   const blocks = readdirSync('projects/blocks').filter((d) => existsSync(`projects/blocks/${d}/${d}.ts`));
-  for (const path of ['/playground', '/preview/scene/dashboard', '/blocks', '/roadmap', ...blocks.flatMap((b) => [`/blocks/${b}`, `/preview/block/${b}`])]) {
+  for (const path of ['/playground', '/preview/scene/wall', '/blocks', '/roadmap', ...blocks.flatMap((b) => [`/blocks/${b}`, `/preview/block/${b}`])]) {
     at = path;
     await visit(page, at);
   }

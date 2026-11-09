@@ -7,12 +7,8 @@ import { ActivatedRoute } from '@angular/router';
 import { map } from 'rxjs';
 import { BLOCKS } from '../../generated/blocks';
 import { PREVIEW_ICONS, PlaygroundLook } from '../playground/playground-look';
-import { PlaygroundPreview } from '../playground/playground-preview';
 import { SCENES } from '../playground/scenes';
-import { SceneCheckout } from '../playground/scenes/checkout';
-import { SceneSettings } from '../playground/scenes/settings';
-import { SceneSignIn } from '../playground/scenes/sign-in';
-import { SceneTeam } from '../playground/scenes/team';
+import { SceneWall } from '../playground/scenes/wall';
 
 /** What the parent page posts when its look changes. Same origin only. */
 export interface LookMessage {
@@ -33,35 +29,15 @@ export interface ReadyMessage {
  */
 @Component({
   selector: 'docs-preview',
-  imports: [NgComponentOutlet, PlaygroundPreview, SceneCheckout, SceneSettings, SceneSignIn, SceneTeam],
+  imports: [NgComponentOutlet, SceneWall],
   providers: [PlaygroundLook, PREVIEW_ICONS],
   changeDetection: ChangeDetectionStrategy.OnPush,
   // A block is a whole page: no stage padding or dots around it.
   host: { '[class]': "blockEntry() ? 'block min-h-svh bg-background' : 'docs-stage block min-h-svh p-4 sm:p-6 lg:p-8'" },
   template: `
     @switch (scene()) {
-      @case ('dashboard') {
-        <docs-playground-preview />
-      }
-      @case ('sign-in') {
-        @defer (on immediate) {
-          <docs-scene-sign-in />
-        }
-      }
-      @case ('settings') {
-        @defer (on immediate) {
-          <docs-scene-settings />
-        }
-      }
-      @case ('team') {
-        @defer (on immediate) {
-          <docs-scene-team />
-        }
-      }
-      @case ('checkout') {
-        @defer (on immediate) {
-          <docs-scene-checkout />
-        }
+      @case ('wall') {
+        <docs-scene-wall />
       }
       @default {
         @if (blockEntry()) {

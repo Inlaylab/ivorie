@@ -787,6 +787,17 @@
   body {
     @apply bg-background text-foreground;
   }
+  /* The radius scale resolves where it is declared (:root). Re-declare it on every style root, so a
+     --radius set there (a style, a preview) reaches the var(--radius-*) uses in the style files. */
+  :where([class*="style-"]) {
+    --radius-sm: calc(var(--radius) * 0.6);
+    --radius-md: calc(var(--radius) * 0.8);
+    --radius-lg: var(--radius);
+    --radius-xl: calc(var(--radius) * 1.4);
+    --radius-2xl: calc(var(--radius) * 1.8);
+    --radius-3xl: calc(var(--radius) * 2.2);
+    --radius-4xl: calc(var(--radius) * 2.6);
+  }
   /* Titles that use the heading font. A preset sets --font-heading; by default it is the body font. */
   .cn-font-heading {
     @apply font-heading;

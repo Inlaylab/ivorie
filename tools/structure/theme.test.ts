@@ -42,6 +42,13 @@ test('theme has the shadcn base layer (border and outline colors, body)', () => 
   assert.ok(theme.includes('@apply bg-background text-foreground;'));
 });
 
+test('every style root re-declares the radius scale, so a --radius set there reaches var(--radius-*)', () => {
+  const rule = theme.match(/:where\(\[class\*="style-"\]\) \{([^}]*)\}/)?.[1] ?? '';
+  for (const size of ['sm', 'md', 'lg', 'xl', '2xl', '3xl', '4xl']) {
+    assert.match(rule, new RegExp(`--radius-${size}:`), size);
+  }
+});
+
 test('theme has the shadcn accordion keyframes', () => {
   assert.ok(theme.includes('@keyframes accordion-down {'));
   assert.ok(theme.includes('--accordion-panel-height'));

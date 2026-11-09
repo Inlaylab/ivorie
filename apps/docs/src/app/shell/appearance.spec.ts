@@ -31,17 +31,26 @@ describe('Appearance', () => {
     document.head.querySelector('link#docs-style')?.remove();
   });
 
-  it('defaults to system + maia with no storage', () => {
+  it('defaults to dark with no storage, even on a light OS', () => {
     mockMatchMedia(false);
-    const { appearance } = create();
-    expect(appearance.state()).toEqual({ mode: 'system' });
+    const { appearance, doc } = create();
+    expect(appearance.state()).toEqual({ mode: 'dark' });
+    expect(doc.documentElement.classList.contains('dark')).toBe(true);
+  });
+
+  it('a saved light choice wins over the dark default', () => {
+    mockMatchMedia(true);
+    localStorage.setItem(APPEARANCE_KEY, '{"mode":"light"}');
+    const { appearance, doc } = create();
+    expect(appearance.dark()).toBe(false);
+    expect(doc.documentElement.classList.contains('dark')).toBe(false);
   });
 
   it('falls back to defaults on corrupt JSON', () => {
     mockMatchMedia(false);
     localStorage.setItem(APPEARANCE_KEY, '{nope');
     const { appearance } = create();
-    expect(appearance.state()).toEqual({ mode: 'system' });
+    expect(appearance.state()).toEqual({ mode: 'dark' });
   });
 
   it('falls back to defaults when getItem throws', () => {
@@ -50,7 +59,7 @@ describe('Appearance', () => {
       throw new Error('blocked');
     });
     const { appearance } = create();
-    expect(appearance.state()).toEqual({ mode: 'system' });
+    expect(appearance.state()).toEqual({ mode: 'dark' });
   });
 
   it('setMode(dark) sets the class and keeps unknown keys in storage', () => {
@@ -67,6 +76,7 @@ describe('Appearance', () => {
 
   it('system mode follows prefers-color-scheme and its changes', () => {
     const change = mockMatchMedia(true);
+    localStorage.setItem(APPEARANCE_KEY, '{"mode":"system"}');
     const { appearance, doc } = create();
     expect(appearance.dark()).toBe(true);
     expect(doc.documentElement.classList.contains('dark')).toBe(true);
@@ -98,12 +108,12 @@ describe('Appearance', () => {
   it('follows a storage event from another page of the site', () => {
     mockMatchMedia(false);
     const { appearance, doc } = create();
-    window.dispatchEvent(new StorageEvent('storage', { key: APPEARANCE_KEY, newValue: '{"mode":"dark"}' }));
+    window.dispatchEvent(new StorageEvent('storage', { key: APPEARANCE_KEY, newValue: '{"mode":"light"}' }));
     TestBed.tick();
-    expect(appearance.dark()).toBe(true);
-    expect(doc.documentElement.classList.contains('dark')).toBe(true);
-    window.dispatchEvent(new StorageEvent('storage', { key: 'other-key', newValue: '{"mode":"light"}' }));
+    expect(appearance.dark()).toBe(false);
+    expect(doc.documentElement.classList.contains('dark')).toBe(false);
+    window.dispatchEvent(new StorageEvent('storage', { key: 'other-key', newValue: '{"mode":"dark"}' }));
     TestBed.tick();
-    expect(appearance.dark()).toBe(true);
+    expect(appearance.dark()).toBe(false);
   });
 });

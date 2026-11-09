@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.4.1
+
+Both packages: `@inlaylab/ivorie` and `ivorie` 1.4.1. Per-package notes: `projects/ui/CHANGELOG.md`, `projects/cli/CHANGELOG.md`.
+
+- Radius follows the pick in every style. The radius scale (`--radius-sm` to `--radius-4xl`) is re-declared on every `style-*` element, so small buttons, inputs, calendar cells and Rhea cards follow a `--radius` set below `:root`.
+- Mono takes font and radius from the theme like every style. It no longer forces radius 0 and the mono font. To keep the old look, pick a mono font and radius none. The playground picks Geist Mono when you switch to Mono.
+
 ## 1.4.0
 
 Both packages: `@inlaylab/ivorie` and `ivorie` 1.4.0. Per-package notes: `projects/ui/CHANGELOG.md`, `projects/cli/CHANGELOG.md`.

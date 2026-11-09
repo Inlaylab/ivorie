@@ -40,25 +40,25 @@ describe('PreviewPage', () => {
   });
 
   it('renders the scene with no site chrome', async () => {
-    const { el } = await open(`/preview/scene/team?preset=${glass}`);
-    expect(el.querySelector('docs-scene-team')).not.toBeNull();
+    const { el } = await open(`/preview/scene/wall?preset=${glass}`);
+    expect(el.querySelector('docs-scene-wall')).not.toBeNull();
     expect(el.querySelector('docs-site-header')).toBeNull();
   }, 60_000);
 
   it('the look is on body, in place of the site style', async () => {
-    await open(`/preview/scene/dashboard?preset=${glass}`);
+    await open(`/preview/scene/wall?preset=${glass}`);
     expect(document.body.classList.contains('style-glass')).toBe(true);
     expect(document.body.classList.contains('style-nova')).toBe(false);
   });
 
   it('applies a look message from the same origin', async () => {
-    await open(`/preview/scene/dashboard?preset=${glass}`);
+    await open(`/preview/scene/wall?preset=${glass}`);
     post(location.origin, maia);
     expect(document.body.classList.contains('style-maia')).toBe(true);
   });
 
   it('ignores messages from other origins', async () => {
-    await open(`/preview/scene/dashboard?preset=${glass}`);
+    await open(`/preview/scene/wall?preset=${glass}`);
     post('https://evil.test', maia);
     expect(document.body.classList.contains('style-glass')).toBe(true);
   });
@@ -66,7 +66,7 @@ describe('PreviewPage', () => {
   // The parent answers with its current look: a look picked before the frame listened is not lost.
   it('tells the parent it is ready once it listens', async () => {
     const post = vi.spyOn(window.parent, 'postMessage');
-    await open(`/preview/scene/dashboard?preset=${glass}`);
+    await open(`/preview/scene/wall?preset=${glass}`);
     expect(post).toHaveBeenCalledWith({ type: 'ivorie-preview-ready' }, location.origin);
     post.mockRestore();
   });
@@ -99,7 +99,7 @@ describe('PreviewPage', () => {
   });
 
   it('has no axe violations', async () => {
-    const { el } = await open('/preview/scene/sign-in');
+    const { el } = await open('/preview/scene/wall');
     await expect(el).toHaveNoViolations();
   });
 });

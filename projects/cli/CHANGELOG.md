@@ -1,5 +1,11 @@
 # ivorie
 
+## 1.4.1
+
+### Patch Changes
+
+- Radius and font follow the pick in every style. The radius scale (`--radius-sm` to `--radius-4xl`) is now re-declared on every `style-*` element, so a `--radius` set below `:root` (a preview, a style class) reaches every component. Mono no longer forces radius 0 and the mono font: like every style it takes `--radius`, `--font-sans` and `--font-heading` from the theme. To keep the old Mono look, pick a mono font and radius none.
+
 ## 1.4.0
 
 ### Minor Changes

@@ -9,10 +9,14 @@ const html = readFileSync('apps/docs/src/index.html', 'utf8');
 const script = /<body[^>]*>[\s\S]*?<script>([\s\S]*?)<\/script>/.exec(html)![1];
 
 function run(storage: { getItem(key: string): string | null }, prefersDark = false) {
-  const classes = new Set<string>();
+  // index.html ships <html class="dark">: the script only removes it.
+  const classes = new Set<string>(['dark']);
   const head: unknown[] = [];
   const document = {
-    documentElement: { classList: { add: (c: string) => classes.add(c) }, style: { colorScheme: '' } },
+    documentElement: {
+      classList: { add: (c: string) => classes.add(c), remove: (c: string) => classes.delete(c) },
+      style: { colorScheme: '' },
+    },
     body: { className: 'style-maia' },
     head: { appendChild: (el: unknown) => head.push(el) },
     createElement: () => ({}),
@@ -28,13 +32,19 @@ function run(storage: { getItem(key: string): string | null }, prefersDark = fal
   return { dark: classes.has('dark'), body: document.body.className, links: head.length };
 }
 
-test('no saved state: defaults, system mode follows the media query', () => {
-  assert.deepEqual(run({ getItem: () => null }), { dark: false, body: 'style-maia', links: 0 });
+test('no saved state: dark, whatever the OS prefers', () => {
+  assert.deepEqual(run({ getItem: () => null }), { dark: true, body: 'style-maia', links: 0 });
   assert.equal(run({ getItem: () => null }, true).dark, true);
 });
 
+test('saved light removes dark; saved system follows the media query', () => {
+  assert.equal(run({ getItem: () => '{"mode":"light"}' }, true).dark, false);
+  assert.equal(run({ getItem: () => '{"mode":"system"}' }, false).dark, false);
+  assert.equal(run({ getItem: () => '{"mode":"system"}' }, true).dark, true);
+});
+
 test('corrupt JSON: defaults, no throw', () => {
-  assert.deepEqual(run({ getItem: () => '{bad' }), { dark: false, body: 'style-maia', links: 0 });
+  assert.deepEqual(run({ getItem: () => '{bad' }), { dark: true, body: 'style-maia', links: 0 });
 });
 
 test('getItem throws: defaults, no throw', () => {
@@ -43,7 +53,7 @@ test('getItem throws: defaults, no throw', () => {
       throw new Error('SecurityError');
     },
   });
-  assert.deepEqual(r, { dark: false, body: 'style-maia', links: 0 });
+  assert.deepEqual(r, { dark: true, body: 'style-maia', links: 0 });
 });
 
 test('localStorage getter throws: no throw', () => {

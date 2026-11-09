@@ -69,7 +69,7 @@ A style class on `<body>` selects the component look: spacing, radius, borders a
 | Brutal | `style-brutal` | Ink borders, hard offset shadows, buttons that press down. |
 | Aurora | `style-aurora` | Gradient hairline edges, a soft glow on focus and primary actions. Brings its own accent hues. |
 | Bento | `style-bento` | Tonal tiles on a toned page, no outlines, big type. |
-| Mono | `style-mono` | Monospace, square and flat, with a block caret. Ignores the preset font and radius. |
+| Mono | `style-mono` | Flat, with hairlines and a block caret. Font and radius follow the preset like every style; it is made for a mono font (the playground picks Geist Mono). |
 
 Import the file for each style you use, then set its class:
 

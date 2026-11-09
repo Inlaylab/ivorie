@@ -12,5 +12,7 @@ export const STYLES = [
   { name: 'mono', label: 'Mono', own: true },
 ] as const;
 export type StyleName = (typeof STYLES)[number]['name'];
+/** The font a style is made for. The playground picks it when you switch to that style. */
+export const STYLE_FONTS: Partial<Record<StyleName, string>> = { mono: 'geist-mono' };
 /** Matches `<body class="style-nova">` in index.html, the server default. */
 export const DEFAULT_STYLE: StyleName = 'nova';
