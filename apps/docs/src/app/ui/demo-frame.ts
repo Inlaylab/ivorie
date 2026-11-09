@@ -14,7 +14,7 @@ const COLLAPSED_LINES = 10;
   selector: 'docs-demo-frame',
   imports: [NgComponentOutlet, IvButton, CopyButton, TrustedHtmlPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  host: { class: 'not-prose my-6 block overflow-hidden rounded-xl border' },
+  host: { class: 'docs-pane not-prose my-6 block overflow-hidden rounded-2xl' },
   template: `
     <!-- The demo host fills the frame and centers its children, so a w-full child gets real width and wide ones shrink on phones. -->
     <div
@@ -28,7 +28,7 @@ const COLLAPSED_LINES = 10;
       @if (long()) {
         <div
           class="flex justify-center p-2"
-          [class]="collapsed() ? 'from-background via-background/80 absolute inset-x-0 bottom-0 h-20 items-end bg-linear-to-t to-transparent' : 'border-t'"
+          [class]="collapsed() ? 'from-card via-card/80 absolute inset-x-0 bottom-0 h-20 items-end bg-linear-to-t to-transparent' : 'border-t'"
         >
           <button
             ivButton

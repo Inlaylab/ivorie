@@ -10,15 +10,28 @@ async function render() {
   return fixture.nativeElement as HTMLElement;
 }
 
+const titles = (el: Element, state: string) =>
+  [...el.querySelectorAll(`[data-state="${state}"] h3`)].map((h) => h.textContent!.trim());
+
 describe('RoadmapPage', () => {
-  it('lists every item in order, shipped first, with exactly one up next', async () => {
+  it('shows every item once: one up next, planned in order, shipped newest first', async () => {
     const el = await render();
-    const items = [...el.querySelectorAll('ol > li')];
-    expect(items.map((li) => li.querySelector('h2')?.textContent?.trim())).toEqual(ROADMAP.map((i) => i.title));
-    const states = items.map((li) => li.getAttribute('data-state'));
-    expect(states.filter((s) => s === 'next')).toHaveLength(1);
-    // Nothing shipped after the next item.
-    expect(states.lastIndexOf('shipped')).toBeLessThan(states.indexOf('next'));
+    expect(titles(el, 'next')).toEqual(ROADMAP.filter((i) => i.state === 'next').map((i) => i.title));
+    expect(titles(el, 'planned')).toEqual(ROADMAP.filter((i) => i.state === 'planned').map((i) => i.title));
+    const shipped = ROADMAP.filter((i) => i.state === 'shipped');
+    expect([...titles(el, 'shipped')].sort()).toEqual(shipped.map((i) => i.title).sort());
+    // Newest version first; inside a version, the list order.
+    expect(titles(el, 'shipped')[0]).toBe(shipped.find((i) => i.version === shipped.at(-1)!.version)!.title);
+  });
+
+  it('counts each state', async () => {
+    const el = await render();
+    const shipped = ROADMAP.filter((i) => i.state === 'shipped').length;
+    const planned = ROADMAP.filter((i) => i.state === 'planned').length;
+    const pairs = [...el.querySelectorAll('[data-testid="counts"] > div')].map(
+      (d) => `${d.querySelector('dd')!.textContent!.trim()} ${d.querySelector('dt')!.textContent!.trim()}`,
+    );
+    expect(pairs).toEqual([`${shipped} Shipped`, '1 Up next', `${planned} Planned`]);
   });
 
   it('has no axe violations', async () => {

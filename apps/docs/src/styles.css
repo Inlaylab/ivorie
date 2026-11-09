@@ -5,6 +5,7 @@
 /* Geist, self-hosted: the check and the SSR smoke run without network. */
 @import "@fontsource-variable/geist";
 @import "@fontsource-variable/geist-mono";
+@import "@fontsource-variable/bricolage-grotesque/opsz.css";
 @plugin "@tailwindcss/typography";
 @source "../../../projects/ui";
 /* Tailwind scans from the repo root; plans, tools and markdown are not UI. */
@@ -17,6 +18,7 @@
 @theme {
   --font-sans: "Geist Variable", system-ui, sans-serif;
   --font-mono: "Geist Mono Variable", SFMono-Regular, Menlo, Consolas, monospace;
+  --font-display: "Bricolage Grotesque Variable", "Geist Variable", system-ui, sans-serif;
 }
 
 @layer base {
@@ -55,8 +57,16 @@
   color: var(--shiki-dark);
   background-color: var(--shiki-dark-bg);
 }
+/* On the site, code sits on a solid pane; Shiki's own background goes. */
+.docs-shell .shiki,
+.docs-shell .shiki span {
+  background-color: transparent;
+}
+.docs-shell .shiki {
+  background-color: var(--docs-pane-solid);
+}
 .shiki {
-  @apply overflow-x-auto rounded-lg border p-4 font-mono text-[0.8125rem] leading-relaxed;
+  @apply overflow-x-auto rounded-xl border p-4 font-mono text-[0.8125rem] leading-relaxed;
 }
 /* Inside the demo card: no own border. Collapsed shows about 10 lines under a fade. */
 .docs-code .shiki {
@@ -127,7 +137,8 @@
 }
 
 .docs-table {
-  @apply my-6 w-full overflow-x-auto rounded-lg border;
+  @apply my-6 w-full overflow-x-auto rounded-xl border;
+  background: var(--docs-pane-solid);
   & table {
     @apply my-0 w-full text-sm;
   }
@@ -144,14 +155,14 @@
 
 /* Shell: a floating header bar, the docs sidebar below it. */
 .docs-shell {
-  --header-height: 4rem;
+  --header-height: 3.5rem;
   /* Only the site sidebar: sidebars inside demo previews keep their own layout. */
   & [data-slot='sidebar-container']:not(.docs-preview *) {
     top: var(--header-height);
     height: calc(100svh - var(--header-height));
   }
   & [data-slot='sidebar-inner']:not(.docs-preview *) {
-    @apply bg-background;
+    background: transparent;
   }
 }
 
@@ -176,6 +187,61 @@
 }
 .docs-specimen-sm {
   height: 2.5rem;
+}
+/* A 16px specimen for list rows: the card only. */
+.docs-specimen-xs {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+  border-radius: 0.25rem;
+}
+.docs-specimen-xs .docs-specimen-card {
+  inset: 3px !important;
+  border-radius: calc(var(--sp-card-r) * 0.4);
+  box-shadow: none !important;
+}
+/* Playground panel rows: a small label over the value, a picture on the right, the whole row is the button. */
+.docs-panel-row {
+  position: relative;
+}
+.docs-row-label {
+  position: absolute;
+  top: 0.45rem;
+  left: 0.75rem;
+  z-index: 1;
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
+  pointer-events: none;
+}
+.docs-row-picture {
+  position: absolute;
+  top: 50%;
+  right: 0.75rem;
+  z-index: 1;
+  display: flex;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+.docs-panel button[data-slot='select-trigger'] {
+  width: 100%;
+  height: auto;
+  min-height: 3.25rem;
+  justify-content: flex-start;
+  padding: 1.35rem 2.75rem 0.45rem 0.75rem;
+  border: 0;
+  border-radius: 0.75rem;
+  background: transparent;
+  box-shadow: none;
+  color: var(--foreground);
+  font-weight: 500;
+  transition: background-color var(--docs-dur) var(--docs-ease);
+}
+.docs-panel button[data-slot='select-trigger']:hover,
+.docs-panel button[data-slot='select-trigger'][data-state='open'] {
+  background: color-mix(in oklab, var(--foreground) 7%, transparent);
+}
+.docs-panel button[data-slot='select-trigger'] > svg {
+  display: none;
 }
 .docs-specimen-card,
 .docs-specimen-button {
@@ -309,34 +375,144 @@
   color: var(--foreground);
 }
 
-/* Ivorie brand: the logo's violet. Lavender #F5F3FF, primary violet #7C3AED, deep indigo. Used sparingly. */
+/* Site material: smoky glass, dark-first. Site chrome only: .docs-shell is the site wrapper and is not
+   rendered on /preview routes. Demo frames restore the theme values below, and preview stages get the
+   picked look inline from PlaygroundLook, so no site value leaks into a preview.
+   Hex on purpose: tools/docs/site-contrast.test.ts reads these values. */
+/* Cool, deep ground; electric indigo brand with a cyan edge. Light mode keeps the same hues, faint. */
 :root {
-  --brand-a: oklch(0.84 0.1 305);
-  --brand-b: oklch(0.6 0.23 293);
-  --brand-c: oklch(0.5 0.22 275);
+  --docs-ground: #f6f7f9;
+  --docs-ink: #0f1115;
+  --docs-ink-muted: #5a5d68;
+  --docs-pane: rgb(255 255 255 / 0.74);
+  --docs-pane-solid: #ffffff;
+  --docs-line: rgb(15 17 21 / 0.08);
+  --docs-rim: inset 0 1px 0 rgb(255 255 255 / 0.9);
+  --docs-shadow: 0 1px 2px rgb(16 20 48 / 0.06), 0 14px 36px -18px rgb(16 20 48 / 0.24);
+  --docs-glow-a: rgb(91 108 255 / 0.26);
+  --docs-glow-b: rgb(56 200 255 / 0.22);
+  --docs-glow-c: rgb(91 108 255 / 0.1);
+  --docs-beam: rgb(91 108 255 / 0.16);
+  --docs-beam-core: rgb(91 108 255 / 0.2);
+  --docs-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --docs-dur: 220ms;
+  /* Brand: the logo dot, badges, focus and the hero light. */
+  --brand: #4453e6;
+  --brand-soft: #e8ebff;
+  --brand-ink: #3240c8;
+  --brand-cyan: #0ea5d9;
 }
 .dark {
-  --brand-a: oklch(0.72 0.14 305);
-  --brand-b: oklch(0.58 0.23 293);
-  --brand-c: oklch(0.48 0.2 275);
+  --docs-ground: #08090d;
+  --docs-ink: #f2f3f6;
+  --docs-ink-muted: #9c9fab;
+  --docs-pane: rgb(255 255 255 / 0.035);
+  --docs-pane-solid: #12141a;
+  --docs-line: rgb(255 255 255 / 0.08);
+  --docs-rim: inset 0 1px 0 rgb(255 255 255 / 0.07);
+  --docs-shadow: 0 1px 2px rgb(0 0 0 / 0.5), 0 18px 44px -18px rgb(0 0 0 / 0.8);
+  --docs-glow-a: rgb(110 124 255 / 0.5);
+  --docs-glow-b: rgb(56 200 255 / 0.34);
+  --docs-glow-c: rgb(110 124 255 / 0.14);
+  --docs-beam: rgb(170 185 255 / 0.26);
+  --docs-beam-core: rgb(124 140 255 / 0.38);
+  --brand: #7c8cff;
+  --brand-soft: rgb(124 140 255 / 0.16);
+  --brand-ink: #b9c2ff;
+  --brand-cyan: #38c8ff;
+}
+/* The site re-points a few theme tokens at the material, so shared chrome (sidebar, prose, inputs) follows. */
+.docs-shell {
+  --background: var(--docs-ground);
+  --foreground: var(--docs-ink);
+  --muted-foreground: var(--docs-ink-muted);
+  --border: var(--docs-line);
+  --card: var(--docs-pane-solid);
+  --ring: var(--brand);
+  background:
+    radial-gradient(70rem 30rem at 50% -14rem, var(--docs-glow-c), transparent 70%),
+    var(--docs-ground);
+  background-repeat: no-repeat;
+  color: var(--docs-ink);
+}
+/* Demo frames show the real default look: the theme values back. */
+.docs-preview {
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --border: oklch(0.922 0 0);
+  --card: oklch(1 0 0);
+  --ring: oklch(0.708 0 0);
+}
+.dark .docs-preview {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --border: oklch(1 0 0 / 10%);
+  --card: oklch(0.205 0 0);
+  --ring: oklch(0.556 0 0);
+}
+body {
+  background: var(--docs-ground);
+}
+::selection {
+  background: color-mix(in oklab, var(--brand) 32%, transparent);
+}
+html {
+  scrollbar-color: color-mix(in oklab, var(--docs-ink) 22%, transparent) transparent;
+}
+/* The site header: a full-width glass bar over the page. */
+.docs-header {
+  border-color: var(--docs-line);
+  background: color-mix(in oklab, var(--docs-ground) 72%, transparent);
+  backdrop-filter: blur(16px) saturate(1.4);
+}
+@media (prefers-reduced-transparency: reduce) {
+  .docs-header {
+    background: var(--docs-ground);
+    backdrop-filter: none;
+  }
+}
+/* A pane: smoky fill, hairline, rim highlight, layered shadow. */
+.docs-pane {
+  border: 1px solid var(--docs-line);
+  background: var(--docs-pane);
+  box-shadow: var(--docs-rim), var(--docs-shadow);
+}
+/* Blur only where content scrolls under the pane (the header). Solid when transparency is reduced. */
+.docs-pane-blur {
+  backdrop-filter: blur(16px) saturate(1.4);
+}
+@media (prefers-reduced-transparency: reduce) {
+  .docs-pane,
+  .docs-pane-blur {
+    background: var(--docs-pane-solid);
+    backdrop-filter: none;
+  }
 }
 .docs-brand-gradient {
-  background-image: linear-gradient(120deg, var(--brand-a), var(--brand-b) 55%, var(--brand-c));
+  background: var(--brand);
 }
-/* Blurred light behind the hero. Decoration only: aria-hidden, pointer-events none. */
-.docs-aurora {
+/* Home hero: a soft beam of light from the top, behind the headline. Decoration only. */
+.docs-beam {
   background:
-    radial-gradient(38% 46% at 22% 32%, color-mix(in oklab, var(--brand-a) 55%, transparent), transparent 70%),
-    radial-gradient(34% 42% at 72% 22%, color-mix(in oklab, var(--brand-b) 42%, transparent), transparent 70%),
-    radial-gradient(40% 48% at 62% 78%, color-mix(in oklab, var(--brand-c) 42%, transparent), transparent 70%);
-  filter: blur(48px);
+    radial-gradient(26rem 18rem at 50% 0, var(--docs-beam-core), transparent 70%),
+    conic-gradient(from 180deg at 50% -6rem, transparent 158deg, var(--docs-beam) 180deg, transparent 202deg);
+  filter: blur(28px);
+  mask-image: linear-gradient(to bottom, black 30%, transparent 92%);
 }
-/* A 1px gradient border: the fill in the padding box, the gradient in the border box. */
-.docs-gradient-border {
-  border: 1px solid transparent;
+/* Home showcase: a blue-cyan horizon behind the top edge of the wall, like light over a product shot. */
+.docs-horizon {
   background:
-    linear-gradient(var(--card), var(--card)) padding-box,
-    linear-gradient(135deg, var(--brand-a), var(--brand-b), var(--brand-c)) border-box;
+    radial-gradient(40% 45% at 50% 62%, var(--docs-glow-b), transparent 70%),
+    radial-gradient(62% 60% at 50% 62%, var(--docs-glow-a), transparent 74%);
+  filter: blur(36px);
+}
+/* Roadmap: light behind the release in progress. */
+.docs-next-glow {
+  background:
+    radial-gradient(40rem 22rem at 100% 0%, var(--docs-glow-a), transparent 70%),
+    radial-gradient(30rem 18rem at 70% 120%, var(--docs-glow-b), transparent 70%);
 }
 /* Text drawn by CSS, so it is not part of the element's text (select labels read text). */
 .docs-glyph::before {

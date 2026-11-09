@@ -1,76 +1,68 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { DomSanitizer, Meta } from '@angular/platform-browser';
-import { RouterLink } from '@angular/router';
-import { IvSkeleton } from '@inlaylab/ivorie/skeleton';
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { Meta } from '@angular/platform-browser';
+import { ActivatedRoute, RouterLink } from '@angular/router';
+import { map } from 'rxjs';
 import { BLOCKS } from '../../generated/blocks';
 import { DEFAULT_PRESET, encodePreset } from '../playground/preset-code';
+import { BlockShowcase } from './block-showcase';
 
-const GROUPS = ['Login', 'Sign up', 'Sidebar', 'Dashboard'] as const;
+/** Category tabs. The tab is in the URL (`?category=`); Featured has no query. */
+const CATEGORIES = [
+  { value: 'featured', label: 'Featured', blocks: ['login-01', 'signup-01', 'sidebar-01', 'dashboard-01'] },
+  { value: 'login', label: 'Login', group: 'Login' },
+  { value: 'signup', label: 'Sign up', group: 'Sign up' },
+  { value: 'sidebar', label: 'Sidebar', group: 'Sidebar' },
+  { value: 'dashboard', label: 'Dashboard', group: 'Dashboard' },
+] as const;
 
-/** `/blocks`: every block, grouped, each with a live thumbnail of the real block. */
+/** `/blocks`: one category at a time, each block full width with its own toolbar. */
 @Component({
   selector: 'docs-blocks',
-  imports: [RouterLink, IvSkeleton],
+  imports: [RouterLink, BlockShowcase],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'block' },
   template: `
-    <div class="mx-auto max-w-6xl px-4 pt-14 pb-24 sm:px-6 sm:pt-20">
-      <header class="max-w-2xl">
-        <h1 class="text-foreground text-[clamp(2.25rem,5vw,3.25rem)] leading-none font-semibold tracking-[-0.04em]">Blocks</h1>
-        <p class="text-muted-foreground mt-4 text-lg text-pretty">
-          Whole pages built from Ivorie components: sign in, sign up, app shells and a dashboard. Forms validate, buttons emit, the sidebar
-          follows your routes. Add one with a single command, then make it yours.
-        </p>
-        <code class="bg-muted/60 text-muted-foreground mt-6 inline-block rounded-full border px-4 py-1.5 font-mono text-[0.8125rem]">npx ivorie add login-01</code>
+    <div class="mx-auto max-w-7xl px-4 pt-14 pb-24 sm:px-6 sm:pt-20">
+      <header>
+        <div class="max-w-2xl">
+          <h1 class="font-display text-foreground text-[clamp(2.25rem,5vw,3.5rem)] leading-none font-semibold tracking-[-0.025em]">Blocks</h1>
+          <p class="text-muted-foreground mt-4 text-lg text-pretty">
+            Whole pages built from Ivorie components: sign in, sign up, app shells and a dashboard. Forms validate, buttons emit, the
+            sidebar follows your routes. Add one with a single command, then make it yours.
+          </p>
+        </div>
       </header>
 
-      @for (g of groups; track g.label) {
-        <section class="mt-16" [attr.aria-labelledby]="'group-' + $index">
-          <h2 [id]="'group-' + $index" class="text-foreground text-xl font-semibold tracking-tight">{{ g.label }}</h2>
-          <ul class="mt-5 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            @for (b of g.blocks; track b.name) {
-              <li>
-                <a [routerLink]="['/blocks', b.name]" class="group focus-visible:ring-ring flex flex-col gap-3 rounded-2xl outline-none focus-visible:ring-2 focus-visible:ring-offset-4">
-                  <!-- The real block, shrunk to a quarter: it is a picture here, so it takes no focus or clicks. -->
-                  <span class="bg-muted/40 relative block aspect-[16/10] overflow-hidden rounded-2xl border transition-shadow group-hover:shadow-md">
-                    @defer (on viewport) {
-                      <iframe
-                        class="pointer-events-none absolute top-0 left-0 h-[400%] w-[400%] origin-top-left scale-25"
-                        [src]="b.src"
-                        [title]="b.title + ' thumbnail'"
-                        tabindex="-1"
-                        aria-hidden="true"
-                        inert
-                        loading="lazy"
-                      ></iframe>
-                    } @placeholder {
-                      <iv-skeleton class="absolute inset-0 rounded-none" />
-                    }
-                  </span>
-                  <span class="flex flex-col gap-0.5 px-1">
-                    <span class="text-foreground font-medium">{{ b.title }}</span>
-                    <span class="text-muted-foreground text-sm text-pretty">{{ b.description }}</span>
-                  </span>
-                </a>
-              </li>
-            }
-          </ul>
-        </section>
-      }
+      <nav aria-label="Block categories" class="docs-pane no-scrollbar mt-10 flex max-w-full gap-0.5 self-start overflow-x-auto rounded-full p-1 sm:w-fit">
+        @for (c of categories; track c.value) {
+          <a
+            routerLink="/blocks"
+            [queryParams]="{ category: c.value === 'featured' ? null : c.value }"
+            [attr.aria-current]="category().value === c.value ? 'page' : null"
+            class="aria-[current=page]:bg-foreground aria-[current=page]:text-background text-muted-foreground hover:text-foreground shrink-0 rounded-full px-4 py-1.5 text-sm font-medium transition-colors duration-(--docs-dur)"
+            >{{ c.label }}</a
+          >
+        }
+      </nav>
+
+      <div class="mt-10 flex flex-col gap-16">
+        @for (b of blocks(); track b.name) {
+          <docs-block-showcase [entry]="b" [code]="code" [attr.aria-labelledby]="b.name + '-title'" role="region" />
+        }
+      </div>
     </div>
   `,
 })
 export default class BlocksPage {
-  private readonly sanitizer = inject(DomSanitizer);
-  private readonly code = encodePreset(DEFAULT_PRESET);
-  // Same-origin paths built here from the generated block list, never from input.
-  protected readonly groups = GROUPS.map((label) => ({
-    label,
-    blocks: BLOCKS.filter((b) => b.group === label).map((b) => ({
-      ...b,
-      src: this.sanitizer.bypassSecurityTrustResourceUrl(`preview/block/${b.name}?preset=${this.code}`),
-    })),
-  }));
+  protected readonly categories = CATEGORIES;
+  protected readonly code = encodePreset(DEFAULT_PRESET);
+  private readonly query = toSignal(inject(ActivatedRoute).queryParamMap.pipe(map((q) => q.get('category'))));
+  protected readonly category = computed(() => CATEGORIES.find((c) => c.value === this.query()) ?? CATEGORIES[0]);
+  protected readonly blocks = computed(() => {
+    const c = this.category();
+    return 'group' in c ? BLOCKS.filter((b) => b.group === c.group) : c.blocks.map((name) => BLOCKS.find((b) => b.name === name)!);
+  });
 
   constructor() {
     inject(Meta).updateTag({ name: 'description', content: 'Ready-made login, sign-up, sidebar and dashboard pages for Ivorie.' });

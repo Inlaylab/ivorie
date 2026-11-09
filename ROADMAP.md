@@ -1,6 +1,6 @@
 # Ivorie — Roadmap
 
-Single source for plan, status and next work. Updated 2026-11-05.
+Single source for plan, status and next work. Updated 2026-11-09.
 
 ## Goal
 
@@ -20,18 +20,21 @@ More detail: [PLAN](docs/PLAN.md) · [ARCHITECTURE](docs/ARCHITECTURE.md) · [CO
 
 ## Status
 
-**Next:** Phase 10 (1.4.0), branch `feat/v1.4.0`: T1–T3 done, versions bumped to 1.4.0 (`chore: release 1.4.0`). Left: `npm run smoke:pack`, `npm run smoke:cli`, PR → `main`, tag `v1.4.0`, publish (ask first). 1.3.0 was bumped but never published: its icon libraries ship in 1.4.0.
-Then Phase 14 (1.5.0, AI-ready): expand the outline into tasks and get an OK.
-Shipped: 1.0.0, 1.1.0, 1.2.0 (both packages). Docs initial bundle is ~800 kB, mostly lucide icons (backlog: docs drop `@lucide/angular`).
+**Next:** release 1.4.1 = Phase 16 + Phase 17 (docs redesign) in one commit on `release/v1.4.1`. Exit gates green: check, smoke:pack, smoke:cli, browser matrix; Phase 17 T5 done (detector clean, Lighthouse a11y 100 on Home, Playground, Blocks, review light/dark at 390/768/1440). Left: PR, merge, tag `v1.4.1`, publish (ask first).
+Then Phase 18 (1.5.0, glass material and dials): expand the outline into tasks and get an OK.
+Shipped: 1.0.0, 1.1.0, 1.2.0, 1.4.0 (both packages; 1.3.0 never published, its icon libraries shipped in 1.4.0). Docs initial bundle is ~800 kB, mostly lucide icons (backlog: docs drop `@lucide/angular`).
 
-| #   | Release | What                               | Status  |
-| --- | ------- | ---------------------------------- | ------- |
-| 8   | 1.1.0   | Components + quick wins            | done    |
-| 9   | 1.2.0   | Playground: themes, colors, fonts  | done    |
-| 11  | 1.3.0   | Icon libraries as plugins          | in 1.4  |
-| 10  | 1.4.0   | Styles, data table, blocks         | publish |
-| 14  | 1.5.0   | AI-ready: AGENTS.md and MCP server | next    |
-| 15  | 1.6.0   | Charts                             | planned |
+| #   | Release | What                                      | Status   |
+| --- | ------- | ----------------------------------------- | -------- |
+| 8   | 1.1.0   | Components + quick wins                   | done     |
+| 9   | 1.2.0   | Playground: themes, colors, fonts         | done     |
+| 11  | 1.3.0   | Icon libraries as plugins                 | in 1.4   |
+| 10  | 1.4.0   | Styles, data table, blocks                | done     |
+| 16  | 1.4.1   | Fix: radius and font follow the pick      | publish  |
+| 17  | 1.4.1   | Docs redesign: Home, Playground, Blocks   | publish  |
+| 18  | 1.5.0   | Glass material and new dials              | planned  |
+| 15  | 1.6.0   | Charts                                    | planned  |
+| 14  | 1.7.0   | AI-ready: AGENTS.md and MCP server        | planned  |
 
 Order is by benefit to users. New features ship as minor releases (1.x.0). A patch (1.x.y) is for bug fixes only.
 
@@ -49,11 +52,10 @@ Owner in brackets. Items marked "user" need a person, not code.
 - Versions follow SemVer 2.0: a new feature is a minor (1.x.0), a bug fix is a patch (1.x.y), a breaking change is a major (x.0.0). Both packages share one version (Changesets `fixed`).
 - Branches: `feat/<short-name>` for a phase, `fix/<short-name>` for a patch, `chore/<short-name>` for tooling or docs only. Lowercase, hyphens, no version in the name. Branch from `main`.
 - Commits: Conventional Commits (`feat:`, `fix:`, `docs:`, `chore:`, `test:`; `!` or `BREAKING CHANGE:` for a major).
-- Release: the version bump commit is `chore: release X.Y.Z`. After merge, tag `main` as `vX.Y.Z` and publish from that tag.
-- Finish a task, run its check, commit, then update **Status** here.
+- One release = one commit. Finish a task, run its check, update **Status** here; no commit between tasks.
+- Release: after the exit gate, `npx changeset version`, then the single commit `<type>: release X.Y.Z — <summary>`. After merge, tag `main` as `vX.Y.Z` and publish from that tag.
 - A phase marked "outline" is expanded into tasks (superpowers:writing-plans) and OK'd before work starts.
 - A phase is done only when its exit gate passes. Run the commands and show the output.
-- The last task of each phase: Changesets version bump, CHANGELOG entry, release.
 - **Publishing is public and cannot be undone. Ask the user before every publish.**
 - New components follow the "Add a component" checklist in [CONVENTIONS](docs/CONVENTIONS.md). Blocks live in `projects/blocks/<name>/` (page `<name>.ts` with `export const meta`, `components/`, optional `data.ts`, spec).
 - Docs site UI work: use the frontend-design skill.
@@ -317,7 +319,84 @@ Branch `feat/v1.4.0`. Tasks are OK'd. One commit per feature (T1–T3), then the
 
 ---
 
-## Phase 14 — Release 1.5.0: AI-ready (AGENTS.md and MCP server)
+## Phase 16 — Release 1.4.1: Radius and font follow the pick
+
+Branch `fix/look-tokens`. Tasks are OK'd. One commit.
+
+**Goal:** a picked radius and font reach every component in every style, Mono included: Playground preview (and overlays), CLI output, package apps.
+
+- **T1** Radius scale: `theme.css` re-declares `--radius-sm`…`--radius-4xl` on `:where([class*="style-"])`, so a `--radius` set below `:root` (Playground target, style class) reaches the `var(--radius-*)` uses in style files.
+- **T2** Mono follows the theme like every style: no forced radius 0 or `--font-mono`. The Playground picks Geist Mono when you switch to Mono, and drops it when you leave. A third font slot is parked: backlog.
+- **T3** Rhea keeps upstream's 24px cap on cards and dialogs (no change).
+- **T4** Specs (playground look, theme structure, mono derive) and a browser matrix: 10 styles × radius × font.
+
+**Exit gate:** `npm run check`, `npm run smoke:pack`, `npm run smoke:cli` green; browser matrix in the PR. 1.4.1 on npm (ask first).
+
+---
+
+## Phase 17 — Release 1.4.1: Docs redesign (Home, Playground, Blocks)
+
+Ships in 1.4.1 with Phase 16 (decided 2026-11-12). Docs only: no change in `projects/ui`, `projects/cli` or `projects/blocks`. Use the frontend-design skill. Direction picked 2026-11-11: smoky glass.
+
+Rule for every task: the site material styles the site chrome only. Previews (home wall, playground iframe, block iframes, demo frames) keep the picked look and never inherit site panes, radials or blur.
+
+### T1. Site material (smoky glass, dark-first)
+
+- Tokens in `apps/docs/src/styles.css`, light and dark, site only: ground `#0E0F13` / `#F3F3F5`, pane (white 4% / white 70%), 1px rim highlight, layered shadow stack, faint background radials, brand violet (logo dot, badges, focus only), `--docs-ease: 220ms ease-out`.
+- Utilities: `.docs-pane` (fill + border + rim + shadow), `.docs-backdrop` (radials, `aria-hidden`, no pointer events). Blur only where text sits on moving content (header); solid fallback under `prefers-reduced-transparency`.
+- Dark-first: with no saved choice the site opens dark. Boot script in `index.html`, `Appearance` default, server render (`<html class="dark">`) all agree, so no flash and clean hydration. The toggle still saves light.
+- Header: glass bar on the new tokens. Docs pages: sidebar and content on the ground, code blocks and tables as panes.
+- **Check:** `appearance.spec.ts` (default dark, saved light wins), contrast ≥ 4.5 for body and muted text on ground and pane in both modes (spec over the token values), `npm run check -- --only build-docs,test-docs,smoke-ssr`.
+
+### T2. Home
+
+- Announcement pill: latest release, links to `/roadmap`.
+- Hero: H1, one line, two CTAs (Get started, Open the playground), install tabs (Package / Copy the source) with copy.
+- Wall of live cards: real components, 15 cards (the old Dashboard, Sign in, Settings, Team and Checkout scenes merged in). Columns 4/3/2/1 at 1440/1024/768/390, bottom fade, "Browse all components" over it.
+- Inline style switcher above the wall: one pill per style. It re-skins only the wall and its overlays (`PlaygroundLook.attach`). No preset command or copy button on Home (changed 2026-11-11). Replaces today's side rail.
+- Package vs source: two short panes. Then the footer.
+- The wall cards live in one component, reused by T3's Wall scene.
+- **Check:** `home.spec.ts` (switcher changes only the wall, command follows, axe clean), SSR renders the wall.
+
+### T3. Playground
+
+- Left panel: compact rows, each a label and a dropdown: style, base color, radius, icons, font, heading font. Fits 900px tall with no scroll.
+- Stage: big iframe preview of the Wall, the only scene (Dashboard, Sign in, Settings, Team and Checkout merged into it, scene tabs removed, 2026-11-11). Widths desktop/tablet/mobile.
+- Bottom bar: Copy link (URL with `preset`), Shuffle (random style, color, radius, fonts; not icons), Get code (one dialog: New app / Existing app command, preset code, CSS).
+- Mobile: the controls open in a sheet; the bottom bar stays.
+- Prerendered route `/preview/scene/wall` replaces `/preview/scene/dashboard` in `tools/smoke/ssr.ts`.
+- **Check:** `playground.spec.ts` (Shuffle changes the code and URL, Get code shows the right command, Copy link copies the URL, axe clean), `npm run check -- --only build-docs,test-docs,smoke-ssr`.
+
+### T4. Blocks
+
+- `/blocks`: category tabs Featured, Login, Sign up, Sidebar, Dashboard; the tab is in the URL (`?category=`). Featured: login-01, signup-01, sidebar-01, dashboard-01.
+- Each block a full-width section: title, one line, toolbar (Preview/Code, widths, open in a new tab, reload, copy `npx ivorie add <name>`), preview iframe loaded on viewport (`@defer`), Code shows the file tree and source.
+- `/blocks/:name` stays for deep links and the inputs/outputs table, on the new material.
+- **Check:** `blocks.spec.ts` and `block.spec.ts` (tabs filter, toolbar actions, axe clean), SSR smoke still renders every block page.
+
+### T5. Review and gate
+
+- Impeccable detector on changed files; fix what it finds.
+- Browser review light and dark at 390, 768, 1440: Home, Playground, Blocks, one docs page. Screenshots in the PR.
+- Lighthouse a11y ≥ 95 on Home, Playground, Blocks.
+
+**Exit gate:** `npm run check`, `npm run docs:build`, browser review light/dark at 390/768/1440, Lighthouse a11y ≥ 95.
+
+---
+
+## Phase 18 — Release 1.5.0: Glass material and new dials
+
+Branch `feat/glass-material`. Outline: expand into tasks and get an OK first.
+
+- **Glass style rework** (`tools/styles/own/glass.css`): thickness ladder, rim/edge shadow stack, blur tokens, ink-pane primary button, float-in motion. Credit solid-glass (MIT) in NOTICE.md.
+- **New dials:** accent, chart color, density; glass-only thickness, rim, shadow, blur; Shuffle. Dials a style ignores are disabled.
+- **Preset v2** `ivp2_` (reads `ivp1_`), CLI `init --preset` / `apply`, only tuned variables emitted.
+
+**Exit gate:** preset v1/v2 round-trip, CLI look specs, contrast test, `smoke:cli` parity, `npm run check`. 1.5.0 on npm.
+
+---
+
+## Phase 14 — Release 1.7.0: AI-ready (AGENTS.md and MCP server)
 
 Branch `feat/ai-ready`. Outline: expand into tasks and get an OK first.
 
@@ -332,7 +411,7 @@ Scope:
 **Exit gate:**
 
 - An MCP client lists and adds a component in a fresh app (extend `smoke:cli`).
-- `npm run check` green. 1.5.0 on npm.
+- `npm run check` green. 1.7.0 on npm.
 
 ---
 
@@ -364,6 +443,7 @@ Scope:
 ## Backlog (not scheduled)
 
 - Docs drop `@lucide/angular` (initial bundle ~800 kB). Blocked on `<ng-icon>` sizing: its unlayered host styles beat Tailwind `size-*`, and its `@layer ng-icon` color beats `text-*`. Needs a small CSS shim first. Also: playground scene icons follow the icon library.
+- Mono fonts: a third font slot `--font-mono` (preset `fontMono`, CLI `--font-mono`, playground picker, more mono fonts). Mono reads it; titles too.
 - Playwright visual regression tests.
 - Docs search and versioned docs.
 - CLI: `ivorie list`, `ivorie diff`, custom third-party registries, interactive component picker.

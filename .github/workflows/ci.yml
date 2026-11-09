@@ -39,6 +39,7 @@ jobs:
         with:
           name: check-logs-${{ matrix.deps }}
           path: .check/
+          include-hidden-files: true
 
   pack:
     needs: check

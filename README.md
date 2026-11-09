@@ -57,7 +57,7 @@ npm run check -- --only test-blocks,test-docs   # just some gates
 - **1.1** More components (popover, sheet, slider, toggle, command, …) and a docs page that lists every example.
 - **1.2** Playground: pick style, base color, font and radius, then install that look.
 - **1.4** Icon libraries (lucide, tabler, phosphor, hugeicons, remix), five new styles (glass, brutal, aurora, bento, mono), a data table and 19 blocks.
-- Next: **1.5** AI-ready (AGENTS.md, MCP server), then **1.6** charts (line, area, bar, pie).
+- Next: **1.4.2** docs redesign, **1.5** glass material and new theme dials, **1.6** charts (line, area, bar, pie), then **1.7** AI-ready (AGENTS.md, MCP server).
 
 Details: [ROADMAP.md](ROADMAP.md).
 

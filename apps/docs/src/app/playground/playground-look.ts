@@ -7,7 +7,7 @@ import { COMPONENT_ICONS as REMIX } from '@inlaylab/ivorie/icons/remix';
 import { COMPONENT_ICONS as TABLER } from '@inlaylab/ivorie/icons/tabler';
 import { BASE_COLORS, FONTS, RADII } from '../../generated/looks';
 import { Appearance } from '../shell/appearance';
-import { DEFAULT_STYLE, STYLES } from '../shell/appearance-options';
+import { DEFAULT_STYLE, STYLES, STYLE_FONTS, type StyleName } from '../shell/appearance-options';
 import { DEFAULT_PRESET, decodePreset, encodePreset, type Preset } from './preset-code';
 import { SCENE_ICONS } from './scene-icons';
 
@@ -127,7 +127,17 @@ export class PlaygroundLook {
   }
 
   set(patch: Partial<Preset>): void {
-    this._preset.update((p) => ({ ...p, ...patch }));
+    this._preset.update((p) => {
+      const next = { ...p, ...patch };
+      // Switching style brings its font along; leaving it drops that font again. An explicit font in the patch wins.
+      if (patch.style && patch.style !== p.style && !patch.font) {
+        const from = STYLE_FONTS[p.style as StyleName];
+        const to = STYLE_FONTS[patch.style as StyleName];
+        if (to) next.font = to;
+        else if (from && p.font === from) next.font = DEFAULT_PRESET.font;
+      }
+      return next;
+    });
   }
 
   /** A share code from the URL. Anything invalid or unknown gives the defaults. */
@@ -139,6 +149,12 @@ export class PlaygroundLook {
   /** The default style is in the main CSS; the others are separate bundles (angular.json, inject: false). */
   private loadStyleSheet(style: string): void {
     if (style !== DEFAULT_STYLE) this.link(`docs-style-${style}`, `style-${style}.css`);
+  }
+
+  /** Loads every font's stylesheet, so a font list can show each name in its own face. Browser only, once. */
+  preloadFonts(): void {
+    if (!this.browser) return;
+    for (const f of FONTS) this.link(`docs-font-${f.name}`, fontHref(f.dependency));
   }
 
   private link(id: string, href: string): void {

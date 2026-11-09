@@ -10,7 +10,7 @@ import { PAGES } from '../../generated/pages';
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <header class="mb-8">
-      <h1 class="text-foreground text-3xl font-semibold tracking-tight text-balance">Components</h1>
+      <h1 class="font-display text-foreground text-3xl font-semibold tracking-tight text-balance">Components</h1>
       <p class="text-muted-foreground mt-2 max-w-[65ch] text-base text-pretty">
         {{ pages.length }} components, each with its own import path. Open one for examples and install steps.
       </p>

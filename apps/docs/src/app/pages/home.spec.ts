@@ -6,7 +6,7 @@ import HomePage from './home';
 async function render() {
   Object.defineProperty(document.defaultView!, 'matchMedia', {
     configurable: true,
-    value: () => ({ matches: false, addEventListener: () => {}, removeEventListener: () => {} }),
+    value: () => ({ matches: false, addEventListener: () => {}, removeEventListener: () => {}, addListener: () => {}, removeListener: () => {} }),
   });
   TestBed.configureTestingModule({ providers: [provideRouter([])] });
   const fixture = TestBed.createComponent(HomePage);
@@ -20,28 +20,31 @@ describe('HomePage', () => {
     document.documentElement.removeAttribute('style');
   });
 
-  it('a style or color choice changes only the preview box', async () => {
+  it('a style choice changes only the wall stage', async () => {
     const { el, fixture } = await render();
-    el.querySelector<HTMLInputElement>('input[aria-label="Mauve"]')!.click();
-    el.querySelector<HTMLInputElement>('input[name="home-style"][value="nova"]')!.click();
+    el.querySelector<HTMLInputElement>('input[name="home-style"][value="brutal"]')!.click();
     await fixture.whenStable();
     const stage = el.querySelector<HTMLElement>('.docs-stage')!;
-    expect(stage.classList).toContain('style-nova');
+    expect(stage.classList).toContain('style-brutal');
     expect(stage.style.getPropertyValue('--primary')).not.toBe('');
+    expect(document.body.classList).not.toContain('style-brutal');
     expect(document.documentElement.style.getPropertyValue('--primary')).toBe('');
-    expect(el.querySelector('a[href^="/playground?preset=ivp1_"]')).not.toBeNull();
   });
 
-  it('the install command follows the picked style', async () => {
+  it('each style explains itself in a tooltip; no preset command on the home page', async () => {
     const { el, fixture } = await render();
-    const command = () => el.querySelector('[data-testid="home-command"]')!.textContent!.trim();
-    expect(command()).toBe('$ npx ivorie init');
     el.querySelector<HTMLInputElement>('input[name="home-style"][value="glass"]')!.click();
     await fixture.whenStable();
-    expect(command()).toMatch(/^\$ npx ivorie init --preset ivp1_/);
-    expect(el.querySelector('[data-testid="style-note"]')!.textContent!.trim()).toBe(
-      'Frosted, see-through surfaces.',
-    );
+    const glass = el.querySelector<HTMLInputElement>('input[name="home-style"][value="glass"]')!;
+    expect(glass.getAttribute('aria-description')).toBe('Frosted, see-through surfaces.');
+    expect(el.querySelectorAll('iv-tooltip-content').length).toBe(10);
+    expect(el.querySelector('[data-testid="home-command"]')).toBeNull();
+  });
+
+  it('shows the wall of live cards and a link to every component', async () => {
+    const { el } = await render();
+    expect(el.querySelectorAll('docs-scene-wall iv-card').length).toBe(15);
+    expect(el.querySelector('a[href="/docs/components"]')!.textContent).toMatch(/Browse all \d+ components/);
   });
 
   it('has no axe violations', async () => {

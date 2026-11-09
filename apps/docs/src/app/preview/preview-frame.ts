@@ -48,8 +48,8 @@ export const PREVIEW_WIDTHS: { value: PreviewWidth; label: string; css: string }
 export class PreviewFrame {
   /** A same-origin path, e.g. `preview/scene/team`. Never user input: the docs build these. */
   readonly path = input.required<string>();
-  /** The preset share code. */
-  readonly code = input.required<string>();
+  /** The preset share code. Not required: an inserted iframe can fire load before inputs are set. */
+  readonly code = input('');
   readonly width = input<PreviewWidth>('desktop');
   readonly label = input.required<string>();
 
@@ -79,9 +79,14 @@ export class PreviewFrame {
     inject(DestroyRef).onDestroy(() => win.removeEventListener('message', onMessage));
   }
 
+  /** Loads the frame again, in the current look. */
+  reload(): void {
+    this.frame().nativeElement.contentWindow?.location.reload();
+  }
+
   /** Posts the current look into the frame. Also runs on load, in case the frame missed a message. */
   protected send(): void {
-    if (!this.win) return;
+    if (!this.win || !this.code()) return;
     const message: LookMessage = { type: 'ivorie-look', preset: this.code() };
     this.frame().nativeElement.contentWindow?.postMessage(message, this.win.location.origin);
   }

@@ -7,7 +7,7 @@ import BlockPage from './block';
 async function render(name = 'login-01') {
   Object.defineProperty(document.defaultView!, 'matchMedia', {
     configurable: true,
-    value: () => ({ matches: false, addEventListener: () => {}, removeEventListener: () => {} }),
+    value: () => ({ matches: false, addEventListener: () => {}, removeEventListener: () => {}, addListener: () => {}, removeListener: () => {} }),
   });
   TestBed.configureTestingModule({ providers: [provideRouter([{ path: 'blocks/:name', component: BlockPage }])] });
   const harness = await RouterTestingHarness.create(`/blocks/${name}`);

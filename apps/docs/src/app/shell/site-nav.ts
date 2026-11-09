@@ -29,7 +29,7 @@ const GROUPS = [
           type="search"
           aria-label="Filter pages"
           placeholder="Filter pages"
-          class="bg-muted/60 placeholder:text-muted-foreground focus-visible:ring-ring/40 focus-visible:border-ring h-8 w-full rounded-full border pr-3 pl-8 text-[0.8125rem] outline-none focus-visible:ring-[3px]"
+          class="bg-foreground/[0.04] placeholder:text-muted-foreground focus-visible:ring-ring/40 focus-visible:border-ring h-8 w-full rounded-full border pr-3 pl-8 text-[0.8125rem] outline-none focus-visible:ring-[3px]"
           [value]="query()"
           (input)="query.set($any($event.target).value)"
         />
@@ -43,9 +43,9 @@ const GROUPS = [
                 <li ivSidebarMenuItem>
                   <a
                     [routerLink]="['/docs', page.slug]"
-                    routerLinkActive="docs-nav-active bg-muted !text-foreground"
+                    routerLinkActive="docs-nav-active bg-foreground/[0.07] !text-foreground"
                     ariaCurrentWhenActive="page"
-                    class="text-muted-foreground hover:text-foreground hover:bg-muted/60 focus-visible:ring-ring group flex h-8 items-center gap-2 rounded-full px-3 text-[0.8125rem] font-medium transition-colors outline-none focus-visible:ring-2"
+                    class="text-muted-foreground hover:text-foreground hover:bg-foreground/[0.05] focus-visible:ring-ring group flex h-8 items-center gap-2 rounded-full px-3 text-[0.8125rem] font-medium transition-colors outline-none focus-visible:ring-2"
                     (click)="closeOnMobile()"
                   >
                     <!-- The brand dot marks the open page. -->

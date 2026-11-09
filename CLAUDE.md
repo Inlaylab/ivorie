@@ -13,9 +13,9 @@ Latest only: Angular 22, Tailwind 4.3, zoneless, Vitest, `@lucide/angular`. No d
 
 ## Rules
 - One phase = one minor release = one branch = one PR. SemVer: feature = minor, fix = patch, breaking = major.
-- Branches from `main`: `feat/<short-name>` (phase), `fix/<short-name>` (patch), `chore/<short-name>` (tooling/docs). Conventional Commits. Release commit `chore: release X.Y.Z`, tag `vX.Y.Z` on `main` after merge.
-- Last task of a phase: `npx changeset version` (both packages, one version), CHANGELOG, release.
-- Finish one task → run its check → commit → update **Status** in ROADMAP.md.
+- Branches from `main`: `feat/<short-name>` (phase), `fix/<short-name>` (patch), `chore/<short-name>` (tooling/docs). Conventional Commits. Tag `vX.Y.Z` on `main` after merge.
+- One release = one commit. Finish a task → run its check → update **Status** in ROADMAP.md. No commit between tasks.
+- After the exit gate: `npx changeset version` (both packages, one version), CHANGELOG, then the single commit `<type>: release X.Y.Z — <summary>` (body lists the tasks).
 - Commit messages and PRs: no `Co-Authored-By` or any AI attribution line.
 - A phase is done only when its **exit gate** passes. Run the commands, show the output.
 - New component? Follow "Add a component" in [docs/CONVENTIONS.md](docs/CONVENTIONS.md) (style sync, count bumps, module smoke, docs).

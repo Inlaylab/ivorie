@@ -109,10 +109,10 @@ test('own styles have no accidental replace rules', () => {
   }
 });
 
-test('mono sets its font and radius on the root and its children, so inheritance below still works', () => {
+test('mono takes font and radius from the theme like every style (the user picks them)', () => {
   const css = readFileSync(join(STYLES, 'style-mono.css'), 'utf8');
-  assert.match(css, /    &,\n    & > :where\(\*\) \{/);
-  assert.doesNotMatch(css, /& :where\(\*\)/);
+  assert.doesNotMatch(css, /--radius:\s*0/);
+  assert.doesNotMatch(css, /font-family:\s*var\(--font-mono\)/);
 });
 
 // Every look-bearing part of every component, so an own style cannot ship half done.
@@ -132,7 +132,7 @@ const LOOK_HOOKS = [
   // Data and small parts
   'table-head', 'table-row', 'badge', 'avatar', 'accordion-item', 'kbd', 'skeleton', 'field-separator-content',
 ];
-/** Styles that change type and shape only; nova's rules fit them as they are. */
+/** Styles that change little beyond nova (mono: flat hairlines, a caret); nova's rules fit them as they are. */
 const SHAPE_ONLY = ['mono'];
 
 test('every own style covers every look-bearing hook', () => {

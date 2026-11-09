@@ -15,7 +15,7 @@ const inlineVars = (el: HTMLElement) => [...el.style].filter((p) => p.startsWith
 function create(providers: unknown[] = []) {
   Object.defineProperty(document.defaultView!, 'matchMedia', {
     configurable: true,
-    value: () => ({ matches: false, addEventListener: () => {}, removeEventListener: () => {} }),
+    value: () => ({ matches: false, addEventListener: () => {}, removeEventListener: () => {}, addListener: () => {}, removeListener: () => {} }),
   });
   TestBed.configureTestingModule({ providers: [PlaygroundLook, ...(providers as never[])] });
   const look = TestBed.inject(PlaygroundLook);
@@ -38,6 +38,7 @@ describe('PlaygroundLook', () => {
 
   it('applies the base color to the attached element only, for light then dark', () => {
     const { look, stage, appearance } = create();
+    appearance.setMode('light');
     look.set({ baseColor: 'olive' });
     TestBed.tick();
     expect(stage.style.getPropertyValue('--primary')).toBe(olive.light['--primary']);
@@ -111,6 +112,22 @@ describe('PlaygroundLook', () => {
     expect(look.css()).toContain('  --radius: 0.875rem;');
     expect(look.css()).toContain(`.dark {\n  --background: ${olive.dark['--background']};`);
     expect(look.css()).toContain("@theme {\n  --font-sans: 'Inter Variable', sans-serif;\n}");
+  });
+
+  it('switching to mono picks its font and keeps the radius; leaving it drops that font', () => {
+    const { look, stage } = create();
+    look.set({ radius: 'large' });
+    look.set({ style: 'mono' });
+    TestBed.tick();
+    expect(look.preset()).toMatchObject({ style: 'mono', font: 'geist-mono', radius: 'large' });
+    expect(stage.style.getPropertyValue('--radius')).toBe('0.875rem');
+    expect(stage.style.getPropertyValue('--font-sans')).toContain("'Geist Mono Variable'");
+    look.set({ style: 'nova' });
+    expect(look.preset().font).toBe('system');
+    look.set({ style: 'mono' });
+    look.set({ font: 'inter' });
+    look.set({ style: 'nova' });
+    expect(look.preset().font).toBe('inter');
   });
 
   it('does nothing on the server', () => {

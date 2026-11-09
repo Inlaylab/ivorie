@@ -137,6 +137,8 @@ for (const step of steps.filter((s) => picked(s.name))) {
   } else {
     failed = true;
     console.log(`FAIL ${step.name} → ${log}`);
+    // CI logs are what people see first: show the end of the failing log there.
+    if (process.env.CI) console.log(readFileSync(log, 'utf8').split('\n').slice(-80).join('\n'));
   }
 }
 

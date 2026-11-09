@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="dark" style="color-scheme: dark">
 <head>
   <meta charset="utf-8">
   <title>Ivorie</title>
@@ -15,8 +15,9 @@
     (function () {
       try {
         var s = JSON.parse(localStorage.getItem('ivorie-docs:appearance') || 'null') || {};
-        var dark = s.mode === 'dark' || ((s.mode === 'system' || !s.mode) && matchMedia('(prefers-color-scheme: dark)').matches);
-        if (dark) document.documentElement.classList.add('dark');
+        // Dark-first: no saved mode means dark. The server markup is already dark.
+        var dark = !s.mode || s.mode === 'dark' || (s.mode === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
+        if (!dark) document.documentElement.classList.remove('dark');
         document.documentElement.style.colorScheme = dark ? 'dark' : 'light';
       } catch (e) {}
     })();

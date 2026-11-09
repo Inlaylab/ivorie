@@ -20,7 +20,7 @@ import type { DocPageData } from './doc-page.resolver';
     <div class="flex gap-12">
       <article class="min-w-0 max-w-3xl flex-1">
         <header class="mb-8">
-          <h1 class="text-foreground scroll-m-24 text-3xl font-semibold tracking-tight text-balance">{{ p.title }}</h1>
+          <h1 class="font-display text-foreground scroll-m-24 text-3xl font-semibold tracking-tight text-balance">{{ p.title }}</h1>
           <p class="text-muted-foreground mt-2 max-w-[65ch] text-base text-pretty">{{ p.description }}</p>
           @if (p.entry) {
             <div data-entry class="bg-muted/60 mt-6 inline-flex max-w-full items-center gap-1 rounded-lg border py-1 pr-1 pl-3">

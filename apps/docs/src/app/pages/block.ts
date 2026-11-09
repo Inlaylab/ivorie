@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, effect, inject, linkedSignal, resource, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Meta } from '@angular/platform-browser';
 import { ActivatedRoute, RouterLink } from '@angular/router';
@@ -9,7 +9,7 @@ import { LookControls } from '../playground/look-controls';
 import { PREVIEW_ICONS, PlaygroundLook } from '../playground/playground-look';
 import { PREVIEW_WIDTHS, PreviewFrame, type PreviewWidth } from '../preview/preview-frame';
 import { CopyButton } from '../ui/copy-button';
-import { TrustedHtmlPipe } from '../ui/trusted-html.pipe';
+import { BlockCode } from './block-code';
 
 /** What the login and sign-up blocks take and give. */
 const AUTH_API = [
@@ -22,7 +22,7 @@ const AUTH_API = [
 /** `/blocks/:name`: the block live in a frame, in the look you pick, its files and the install command. */
 @Component({
   selector: 'docs-block',
-  imports: [RouterLink, IV_TABS_IMPORTS, LookControls, PreviewFrame, CopyButton, TrustedHtmlPipe],
+  imports: [RouterLink, IV_TABS_IMPORTS, LookControls, PreviewFrame, CopyButton, BlockCode],
   providers: [PlaygroundLook, PREVIEW_ICONS],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'block' },
@@ -32,10 +32,10 @@ const AUTH_API = [
       @if (entry(); as b) {
         <header class="mt-4 flex flex-wrap items-end justify-between gap-4">
           <div class="max-w-2xl">
-            <h1 class="text-foreground text-3xl font-semibold tracking-[-0.03em] sm:text-4xl">{{ b.title }}</h1>
+            <h1 class="font-display text-foreground text-3xl font-semibold tracking-[-0.03em] sm:text-4xl">{{ b.title }}</h1>
             <p class="text-muted-foreground mt-2 text-pretty">{{ b.description }}</p>
           </div>
-          <div class="bg-background flex min-w-0 items-center gap-3 rounded-full border py-1 pr-1 pl-5 font-mono text-[0.8125rem]">
+          <div class="docs-pane flex min-w-0 items-center gap-3 rounded-full py-1 pr-1 pl-5 font-mono text-[0.8125rem]">
             <span class="truncate"><span class="text-muted-foreground select-none">$ </span><span data-testid="command">{{ command() }}</span></span>
             <docs-copy-button [text]="command()" [label]="'Copy ' + command()" />
           </div>
@@ -48,10 +48,10 @@ const AUTH_API = [
                 <iv-tabs-trigger value="preview">Preview</iv-tabs-trigger>
                 <iv-tabs-trigger value="code">Code</iv-tabs-trigger>
               </iv-tabs-list>
-              <div role="radiogroup" aria-label="Preview width" class="bg-muted hidden gap-0.5 rounded-full p-0.5 md:flex">
+              <div role="radiogroup" aria-label="Preview width" class="docs-pane hidden gap-0.5 rounded-full p-1 md:flex">
                 @for (w of widths; track w.value) {
                   <label
-                    class="has-checked:bg-background has-checked:text-foreground has-checked:shadow-xs text-muted-foreground hover:text-foreground has-focus-visible:outline-ring cursor-pointer rounded-full px-3 py-1 text-sm font-medium transition-colors has-focus-visible:outline-2"
+                    class="has-checked:bg-foreground has-checked:text-background text-muted-foreground hover:text-foreground has-focus-visible:outline-ring cursor-pointer rounded-full px-3 py-1 text-sm font-medium transition-colors has-focus-visible:outline-2"
                   >
                     <input type="radio" class="sr-only" name="block-width" [value]="w.value" [checked]="width() === w.value" (change)="width.set(w.value)" />
                     {{ w.label }}
@@ -60,34 +60,12 @@ const AUTH_API = [
               </div>
             </div>
             <iv-tabs-content value="preview" class="mt-3">
-              <div class="docs-stage bg-muted/40 rounded-2xl border p-2 sm:p-3">
+              <div class="docs-pane rounded-[1.25rem] p-1.5">
                 <docs-preview-frame class="h-[46rem]" [path]="'preview/block/' + b.name" [code]="look.code()" [width]="width()" [label]="b.title + ' preview'" />
               </div>
             </iv-tabs-content>
             <iv-tabs-content value="code" class="mt-3">
-              @if (files.value(); as list) {
-                <div class="grid overflow-hidden rounded-2xl border md:grid-cols-[14rem_minmax(0,1fr)]">
-                  <nav aria-label="Files" class="bg-muted/40 flex flex-col gap-0.5 border-b p-2 md:border-r md:border-b-0">
-                    @for (f of list; track f.path) {
-                      <button
-                        type="button"
-                        data-testid="file"
-                        class="hover:bg-background aria-[current=true]:bg-background aria-[current=true]:text-foreground text-muted-foreground truncate rounded-md px-2.5 py-1.5 text-left font-mono text-xs"
-                        [attr.aria-current]="f.path === file()?.path"
-                        (click)="current.set(f.path)"
-                      >
-                        {{ f.path }}
-                      </button>
-                    }
-                  </nav>
-                  @if (file(); as f) {
-                    <div class="relative min-w-0">
-                      <docs-copy-button class="absolute top-2 right-2 z-10" [text]="f.code" [label]="'Copy ' + f.path" />
-                      <div class="max-h-[46rem] overflow-auto text-[0.8125rem] [&_pre]:p-4" [innerHTML]="f.html | trustedHtml"></div>
-                    </div>
-                  }
-                </div>
-              }
+              <docs-block-code [entry]="b" />
             </iv-tabs-content>
           </iv-tabs>
 
@@ -126,13 +104,6 @@ export default class BlockPage {
   protected readonly api = AUTH_API;
   protected readonly widths = PREVIEW_WIDTHS;
   protected readonly width = signal<PreviewWidth>('desktop');
-  protected readonly files = resource({ params: () => this.entry(), loader: ({ params }) => params.files() });
-  /** The open file: the page file first. */
-  protected readonly current = linkedSignal(() => this.entry()?.name + '.ts');
-  protected readonly file = computed((): { path: string; code: string; html: string } | undefined => {
-    const list = this.files.value() ?? [];
-    return list.find((f) => f.path === this.current()) ?? list[0];
-  });
 
   constructor() {
     const meta = inject(Meta);
