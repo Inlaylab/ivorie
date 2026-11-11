@@ -1,3 +1,4 @@
+import { Provider, Signal, TemplateRef, Type, booleanAttribute, inject } from '@angular/core';
 import { ScaleBand, ScalePoint, scaleLinear } from 'd3-scale';
 import {
   CurveFactory,
@@ -10,7 +11,7 @@ import {
   stackOffsetExpand,
   stackOffsetNone,
 } from 'd3-shape';
-import { IvChartDatum } from './types';
+import { IV_SERIES, IvChartDatum, IvSeriesContext, IvSeriesItem } from './types';
 
 /** Recharts curve names. */
 export type IvCurve = 'natural' | 'linear' | 'step' | 'monotone' | 'bump';
@@ -74,10 +75,13 @@ export function ivBandCenter(scale: ScaleBand<string> | ScalePoint<string>, inde
   return start === undefined ? undefined : start + scale.bandwidth() / 2;
 }
 
-/** Recharts' percent value: `'10%'` of `total`, or a plain number. Invalid gives 0; at most `total`. */
-export function ivPercent(value: number | string, total: number): number {
+/**
+ * Recharts' percent value: `'10%'` of `total`, or a plain number. Invalid gives 0.
+ * The result is clamped to `[0, max]` (`max` defaults to `total`).
+ */
+export function ivPercent(value: number | string, total: number, max = total): number {
   const n = typeof value === 'string' && value.trim().endsWith('%') ? (total * parseFloat(value)) / 100 : Number(value);
-  return Number.isFinite(n) ? Math.min(n, total) : 0;
+  return Number.isFinite(n) ? Math.min(Math.max(0, n), max) : 0;
 }
 
 /**
@@ -97,4 +101,45 @@ export function ivBarPosition(
   let size = Math.max(0, (bandSize - 2 * outer - (count - 1) * inner) / Math.max(1, count));
   if (size > 1) size = Math.trunc(size);
   return { offset: outer + (size + inner) * index, size };
+}
+
+/** Sorts by the hosts' document position; items without a host keep their place at the end. */
+export function ivMarkupOrder<T extends { el?: Element }>(items: readonly T[]): T[] {
+  return [...items].sort((a, b) => {
+    if (!a.el || !b.el) return a.el ? -1 : b.el ? 1 : 0;
+    return a.el.compareDocumentPosition(b.el) & 4 /* Node.DOCUMENT_POSITION_FOLLOWING */ ? -1 : 1;
+  });
+}
+
+/** Provides `IV_SERIES` from a series part, for `ivLabelList`. */
+export function ivSeriesProvider(type: Type<{ dataKey: Signal<string>; items: Signal<IvSeriesItem[]> }>): Provider {
+  return {
+    provide: IV_SERIES,
+    useFactory: (): IvSeriesContext => {
+      const series = inject(type);
+      return {
+        get key() {
+          return series.dataKey();
+        },
+        items: series.items,
+      };
+    },
+  };
+}
+
+/** Input transform for `boolean | TemplateRef` inputs: a template stays, anything else is `booleanAttribute`. */
+export function ivTemplateAttribute<T>(value: unknown): boolean | TemplateRef<T> {
+  return value instanceof TemplateRef ? (value as TemplateRef<T>) : booleanAttribute(value);
+}
+
+export const RADIAN = Math.PI / 180;
+
+/** A point at `radius` and `angle` (degrees, Recharts: 0 is 3 o'clock, counter-clockwise) from the center. */
+export function ivPolarPoint(cx: number, cy: number, radius: number, angle: number): { x: number; y: number } {
+  return { x: cx + Math.cos(-angle * RADIAN) * radius, y: cy + Math.sin(-angle * RADIAN) * radius };
+}
+
+/** Recharts' text anchor for a point right of, left of, or in line with the center. */
+export function ivSideAnchor(x: number, cx: number): 'start' | 'middle' | 'end' {
+  return x > cx + 1e-6 ? 'start' : x < cx - 1e-6 ? 'end' : 'middle';
 }

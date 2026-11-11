@@ -1,8 +1,8 @@
 import { ChangeDetectionStrategy, Component, ElementRef, computed, effect, inject, input } from '@angular/core';
 import { cn } from '@inlaylab/ivorie/core';
 import { IV_CARTESIAN } from './cartesian';
-import { ivBarPosition } from './scales';
-import { IV_CHART, IV_SERIES, IvSeriesContext, IvSeriesItem, ivSeriesColor } from './types';
+import { ivBarPosition, ivSeriesProvider } from './scales';
+import { IV_CHART, IvSeriesItem, ivSeriesColor } from './types';
 
 /** One radius for every corner, or `[topLeft, topRight, bottomRight, bottomLeft]`. */
 export type IvBarRadius = number | [number, number, number, number];
@@ -48,20 +48,7 @@ export function ivBarPath(x: number, y: number, width: number, height: number, r
   selector: 'g[ivBar]',
   host: { 'data-slot': 'chart-bar-series', '[class]': 'classes()' },
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [
-    {
-      provide: IV_SERIES,
-      useFactory: (): IvSeriesContext => {
-        const bar = inject(IvBar);
-        return {
-          get key() {
-            return bar.dataKey();
-          },
-          items: bar.items,
-        };
-      },
-    },
-  ],
+  providers: [ivSeriesProvider(IvBar)],
   template: `
     @for (bar of bars(); track bar.item.index) {
       <svg:path data-slot="chart-bar" class="iv-chart-bar"

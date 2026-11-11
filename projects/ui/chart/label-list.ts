@@ -1,10 +1,13 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
 import { cn } from '@inlaylab/ivorie/core';
 import { IV_CARTESIAN } from './cartesian';
-import { ivNumber } from './scales';
+import { ivNumber, ivPolarPoint, ivSideAnchor } from './scales';
 import { IV_SERIES, IvSeriesItem } from './types';
 
-/** `outside` is for pie sectors; on bars and points it acts like `top`. */
+/**
+ * `outside` is for sectors (pie, radial bar); on bars and points it acts like `top`.
+ * On sectors, every other position is the centroid.
+ */
 export type IvLabelPosition = 'top' | 'inside' | 'insideLeft' | 'right' | 'outside';
 
 /** Recharts' label formatter. `any`, so `(value: number) => …` binds without a cast. */
@@ -46,7 +49,18 @@ function place(item: IvSeriesItem, position: IvLabelPosition, offset: number, fl
   }
 }
 
-/** Text labels for each item of the series it sits in (`g[ivBar]`, `g[ivLine]`, `g[ivArea]`). */
+/** Recharts' polar label: the centroid, or `offset` px beyond the outer radius on the middle angle. */
+function placePolar(item: IvSeriesItem, position: IvLabelPosition, offset: number) {
+  if (position !== 'outside') return { x: item.x, y: item.y, anchor: 'middle', dy: DY.middle } as const;
+  const cx = item.cx ?? 0;
+  const { x, y } = ivPolarPoint(cx, item.cy ?? 0, (item.outerRadius ?? 0) + offset, item.midAngle ?? 0);
+  return { x, y, anchor: ivSideAnchor(x, cx), dy: DY.middle } as const;
+}
+
+/**
+ * Text labels for each item of the series it sits in: `g[ivBar]`, `g[ivLine]`, `g[ivArea]`,
+ * `g[ivPie]`, `g[ivRadialBar]`, `g[ivRadar]`.
+ */
 @Component({
   selector: 'g[ivLabelList]',
   host: { 'data-slot': 'chart-label-list', '[class]': 'classes()' },
@@ -83,7 +97,10 @@ export class IvLabelList {
       if (value === null || value === undefined) continue;
       // Only a bar (an item with a size) has a direction to flip.
       const negative = (ivNumber(item.value) ?? 0) < 0 && (item.width > 0 || item.height > 0);
-      const at = place(item, position, offset, negative && vertical, negative && !vertical);
+      const at =
+        item.midAngle === undefined
+          ? place(item, position, offset, negative && vertical, negative && !vertical)
+          : placePolar(item, position, offset);
       labels.push({ index: item.index, ...at, text: format ? format(value) : String(value) });
     }
     return labels;

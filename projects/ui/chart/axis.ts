@@ -3,6 +3,7 @@ import {
   Component,
   Directive,
   InputSignal,
+  booleanAttribute,
   computed,
   effect,
   inject,
@@ -80,9 +81,9 @@ const AXIS_TEMPLATE = `
 })
 export abstract class IvCartesianAxis {
   readonly dataKey = input('');
-  readonly hide = input(false);
-  readonly tickLine = input(true);
-  readonly axisLine = input(true);
+  readonly hide = input(false, { transform: booleanAttribute });
+  readonly tickLine = input(true, { transform: booleanAttribute });
+  readonly axisLine = input(true, { transform: booleanAttribute });
   readonly tickMargin = input(8);
   readonly tickFormatter = input<IvTickFormatter>();
   /** Category axis: hide a tick when its label would be closer than this many px to the next shown one. */
@@ -195,8 +196,8 @@ export class IvYAxis extends IvCartesianAxis {
   `,
 })
 export class IvCartesianGrid {
-  readonly vertical = input(true);
-  readonly horizontal = input(true);
+  readonly vertical = input(true, { transform: booleanAttribute });
+  readonly horizontal = input(true, { transform: booleanAttribute });
   readonly class = input('');
 
   protected readonly ctx = inject(IV_CARTESIAN);

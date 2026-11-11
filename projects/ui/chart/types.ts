@@ -65,6 +65,7 @@ export function ivSeriesLabel(config: IvChartConfig, key: string): string {
  * One drawn item of a series (a point, a bar or a sector), for labels.
  * Line and area: `x`, `y` are the point's center, `width` and `height` are 0.
  * Bar: `x`, `y` are the top-left corner of the rect, `width` and `height` are its size.
+ * Sector: `x`, `y` are its centroid, `width` and `height` are 0, and the polar fields are set.
  */
 export interface IvSeriesItem {
   index: number;
@@ -77,6 +78,17 @@ export interface IvSeriesItem {
   fill: string;
   /** The data row. */
   payload: IvChartDatum;
+  /**
+   * Sectors (pie, radial bar) only: center, radii and angles. Angles are degrees, Recharts'
+   * convention: 0 is 3 o'clock, positive is counter-clockwise. `x`, `y` are then the centroid.
+   */
+  cx?: number;
+  cy?: number;
+  innerRadius?: number;
+  outerRadius?: number;
+  startAngle?: number;
+  endAngle?: number;
+  midAngle?: number;
 }
 
 /** What a series part provides through `IV_SERIES`. */

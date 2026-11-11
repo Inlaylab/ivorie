@@ -12,7 +12,7 @@ import {
 import { ScaleBand, ScaleLinear, ScalePoint, scaleBand, scaleLinear, scalePoint } from 'd3-scale';
 import { cn } from '@inlaylab/ivorie/core';
 import { IV_CHART, IvChartDatum, IvChartMargin, ivSeriesLabel } from './types';
-import { ivBandCenter, ivStack, ivValueDomain } from './scales';
+import { ivBandCenter, ivMarkupOrder, ivStack, ivValueDomain } from './scales';
 
 export type IvChartLayout = 'horizontal' | 'vertical';
 export type IvStackOffset = 'none' | 'expand';
@@ -80,14 +80,6 @@ interface AxisRef {
   tickCount?: number;
 }
 
-/** Sorts by the hosts' document position; series without a host keep their place at the end. */
-function inMarkupOrder(series: IvCartesianSeriesRef[]): IvCartesianSeriesRef[] {
-  return [...series].sort((a, b) => {
-    if (!a.el || !b.el) return a.el ? -1 : b.el ? 1 : 0;
-    return a.el.compareDocumentPosition(b.el) & 4 /* Node.DOCUMENT_POSITION_FOLLOWING */ ? -1 : 1;
-  });
-}
-
 /** Shared root of the cartesian charts: owns data, margin, stacks and scales. */
 @Directive({
   host: {
@@ -115,7 +107,7 @@ export abstract class IvCartesianChart {
 
   protected readonly chart = inject(IV_CHART);
   private readonly registered = signal<IvCartesianSeriesRef[]>([]);
-  private readonly series = computed(() => inMarkupOrder(this.registered()));
+  private readonly series = computed(() => ivMarkupOrder(this.registered()));
   private readonly axes = signal<AxisRef[]>([]);
   private readonly memo = new Map<string, Signal<(IvCartesianPoint | undefined)[]>>();
 

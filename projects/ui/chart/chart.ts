@@ -26,6 +26,11 @@ import { IvCartesianGrid, IvXAxis, IvYAxis } from './axis';
 import { IvArea, IvLine } from './series';
 import { IvBar } from './bar';
 import { IvLabelList } from './label-list';
+import { IvPieChart, IvPolarAngleAxis, IvPolarGrid, IvPolarRadiusAxis, IvRadarChart, IvRadialChart } from './polar';
+import { IvPie } from './pie';
+import { IvRadar } from './radar';
+import { IvRadialBar } from './radial-bar';
+import { IvChartLabel } from './chart-label';
 
 const CHART_CLASSES = [
   'cn-chart relative flex aspect-video justify-center text-xs',
@@ -159,4 +164,14 @@ export const IV_CHART_IMPORTS = [
   IvArea,
   IvBar,
   IvLabelList,
+  IvPieChart,
+  IvRadarChart,
+  IvRadialChart,
+  IvPolarGrid,
+  IvPolarAngleAxis,
+  IvPolarRadiusAxis,
+  IvPie,
+  IvRadar,
+  IvRadialBar,
+  IvChartLabel,
 ] as const;

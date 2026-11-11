@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { curveLinear, curveMonotoneX, curveNatural, curveStep } from 'd3-shape';
-import { ivCurve, ivStack, ivValueDomain } from './scales';
+import { ivCurve, ivPercent, ivStack, ivValueDomain } from './scales';
 
 const rows = [
   { month: 'January', desktop: 186, mobile: 80 },
@@ -55,5 +55,17 @@ describe('ivCurve', () => {
     expect(ivCurve('natural')).toBe(curveNatural);
     expect(ivCurve('step')).toBe(curveStep);
     expect(ivCurve('monotone')).toBe(curveMonotoneX);
+  });
+});
+
+describe('ivPercent', () => {
+  it('reads a percent or a number, clamped to [0, max]', () => {
+    expect(ivPercent('10%', 200)).toBe(20);
+    expect(ivPercent(30, 200)).toBe(30);
+    expect(ivPercent(300, 200)).toBe(200);
+    expect(ivPercent(300, 200, Infinity)).toBe(300);
+    expect(ivPercent(-4, 200)).toBe(0);
+    expect(ivPercent('-10%', 200)).toBe(0);
+    expect(ivPercent('abc', 200)).toBe(0);
   });
 });

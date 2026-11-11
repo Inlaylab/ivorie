@@ -4,9 +4,9 @@ import {
   Directive,
   ElementRef,
   InputSignal,
-  Provider,
+  Signal,
   TemplateRef,
-  Type,
+  booleanAttribute,
   computed,
   effect,
   inject,
@@ -16,8 +16,8 @@ import { NgTemplateOutlet } from '@angular/common';
 import { area, line } from 'd3-shape';
 import { cn } from '@inlaylab/ivorie/core';
 import { IV_CARTESIAN, IvCartesianPoint } from './cartesian';
-import { IvCurve, ivCurve } from './scales';
-import { IV_CHART, IV_SERIES, IvChartDatum, IvSeriesContext, IvSeriesItem, ivSeriesColor } from './types';
+import { IvCurve, ivCurve, ivSeriesProvider, ivTemplateAttribute } from './scales';
+import { IV_CHART, IvChartDatum, IvSeriesItem, ivSeriesColor } from './types';
 
 /** A drawn point, given to a custom `dot` template as `$implicit`. */
 export interface IvDot {
@@ -34,22 +34,6 @@ export interface IvDotContext {
 }
 
 type Point = IvCartesianPoint | undefined;
-
-/** Provides `IV_SERIES` from a line or area, for `ivLabelList`. */
-function seriesProvider(type: Type<IvCartesianSeries>): Provider {
-  return {
-    provide: IV_SERIES,
-    useFactory: (): IvSeriesContext => {
-      const series = inject(type);
-      return {
-        get key() {
-          return series.dataKey();
-        },
-        items: series.items,
-      };
-    },
-  };
-}
 
 const DOTS_TEMPLATE = `
   @if (dotTemplate(); as tpl) {
@@ -76,10 +60,10 @@ export abstract class IvCartesianSeries {
   readonly dataKey = input.required<string>();
   readonly curve = input<IvCurve>('linear');
   readonly stroke = input<string>();
-  readonly activeDot = input(true);
+  readonly activeDot = input(true, { transform: booleanAttribute });
   readonly class = input('');
   abstract readonly strokeWidth: InputSignal<number>;
-  abstract readonly dot: InputSignal<boolean | TemplateRef<IvDotContext>>;
+  abstract readonly dot: Signal<boolean | TemplateRef<IvDotContext>>;
 
   protected abstract readonly kind: 'line' | 'area';
   protected abstract stackKey(): string | undefined;
@@ -151,7 +135,7 @@ export abstract class IvCartesianSeries {
   host: { 'data-slot': 'chart-line-series' },
   imports: [NgTemplateOutlet],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [seriesProvider(IvLine)],
+  providers: [ivSeriesProvider(IvLine)],
   template:
     `
     @if (linePath(); as d) {
@@ -164,7 +148,7 @@ export abstract class IvCartesianSeries {
 })
 export class IvLine extends IvCartesianSeries {
   readonly strokeWidth = input(2);
-  readonly dot = input<boolean | TemplateRef<IvDotContext>>(true);
+  readonly dot = input(true, { transform: ivTemplateAttribute<IvDotContext> });
   protected readonly kind = 'line';
   protected stackKey(): undefined {
     return undefined;
@@ -177,7 +161,7 @@ export class IvLine extends IvCartesianSeries {
   host: { 'data-slot': 'chart-area-series' },
   imports: [NgTemplateOutlet],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [seriesProvider(IvArea)],
+  providers: [ivSeriesProvider(IvArea)],
   template:
     `
     @if (areaPath(); as d) {
@@ -194,7 +178,7 @@ export class IvLine extends IvCartesianSeries {
 })
 export class IvArea extends IvCartesianSeries {
   readonly strokeWidth = input(1);
-  readonly dot = input<boolean | TemplateRef<IvDotContext>>(false);
+  readonly dot = input(false, { transform: ivTemplateAttribute<IvDotContext> });
   readonly fill = input<string>();
   readonly fillOpacity = input(0.4);
   readonly stackId = input<string>();
