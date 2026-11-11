@@ -60,3 +60,17 @@ export function ivSeriesColor(key: string): string {
 export function ivSeriesLabel(config: IvChartConfig, key: string): string {
   return config[key]?.label ?? key;
 }
+
+/** One drawn item of a series (a point, a bar or a sector), for labels. */
+export interface IvSeriesItem {
+  index: number;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  value: unknown;
+  fill: string;
+}
+
+/** Provided by each series part: its key and its drawn items. Gap rows have no item. */
+export const IV_SERIES = new InjectionToken<{ key: string; items: Signal<IvSeriesItem[]> }>('IV_SERIES');
