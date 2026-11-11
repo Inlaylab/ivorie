@@ -54,13 +54,13 @@ if (errors.length) {
   process.exit(1);
 }
 
-// Guides first by order, then components A–Z.
-pages.sort((a, b) =>
-  a.section !== b.section
-    ? a.section === 'guide'
-      ? -1
-      : 1
-    : (orders.get(a.slug)! - orders.get(b.slug)!) || a.title.localeCompare(b.title),
+// Guides first by order, then components A–Z, then the chart gallery A–Z.
+const SECTIONS = ['guide', 'component', 'charts'];
+pages.sort(
+  (a, b) =>
+    SECTIONS.indexOf(a.section) - SECTIONS.indexOf(b.section) ||
+    orders.get(a.slug)! - orders.get(b.slug)! ||
+    a.title.localeCompare(b.title),
 );
 
 rmSync(OUT, { recursive: true, force: true });

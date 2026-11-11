@@ -16,7 +16,7 @@ import { NgTemplateOutlet } from '@angular/common';
 import { area, line } from 'd3-shape';
 import { cn } from '@inlaylab/ivorie/core';
 import { IV_CARTESIAN, IvCartesianPoint } from './cartesian';
-import { IvCurve, ivCurve, ivSeriesProvider, ivTemplateAttribute } from './scales';
+import { IvCurve, ivCurve, ivSeriesProvider } from './scales';
 import { IV_CHART, IvChartDatum, IvSeriesItem, ivSeriesColor } from './types';
 
 /** A drawn point, given to a custom `dot` template as `$implicit`. */
@@ -33,22 +33,44 @@ export interface IvDotContext {
   $implicit: IvDot;
 }
 
+/** Circle props merged over the default dot, like a Recharts `dot={{ … }}` or `activeDot={{ … }}` object. */
+export interface IvDotProps {
+  r?: number;
+  fill?: string;
+  stroke?: string;
+  strokeWidth?: number;
+}
+
+/** `dot`: a bare attribute or boolean, a template, or circle props. */
+function ivDotAttribute(value: unknown): boolean | TemplateRef<IvDotContext> | IvDotProps {
+  if (value instanceof TemplateRef) return value as TemplateRef<IvDotContext>;
+  return value !== null && typeof value === 'object' ? (value as IvDotProps) : booleanAttribute(value);
+}
+
+/** `activeDot`: a bare attribute or boolean, or circle props. */
+function ivActiveDotAttribute(value: unknown): boolean | IvDotProps {
+  return value !== null && typeof value === 'object' ? (value as IvDotProps) : booleanAttribute(value);
+}
+
 type Point = IvCartesianPoint | undefined;
+
+const BACKGROUND = 'var(--background)';
 
 const DOTS_TEMPLATE = `
   @if (dotTemplate(); as tpl) {
     @for (dot of dots(); track dot.index) {
       <ng-container [ngTemplateOutlet]="tpl" [ngTemplateOutletContext]="{ $implicit: dot }" />
     }
-  } @else if (dot()) {
+  } @else if (dotProps(); as p) {
     @for (dot of dots(); track dot.index) {
-      <svg:circle data-slot="chart-dot" r="3" fill="var(--background)"
-        [attr.cx]="dot.cx" [attr.cy]="dot.cy" [attr.stroke]="color()" [attr.stroke-width]="strokeWidth()" />
+      <svg:circle data-slot="chart-dot" [attr.r]="p.r" [attr.fill]="p.fill"
+        [attr.cx]="dot.cx" [attr.cy]="dot.cy" [attr.stroke]="p.stroke" [attr.stroke-width]="p.strokeWidth" />
     }
   }
   @if (active(); as a) {
-    <svg:circle data-slot="chart-active-dot" class="iv-chart-dot" r="4" stroke="var(--background)" stroke-width="2"
-      [attr.cx]="a.cx" [attr.cy]="a.cy" [attr.fill]="color()" />
+    <svg:circle data-slot="chart-active-dot" [attr.class]="a.stroke === background ? 'iv-chart-dot' : null"
+      [attr.r]="a.r" [attr.stroke]="a.stroke" [attr.stroke-width]="a.strokeWidth"
+      [attr.cx]="a.cx" [attr.cy]="a.cy" [attr.fill]="a.fill" />
   }
 `;
 
@@ -60,10 +82,11 @@ export abstract class IvCartesianSeries {
   readonly dataKey = input.required<string>();
   readonly curve = input<IvCurve>('linear');
   readonly stroke = input<string>();
-  readonly activeDot = input(true, { transform: booleanAttribute });
+  /** The dot at the active row: on, off, or circle props over `r` 4, the series color and a background stroke. */
+  readonly activeDot = input<boolean | IvDotProps, unknown>(true, { transform: ivActiveDotAttribute });
   readonly class = input('');
   abstract readonly strokeWidth: InputSignal<number>;
-  abstract readonly dot: Signal<boolean | TemplateRef<IvDotContext>>;
+  abstract readonly dot: Signal<boolean | TemplateRef<IvDotContext> | IvDotProps>;
 
   protected abstract readonly kind: 'line' | 'area';
   protected abstract stackKey(): string | undefined;
@@ -120,11 +143,24 @@ export abstract class IvCartesianSeries {
     return dot instanceof TemplateRef ? dot : null;
   });
 
+  protected readonly background = BACKGROUND;
+
+  /** Recharts' dot: r 3, a background fill, the series stroke; an object overrides each. */
+  protected readonly dotProps = computed<Required<IvDotProps> | null>(() => {
+    const dot = this.dot();
+    if (!dot || dot instanceof TemplateRef) return null;
+    const base = { r: 3, fill: BACKGROUND, stroke: this.color(), strokeWidth: this.strokeWidth() };
+    return dot === true ? base : { ...base, ...dot };
+  });
+
   protected readonly active = computed(() => {
     const index = this.chart.active()?.index;
-    if (!this.activeDot() || index === undefined) return null;
+    const props = this.activeDot();
+    if (!props || index === undefined) return null;
     const p = this.points()[index];
-    return p ? { cx: p.x, cy: p.y1 } : null;
+    if (!p) return null;
+    const base = { r: 4, fill: this.color(), stroke: BACKGROUND, strokeWidth: 2 };
+    return { ...base, ...(props === true ? {} : props), cx: p.x, cy: p.y1 };
   });
 
   protected readonly classes = computed(() => cn(this.class()));
@@ -148,7 +184,7 @@ export abstract class IvCartesianSeries {
 })
 export class IvLine extends IvCartesianSeries {
   readonly strokeWidth = input(2);
-  readonly dot = input(true, { transform: ivTemplateAttribute<IvDotContext> });
+  readonly dot = input<boolean | TemplateRef<IvDotContext> | IvDotProps, unknown>(true, { transform: ivDotAttribute });
   protected readonly kind = 'line';
   protected stackKey(): undefined {
     return undefined;
@@ -178,7 +214,7 @@ export class IvLine extends IvCartesianSeries {
 })
 export class IvArea extends IvCartesianSeries {
   readonly strokeWidth = input(1);
-  readonly dot = input(false, { transform: ivTemplateAttribute<IvDotContext> });
+  readonly dot = input<boolean | TemplateRef<IvDotContext> | IvDotProps, unknown>(false, { transform: ivDotAttribute });
   readonly fill = input<string>();
   readonly fillOpacity = input(0.4);
   readonly stackId = input<string>();

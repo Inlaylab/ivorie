@@ -1,7 +1,9 @@
 import { Component, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { describe, expect, it } from 'vitest';
-import { IV_CARTESIAN, IV_CHART, IV_CHART_IMPORTS, IV_SERIES, IvChartConfig, IvChartDatum } from '@inlaylab/ivorie/chart';
+import {
+  IV_CARTESIAN, IV_CHART, IV_CHART_IMPORTS, IV_SERIES, IvChartConfig, IvChartDatum, IvDotProps,
+} from '@inlaylab/ivorie/chart';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
@@ -81,6 +83,23 @@ class LineHost {
 class ExpandHost {
   config = CONFIG;
   data = MONTHS;
+}
+
+@Component({
+  imports: [IV_CHART_IMPORTS],
+  template: `
+    <iv-chart [config]="config">
+      <svg ivLineChart [data]="data">
+        <g ivLine dataKey="desktop" [dot]="dot()" [activeDot]="activeDot()" [strokeWidth]="3" />
+      </svg>
+    </iv-chart>
+  `,
+})
+class DotPropsHost {
+  config = CONFIG;
+  data = MONTHS;
+  dot = signal<boolean | IvDotProps>({ fill: 'var(--color-desktop)' });
+  activeDot = signal<boolean | IvDotProps>({ r: 6 });
 }
 
 async function render<T>(type: new () => T, patch?: (host: T) => void) {
@@ -222,6 +241,36 @@ describe('Cartesian charts', () => {
     const dot = el.querySelector('[data-slot="chart-active-dot"]');
     expect(dot?.getAttribute('fill')).toBe('var(--color-desktop)');
     expect(dot?.getAttribute('stroke')).toBe('var(--background)');
+  });
+
+  it('merges dot and activeDot props over the defaults (Recharts objects)', async () => {
+    const { el, fixture } = await render(DotPropsHost);
+    const dots = el.querySelectorAll('[data-slot="chart-dot"]');
+    expect(dots.length).toBe(6);
+    // Recharts: r 3, the line's stroke and stroke width, then the given props.
+    expect(dots[0].getAttribute('r')).toBe('3');
+    expect(dots[0].getAttribute('fill')).toBe('var(--color-desktop)');
+    expect(dots[0].getAttribute('stroke')).toBe('var(--color-desktop)');
+    expect(dots[0].getAttribute('stroke-width')).toBe('3');
+    fixture.debugElement.query((d) => d.name === 'iv-chart').injector.get(IV_CHART).active.set({ index: 1 });
+    await fixture.whenStable();
+    const active = el.querySelector('[data-slot="chart-active-dot"]')!;
+    expect(active.getAttribute('r')).toBe('6');
+    expect(active.getAttribute('fill')).toBe('var(--color-desktop)');
+    expect(active.getAttribute('stroke')).toBe('var(--background)');
+    expect(active.getAttribute('class')).toBe('iv-chart-dot');
+    // A given stroke is kept: the container's transparent-stroke rule does not apply.
+    fixture.componentInstance.activeDot.set({ stroke: 'red' });
+    fixture.componentInstance.dot.set(false);
+    await fixture.whenStable();
+    expect(el.querySelectorAll('[data-slot="chart-dot"]').length).toBe(0);
+    const red = el.querySelector('[data-slot="chart-active-dot"]')!;
+    expect(red.getAttribute('stroke')).toBe('red');
+    expect(red.getAttribute('r')).toBe('4');
+    expect(red.getAttribute('class')).toBeNull();
+    fixture.componentInstance.activeDot.set(false);
+    await fixture.whenStable();
+    expect(el.querySelector('[data-slot="chart-active-dot"]')).toBeNull();
   });
 
   it('expands stacks to 0..1', async () => {

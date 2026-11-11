@@ -1,20 +1,227 @@
 ---
 title: Chart
-description: A responsive SVG chart container that colors series from a config.
+description: SVG charts built from small parts. Line, area, bar, pie, radar and radial.
 section: component
 entry: '@inlaylab/ivorie/chart'
 ---
 
-Wrap chart parts in `iv-chart`. Each key in `config` becomes the CSS variable `--color-<key>`.
+Charts are made of parts: a container, a chart root, then grid, axes, series, tooltip and legend. You add only the parts you need. The parts and their inputs follow [Recharts](https://recharts.org), so shadcn's chart examples port almost line by line.
+
+Browse ready-made cards in [Area Charts](docs/charts-area), [Bar Charts](docs/charts-bar) and [Line Charts](docs/charts-line).
 
 ## Usage
 
 ```ts
-import { IvChart } from '@inlaylab/ivorie/chart';
+import { IV_CHART_IMPORTS, IvChartConfig } from '@inlaylab/ivorie/chart';
 ```
 
 ```html
-<iv-chart [config]="config"></iv-chart>
+<iv-chart [config]="config" class="min-h-[200px] w-full">
+  <svg ivBarChart [data]="data">
+    <g ivCartesianGrid [vertical]="false" />
+    <g ivXAxis dataKey="month" />
+    <g ivBar dataKey="desktop" [radius]="4" />
+  </svg>
+  <iv-chart-tooltip />
+  <iv-chart-legend />
+</iv-chart>
+```
+
+The `svg` root and its `g` parts are real SVG elements. Angular renders them on the server too.
+
+## Your first chart
+
+Build the bar chart at the top of this page, one step at a time.
+
+### 1. Define your data
+
+Any array of objects works. Each key is a column you can draw.
+
+```ts
+protected readonly data = [
+  { month: 'January', desktop: 186, mobile: 80 },
+  { month: 'February', desktop: 305, mobile: 200 },
+  { month: 'March', desktop: 237, mobile: 120 },
+  { month: 'April', desktop: 73, mobile: 190 },
+  { month: 'May', desktop: 209, mobile: 130 },
+  { month: 'June', desktop: 214, mobile: 140 },
+];
+```
+
+### 2. Define your config
+
+The config names and colors each series. It holds no data, so many charts can share one.
+
+```ts
+protected readonly config: IvChartConfig = {
+  desktop: { label: 'Desktop', color: '#2563eb' },
+  mobile: { label: 'Mobile', color: '#60a5fa' },
+};
+```
+
+### 3. Build your chart
+
+Put a chart root inside `iv-chart`, and a series per data key. Give the container a height: a `min-h-*`, an `h-*` or an `aspect-*` class. Its default is `aspect-video`.
+
+<!-- demo: chart -->
+
+### 4. Add a grid
+
+`g[ivCartesianGrid]` draws the lines. `[vertical]="false"` keeps only the horizontal ones.
+
+<!-- demo: chart-bar-demo-grid -->
+
+### 5. Add an axis
+
+`g[ivXAxis]` labels each row with its `dataKey`. `tickFormatter` shortens the labels.
+
+<!-- demo: chart-bar-demo-axis -->
+
+### 6. Add a tooltip
+
+Put `iv-chart-tooltip` inside `iv-chart`, after the chart root. Hover a bar. Labels and colors come from the config.
+
+<!-- demo: chart-bar-demo-tooltip -->
+
+### 7. Add a legend
+
+`iv-chart-legend` lists each series with its config label. The chart makes room for it.
+
+<!-- demo: chart-bar-demo-legend -->
+
+That is your first chart. Next, browse the gallery pages or read the API below.
+
+## Config
+
+The config maps each data key to a `label`, an optional `icon`, and a `color` or a `theme`.
+
+```ts
+import { IvChartConfig } from '@inlaylab/ivorie/chart';
+
+protected readonly config: IvChartConfig = {
+  desktop: {
+    label: 'Desktop',
+    icon: MonitorIcon,
+    // A color...
+    color: '#2563eb',
+  },
+  mobile: {
+    label: 'Mobile',
+    // ...or a light and a dark color.
+    theme: { light: '#60a5fa', dark: '#93c5fd' },
+  },
+};
+```
+
+- `label` names the series in the tooltip and the legend.
+- `icon` is any component. The tooltip and the legend draw it in place of the swatch. To use an `<ng-icon>`, wrap it in a small component.
+- Each key becomes a CSS custom property, `--color-<key>`, on `iv-chart`. Use simple identifiers as keys: letters, digits, `-` and `_`, no spaces.
+
+## Theming
+
+Use CSS variables (recommended), or any color: hex, `hsl`, `oklch`.
+
+### CSS variables
+
+The theme defines `--chart-1` to `--chart-5`, for light and dark mode. Point the config at them:
+
+```ts
+protected readonly config: IvChartConfig = {
+  desktop: { label: 'Desktop', color: 'var(--chart-1)' },
+  mobile: { label: 'Mobile', color: 'var(--chart-2)' },
+};
+```
+
+Change them in your styles to recolor every chart:
+
+```css
+:root {
+  --chart-1: oklch(0.646 0.222 41.116);
+  --chart-2: oklch(0.6 0.118 184.704);
+}
+.dark {
+  --chart-1: oklch(0.488 0.243 264.376);
+  --chart-2: oklch(0.696 0.17 162.48);
+}
+```
+
+### A theme per series
+
+`theme` sets a light and a dark color for one series. Dark applies under a `.dark` ancestor.
+
+```ts
+protected readonly config: IvChartConfig = {
+  desktop: { label: 'Desktop', theme: { light: '#2563eb', dark: '#60a5fa' } },
+};
+```
+
+### Using the colors
+
+A series uses `var(--color-<dataKey>)` by default. Use the same variable anywhere inside `iv-chart`:
+
+- In an input: `<g ivBar dataKey="desktop" fill="var(--color-mobile)" />`.
+- In data: `{ browser: 'chrome', visitors: 275, fill: 'var(--color-chrome)' }`. A row's `fill` colors its bar, sector or tooltip row.
+- In a class: `<g ivLabelList class="fill-(--color-desktop)" />`.
+
+## Tooltip
+
+A tooltip shows a label, a name, an indicator and a value per series.
+
+<!-- demo: chart-tooltip-demo -->
+
+Pick the indicator with `indicator`: `dot`, `line` or `dashed`. Hide parts with `hideLabel` and `hideIndicator`. Add `[cursor]="false"` to drop the band or line under the active row.
+
+```html
+<iv-chart-tooltip indicator="line" hideLabel [cursor]="false" />
+```
+
+Names come from the config. `nameKey` and `labelKey` pick other config entries:
+
+```ts
+protected readonly data = [
+  { browser: 'chrome', visitors: 187, fill: 'var(--color-chrome)' },
+  { browser: 'safari', visitors: 200, fill: 'var(--color-safari)' },
+];
+
+protected readonly config: IvChartConfig = {
+  visitors: { label: 'Total Visitors' },
+  chrome: { label: 'Chrome', color: 'var(--chart-1)' },
+  safari: { label: 'Safari', color: 'var(--chart-2)' },
+};
+```
+
+```html
+<!-- Label "Total Visitors", rows named "Chrome" and "Safari". -->
+<iv-chart-tooltip labelKey="visitors" nameKey="browser" />
+```
+
+For your own markup, put an `ivChartTooltipContent` template inside. It gets the rows and the label:
+
+```html
+<iv-chart-tooltip hideLabel>
+  <ng-template ivChartTooltipContent let-payload>
+    @for (item of payload; track item.key) {
+      <div class="flex items-center gap-2">
+        {{ config[item.key].label }}
+        <span class="ml-auto font-mono tabular-nums">{{ item.value }} kcal</span>
+      </div>
+    }
+  </ng-template>
+</iv-chart-tooltip>
+```
+
+## Legend
+
+Put `iv-chart-legend` inside `iv-chart`. It shows a swatch, or the config `icon`, and the label per series. `verticalAlign="top"` puts it above the chart.
+
+```html
+<iv-chart-legend verticalAlign="top" />
+```
+
+Like the tooltip, `nameKey` picks the config entry by a row value, for example a pie's sector names:
+
+```html
+<iv-chart-legend nameKey="browser" />
 ```
 
 ## API
@@ -71,8 +278,8 @@ Every part also accepts `class`. Boolean inputs take a bare attribute, like shad
 | `curve` | `'linear' \| 'natural' \| 'step' \| 'monotone' \| 'bump'` | `'linear'` | Curve type. |
 | `stroke` | `string` | series color | Line color. |
 | `strokeWidth` | `number` | line `2`, area `1` | Line width. |
-| `dot` | `boolean \| TemplateRef<IvDotContext>` | line `true`, area `false` | Dots, or a template given `IvDot`. |
-| `activeDot` | `boolean` | `true` | Dot at the active row. |
+| `dot` | `boolean \| IvDotProps \| TemplateRef<IvDotContext>` | line `true`, area `false` | Dots; circle props (`r`, `fill`, `stroke`, `strokeWidth`) over the default (`r` 3, background fill, series stroke); or a template given `IvDot`. |
+| `activeDot` | `boolean \| IvDotProps` | `true` | Dot at the active row; circle props over the default (`r` 4, series fill, background stroke). |
 | `fill` | `string` | series color | Area only. |
 | `fillOpacity` | `number` | `0.4` | Area only. |
 | `stackId` | `string` | — | Area only. Areas with the same id stack, in markup order. |
@@ -236,12 +443,12 @@ grow = (shape: IvSectorShape) => ivArc({ ...shape, outerRadius: shape.outerRadiu
 
 The container has no role. Chart roots are `role="img"` with an `aria-label` (default: the chart type and series names).
 
-Each chart root is one tab stop (`tabindex="0"`), like Recharts' `accessibilityLayer` Keyboard focus shows a ring (`focus-visible:outline-ring/50`).
+Each chart root is one tab stop (`tabindex="0"`), like Recharts' `accessibilityLayer`. Keyboard focus shows a ring (`focus-visible:outline-ring/50`).
 
 | Key | Action |
 |---|---|
 | ArrowRight / ArrowLeft | Next / previous row. Wraps. Vertical bar charts and polar charts use ArrowDown / ArrowUp. |
 | Home / End | First / last row. |
-| Escape | Hide the tooltip. |
+| Escape | Hide the tooltip. Works while the chart has focus. |
 
 While the chart has focus, the tooltip is an `aria-live="polite"` region, so the row is read out.

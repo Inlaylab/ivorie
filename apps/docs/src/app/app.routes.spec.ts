@@ -5,6 +5,12 @@ import { describe, expect, it } from 'vitest';
 import { SITE_DESCRIPTION, TrailingSlashUrlSerializer, routes } from './app.routes';
 
 async function open(url: string) {
+  // /all renders every demo; the sidebar demos' BreakpointObserver needs the old addListener API too.
+  // Other specs leave a partial matchMedia behind (no isolation), so set a full one here.
+  Object.defineProperty(document.defaultView!, 'matchMedia', {
+    configurable: true,
+    value: () => ({ matches: false, addEventListener: () => {}, removeEventListener: () => {}, addListener: () => {}, removeListener: () => {} }),
+  });
   TestBed.configureTestingModule({
     providers: [
       provideRouter(routes, withComponentInputBinding()),
