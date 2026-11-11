@@ -15,6 +15,7 @@ import { IvButton } from '@inlaylab/ivorie/button';
 import { IV_BUTTON_GROUP_IMPORTS } from '@inlaylab/ivorie/button-group';
 import { IvCalendar } from '@inlaylab/ivorie/calendar';
 import { IV_CARD_IMPORTS } from '@inlaylab/ivorie/card';
+import { IV_CHART_IMPORTS } from '@inlaylab/ivorie/chart';
 import { IvCheckbox } from '@inlaylab/ivorie/checkbox';
 import { IV_COLLAPSIBLE_IMPORTS } from '@inlaylab/ivorie/collapsible';
 import { IV_COMBOBOX_IMPORTS } from '@inlaylab/ivorie/combobox';
@@ -73,6 +74,7 @@ import { App } from './app';
     ...IV_BREADCRUMB_IMPORTS,
     ...IV_BUTTON_GROUP_IMPORTS,
     ...IV_CARD_IMPORTS,
+    ...IV_CHART_IMPORTS,
     ...IV_COLLAPSIBLE_IMPORTS,
     ...IV_COMBOBOX_IMPORTS,
     ...IV_DIALOG_IMPORTS,

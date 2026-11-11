@@ -7,7 +7,9 @@
   "allowedNonPeerDependencies": [
     "class-variance-authority",
     "clsx",
-    "tailwind-merge"
+    "tailwind-merge",
+    "d3-scale",
+    "d3-shape"
   ],
   "assets": [
     "styles/**/*.css"
