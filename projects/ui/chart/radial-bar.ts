@@ -25,6 +25,9 @@ interface RadialBar {
   d: string;
 }
 
+/** Entrance: fade and scale in from the shape's own center. Off under reduced motion. */
+const ENTER_CLASSES = 'motion-safe:animate-chart-in origin-center [transform-box:fill-box]';
+
 /**
  * An arc per row, on the row's ring. Bars with the same `stackId` share a ring and stack;
  * others sit side by side in markup order. Rows with no value draw no arc.
@@ -203,5 +206,5 @@ export class IvRadialBar {
 
   protected readonly labelContext = ivLabelContext(this.ctx.center, this.ctx.radius);
 
-  protected readonly classes = computed(() => cn(this.class()));
+  protected readonly classes = computed(() => cn(ENTER_CLASSES, this.class()));
 }

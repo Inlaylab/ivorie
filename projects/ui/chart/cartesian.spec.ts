@@ -105,6 +105,16 @@ describe('Cartesian charts', () => {
     expect(path.parentElement?.namespaceURI).toBe(SVG_NS);
   });
 
+  it('draws lines in over a normalised path, motion-safe only', async () => {
+    const { el } = await render(LineHost);
+    const path = line(el)!;
+    expect(path.getAttribute('pathLength')).toBe('1');
+    expect(path.getAttribute('class')).toContain('motion-safe:animate-chart-draw');
+    const area = await render(AreaHost);
+    expect(area.el.querySelector('[data-slot="chart-area"]')!.getAttribute('class')).toContain('motion-safe:animate-chart-fade');
+    expect(area.el.querySelector('[data-slot="chart-area-stroke"]')!.getAttribute('pathLength')).toBe('1');
+  });
+
   it('draws two stacked areas', async () => {
     const { el, fixture } = await render(AreaHost);
     const paths = areas(el);

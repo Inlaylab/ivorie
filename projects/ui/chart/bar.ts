@@ -22,10 +22,19 @@ export type IvBarRadius = number | [number, number, number, number];
 /** A drawn bar: its item and its path. */
 interface Bar {
   item: IvSeriesItem;
+  /** Entrance: grow from the baseline (the end the bar starts at). */
+  grow: string;
   d: string;
   /** For an `ivActiveShape` template: no sector, so the polar fields are 0. */
   shape: IvActiveShapeProps;
 }
+
+/** Entrance classes, one per baseline side. The group scales about its own box, so hover swaps do not replay it. */
+const GROW = 'motion-safe:[transform-box:fill-box]';
+const GROW_UP = `${GROW} motion-safe:origin-bottom motion-safe:animate-chart-grow-y`;
+const GROW_DOWN = `${GROW} motion-safe:origin-top motion-safe:animate-chart-grow-y`;
+const GROW_RIGHT = `${GROW} motion-safe:origin-left motion-safe:animate-chart-grow-x`;
+const GROW_LEFT = `${GROW} motion-safe:origin-right motion-safe:animate-chart-grow-x`;
 
 const NO_SECTOR = { cx: 0, cy: 0, innerRadius: 0, outerRadius: 0, startAngle: 0, endAngle: 0 };
 
@@ -66,6 +75,7 @@ export function ivBarPath(x: number, y: number, width: number, height: number, r
   providers: [ivSeriesProvider(IvBar)],
   template: `
     @for (bar of bars(); track bar.item.index) {
+      <svg:g [attr.class]="bar.grow">
       @if (bar.item.index === active() && activeShape(); as shape) {
         <ng-container [ngTemplateOutlet]="shape.template" [ngTemplateOutletContext]="{ $implicit: bar.shape }" />
       } @else {
@@ -73,6 +83,7 @@ export function ivBarPath(x: number, y: number, width: number, height: number, r
           [attr.d]="bar.d" [attr.fill]="bar.item.fill"
           [attr.data-active]="bar.item.index === active() ? '' : null" />
       }
+      </svg:g>
     }
     <ng-content />
   `,
@@ -149,7 +160,10 @@ export class IvBar {
         fill,
         payload: row,
       };
-      bars.push({ d, item, shape: { ...item, ...NO_SECTOR, d } });
+      const grow = horizontal
+        ? height >= 0 ? GROW_UP : GROW_DOWN
+        : width >= 0 ? GROW_RIGHT : GROW_LEFT;
+      bars.push({ d, item, grow, shape: { ...item, ...NO_SECTOR, d } });
     });
     return bars;
   });

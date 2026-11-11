@@ -1190,6 +1190,7 @@
     .cn-combobox-content,
     .cn-command,
     .cn-navigation-menu-viewport,
+    .cn-chart-tooltip,
     .cn-toast {
       border: 1px solid transparent;
       background: linear-gradient(var(--popover), var(--popover)) padding-box, var(--aurora-edge) border-box;

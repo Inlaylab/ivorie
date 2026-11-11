@@ -57,12 +57,18 @@
 .cn-combobox-content,
 .cn-command,
 .cn-navigation-menu-viewport,
+.cn-chart-tooltip,
 .cn-toast {
   @apply rounded-3xl ring-0 shadow-[0_16px_48px_-12px_var(--bento-float-shadow)];
 }
 
 & .cn-dialog-content .cn-command {
   @apply rounded-none shadow-none;
+}
+
+/* A tooltip is small: a smaller radius than a menu, the same lift. */
+& .cn-chart-tooltip {
+  @apply rounded-2xl border-0;
 }
 
 & .cn-sheet-content {

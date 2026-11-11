@@ -16,6 +16,9 @@ import { IvDot, IvDotContext } from './series';
 import { ivPolarPoint, ivSeriesProvider, ivTemplateAttribute } from './scales';
 import { IV_CHART, IvSeriesItem, ivSeriesColor } from './types';
 
+/** Entrance: fade and scale in from the shape's own center. Off under reduced motion. */
+const ENTER_CLASSES = 'motion-safe:animate-chart-in origin-center [transform-box:fill-box]';
+
 /** A filled polygon through each row's value on its spoke. Rows with no value are left out. */
 @Component({
   selector: 'g[ivRadar]',
@@ -156,5 +159,5 @@ export class IvRadar {
     return dot instanceof TemplateRef ? dot : null;
   });
 
-  protected readonly classes = computed(() => cn(this.class()));
+  protected readonly classes = computed(() => cn(ENTER_CLASSES, this.class()));
 }

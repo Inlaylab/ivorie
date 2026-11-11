@@ -1228,12 +1228,17 @@
     .cn-combobox-content,
     .cn-command,
     .cn-navigation-menu-viewport,
+    .cn-chart-tooltip,
     .cn-toast {
       @apply bg-(--glass-popover) ring-1 ring-(--glass-edge) backdrop-blur-(--glass-float-blur) backdrop-saturate-[1.8] inset-shadow-[0_1px_0_0_var(--glass-shine)] shadow-[0_24px_60px_-24px_var(--glass-shadow)];
     }
 
     & .cn-dialog-content .cn-command {
       @apply bg-transparent ring-0 shadow-none inset-shadow-none backdrop-blur-none;
+    }
+
+    & .cn-chart-tooltip {
+      @apply border-transparent;
     }
 
     & .cn-tooltip-content {

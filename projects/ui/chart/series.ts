@@ -139,7 +139,7 @@ export abstract class IvCartesianSeries {
   template:
     `
     @if (linePath(); as d) {
-      <svg:path data-slot="chart-line" class="iv-chart-line" fill="none"
+      <svg:path data-slot="chart-line" class="iv-chart-line motion-safe:animate-chart-draw" fill="none" pathLength="1"
         [attr.d]="d" [attr.stroke]="color()" [attr.stroke-width]="strokeWidth()" />
     }
   ` +
@@ -165,11 +165,11 @@ export class IvLine extends IvCartesianSeries {
   template:
     `
     @if (areaPath(); as d) {
-      <svg:path data-slot="chart-area" class="iv-chart-area" stroke="none"
+      <svg:path data-slot="chart-area" class="iv-chart-area motion-safe:animate-chart-fade" stroke="none"
         [attr.d]="d" [attr.fill]="fillColor()" [attr.fill-opacity]="fillOpacity()" />
     }
     @if (linePath(); as d) {
-      <svg:path data-slot="chart-area-stroke" fill="none"
+      <svg:path data-slot="chart-area-stroke" class="motion-safe:animate-chart-draw" fill="none" pathLength="1"
         [attr.d]="d" [attr.stroke]="color()" [attr.stroke-width]="strokeWidth()" />
     }
   ` +

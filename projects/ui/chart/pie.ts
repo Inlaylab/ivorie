@@ -70,6 +70,9 @@ interface Row {
   value: number;
 }
 
+/** Entrance: fade and scale in from the shape's own center. Off under reduced motion. */
+const ENTER_CLASSES = 'motion-safe:animate-chart-in origin-center [transform-box:fill-box]';
+
 /**
  * A sector per row, in data order from `startAngle`. Rows with a `null` or missing value are
  * skipped; a pie whose values sum to 0 draws nothing.
@@ -307,5 +310,5 @@ export class IvPie {
 
   protected readonly labelContext = ivLabelContext(this.ctx.center, this.radius);
 
-  protected readonly classes = computed(() => cn(this.class()));
+  protected readonly classes = computed(() => cn(ENTER_CLASSES, this.class()));
 }

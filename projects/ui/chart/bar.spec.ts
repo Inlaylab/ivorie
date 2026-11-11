@@ -207,6 +207,15 @@ describe('Bar chart', () => {
     expect(cartesian.value().domain()[1]).toBe(0);
   });
 
+  it('grows each bar from its baseline, motion-safe only', async () => {
+    const data = NEGATIVE.map((row, i) => (i === 0 ? { ...row, visitors: -Math.abs(row['visitors'] as number) } : row));
+    const { el } = await render(NegativeHost, (h) => h.data.set(data));
+    const groups = Array.from(el.querySelectorAll('[data-slot="chart-bar"]')).map((b) => b.parentElement!);
+    expect(groups.every((g) => g.getAttribute('class')!.includes('motion-safe:animate-chart-grow-y'))).toBe(true);
+    expect(groups.some((g) => g.getAttribute('class')!.includes('motion-safe:origin-top'))).toBe(true);
+    expect(groups.some((g) => g.getAttribute('class')!.includes('motion-safe:origin-bottom'))).toBe(true);
+  });
+
   it('colors a bar from its row fill', async () => {
     const data = MONTHS.map((row, i) => (i === 1 ? { ...row, fill: 'var(--chart-5)' } : row));
     const { el, series } = await render(MultipleHost, (h) => h.data.set(data));

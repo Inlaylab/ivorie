@@ -121,7 +121,7 @@ const LOOK_HOOKS = [
   // Surfaces and overlays
   'card', 'card-title', 'popover-content', 'dialog-content', 'dialog-overlay', 'alert-dialog-content', 'sheet-content', 'sheet-overlay',
   'drawer-content', 'hover-card-content', 'dropdown-menu-content', 'select-content', 'combobox-content', 'command', 'tooltip-content',
-  'navigation-menu-viewport', 'sidebar-inner', 'alert', 'toast', 'item-variant-outline', 'empty',
+  'navigation-menu-viewport', 'sidebar-inner', 'alert', 'toast', 'item-variant-outline', 'empty', 'chart-tooltip',
   // Controls
   'button-variant-default', 'button-variant-outline', 'button-variant-secondary', 'button-variant-ghost', 'input', 'textarea',
   'input-group', 'select-trigger', 'native-select', 'input-otp-slot', 'checkbox', 'radio-group-item', 'switch', 'switch-thumb',

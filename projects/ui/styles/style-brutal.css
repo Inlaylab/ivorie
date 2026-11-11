@@ -1170,6 +1170,7 @@
     .cn-combobox-content,
     .cn-command,
     .cn-navigation-menu-viewport,
+    .cn-chart-tooltip,
     .cn-toast {
       @apply rounded-md border-2 border-(--brutal-ink) ring-0 shadow-(--brutal-shadow);
     }

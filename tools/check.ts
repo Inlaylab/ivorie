@@ -26,6 +26,8 @@ interface Rule {
 
 export const steps: Step[] = [
   { name: 'build-ui', cmd: 'npx ng build ui' },
+  // Chart entry plus d3, gzipped, under 45 kB. Reads dist/ui.
+  { name: 'size-chart', cmd: 'node tools/size/chart.ts' },
   // Tools tests; some read dist/ui, so they run after build-ui.
   { name: 'test-tools', cmd: 'node --test "tools/**/*.test.ts"' },
   { name: 'publint', cmd: 'npx publint dist/ui --strict' },
