@@ -49,7 +49,8 @@ const CHART_CLASSES = [
   '[&_.iv-chart-radial-background]:fill-muted',
   '[&_.iv-chart-dot]:stroke-transparent',
   '[&_.iv-chart-sector]:stroke-transparent',
-  '[&_svg]:outline-hidden [&_g]:outline-hidden [&_path]:outline-hidden',
+  // The root keeps its keyboard focus ring; everything else draws no outline.
+  '[&_svg:not(:focus-visible)]:outline-hidden [&_g]:outline-hidden [&_path]:outline-hidden',
 ].join(' ');
 
 const THEMES = [

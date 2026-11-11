@@ -282,14 +282,17 @@ export class IvPie {
   /** One item per drawn sector, for `ivLabelList`. */
   readonly items = computed<IvSeriesItem[]>(() => this.sectors().map((s) => s.item));
 
-  /** `activeIndex`, or the hovered row when it is in this ring (or names no ring). */
+  /**
+   * `activeIndex`, or the active row when it is in this ring. A row that names no ring
+   * (`defaultIndex`, a keyless `active.set`) is the first ring's, as the tooltip shows it.
+   */
   protected readonly active = computed(() => {
     const fixed = this.activeIndex();
     if (fixed !== undefined) return fixed;
     const active = this.chart.active();
-    return active && (active.key === undefined || active.key === this.dataKey())
-      ? active.index
-      : undefined;
+    if (!active) return undefined;
+    const key = active.key ?? this.ctx.series().find((s) => s.kind === 'pie')?.key;
+    return key === this.dataKey() ? active.index : undefined;
   });
 
   protected readonly labelTemplate = computed(() => {

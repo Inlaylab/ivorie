@@ -1,6 +1,15 @@
-import { Component, signal } from '@angular/core';
+import {
+  Component,
+  signal,
+  ɵgetDocument as getDocument,
+  ɵsetDocument as setDocument,
+} from '@angular/core';
+import { ɵgetDOM as getDOM } from '@angular/common';
 import { TestBed } from '@angular/core/testing';
-import { bootstrapApplication } from '@angular/platform-browser';
+import {
+  bootstrapApplication,
+  ɵBrowserDomAdapter as BrowserDomAdapter,
+} from '@angular/platform-browser';
 import { provideServerRendering, renderApplication } from '@angular/platform-server';
 import { describe, expect, it } from 'vitest';
 import {
@@ -164,7 +173,12 @@ class PieActiveHost {
           [outerRadius]="90"
         />
       </svg>
-      <iv-chart-tooltip [labelFormatter]="ringLabel" nameKey="month" indicator="line" />
+      <iv-chart-tooltip
+        [labelFormatter]="ringLabel"
+        nameKey="month"
+        indicator="line"
+        [defaultIndex]="defaultIndex()"
+      />
       <iv-chart-legend nameKey="month" />
     </iv-chart>
   `,
@@ -186,6 +200,7 @@ class PieStackedHost {
     { month: 'february', mobile: 200, fill: 'var(--color-february)' },
     { month: 'march', mobile: 120, fill: 'var(--color-march)' },
   ];
+  defaultIndex = signal<number | undefined>(undefined);
   ringLabel = (_: unknown, payload: IvChartPayload[]) => this.config[payload[0].key]?.label ?? '';
 }
 
@@ -439,6 +454,11 @@ describe('Chart keyboard', () => {
   it('is one tab stop; arrows move the active row and wrap, Home and End jump, Escape hides', async () => {
     const { el, svg, chart, key } = await render(BarHost);
     expect(svg.getAttribute('tabindex')).toBe('0');
+    // A visible ring for keyboard focus (WCAG 2.4.7); the container only hides other outlines.
+    expect(hasClasses(svg, 'focus-visible:outline-[3px] focus-visible:outline-ring/50')).toBe(true);
+    const container = el.querySelector('[data-slot="chart"]')!;
+    expect(container.classList).toContain('[&_svg:not(:focus-visible)]:outline-hidden');
+    expect(container.classList).not.toContain('[&_svg]:outline-hidden');
     svg.focus();
     svg.dispatchEvent(new FocusEvent('focus'));
     expect((await key('ArrowRight')).defaultPrevented).toBe(true);
@@ -557,6 +577,17 @@ describe('Polar interaction', () => {
     await stable();
     expect(el.querySelectorAll('[data-testid="active-shape"]').length).toBe(1);
     expect(shape().getAttribute('d')).toBe(grown(4));
+  });
+
+  it('defaultIndex on two rings marks only the first ring, the one the tooltip shows', async () => {
+    const { el, chart } = await render(PieStackedHost, (h) => h.defaultIndex.set(1));
+    expect(chart.active()).toEqual({ index: 1 });
+    const active = Array.from(
+      el.querySelectorAll('path[data-slot="chart-pie-sector"][data-active]'),
+    );
+    expect(active.length).toBe(1);
+    expect(active[0].closest('[ivPie]')?.getAttribute('dataKey')).toBe('desktop');
+    expect(rows(el).map(text)).toEqual(['Desktop February 305']);
   });
 
   it('hovers a sector by angle and radius, and only in its own ring', async () => {
@@ -698,6 +729,9 @@ async function renderOnServer(root: new () => unknown): Promise<string> {
       if (d.set) g[k] = v;
       else Object.defineProperty(g, k, d);
     }
+    // Module state, not globals: the DOM adapter (@angular/common) and core's document.
+    BrowserDomAdapter.makeCurrent();
+    setDocument(document);
   }
 }
 
@@ -728,6 +762,8 @@ describe('Chart tooltip on the server', () => {
     expect(html).toMatch(/Desktop[\s\S]*305/);
     expect(html).toContain('data-active');
     // The rest of this worker still sees jsdom.
+    expect(getDOM().constructor).toBe(BrowserDomAdapter);
+    expect(getDocument()).toBe(document);
     expect(TestBed.createComponent(BarHost).debugElement).not.toBeNull();
   });
 });

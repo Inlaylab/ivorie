@@ -38,6 +38,7 @@ import {
   ivValueDomain,
 } from './scales';
 import {
+  IV_CHART_ROOT_CLASSES,
   IvChartHit,
   IvChartRoot,
   ivAngleDistance,
@@ -264,7 +265,7 @@ export abstract class IvPolarChart extends IvChartRoot {
     return `0 0 ${width} ${height}`;
   });
 
-  protected readonly classes = computed(() => cn('overflow-visible', this.class()));
+  protected readonly classes = computed(() => cn(IV_CHART_ROOT_CLASSES, this.class()));
 
   // Interaction (IvChartRoot). Pies are hit by sector; radial bars by ring; radars by spoke.
 

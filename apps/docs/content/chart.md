@@ -236,7 +236,7 @@ grow = (shape: IvSectorShape) => ivArc({ ...shape, outerRadius: shape.outerRadiu
 
 The container has no role. Chart roots are `role="img"` with an `aria-label` (default: the chart type and series names).
 
-Each chart root is one tab stop (`tabindex="0"`), like Recharts' `accessibilityLayer`.
+Each chart root is one tab stop (`tabindex="0"`), like Recharts' `accessibilityLayer` Keyboard focus shows a ring (`focus-visible:outline-ring/50`).
 
 | Key | Action |
 |---|---|

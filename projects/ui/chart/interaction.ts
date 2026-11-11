@@ -1,6 +1,10 @@
 import { Directive, ElementRef, Signal, inject } from '@angular/core';
 import { IV_CHART, IvChartActive, IvChartLegendItem, IvChartPayload, IvChartSource } from './types';
 
+/** The root is a tab stop: a ring for keyboard focus (an outline, since svg has no border). */
+export const IV_CHART_ROOT_CLASSES =
+  'overflow-visible focus-visible:outline-[3px] focus-visible:outline-offset-0 focus-visible:outline-ring/50';
+
 /** What the pointer is over: a row, and for a pie ring its series. */
 export interface IvChartHit {
   index: number;

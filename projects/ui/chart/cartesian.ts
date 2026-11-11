@@ -20,7 +20,7 @@ import {
   ivSeriesLabel,
 } from './types';
 import { ivBandCenter, ivMarkupOrder, ivStack, ivValueDomain } from './scales';
-import { IvChartHit, IvChartRoot, ivRange } from './interaction';
+import { IV_CHART_ROOT_CLASSES, IvChartHit, IvChartRoot, ivRange } from './interaction';
 
 export type IvChartLayout = 'horizontal' | 'vertical';
 export type IvStackOffset = 'none' | 'expand';
@@ -269,7 +269,7 @@ export abstract class IvCartesianChart extends IvChartRoot {
     return `0 0 ${width} ${height}`;
   });
 
-  protected readonly classes = computed(() => cn('overflow-visible', this.class()));
+  protected readonly classes = computed(() => cn(IV_CHART_ROOT_CLASSES, this.class()));
 
   // Interaction (IvChartRoot).
 
