@@ -102,24 +102,29 @@ export class IvChart {
 
   constructor() {
     // The <style> is made with Renderer2, so it is part of the server output.
+    // Hydration does not adopt Renderer2 nodes: reuse the server's marked element
+    // (and drop extras) instead of adding a second one. It goes last, so the
+    // projected parts keep their place for hydration.
     effect(() => {
       const css = themeCss(this.id, this.config());
+      const host = this.host.nativeElement;
+      const found = Array.from(host.children).filter(
+        (c): c is HTMLStyleElement => c.matches('style[data-chart-style]'),
+      );
+      let el = this.styleEl && found.includes(this.styleEl) ? this.styleEl : (found[0] ?? null);
+      for (const extra of found) if (extra !== el) this.renderer.removeChild(host, extra);
       if (!css) {
-        if (this.styleEl) {
-          this.renderer.removeChild(this.host.nativeElement, this.styleEl);
-          this.styleEl = null;
-        }
+        if (el) this.renderer.removeChild(host, el);
+        this.styleEl = null;
         return;
       }
-      if (!this.styleEl) {
-        this.styleEl = this.renderer.createElement('style') as HTMLStyleElement;
-        this.renderer.insertBefore(
-          this.host.nativeElement,
-          this.styleEl,
-          this.host.nativeElement.firstChild,
-        );
+      if (!el) {
+        el = this.renderer.createElement('style') as HTMLStyleElement;
+        this.renderer.setAttribute(el, 'data-chart-style', '');
+        this.renderer.appendChild(host, el);
       }
-      this.styleEl.textContent = css;
+      this.styleEl = el;
+      if (el.textContent !== css) el.textContent = css;
     });
 
     afterNextRender(() => {

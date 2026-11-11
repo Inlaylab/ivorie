@@ -73,6 +73,30 @@ describe('IvChart', () => {
     expect(el.style.getPropertyValue('--color-a')).toBe('red');
   });
 
+  it('reuses a server-rendered style instead of adding a second one', async () => {
+    const fixture = TestBed.createComponent(Host);
+    const host = fixture.nativeElement.querySelector('iv-chart') as HTMLElement | null;
+    // Seed before the first change detection, like server markup on the client.
+    const seeded = document.createElement('style');
+    seeded.setAttribute('data-chart-style', '');
+    seeded.textContent = '[data-chart=old] {}';
+    const target = (host ?? fixture.nativeElement) as HTMLElement;
+    target.appendChild(seeded);
+    fixture.componentInstance.config.set({ a: { theme: { light: 'red', dark: 'blue' } } });
+    await fixture.whenStable();
+    const el = fixture.nativeElement.querySelector('[data-slot="chart"]') as HTMLElement;
+    expect(el.querySelectorAll('style').length).toBe(1);
+    expect(el.querySelector('style')).toBe(seeded);
+    expect(seeded.textContent).toContain('--color-a: red;');
+    fixture.componentInstance.config.set({ a: { theme: { light: 'green', dark: 'blue' } } });
+    await fixture.whenStable();
+    expect(el.querySelectorAll('style').length).toBe(1);
+    expect(seeded.textContent).toContain('--color-a: green;');
+    fixture.componentInstance.config.set({});
+    await fixture.whenStable();
+    expect(el.querySelector('style')).toBeNull();
+  });
+
   it('missing key falls back to the key', () => {
     expect(ivSeriesLabel({}, 'visits')).toBe('visits');
     expect(ivSeriesLabel({ visits: { label: 'Visits' } }, 'visits')).toBe('Visits');
