@@ -23,20 +23,51 @@ export interface IvChartSize {
   height: number;
 }
 
+/**
+ * The highlighted row. `key` names the series when the row belongs to one (a pie ring).
+ * `x`, `y` are the pointer in chart px; unset for the keyboard and `defaultIndex`, so the
+ * tooltip sits at the row.
+ */
 export interface IvChartActive {
   index: number;
   key?: string;
-  x: number;
-  y: number;
+  x?: number;
+  y?: number;
 }
 
-/** One row of the tooltip: a series value under the cursor. */
+/** One row of the tooltip: a series value under the cursor (Recharts' payload item). */
 export interface IvChartPayload {
+  /** The series' `dataKey`. */
   key: string;
+  /** The series key, or the sector's `nameKey` value (pie). */
   name: string;
   value: unknown;
+  /** The series color (a pie sector: its fill). */
   color: string;
+  /** The data row. */
   row: IvChartDatum;
+}
+
+/** One legend entry: a series, or a pie sector. */
+export interface IvChartLegendItem {
+  key: string;
+  name: string;
+  color: string;
+  /** Pie sectors: the data row. */
+  row?: IvChartDatum;
+}
+
+/** What a chart root tells the tooltip and legend. Methods read signals: call them in a `computed`. */
+export interface IvChartSource {
+  /** Rows the active index can point at: the active index is cleared when they shrink below it. */
+  rowCount(): number;
+  /** Tooltip rows for the active item, `[]` when it is gone. */
+  payload(active: IvChartActive): IvChartPayload[];
+  /** The category value (Recharts' tooltip `label`): the axis key's value, or the row index. */
+  activeLabel(active: IvChartActive): unknown;
+  /** Where the tooltip points: the pointer, or the item. */
+  anchor(active: IvChartActive): { x: number; y: number };
+  legend(): IvChartLegendItem[];
 }
 
 export interface IvChartContext {
@@ -44,10 +75,22 @@ export interface IvChartContext {
   id: string;
   config: Signal<IvChartConfig>;
   size: Signal<IvChartSize>;
+  /** The highlighted row, from the pointer, the keyboard or the tooltip's `defaultIndex`. */
   active: WritableSignal<IvChartActive | null>;
   /** Rows under the cursor, for the tooltip. */
-  payload: WritableSignal<IvChartPayload[]>;
+  payload: Signal<IvChartPayload[]>;
+  /** The chart root, once it is there. */
+  source: Signal<IvChartSource | undefined>;
+  /** Space the legend takes above and below the plot, in px. */
+  reserve: Signal<{ top: number; bottom: number }>;
+  /** A tooltip with `cursor` is present. */
+  cursor: Signal<boolean>;
+  /** The chart root has focus: the tooltip is a live region. */
+  focused: WritableSignal<boolean>;
 }
+
+/** Recharts' formatter. `any`, so `(value: string) => …` binds without a cast. */
+export type IvTickFormatter = (value: any, index: number) => string;
 
 export const IV_CHART = new InjectionToken<IvChartContext>('IV_CHART');
 

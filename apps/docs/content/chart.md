@@ -85,7 +85,7 @@ Every part also accepts `class`. Boolean inputs take a bare attribute, like shad
 | `stackId` | `string` | — | Bars with the same id stack, in markup order. Others sit side by side. |
 | `radius` | `number \| [number, number, number, number]` | `0` | Corner radius, or `[topLeft, topRight, bottomRight, bottomLeft]`. The top is the bar's tip. |
 | `fill` | `string` | series color | Bar color. |
-| `activeIndex` | `number` | — | The highlighted bar (`data-active`). Default: the bar under the cursor. |
+| `activeIndex` | `number` | — | The highlighted bar (`data-active`, or the `ivActiveShape` template). Default: the bars under the cursor. |
 
 ### g[ivLabelList]
 
@@ -123,7 +123,7 @@ Angles are degrees, as in Recharts: 0 is 3 o'clock, positive is counter-clockwis
 | `paddingAngle` | `number` | `0` | Degrees between sectors. |
 | `stroke` | `string` | none | Sector outline. |
 | `strokeWidth` | `number` | `1` | Outline width. |
-| `activeIndex` | `number` | — | The highlighted sector (`data-active`). Default: the sector under the cursor. |
+| `activeIndex` | `number` | — | The highlighted sector (`data-active`, or the `ivActiveShape` template). Default: the sector under the cursor, in this ring. |
 | `label` | `boolean \| TemplateRef<IvPieLabelContext>` | `false` | Values outside the sectors, or a template given `IvPieLabel`. |
 | `labelLine` | `boolean` | `true` | A line from each sector to its label. |
 
@@ -172,6 +172,7 @@ Center content, rendered in the SVG. Put it inside `g[ivPie]`, `g[ivRadialBar]` 
 | `stroke` | `string` | none | Outline color. |
 | `strokeWidth` | `number` | — | Outline width. |
 | `dot` | `boolean \| TemplateRef<IvDotContext>` | `false` | Dots on the vertices, or a template given `IvDot`. |
+| `activeDot` | `boolean` | `true` | Dot at the active row's vertex. |
 
 ### g[ivRadialBar]
 
@@ -179,10 +180,68 @@ Center content, rendered in the SVG. Put it inside `g[ivPie]`, `g[ivRadialBar]` 
 |---|---|---|---|
 | `dataKey` | `string` | required | Row key of the values. A ring per row, from the inside out. The largest value fills the sweep. |
 | `background` | `boolean` | `false` | A muted track over the whole sweep. |
-| `cornerRadius` | `number` | `10` | Rounds the bar ends. |
+| `cornerRadius` | `number` | `0` | Rounds the bar ends. |
 | `stackId` | `string` | — | Bars with the same id share a ring and stack. |
 | `fill` | `string` | series color | Bar color. A row's own `fill` wins. |
+
+### iv-chart-tooltip
+
+Put it inside `iv-chart`. It opens on the active row: the pointer (hover, or a tap on touch), the keyboard, or `defaultIndex`. Labels, icons and colors come from the config.
+
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `indicator` | `'dot' \| 'line' \| 'dashed'` | `'dot'` | Indicator shape. With one row, `line` and `dashed` move the label into the row. |
+| `hideLabel` | `boolean` | `false` | Hide the label (the category, or the config label of the series). |
+| `hideIndicator` | `boolean` | `false` | Hide the indicators. |
+| `nameKey` | `string` | — | Row key whose string value names each row's config entry (a pie's sector names). |
+| `labelKey` | `string` | — | Config key of the label. |
+| `labelFormatter` | `(label, payload) => string` | — | Formats the label. |
+| `formatter` | `(value, name, item, index) => string` | — | Replaces each row with text. For markup, use `ivChartTooltipContent`. |
+| `cursor` | `boolean` | `true` | A muted band (bar), line (line, area) or spoke (radar) under the active row. |
+| `defaultIndex` | `number` | — | Opens on this row at start. Rendered on the server too. |
+
+`class` goes on the `cn-chart-tooltip` card. The tooltip sits 10px past the pointer, on the side with more room, inside the chart box.
+
+### ng-template[ivChartTooltipContent]
+
+A custom tooltip body inside the card. The context is the rows (`$implicit: IvChartPayload[]`) and `label`, the category value: `let-payload let-label="label"`.
+
+### iv-chart-legend
+
+Put it inside `iv-chart`. A swatch, or the config `icon`, and the config label per series (per sector on a pie). The chart leaves room for it.
+
+| Name | Type | Default | Description |
+|---|---|---|---|
+| `verticalAlign` | `'top' \| 'bottom'` | `'bottom'` | Above or under the chart. |
+| `hideIcon` | `boolean` | `false` | Show the swatch even when the config has an `icon`. |
+| `nameKey` | `string` | — | Row key whose string value names each item's config entry (a pie's sector names). |
+
+### ng-template[ivActiveShape]
+
+Draws the active item instead of its default shape, inside `g[ivBar]` or `g[ivPie]`. The active item is `activeIndex`, or the one under the cursor. `let-shape` gives `IvActiveShapeProps`: the item, `d` (its default path) and, on a pie, the sector (`cx`, `cy`, radii, angles) for `ivArc`.
+
+```html
+<g ivPie dataKey="visitors" nameKey="browser" [innerRadius]="60" [activeIndex]="0">
+  <ng-template ivActiveShape let-shape>
+    <svg:path [attr.d]="grow(shape)" [attr.fill]="shape.fill" />
+  </ng-template>
+</g>
+```
+
+```ts
+grow = (shape: IvSectorShape) => ivArc({ ...shape, outerRadius: shape.outerRadius + 10 });
+```
 
 ## Accessibility
 
 The container has no role. Chart roots are `role="img"` with an `aria-label` (default: the chart type and series names).
+
+Each chart root is one tab stop (`tabindex="0"`), like Recharts' `accessibilityLayer`.
+
+| Key | Action |
+|---|---|
+| ArrowRight / ArrowLeft | Next / previous row. Wraps. Vertical bar charts and polar charts use ArrowDown / ArrowUp. |
+| Home / End | First / last row. |
+| Escape | Hide the tooltip. |
+
+While the chart has focus, the tooltip is an `aria-live="polite"` region, so the row is read out.

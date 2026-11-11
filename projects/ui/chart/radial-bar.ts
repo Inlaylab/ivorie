@@ -12,9 +12,9 @@ import {
 import { NgTemplateOutlet } from '@angular/common';
 import { cn } from '@inlaylab/ivorie/core';
 import { IV_POLAR } from './polar';
-import { IvChartLabel, IvChartLabelContext, IvPolarViewBox, ivArc } from './chart-label';
+import { IvChartLabel, ivArc, ivLabelContext } from './chart-label';
 import { ivBarPosition, ivPolarPoint, ivSeriesProvider } from './scales';
-import { IvSeriesItem, ivSeriesColor } from './types';
+import { IV_CHART, IvSeriesItem, ivSeriesColor } from './types';
 
 /** Recharts' radial bar defaults: gap between stacks in a ring, and on each side of a ring. */
 const BAR_GAP = 4;
@@ -52,6 +52,7 @@ interface RadialBar {
         class="iv-chart-sector"
         [attr.d]="bar.d"
         [attr.fill]="bar.item.fill"
+        [attr.data-active]="bar.item.index === active() ? '' : null"
       />
     }
     <ng-content />
@@ -64,13 +65,15 @@ export class IvRadialBar {
   readonly dataKey = input.required<string>();
   /** A muted track behind each bar, over the whole sweep. */
   readonly background = input(false, { transform: booleanAttribute });
-  readonly cornerRadius = input(10);
+  /** Rounds the bar ends (Recharts' default: square). */
+  readonly cornerRadius = input(0);
   readonly stackId = input<string>();
   /** Bar color. Default: `var(--color-<dataKey>)`. A row's own `fill` wins. */
   readonly fill = input<string>();
   readonly class = input('');
 
   private readonly ctx = inject(IV_POLAR);
+  private readonly chart = inject(IV_CHART);
   private readonly el = inject<ElementRef<Element>>(ElementRef).nativeElement;
   protected readonly chartLabel = contentChild(IvChartLabel);
 
@@ -82,6 +85,8 @@ export class IvRadialBar {
           kind: 'radialBar',
           stackId: this.stackId(),
           el: this.el,
+          items: this.items,
+          color: this.color,
         }),
       );
     });
@@ -188,12 +193,15 @@ export class IvRadialBar {
   /** One item per drawn bar, for `ivLabelList`. */
   readonly items = computed<IvSeriesItem[]>(() => this.bars().map((b) => b.item));
 
-  protected readonly labelContext = computed<IvChartLabelContext>(() => {
-    const { cx, cy } = this.ctx.center();
-    const { inner, outer } = this.ctx.radius();
-    const box: IvPolarViewBox = { cx, cy, innerRadius: inner, outerRadius: outer };
-    return { $implicit: box, ...box };
+  /** The hovered ring's bar (`data-active`), unless the active row names another series. */
+  protected readonly active = computed(() => {
+    const active = this.chart.active();
+    return active && (active.key === undefined || active.key === this.dataKey())
+      ? active.index
+      : undefined;
   });
+
+  protected readonly labelContext = ivLabelContext(this.ctx.center, this.ctx.radius);
 
   protected readonly classes = computed(() => cn(this.class()));
 }

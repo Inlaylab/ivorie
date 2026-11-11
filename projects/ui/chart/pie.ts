@@ -14,7 +14,7 @@ import { NgTemplateOutlet } from '@angular/common';
 import { pie } from 'd3-shape';
 import { cn } from '@inlaylab/ivorie/core';
 import { IV_POLAR } from './polar';
-import { IvChartLabel, IvChartLabelContext, IvPolarViewBox, ivArc } from './chart-label';
+import { IvChartLabel, ivArc, ivLabelContext } from './chart-label';
 import {
   RADIAN,
   ivNumber,
@@ -25,6 +25,7 @@ import {
   ivTemplateAttribute,
 } from './scales';
 import { IV_CHART, IvChartDatum, IvSeriesItem, ivSeriesColor } from './types';
+import { IvActiveShape, IvActiveShapeProps } from './active-shape';
 
 /** A sector's label, given to a custom `label` template as `$implicit`. */
 export interface IvPieLabel {
@@ -56,6 +57,8 @@ const LABEL_OFFSET = 20;
 
 interface Sector {
   item: IvSeriesItem;
+  /** For an `ivActiveShape` template. */
+  shape: IvActiveShapeProps;
   d: string;
   label: IvPieLabel;
   line: string;
@@ -79,15 +82,22 @@ interface Row {
   providers: [ivSeriesProvider(IvPie)],
   template: `
     @for (s of sectors(); track s.item.index) {
-      <svg:path
-        data-slot="chart-pie-sector"
-        [attr.class]="sectorClass()"
-        [attr.d]="s.d"
-        [attr.fill]="s.item.fill"
-        [attr.stroke]="stroke() ?? null"
-        [attr.stroke-width]="strokeWidth()"
-        [attr.data-active]="s.item.index === active() ? '' : null"
-      />
+      @if (s.item.index === active() && activeShape(); as shape) {
+        <ng-container
+          [ngTemplateOutlet]="shape.template"
+          [ngTemplateOutletContext]="{ $implicit: s.shape }"
+        />
+      } @else {
+        <svg:path
+          data-slot="chart-pie-sector"
+          [attr.class]="sectorClass()"
+          [attr.d]="s.d"
+          [attr.fill]="s.item.fill"
+          [attr.stroke]="stroke() ?? null"
+          [attr.stroke-width]="strokeWidth()"
+          [attr.data-active]="s.item.index === active() ? '' : null"
+        />
+      }
     }
     @if (label()) {
       @for (s of sectors(); track s.item.index) {
@@ -138,7 +148,10 @@ export class IvPie {
   /** Sector outline color. Default: none (shadcn hides the outline). */
   readonly stroke = input<string>();
   readonly strokeWidth = input(1);
-  /** The highlighted sector (`data-active`). Default: the sector under the cursor. */
+  /**
+   * The highlighted sector (`data-active`, or the `ivActiveShape` template). Default: the
+   * sector under the cursor, in this ring.
+   */
   readonly activeIndex = input<number>();
   /** Value labels outside the sectors, or a template given `IvPieLabel`. */
   readonly label = input(false, { transform: ivTemplateAttribute<IvPieLabelContext> });
@@ -150,10 +163,19 @@ export class IvPie {
   private readonly chart = inject(IV_CHART);
   private readonly el = inject<ElementRef<Element>>(ElementRef).nativeElement;
   protected readonly chartLabel = contentChild(IvChartLabel);
+  protected readonly activeShape = contentChild(IvActiveShape);
 
   constructor() {
     effect((onCleanup) => {
-      onCleanup(this.ctx.register({ key: this.dataKey(), kind: 'pie', el: this.el }));
+      onCleanup(
+        this.ctx.register({
+          key: this.dataKey(),
+          kind: 'pie',
+          el: this.el,
+          items: this.items,
+          nameKey: this.nameKey(),
+        }),
+      );
     });
   }
 
@@ -209,35 +231,32 @@ export class IvPie {
       const centroid = ivPolarPoint(cx, cy, (inner + outer) / 2, midAngle);
       const from = ivPolarPoint(cx, cy, outer, midAngle);
       const to = ivPolarPoint(cx, cy, outer + LABEL_OFFSET, midAngle);
+      const sector = {
+        cx,
+        cy,
+        innerRadius: inner,
+        outerRadius: outer,
+        startAngle,
+        endAngle,
+        fill,
+        index,
+      };
+      const d = ivArc(sector);
+      const item: IvSeriesItem = {
+        x: centroid.x,
+        y: centroid.y,
+        width: 0,
+        height: 0,
+        value: row[key],
+        payload: row,
+        ...sector,
+        midAngle,
+      };
       sectors.push({
-        d: ivArc({
-          cx,
-          cy,
-          innerRadius: inner,
-          outerRadius: outer,
-          startAngle,
-          endAngle,
-          fill,
-          index,
-        }),
+        d,
+        shape: { ...item, ...sector, d },
         line: `M${from.x},${from.y}L${to.x},${to.y}`,
-        item: {
-          index,
-          x: centroid.x,
-          y: centroid.y,
-          width: 0,
-          height: 0,
-          value: row[key],
-          fill,
-          payload: row,
-          cx,
-          cy,
-          innerRadius: inner,
-          outerRadius: outer,
-          startAngle,
-          endAngle,
-          midAngle,
-        },
+        item,
         label: {
           x: to.x,
           y: to.y,
@@ -263,7 +282,15 @@ export class IvPie {
   /** One item per drawn sector, for `ivLabelList`. */
   readonly items = computed<IvSeriesItem[]>(() => this.sectors().map((s) => s.item));
 
-  protected readonly active = computed(() => this.activeIndex() ?? this.chart.active()?.index);
+  /** `activeIndex`, or the hovered row when it is in this ring (or names no ring). */
+  protected readonly active = computed(() => {
+    const fixed = this.activeIndex();
+    if (fixed !== undefined) return fixed;
+    const active = this.chart.active();
+    return active && (active.key === undefined || active.key === this.dataKey())
+      ? active.index
+      : undefined;
+  });
 
   protected readonly labelTemplate = computed(() => {
     const label = this.label();
@@ -275,12 +302,7 @@ export class IvPie {
     this.stroke() === undefined ? 'iv-chart-sector' : null,
   );
 
-  protected readonly labelContext = computed<IvChartLabelContext>(() => {
-    const { cx, cy } = this.ctx.center();
-    const { inner, outer } = this.radius();
-    const box: IvPolarViewBox = { cx, cy, innerRadius: inner, outerRadius: outer };
-    return { $implicit: box, ...box };
-  });
+  protected readonly labelContext = ivLabelContext(this.ctx.center, this.radius);
 
   protected readonly classes = computed(() => cn(this.class()));
 }

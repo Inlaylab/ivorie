@@ -11,8 +11,16 @@ import {
 } from '@angular/core';
 import { ScaleBand, ScaleLinear, ScalePoint, scaleBand, scaleLinear, scalePoint } from 'd3-scale';
 import { cn } from '@inlaylab/ivorie/core';
-import { IV_CHART, IvChartDatum, IvChartMargin, ivSeriesLabel } from './types';
+import {
+  IvChartActive,
+  IvChartDatum,
+  IvChartLegendItem,
+  IvChartMargin,
+  IvChartPayload,
+  ivSeriesLabel,
+} from './types';
 import { ivBandCenter, ivMarkupOrder, ivStack, ivValueDomain } from './scales';
+import { IvChartHit, IvChartRoot, ivRange } from './interaction';
 
 export type IvChartLayout = 'horizontal' | 'vertical';
 export type IvStackOffset = 'none' | 'expand';
@@ -80,6 +88,26 @@ interface AxisRef {
   tickCount?: number;
 }
 
+/**
+ * The cursor under the tooltip: a band (bar charts) or a line (line and area). The overlay is a
+ * transparent rect over the plot, so the plot takes the pointer where nothing is drawn.
+ */
+const CARTESIAN_TEMPLATE = `
+  @let p = plot();
+  <svg:rect data-slot="chart-overlay" fill="transparent"
+    [attr.x]="p.x" [attr.y]="p.y" [attr.width]="p.width" [attr.height]="p.height" />
+  @if (cursorShape(); as c) {
+    @if (c.band) {
+      <svg:rect data-slot="chart-cursor" class="iv-chart-cursor-rect fill-muted"
+        [attr.x]="c.x" [attr.y]="c.y" [attr.width]="c.width" [attr.height]="c.height" />
+    } @else {
+      <svg:line data-slot="chart-cursor" class="iv-chart-cursor-line stroke-border" fill="none"
+        [attr.x1]="c.x" [attr.y1]="c.y" [attr.x2]="c.x + c.width" [attr.y2]="c.y + c.height" />
+    }
+  }
+  <ng-content />
+`;
+
 /** Shared root of the cartesian charts: owns data, margin, stacks and scales. */
 @Directive({
   host: {
@@ -92,7 +120,7 @@ interface AxisRef {
     '[class]': 'classes()',
   },
 })
-export abstract class IvCartesianChart {
+export abstract class IvCartesianChart extends IvChartRoot {
   readonly data = input.required<readonly IvChartDatum[]>();
   readonly margin = input<IvChartMargin>({});
   readonly ariaLabel = input('');
@@ -105,7 +133,6 @@ export abstract class IvCartesianChart {
   protected readonly barGap: Signal<number | string> = signal(4);
   protected readonly barCategoryGap: Signal<number | string> = signal('10%');
 
-  protected readonly chart = inject(IV_CHART);
   private readonly registered = signal<IvCartesianSeriesRef[]>([]);
   private readonly series = computed(() => ivMarkupOrder(this.registered()));
   private readonly axes = signal<AxisRef[]>([]);
@@ -116,16 +143,17 @@ export abstract class IvCartesianChart {
     return scalePoint<string>().domain(domain).range(range).padding(0);
   }
 
-  private readonly plot = computed<IvCartesianPlot>(() => {
+  protected readonly plot = computed<IvCartesianPlot>(() => {
     const { width, height } = this.chart.size();
     const m = this.margin();
+    const legend = this.chart.reserve();
     let left = m.left ?? MARGIN;
-    let bottom = m.bottom ?? MARGIN;
+    let bottom = (m.bottom ?? MARGIN) + legend.bottom;
     for (const a of this.axes()) {
       if (a.axis === 'x') bottom += a.reserve;
       else left += a.reserve;
     }
-    const top = m.top ?? MARGIN;
+    const top = (m.top ?? MARGIN) + legend.top;
     const right = m.right ?? MARGIN;
     return {
       x: left,
@@ -242,13 +270,95 @@ export abstract class IvCartesianChart {
   });
 
   protected readonly classes = computed(() => cn('overflow-visible', this.class()));
+
+  // Interaction (IvChartRoot).
+
+  protected override readonly vertical = computed(() => this.layout() === 'vertical');
+  private readonly allRows = computed(() => ivRange(this.data().length));
+
+  protected override rows(): number[] {
+    return this.allRows();
+  }
+
+  override rowCount(): number {
+    return this.data().length;
+  }
+
+  /** The category under a point in the plot: the band it is in, or the nearest point. */
+  protected override hit(x: number, y: number): IvChartHit | null {
+    const p = this.plot();
+    const category = this.category();
+    if (!category || x < p.x || x > p.x + p.width || y < p.y || y > p.y + p.height) return null;
+    const { scale } = category;
+    const n = this.data().length;
+    const start = scale('0') ?? 0;
+    const step = scale.step();
+    const along = (this.layout() === 'horizontal' ? x : y) - start;
+    const raw = scale.bandwidth() > 0 ? Math.floor(along / step) : Math.round(along / step);
+    const index = Number.isFinite(raw) ? Math.min(n - 1, Math.max(0, raw)) : 0;
+    return { index };
+  }
+
+  override anchor(active: IvChartActive): { x: number; y: number } {
+    if (active.x !== undefined && active.y !== undefined) return { x: active.x, y: active.y };
+    const p = this.plot();
+    const category = this.category();
+    const at = category ? ivBandCenter(category.scale, active.index) : undefined;
+    const middle = this.layout() === 'horizontal' ? p.y + p.height / 2 : p.x + p.width / 2;
+    const along = at ?? (this.layout() === 'horizontal' ? p.x : p.y);
+    return this.layout() === 'horizontal' ? { x: along, y: middle } : { x: middle, y: along };
+  }
+
+  override payload(active: IvChartActive): IvChartPayload[] {
+    const row = this.data()[active.index];
+    if (!row) return [];
+    const items: IvChartPayload[] = [];
+    for (const s of this.series()) {
+      const value = row[s.key];
+      // Recharts' Tooltip `filterNull`: gaps have no row.
+      if (value === null || value === undefined) continue;
+      items.push({ key: s.key, name: s.key, value, color: s.color(), row });
+    }
+    return items;
+  }
+
+  override activeLabel(active: IvChartActive): unknown {
+    const row = this.data()[active.index];
+    if (!row) return undefined;
+    const key = this.category()?.key;
+    return key ? row[key] : active.index;
+  }
+
+  override legend(): IvChartLegendItem[] {
+    return this.series().map((s) => ({ key: s.key, name: s.key, color: s.color() }));
+  }
+
+  /** The tooltip cursor at the active row, in px. */
+  protected readonly cursorShape = computed(() => {
+    if (!this.chart.cursor()) return null;
+    const active = this.chart.active();
+    const category = this.category();
+    if (!active || !category || !this.data()[active.index]) return null;
+    const start = category.scale(String(active.index));
+    if (start === undefined) return null;
+    const p = this.plot();
+    const band = category.scale.bandwidth();
+    const horizontal = this.layout() === 'horizontal';
+    // A band covers the category; a line runs across the plot at the point.
+    return horizontal
+      ? { band: band > 0, x: start, y: p.y, width: band, height: p.height }
+      : { band: band > 0, x: p.x, y: start, width: p.width, height: band };
+  });
 }
 
 @Component({
   selector: 'svg[ivLineChart]',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [{ provide: IV_CARTESIAN, useFactory: () => inject(IvLineChart).context }],
-  template: `<ng-content />`,
+  providers: [
+    { provide: IV_CARTESIAN, useFactory: () => inject(IvLineChart).context },
+    { provide: IvChartRoot, useExisting: IvLineChart },
+  ],
+  template: CARTESIAN_TEMPLATE,
 })
 export class IvLineChart extends IvCartesianChart {
   protected readonly name = 'Line';
@@ -257,8 +367,11 @@ export class IvLineChart extends IvCartesianChart {
 @Component({
   selector: 'svg[ivAreaChart]',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [{ provide: IV_CARTESIAN, useFactory: () => inject(IvAreaChart).context }],
-  template: `<ng-content />`,
+  providers: [
+    { provide: IV_CARTESIAN, useFactory: () => inject(IvAreaChart).context },
+    { provide: IvChartRoot, useExisting: IvAreaChart },
+  ],
+  template: CARTESIAN_TEMPLATE,
 })
 export class IvAreaChart extends IvCartesianChart {
   readonly stackOffset = input<IvStackOffset>('none');
@@ -270,8 +383,11 @@ export class IvAreaChart extends IvCartesianChart {
 @Component({
   selector: 'svg[ivBarChart]',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [{ provide: IV_CARTESIAN, useFactory: () => inject(IvBarChart).context }],
-  template: `<ng-content />`,
+  providers: [
+    { provide: IV_CARTESIAN, useFactory: () => inject(IvBarChart).context },
+    { provide: IvChartRoot, useExisting: IvBarChart },
+  ],
+  template: CARTESIAN_TEMPLATE,
 })
 export class IvBarChart extends IvCartesianChart {
   override readonly layout = input<IvChartLayout>('horizontal');

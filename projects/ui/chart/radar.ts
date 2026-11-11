@@ -3,6 +3,7 @@ import {
   Component,
   ElementRef,
   TemplateRef,
+  booleanAttribute,
   computed,
   effect,
   inject,
@@ -13,7 +14,7 @@ import { cn } from '@inlaylab/ivorie/core';
 import { IV_POLAR } from './polar';
 import { IvDot, IvDotContext } from './series';
 import { ivPolarPoint, ivSeriesProvider, ivTemplateAttribute } from './scales';
-import { IvSeriesItem, ivSeriesColor } from './types';
+import { IV_CHART, IvSeriesItem, ivSeriesColor } from './types';
 
 /** A filled polygon through each row's value on its spoke. Rows with no value are left out. */
 @Component({
@@ -49,6 +50,18 @@ import { IvSeriesItem, ivSeriesColor } from './types';
         />
       }
     }
+    @if (active(); as a) {
+      <svg:circle
+        data-slot="chart-active-dot"
+        class="iv-chart-dot"
+        r="4"
+        stroke="var(--background)"
+        stroke-width="2"
+        [attr.cx]="a.cx"
+        [attr.cy]="a.cy"
+        [attr.fill]="color()"
+      />
+    }
     <ng-content />
   `,
 })
@@ -62,14 +75,25 @@ export class IvRadar {
   readonly strokeWidth = input<number>();
   /** Dots on the vertices, or a template given `IvDot`. */
   readonly dot = input(false, { transform: ivTemplateAttribute<IvDotContext> });
+  /** A dot at the vertex of the active row. */
+  readonly activeDot = input(true, { transform: booleanAttribute });
   readonly class = input('');
 
   private readonly ctx = inject(IV_POLAR);
+  private readonly chart = inject(IV_CHART);
   private readonly el = inject<ElementRef<Element>>(ElementRef).nativeElement;
 
   constructor() {
     effect((onCleanup) => {
-      onCleanup(this.ctx.register({ key: this.dataKey(), kind: 'radar', el: this.el }));
+      onCleanup(
+        this.ctx.register({
+          key: this.dataKey(),
+          kind: 'radar',
+          el: this.el,
+          items: this.items,
+          color: this.color,
+        }),
+      );
     });
   }
 
@@ -120,6 +144,12 @@ export class IvRadar {
       payload: d.payload,
     })),
   );
+
+  protected readonly active = computed(() => {
+    const index = this.chart.active()?.index;
+    if (!this.activeDot() || index === undefined) return null;
+    return this.dots().find((d) => d.index === index) ?? null;
+  });
 
   protected readonly dotTemplate = computed(() => {
     const dot = this.dot();

@@ -11,7 +11,14 @@ import {
   stackOffsetExpand,
   stackOffsetNone,
 } from 'd3-shape';
-import { IV_SERIES, IvChartDatum, IvSeriesContext, IvSeriesItem } from './types';
+import {
+  IV_SERIES,
+  IvChartConfig,
+  IvChartDatum,
+  IvChartSeries,
+  IvSeriesContext,
+  IvSeriesItem,
+} from './types';
 
 /** Recharts curve names. */
 export type IvCurve = 'natural' | 'linear' | 'step' | 'monotone' | 'bump';
@@ -142,4 +149,24 @@ export function ivPolarPoint(cx: number, cy: number, radius: number, angle: numb
 /** Recharts' text anchor for a point right of, left of, or in line with the center. */
 export function ivSideAnchor(x: number, cx: number): 'start' | 'middle' | 'end' {
   return x > cx + 1e-6 ? 'start' : x < cx - 1e-6 ? 'end' : 'middle';
+}
+
+/** The config entry of `key`, or `undefined`. Own keys only, so `'toString'` finds nothing. */
+export function ivConfigEntry(config: IvChartConfig, key: string): IvChartSeries | undefined {
+  return Object.hasOwn(config, key) ? config[key] : undefined;
+}
+
+/**
+ * shadcn's `getPayloadConfigFromPayload`: when the item or its row holds a string at `key`,
+ * that string names the config entry (a pie's `nameKey` value). Else `key` does.
+ */
+export function ivPayloadConfig(
+  config: IvChartConfig,
+  item: object & { row?: IvChartDatum },
+  key: string,
+): IvChartSeries | undefined {
+  const own = (item as Record<string, unknown>)[key];
+  const fromRow = item.row?.[key];
+  const name = typeof own === 'string' ? own : typeof fromRow === 'string' ? fromRow : key;
+  return ivConfigEntry(config, name) ?? ivConfigEntry(config, key);
 }

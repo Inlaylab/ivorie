@@ -6,9 +6,11 @@ import {
   Renderer2,
   afterNextRender,
   computed,
+  contentChild,
   effect,
   inject,
   input,
+  linkedSignal,
   signal,
 } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
@@ -31,6 +33,10 @@ import { IvPie } from './pie';
 import { IvRadar } from './radar';
 import { IvRadialBar } from './radial-bar';
 import { IvChartLabel } from './chart-label';
+import { IvChartRoot } from './interaction';
+import { IvChartTooltip, IvChartTooltipContent } from './tooltip';
+import { IvChartLegend } from './legend';
+import { IvActiveShape } from './active-shape';
 
 const CHART_CLASSES = [
   'cn-chart relative flex aspect-video justify-center text-xs',
@@ -87,9 +93,43 @@ export class IvChart {
 
   private readonly measured = signal<IvChartSize | null>(null);
   private readonly size = computed(() => this.measured() ?? this.initialDimension());
-  private readonly active = signal<IvChartActive | null>(null);
-  private readonly payload = signal<IvChartPayload[]>([]);
   private styleEl: HTMLStyleElement | null = null;
+
+  private readonly root = contentChild(IvChartRoot);
+  private readonly tooltip = contentChild(IvChartTooltip);
+  private readonly legend = contentChild(IvChartLegend);
+
+  /**
+   * The tooltip's `defaultIndex` until the pointer or the keyboard moves it. When the rows
+   * shrink below the active one, it clears (a stale row never shows).
+   */
+  private readonly active = linkedSignal<
+    { start: number | undefined; count: number },
+    IvChartActive | null
+  >({
+    source: () => ({ start: this.tooltip()?.defaultIndex(), count: this.root()?.rowCount() ?? 0 }),
+    computation: ({ start, count }, previous) => {
+      if (!previous || previous.source.start !== start) {
+        return start !== undefined && Number.isInteger(start) && start >= 0 ? { index: start } : null;
+      }
+      const active = previous.value;
+      // Rows that only grew (or arrive late) keep the active row: the payload hides it until it exists.
+      return active && (active.index < count || count >= previous.source.count) ? active : null;
+    },
+  });
+
+  private readonly payload = computed<IvChartPayload[]>(() => {
+    const active = this.active();
+    const root = this.root();
+    return active && root ? root.payload(active) : [];
+  });
+
+  private readonly reserve = computed(() => {
+    const legend = this.legend();
+    if (!legend) return { top: 0, bottom: 0 };
+    const height = legend.height();
+    return legend.verticalAlign() === 'top' ? { top: height, bottom: 0 } : { top: 0, bottom: height };
+  });
 
   /** Shared with the chart parts through `IV_CHART`. */
   readonly context: IvChartContext = {
@@ -98,6 +138,10 @@ export class IvChart {
     size: this.size,
     active: this.active,
     payload: this.payload,
+    source: this.root,
+    reserve: this.reserve,
+    cursor: computed(() => this.tooltip()?.cursor() ?? false),
+    focused: signal(false),
   };
 
   protected readonly colorVars = computed(() => {
@@ -174,4 +218,8 @@ export const IV_CHART_IMPORTS = [
   IvRadar,
   IvRadialBar,
   IvChartLabel,
+  IvChartTooltip,
+  IvChartTooltipContent,
+  IvChartLegend,
+  IvActiveShape,
 ] as const;

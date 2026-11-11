@@ -1,8 +1,20 @@
-import { ChangeDetectionStrategy, Component, ElementRef, computed, effect, inject, input } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  ElementRef,
+  computed,
+  contentChild,
+  effect,
+  inject,
+  input,
+} from '@angular/core';
+import { NgTemplateOutlet } from '@angular/common';
 import { cn } from '@inlaylab/ivorie/core';
 import { IV_CARTESIAN } from './cartesian';
 import { ivBarPosition, ivSeriesProvider } from './scales';
 import { IV_CHART, IvSeriesItem, ivSeriesColor } from './types';
+import { ivFinite } from './chart-label';
+import { IvActiveShape, IvActiveShapeProps } from './active-shape';
 
 /** One radius for every corner, or `[topLeft, topRight, bottomRight, bottomLeft]`. */
 export type IvBarRadius = number | [number, number, number, number];
@@ -11,9 +23,11 @@ export type IvBarRadius = number | [number, number, number, number];
 interface Bar {
   item: IvSeriesItem;
   d: string;
+  /** For an `ivActiveShape` template: no sector, so the polar fields are 0. */
+  shape: IvActiveShapeProps;
 }
 
-const finite = (n: number) => (Number.isFinite(n) ? n : 0);
+const NO_SECTOR = { cx: 0, cy: 0, innerRadius: 0, outerRadius: 0, startAngle: 0, endAngle: 0 };
 
 /**
  * A rect path with corner arcs (Recharts' Rectangle). `width` and `height` may be negative:
@@ -22,7 +36,7 @@ const finite = (n: number) => (Number.isFinite(n) ? n : 0);
 export function ivBarPath(x: number, y: number, width: number, height: number, radius: IvBarRadius): string {
   const max = Math.min(Math.abs(width) / 2, Math.abs(height) / 2);
   const r = (typeof radius === 'number' ? [radius, radius, radius, radius] : radius).map((v) =>
-    Math.min(Math.max(finite(v), 0), max),
+    Math.min(Math.max(ivFinite(v), 0), max),
   );
   if (max <= 0 || r.every((v) => v === 0)) return `M${x},${y}h${width}v${height}h${-width}Z`;
   const sx = width >= 0 ? 1 : -1;
@@ -47,13 +61,18 @@ export function ivBarPath(x: number, y: number, width: number, height: number, r
 @Component({
   selector: 'g[ivBar]',
   host: { 'data-slot': 'chart-bar-series', '[class]': 'classes()' },
+  imports: [NgTemplateOutlet],
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [ivSeriesProvider(IvBar)],
   template: `
     @for (bar of bars(); track bar.item.index) {
-      <svg:path data-slot="chart-bar" class="iv-chart-bar"
-        [attr.d]="bar.d" [attr.fill]="bar.item.fill"
-        [attr.data-active]="bar.item.index === active() ? '' : null" />
+      @if (bar.item.index === active() && activeShape(); as shape) {
+        <ng-container [ngTemplateOutlet]="shape.template" [ngTemplateOutletContext]="{ $implicit: bar.shape }" />
+      } @else {
+        <svg:path data-slot="chart-bar" class="iv-chart-bar"
+          [attr.d]="bar.d" [attr.fill]="bar.item.fill"
+          [attr.data-active]="bar.item.index === active() ? '' : null" />
+      }
     }
     <ng-content />
   `,
@@ -64,13 +83,14 @@ export class IvBar {
   /** Corner radius: one number, or `[topLeft, topRight, bottomRight, bottomLeft]`. */
   readonly radius = input<IvBarRadius>(0);
   readonly fill = input<string>();
-  /** The highlighted bar. Without it, the bar under the cursor. */
+  /** The highlighted bar (`data-active`, or the `ivActiveShape` template). Without it, the bar under the cursor. */
   readonly activeIndex = input<number>();
   readonly class = input('');
 
   private readonly ctx = inject(IV_CARTESIAN);
   private readonly chart = inject(IV_CHART);
   private readonly el = inject<ElementRef<Element>>(ElementRef).nativeElement;
+  protected readonly activeShape = contentChild(IvActiveShape);
 
   protected readonly color = computed(() => this.fill() ?? ivSeriesColor(this.dataKey()));
 
@@ -118,19 +138,18 @@ export class IvBar {
         : [p.y0, along, p.y1 - p.y0, slot.size];
       const row = data[index];
       const fill = typeof row['fill'] === 'string' ? row['fill'] : color;
-      bars.push({
-        d: ivBarPath(x, y, width, height, radius),
-        item: {
-          index,
-          x: Math.min(x, x + width),
-          y: Math.min(y, y + height),
-          width: Math.abs(width),
-          height: Math.abs(height),
-          value: row[key],
-          fill,
-          payload: row,
-        },
-      });
+      const d = ivBarPath(x, y, width, height, radius);
+      const item: IvSeriesItem = {
+        index,
+        x: Math.min(x, x + width),
+        y: Math.min(y, y + height),
+        width: Math.abs(width),
+        height: Math.abs(height),
+        value: row[key],
+        fill,
+        payload: row,
+      };
+      bars.push({ d, item, shape: { ...item, ...NO_SECTOR, d } });
     });
     return bars;
   });
@@ -138,7 +157,14 @@ export class IvBar {
   /** One item per drawn bar, for `ivLabelList`. */
   readonly items = computed<IvSeriesItem[]>(() => this.bars().map((b) => b.item));
 
-  protected readonly active = computed(() => this.activeIndex() ?? this.chart.active()?.index);
+  protected readonly active = computed(() => {
+    const fixed = this.activeIndex();
+    if (fixed !== undefined) return fixed;
+    const active = this.chart.active();
+    return active && (active.key === undefined || active.key === this.dataKey())
+      ? active.index
+      : undefined;
+  });
 
   protected readonly classes = computed(() => cn(this.class()));
 }

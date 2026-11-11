@@ -1,4 +1,4 @@
-import { Directive, TemplateRef, inject } from '@angular/core';
+import { Directive, Signal, TemplateRef, computed, inject } from '@angular/core';
 import { arc } from 'd3-shape';
 import { RADIAN } from './scales';
 
@@ -14,7 +14,11 @@ export interface IvSectorShape {
   index: number;
 }
 
-const finite = (n: number) => (Number.isFinite(n) ? n : 0);
+/** `n`, or `fallback` when it is `NaN` or infinite. */
+export function ivFinite(n: number, fallback = 0): number {
+  return Number.isFinite(n) ? n : fallback;
+}
+
 const round = (n: number) => Math.round(n * 1000) / 1000;
 
 /** Moves an absolute `M`/`L`/`A`/`Z` path (d3-path output) by `dx`, `dy`. */
@@ -33,17 +37,17 @@ function translate(d: string, dx: number, dy: number): string {
  * Bad numbers draw as 0, so the path never holds `NaN`.
  */
 export function ivArc(shape: IvSectorShape, cornerRadius = 0): string {
-  const inner = Math.max(0, finite(shape.innerRadius));
-  const outer = Math.max(inner, finite(shape.outerRadius));
+  const inner = Math.max(0, ivFinite(shape.innerRadius));
+  const outer = Math.max(inner, ivFinite(shape.outerRadius));
   // d3 angles: radians, 0 at 12 o'clock, clockwise.
   const d =
-    arc().cornerRadius(Math.max(0, finite(cornerRadius)))({
+    arc().cornerRadius(Math.max(0, ivFinite(cornerRadius)))({
       innerRadius: inner,
       outerRadius: outer,
-      startAngle: (90 - finite(shape.startAngle)) * RADIAN,
-      endAngle: (90 - finite(shape.endAngle)) * RADIAN,
+      startAngle: (90 - ivFinite(shape.startAngle)) * RADIAN,
+      endAngle: (90 - ivFinite(shape.endAngle)) * RADIAN,
     }) ?? '';
-  return translate(d, finite(shape.cx), finite(shape.cy));
+  return translate(d, ivFinite(shape.cx), ivFinite(shape.cy));
 }
 
 /** The polar box a center label is placed in. */
@@ -57,6 +61,19 @@ export interface IvPolarViewBox {
 /** `let-box` gives the whole box; `let-cx="cx"` and friends give one field. */
 export interface IvChartLabelContext extends IvPolarViewBox {
   $implicit: IvPolarViewBox;
+}
+
+/** The `ivChartLabel` context for a center and radii: `$implicit` is the box, its fields are spread too. */
+export function ivLabelContext(
+  center: Signal<{ cx: number; cy: number }>,
+  radius: Signal<{ inner: number; outer: number }>,
+): Signal<IvChartLabelContext> {
+  return computed(() => {
+    const { cx, cy } = center();
+    const { inner, outer } = radius();
+    const box: IvPolarViewBox = { cx, cy, innerRadius: inner, outerRadius: outer };
+    return { $implicit: box, ...box };
+  });
 }
 
 /**

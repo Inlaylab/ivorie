@@ -12,11 +12,9 @@ import {
 import { cn } from '@inlaylab/ivorie/core';
 import { IV_CARTESIAN } from './cartesian';
 import { ivBandCenter } from './scales';
+import { IvTickFormatter } from './types';
 
 export type IvAxisType = 'category' | 'number';
-
-/** Recharts' formatter. `any`, so `(value: string) => …` binds without a cast. */
-export type IvTickFormatter = (value: any, index: number) => string;
 
 const TICK_SIZE = 6;
 /**

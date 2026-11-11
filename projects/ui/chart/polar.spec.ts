@@ -453,6 +453,14 @@ describe('Radial chart', () => {
     expect(el.innerHTML).not.toContain('NaN');
   });
 
+  it('draws square bar ends unless cornerRadius is set (Recharts default 0)', async () => {
+    const square = await render(RadialHost);
+    // An annular sector without rounding: the outer and the inner arc only.
+    expect(arcCount(radialBars(square.el)[1].getAttribute('d'))).toBe(2);
+    const rounded = await render(RadialStackedHost);
+    expect(arcCount(radialBars(rounded.el)[0].getAttribute('d'))).toBeGreaterThan(2);
+  });
+
   it('stacks bars with a stackId on one track', async () => {
     const { el, series } = await render(RadialStackedHost);
     expect(radialBars(el).length).toBe(2);

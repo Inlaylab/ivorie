@@ -17,9 +17,17 @@ import {
 import { NgTemplateOutlet } from '@angular/common';
 import { ScaleLinear, scaleLinear } from 'd3-scale';
 import { cn } from '@inlaylab/ivorie/core';
-import { IV_CHART, IvChartDatum, ivSeriesLabel } from './types';
-import { IvTickFormatter } from './axis';
-import { IvChartLabel, IvChartLabelContext, IvPolarViewBox } from './chart-label';
+import {
+  IvChartActive,
+  IvChartDatum,
+  IvChartLegendItem,
+  IvChartPayload,
+  IvSeriesItem,
+  IvTickFormatter,
+  ivSeriesColor,
+  ivSeriesLabel,
+} from './types';
+import { IvChartLabel, ivFinite, ivLabelContext } from './chart-label';
 import {
   ivMarkupOrder,
   ivPercent,
@@ -29,6 +37,14 @@ import {
   ivTemplateAttribute,
   ivValueDomain,
 } from './scales';
+import {
+  IvChartHit,
+  IvChartRoot,
+  ivAngleDistance,
+  ivInSweep,
+  ivPointAngle,
+  ivRange,
+} from './interaction';
 
 export type IvPolarSeriesKind = 'pie' | 'radar' | 'radialBar';
 
@@ -39,6 +55,12 @@ export interface IvPolarSeriesRef {
   stackId?: string;
   /** The series' host. Stacks follow markup order. */
   el?: Element;
+  /** The drawn items: the tooltip and legend read them. */
+  items?: Signal<IvSeriesItem[]>;
+  /** The series color (radar, radial bar). A pie's sectors carry their own. */
+  color?: Signal<string>;
+  /** Pie: the row key of the sector name. */
+  nameKey?: string;
 }
 
 /** A tick of a polar axis. `coord` is an angle in degrees (angle axis) or a radius in px (radius axis). */
@@ -84,7 +106,15 @@ const MARGIN = 5;
 const RADIUS_TICKS = 4;
 const ANGLE_TICKS = 5;
 const NO_VALUES: ([number, number] | undefined)[] = [];
-const finite = (n: number, fallback = 0) => (Number.isFinite(n) ? n : fallback);
+
+/** A radar's tooltip cursor: a line along the active spoke. */
+const POLAR_TEMPLATE = `
+  @if (cursorLine(); as c) {
+    <svg:line data-slot="chart-cursor" class="iv-chart-cursor-line stroke-border" fill="none"
+      [attr.x1]="c.x1" [attr.y1]="c.y1" [attr.x2]="c.x2" [attr.y2]="c.y2" />
+  }
+  <ng-content />
+`;
 
 /** Shared root of the polar charts: owns data, center, radii, angles and the value scale. */
 @Directive({
@@ -98,7 +128,7 @@ const finite = (n: number, fallback = 0) => (Number.isFinite(n) ? n : fallback);
     '[class]': 'classes()',
   },
 })
-export abstract class IvPolarChart {
+export abstract class IvPolarChart extends IvChartRoot {
   /** Rows. A pie may bring its own. */
   readonly data = input<readonly IvChartDatum[]>([]);
   readonly innerRadius = input<number | string>(0);
@@ -111,23 +141,29 @@ export abstract class IvPolarChart {
   /** Used in the default label, e.g. "Pie". */
   protected abstract readonly name: string;
 
-  protected readonly chart = inject(IV_CHART);
   private readonly registered = signal<IvPolarSeriesRef[]>([]);
   protected readonly series = computed(() => ivMarkupOrder(this.registered()));
   private readonly angleKeys = signal<{ key: string }[]>([]);
   private readonly radiusDomains = signal<[number, number][]>([]);
   private readonly memo = new Map<string, Signal<([number, number] | undefined)[]>>();
 
-  protected readonly center = computed(() => {
+  /** The box left for the chart once a legend takes its space. */
+  private readonly box = computed(() => {
     const { width, height } = this.chart.size();
+    const { top, bottom } = this.chart.reserve();
+    return { top, width, height: Math.max(0, height - top - bottom) };
+  });
+
+  protected readonly center = computed(() => {
+    const { top, width, height } = this.box();
     return {
       cx: MARGIN + Math.max(0, width - 2 * MARGIN) / 2,
-      cy: MARGIN + Math.max(0, height - 2 * MARGIN) / 2,
+      cy: top + MARGIN + Math.max(0, height - 2 * MARGIN) / 2,
     };
   });
 
   protected readonly maxRadius = computed(() => {
-    const { width, height } = this.chart.size();
+    const { width, height } = this.box();
     return Math.max(0, Math.min(width - 2 * MARGIN, height - 2 * MARGIN) / 2);
   });
 
@@ -140,8 +176,8 @@ export abstract class IvPolarChart {
   });
 
   protected readonly angles = computed(() => ({
-    start: finite(this.startAngle()),
-    end: finite(this.endAngle()),
+    start: ivFinite(this.startAngle()),
+    end: ivFinite(this.endAngle()),
   }));
   protected readonly angleKey = computed(() => this.angleKeys()[0]?.key ?? null);
   protected readonly radiusDomain = computed(() => this.radiusDomains()[0] ?? null);
@@ -229,14 +265,182 @@ export abstract class IvPolarChart {
   });
 
   protected readonly classes = computed(() => cn('overflow-visible', this.class()));
+
+  // Interaction (IvChartRoot). Pies are hit by sector; radial bars by ring; radars by spoke.
+
+  protected override readonly vertical = signal(true).asReadonly();
+  private readonly pies = computed(() => this.series().filter((s) => s.kind === 'pie'));
+  private readonly allRows = computed(() => ivRange(this.data().length));
+
+  /** The pie a key names, or the first one. */
+  private pie(key?: string): IvPolarSeriesRef | undefined {
+    const pies = this.pies();
+    return pies.find((p) => p.key === key) ?? pies[0];
+  }
+
+  /** The item of row `index` in a series. */
+  private itemOf(ref: IvPolarSeriesRef | undefined, index: number): IvSeriesItem | undefined {
+    return ref?.items?.().find((i) => i.index === index);
+  }
+
+  protected override navKey(): string | undefined {
+    return this.pies()[0]?.key;
+  }
+
+  protected override rows(key?: string): number[] {
+    if (!this.pies().length) return this.allRows();
+    return (this.pie(key)?.items?.() ?? []).map((i) => i.index);
+  }
+
+  override rowCount(): number {
+    let count = this.data().length;
+    for (const pie of this.pies()) {
+      for (const item of pie.items?.() ?? []) count = Math.max(count, item.index + 1);
+    }
+    return count;
+  }
+
+  protected override hit(x: number, y: number): IvChartHit | null {
+    const { cx, cy } = this.center();
+    const r = Math.hypot(x - cx, y - cy);
+    const angle = ivPointAngle(cx, cy, x, y);
+    const pies = this.pies();
+    if (pies.length) {
+      // The last pie is drawn on top.
+      for (const pie of [...pies].reverse()) {
+        for (const item of pie.items?.() ?? []) {
+          const inner = item.innerRadius ?? 0;
+          const outer = item.outerRadius ?? 0;
+          if (
+            r >= inner &&
+            r <= outer &&
+            ivInSweep(angle, item.startAngle ?? 0, item.endAngle ?? 0)
+          ) {
+            return { index: item.index, key: pie.key };
+          }
+        }
+      }
+      return null;
+    }
+    const n = this.data().length;
+    const { inner, outer } = this.radius();
+    if (!n || r < inner || r > outer) return null;
+    if (this.series().some((s) => s.kind === 'radialBar')) {
+      // One ring per row, from the inside out.
+      const band = (outer - inner) / n;
+      return band > 0 ? { index: Math.min(n - 1, Math.floor((r - inner) / band)) } : null;
+    }
+    // Radar: the nearest spoke.
+    let best: IvChartHit | null = null;
+    let distance = Infinity;
+    for (const tick of this.angleTicks()) {
+      const d = ivAngleDistance(angle, tick.coord);
+      if (d < distance) {
+        distance = d;
+        best = { index: tick.index };
+      }
+    }
+    return best;
+  }
+
+  override anchor(active: IvChartActive): { x: number; y: number } {
+    if (active.x !== undefined && active.y !== undefined) return { x: active.x, y: active.y };
+    const ref = this.pies().length ? this.pie(active.key) : this.series()[0];
+    const item = this.itemOf(ref, active.index);
+    if (item) return { x: item.x, y: item.y };
+    const { cx, cy } = this.center();
+    return { x: cx, y: cy };
+  }
+
+  override payload(active: IvChartActive): IvChartPayload[] {
+    if (this.pies().length) {
+      const pie = this.pie(active.key);
+      const item = this.itemOf(pie, active.index);
+      if (!pie || !item) return [];
+      const name = item.payload[pie.nameKey ?? 'name'];
+      return [
+        {
+          key: pie.key,
+          name: typeof name === 'string' || typeof name === 'number' ? String(name) : pie.key,
+          value: item.value,
+          color: item.fill,
+          row: item.payload,
+        },
+      ];
+    }
+    const row = this.data()[active.index];
+    if (!row) return [];
+    const items: IvChartPayload[] = [];
+    for (const s of this.series()) {
+      const value = row[s.key];
+      if (value === null || value === undefined) continue;
+      items.push({
+        key: s.key,
+        name: s.key,
+        value,
+        color: s.color?.() ?? ivSeriesColor(s.key),
+        row,
+      });
+    }
+    return items;
+  }
+
+  override activeLabel(active: IvChartActive): unknown {
+    // A pie has no category axis: Recharts gives no label.
+    if (this.pies().length) return undefined;
+    const row = this.data()[active.index];
+    if (!row) return undefined;
+    const key = this.angleKey();
+    return key ? row[key] : active.index;
+  }
+
+  override legend(): IvChartLegendItem[] {
+    if (!this.pies().length) {
+      return this.series().map((s) => ({
+        key: s.key,
+        name: s.key,
+        color: s.color?.() ?? ivSeriesColor(s.key),
+      }));
+    }
+    // Pies: one entry per sector name, across rings.
+    const seen = new Set<string>();
+    const items: IvChartLegendItem[] = [];
+    for (const pie of this.pies()) {
+      for (const item of pie.items?.() ?? []) {
+        const raw = item.payload[pie.nameKey ?? 'name'];
+        const name = typeof raw === 'string' || typeof raw === 'number' ? String(raw) : pie.key;
+        if (seen.has(name)) continue;
+        seen.add(name);
+        items.push({ key: pie.key, name, color: item.fill, row: item.payload });
+      }
+    }
+    return items;
+  }
+
+  /** Radar only: the tooltip cursor along the active spoke. */
+  protected readonly cursorLine = computed(() => {
+    const active = this.chart.active();
+    if (!this.chart.cursor() || !active || !this.series().some((s) => s.kind === 'radar'))
+      return null;
+    const tick = this.angleTicks()[active.index];
+    if (!tick) return null;
+    const { cx, cy } = this.center();
+    const { inner, outer } = this.radius();
+    const a = ivPolarPoint(cx, cy, inner, tick.coord);
+    const b = ivPolarPoint(cx, cy, outer, tick.coord);
+    return { x1: a.x, y1: a.y, x2: b.x, y2: b.y };
+  });
 }
 
 /** Sectors per row: one or more `g[ivPie]` (rings when their radii differ). */
 @Component({
   selector: 'svg[ivPieChart]',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [{ provide: IV_POLAR, useFactory: () => inject(IvPieChart).context }],
-  template: `<ng-content />`,
+  providers: [
+    { provide: IV_POLAR, useFactory: () => inject(IvPieChart).context },
+    { provide: IvChartRoot, useExisting: IvPieChart },
+  ],
+  template: POLAR_TEMPLATE,
 })
 export class IvPieChart extends IvPolarChart {
   readonly startAngle = input(0);
@@ -258,8 +462,11 @@ export class IvPieChart extends IvPolarChart {
 @Component({
   selector: 'svg[ivRadarChart]',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [{ provide: IV_POLAR, useFactory: () => inject(IvRadarChart).context }],
-  template: `<ng-content />`,
+  providers: [
+    { provide: IV_POLAR, useFactory: () => inject(IvRadarChart).context },
+    { provide: IvChartRoot, useExisting: IvRadarChart },
+  ],
+  template: POLAR_TEMPLATE,
 })
 export class IvRadarChart extends IvPolarChart {
   readonly startAngle = input(90);
@@ -304,8 +511,11 @@ export class IvRadarChart extends IvPolarChart {
 @Component({
   selector: 'svg[ivRadialChart]',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [{ provide: IV_POLAR, useFactory: () => inject(IvRadialChart).context }],
-  template: `<ng-content />`,
+  providers: [
+    { provide: IV_POLAR, useFactory: () => inject(IvRadialChart).context },
+    { provide: IvChartRoot, useExisting: IvRadialChart },
+  ],
+  template: POLAR_TEMPLATE,
 })
 export class IvRadialChart extends IvPolarChart {
   readonly startAngle = input(0);
@@ -585,7 +795,7 @@ export class IvPolarRadiusAxis {
     });
   }
 
-  private readonly at = computed(() => finite(this.angle()));
+  private readonly at = computed(() => ivFinite(this.angle()));
 
   protected readonly line = computed(() => {
     const { cx, cy } = this.ctx.center();
@@ -619,12 +829,7 @@ export class IvPolarRadiusAxis {
     });
   });
 
-  protected readonly labelContext = computed<IvChartLabelContext>(() => {
-    const { cx, cy } = this.ctx.center();
-    const { inner, outer } = this.ctx.radius();
-    const box: IvPolarViewBox = { cx, cy, innerRadius: inner, outerRadius: outer };
-    return { $implicit: box, ...box };
-  });
+  protected readonly labelContext = ivLabelContext(this.ctx.center, this.ctx.radius);
 
   protected readonly classes = computed(() => cn('iv-chart-polar-radius-axis', this.class()));
 }
