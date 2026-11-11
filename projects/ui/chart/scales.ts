@@ -56,7 +56,7 @@ export function ivStack(
 }
 
 /** The value domain over `[low, high]` extents: always includes 0, rounded out to nice ticks. */
-export function ivValueDomain(extents: [number, number][]): [number, number] {
+export function ivValueDomain(extents: [number, number][], tickCount = 5): [number, number] {
   let lo = 0;
   let hi = 0;
   for (const [a, b] of extents) {
@@ -64,7 +64,7 @@ export function ivValueDomain(extents: [number, number][]): [number, number] {
     hi = Math.max(hi, a, b);
   }
   if (lo === hi) return [0, 1];
-  const [min, max] = scaleLinear().domain([lo, hi]).nice(5).domain();
+  const [min, max] = scaleLinear().domain([lo, hi]).nice(tickCount).domain();
   return [min, max];
 }
 
@@ -72,4 +72,29 @@ export function ivValueDomain(extents: [number, number][]): [number, number] {
 export function ivBandCenter(scale: ScaleBand<string> | ScalePoint<string>, index: number): number | undefined {
   const start = scale(String(index));
   return start === undefined ? undefined : start + scale.bandwidth() / 2;
+}
+
+/** Recharts' percent value: `'10%'` of `total`, or a plain number. Invalid gives 0; at most `total`. */
+export function ivPercent(value: number | string, total: number): number {
+  const n = typeof value === 'string' && value.trim().endsWith('%') ? (total * parseFloat(value)) / 100 : Number(value);
+  return Number.isFinite(n) ? Math.min(n, total) : 0;
+}
+
+/**
+ * Where bar slot `index` of `count` sits in a band of `bandSize` (Recharts' getBarPosition):
+ * `categoryGap` on each side of the band, `gap` between slots. Sizes over 1px are whole pixels.
+ */
+export function ivBarPosition(
+  bandSize: number,
+  count: number,
+  index: number,
+  gap: number | string,
+  categoryGap: number | string,
+): { offset: number; size: number } {
+  const outer = ivPercent(categoryGap, bandSize);
+  let inner = ivPercent(gap, bandSize);
+  if (bandSize - 2 * outer - (count - 1) * inner <= 0) inner = 0;
+  let size = Math.max(0, (bandSize - 2 * outer - (count - 1) * inner) / Math.max(1, count));
+  if (size > 1) size = Math.trunc(size);
+  return { offset: outer + (size + inner) * index, size };
 }

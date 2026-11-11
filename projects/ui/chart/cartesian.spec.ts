@@ -168,6 +168,27 @@ describe('Cartesian charts', () => {
     expect(series.items().map((i) => i.value)).toEqual([186, 305, 237, 73, 209, 214]);
   });
 
+  it('gives IV_SERIES items for an area, with the row', async () => {
+    const { fixture } = await render(AreaHost);
+    const series = fixture.debugElement
+      .queryAll((d) => d.attributes['ivArea'] !== undefined)
+      .map((d) => d.injector.get(IV_SERIES));
+    expect(series.map((s) => s.key)).toEqual(['mobile', 'desktop']);
+    const items = series[1].items();
+    expect(items.map((i) => i.value)).toEqual([186, 305, 237, 73, 209, 214]);
+    expect(items[0].payload).toBe(MONTHS[0]);
+    expect(items[0].fill).toBe('var(--color-desktop)');
+  });
+
+  it('lists series in markup order with their color', async () => {
+    const { fixture } = await render(AreaHost);
+    const ctx = fixture.debugElement.query((d) => d.name === 'svg').injector.get(IV_CARTESIAN);
+    expect(ctx.series().map((s) => [s.key, s.color()])).toEqual([
+      ['mobile', 'var(--color-mobile)'],
+      ['desktop', 'var(--color-desktop)'],
+    ]);
+  });
+
   it('draws a custom dot template with the row', async () => {
     const { el } = await render(LineHost, (h) => h.custom.set(true));
     const dots = el.querySelectorAll('[data-slot="custom-dot"]');
@@ -190,6 +211,7 @@ describe('Cartesian charts', () => {
     await fixture.whenStable();
     const dot = el.querySelector('[data-slot="chart-active-dot"]');
     expect(dot?.getAttribute('fill')).toBe('var(--color-desktop)');
+    expect(dot?.getAttribute('stroke')).toBe('var(--background)');
   });
 
   it('expands stacks to 0..1', async () => {
@@ -197,7 +219,9 @@ describe('Cartesian charts', () => {
     const ctx = fixture.debugElement.query((d) => d.name === 'svg').injector.get(IV_CARTESIAN);
     expect(ctx.value().domain()).toEqual([0, 1]);
     const plot = ctx.plot();
-    for (const p of ctx.points('desktop')()) expect(p?.y1).toBeCloseTo(plot.y);
+    const points = ctx.points('desktop')();
+    expect(points.length).toBe(6);
+    for (const p of points) expect(p?.y1).toBeCloseTo(plot.y);
   });
 
   it('breaks the line at a null value', async () => {
@@ -240,5 +264,65 @@ describe('Cartesian charts', () => {
       const { fixture } = await render<AreaHost | LineHost | ExpandHost>(type);
       await expect(fixture.nativeElement).toHaveNoViolations();
     }
+  });
+});
+
+// Many rows, for minTickGap (the 90-day toggle in chart-bar-interactive).
+const DAYS: IvChartDatum[] = Array.from({ length: 90 }, (_, i) => ({ date: `Day ${i + 1}`, desktop: (i * 37) % 400 }));
+
+@Component({
+  imports: [IV_CHART_IMPORTS],
+  template: `
+    <iv-chart [config]="config">
+      <svg ivBarChart [data]="data()">
+        <g ivXAxis dataKey="date" [minTickGap]="minTickGap()" [height]="height()" />
+        <g ivYAxis [tickCount]="tickCount()" />
+        <g ivBar dataKey="desktop" />
+      </svg>
+    </iv-chart>
+  `,
+})
+class AxisHost {
+  config = CONFIG;
+  data = signal<IvChartDatum[]>(DAYS);
+  minTickGap = signal(32);
+  height = signal(30);
+  tickCount = signal(5);
+}
+
+describe('Cartesian axes', () => {
+  const xTicks = (el: Element) => Array.from(el.querySelectorAll('[data-slot="chart-x-axis"] .iv-chart-tick text'));
+
+  it('hides category ticks closer than minTickGap', async () => {
+    const { el } = await render(AxisHost);
+    const xs = xTicks(el).map((t) => Number(t.getAttribute('x')));
+    expect(xs.length).toBeGreaterThan(1);
+    expect(xs.length).toBeLessThan(90);
+    for (let i = 1; i < xs.length; i++) expect(xs[i] - xs[i - 1]).toBeGreaterThanOrEqual(32);
+    // The last row keeps its label (Recharts' preserveEnd).
+    expect(xTicks(el).at(-1)?.textContent?.trim()).toBe('Day 90');
+  });
+
+  it('shows every tick when there is room (default minTickGap 5)', async () => {
+    const { el } = await render(AxisHost, (h) => {
+      h.data.set(DAYS.slice(0, 6));
+      h.minTickGap.set(5);
+    });
+    expect(xTicks(el).length).toBe(6);
+  });
+
+  it('uses tickCount for value ticks and the grid', async () => {
+    const { el } = await render(AxisHost, (h) => {
+      h.data.set(MONTHS);
+      h.tickCount.set(3);
+    });
+    const labels = Array.from(el.querySelectorAll('[data-slot="chart-y-axis"] .iv-chart-tick text'));
+    expect(labels.map((t) => t.textContent?.trim())).toEqual(['0', '100', '200', '300', '400']);
+  });
+
+  it('reserves the X axis height', async () => {
+    const { fixture } = await render(AxisHost, (h) => h.height.set(50));
+    const ctx = fixture.debugElement.query((d) => d.name === 'svg').injector.get(IV_CARTESIAN);
+    expect(ctx.plot().height).toBe(200 - 5 - 5 - 50);
   });
 });

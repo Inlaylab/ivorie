@@ -9,7 +9,7 @@ import {
   input,
   signal,
 } from '@angular/core';
-import { ScaleBand, ScaleLinear, ScalePoint, scaleLinear, scalePoint } from 'd3-scale';
+import { ScaleBand, ScaleLinear, ScalePoint, scaleBand, scaleLinear, scalePoint } from 'd3-scale';
 import { cn } from '@inlaylab/ivorie/core';
 import { IV_CHART, IvChartDatum, IvChartMargin, ivSeriesLabel } from './types';
 import { ivBandCenter, ivStack, ivValueDomain } from './scales';
@@ -28,6 +28,8 @@ export interface IvCartesianSeriesRef {
   key: string;
   stackId?: string;
   kind: 'line' | 'area' | 'bar';
+  /** The resolved series color: the stroke of a line or area, the fill of a bar. */
+  color: Signal<string>;
   /** The series' host. Stacks follow markup order, which an `@if` or `@for` can differ from registration order. */
   el?: Element;
 }
@@ -47,23 +49,35 @@ export interface IvCartesianContext {
   /** The category axis. Its domain is the row index as a string (`'0'`, `'1'`, …). Null with no rows. */
   category: Signal<{ key: string; scale: ScaleBand<string> | ScalePoint<string> } | null>;
   value: Signal<ScaleLinear<number, number>>;
+  /** Value ticks, from the number axis' `tickCount`. Shared by that axis and the grid. */
+  ticks: Signal<number[]>;
+  /** The registered series in markup order. */
+  series: Signal<readonly IvCartesianSeriesRef[]>;
+  /** Bar chart: gap between bars of a category, and on each side of a category (a number or a percent). */
+  barGap: Signal<number | string>;
+  barCategoryGap: Signal<number | string>;
   /** Adds a series to the stacks and the value domain. Returns the unregister function. */
   register(series: IvCartesianSeriesRef): () => void;
   /** One entry per row; `undefined` is a gap (missing or null value). */
   points(key: string): Signal<(IvCartesianPoint | undefined)[]>;
-  /** An axis gives its `dataKey` ('' for a number axis) and the space it takes. Returns the unregister function. */
-  setCategory(key: string, axis: 'x' | 'y', reserve: number): () => void;
+  /**
+   * An axis gives its `dataKey` ('' for a number axis), the space it takes and, for a number axis,
+   * its tick count. Returns the unregister function.
+   */
+  setCategory(key: string, axis: 'x' | 'y', reserve: number, tickCount?: number): () => void;
 }
 
 export const IV_CARTESIAN = new InjectionToken<IvCartesianContext>('IV_CARTESIAN');
 
 const MARGIN = 5;
+const TICK_COUNT = 5;
 const NO_POINTS: (IvCartesianPoint | undefined)[] = [];
 
 interface AxisRef {
   key: string;
   axis: 'x' | 'y';
   reserve: number;
+  tickCount?: number;
 }
 
 /** Sorts by the hosts' document position; series without a host keep their place at the end. */
@@ -96,9 +110,12 @@ export abstract class IvCartesianChart {
   protected abstract readonly name: string;
   protected readonly layout: Signal<IvChartLayout> = signal('horizontal');
   protected readonly offset: Signal<IvStackOffset> = signal('none');
+  protected readonly barGap: Signal<number | string> = signal(4);
+  protected readonly barCategoryGap: Signal<number | string> = signal('10%');
 
   protected readonly chart = inject(IV_CHART);
-  private readonly series = signal<IvCartesianSeriesRef[]>([]);
+  private readonly registered = signal<IvCartesianSeriesRef[]>([]);
+  private readonly series = computed(() => inMarkupOrder(this.registered()));
   private readonly axes = signal<AxisRef[]>([]);
   private readonly memo = new Map<string, Signal<(IvCartesianPoint | undefined)[]>>();
 
@@ -142,7 +159,7 @@ export abstract class IvCartesianChart {
     const offset = this.offset();
     const groups = new Map<string, string[]>();
     const out = new Map<string, ([number, number] | undefined)[]>();
-    for (const s of inMarkupOrder(this.series())) {
+    for (const s of this.series()) {
       if (s.stackId === undefined) {
         for (const [key, values] of ivStack(data, [s.key], 'none')) out.set(key, values);
       } else {
@@ -155,13 +172,22 @@ export abstract class IvCartesianChart {
     return out;
   });
 
+  /** The `tickCount` of the number axis on the value side, or 5. */
+  private readonly tickCount = computed(() => {
+    const side = this.layout() === 'horizontal' ? 'y' : 'x';
+    const count = this.axes().find((a) => a.axis === side && a.tickCount !== undefined)?.tickCount;
+    return count !== undefined && Number.isFinite(count) && count > 0 ? count : TICK_COUNT;
+  });
+
   private readonly value = computed(() => {
     const extents: [number, number][] = [];
     for (const values of this.stacks().values()) for (const v of values) if (v) extents.push(v);
     const p = this.plot();
     const range = this.layout() === 'horizontal' ? [p.y + p.height, p.y] : [p.x, p.x + p.width];
-    return scaleLinear().domain(ivValueDomain(extents)).range(range);
+    return scaleLinear().domain(ivValueDomain(extents, this.tickCount())).range(range);
   });
+
+  private readonly ticks = computed(() => this.value().ticks(this.tickCount()));
 
   private readonly pixels = computed(() => {
     const out = new Map<string, (IvCartesianPoint | undefined)[]>();
@@ -187,10 +213,14 @@ export abstract class IvCartesianChart {
     plot: this.plot,
     category: this.category,
     value: this.value,
+    ticks: this.ticks,
+    series: this.series,
+    barGap: computed(() => this.barGap()),
+    barCategoryGap: computed(() => this.barCategoryGap()),
     register: (series) => {
       const entry = { ...series };
-      this.series.update((list) => [...list, entry]);
-      return () => this.series.update((list) => list.filter((s) => s !== entry));
+      this.registered.update((list) => [...list, entry]);
+      return () => this.registered.update((list) => list.filter((s) => s !== entry));
     },
     points: (key) => {
       let points = this.memo.get(key);
@@ -200,8 +230,8 @@ export abstract class IvCartesianChart {
       }
       return points;
     },
-    setCategory: (key, axis, reserve) => {
-      const entry = { key, axis, reserve };
+    setCategory: (key, axis, reserve, tickCount) => {
+      const entry = { key, axis, reserve, tickCount };
       this.axes.update((list) => [...list, entry]);
       return () => this.axes.update((list) => list.filter((a) => a !== entry));
     },
@@ -242,4 +272,27 @@ export class IvAreaChart extends IvCartesianChart {
   readonly stackOffset = input<IvStackOffset>('none');
   protected readonly name = 'Area';
   protected override readonly offset = this.stackOffset;
+}
+
+/** Bars per category, side by side or stacked by `stackId`. `layout="vertical"` draws horizontal bars. */
+@Component({
+  selector: 'svg[ivBarChart]',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  providers: [{ provide: IV_CARTESIAN, useFactory: () => inject(IvBarChart).context }],
+  template: `<ng-content />`,
+})
+export class IvBarChart extends IvCartesianChart {
+  override readonly layout = input<IvChartLayout>('horizontal');
+  readonly stackOffset = input<IvStackOffset>('none');
+  /** Gap between the bars of one category: px or a percent of the band. */
+  override readonly barGap = input<number | string>(4);
+  /** Gap on each side of a category: px or a percent of the band. */
+  override readonly barCategoryGap = input<number | string>('10%');
+  protected readonly name = 'Bar';
+  protected override readonly offset = this.stackOffset;
+
+  /** Bands with no padding: `barCategoryGap` makes the space. */
+  protected override categoryScale(domain: string[], range: [number, number]): ScaleBand<string> {
+    return scaleBand<string>().domain(domain).range(range).padding(0);
+  }
 }

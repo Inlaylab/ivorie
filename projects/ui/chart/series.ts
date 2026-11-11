@@ -4,7 +4,9 @@ import {
   Directive,
   ElementRef,
   InputSignal,
+  Provider,
   TemplateRef,
+  Type,
   computed,
   effect,
   inject,
@@ -15,7 +17,7 @@ import { area, line } from 'd3-shape';
 import { cn } from '@inlaylab/ivorie/core';
 import { IV_CARTESIAN, IvCartesianPoint } from './cartesian';
 import { IvCurve, ivCurve } from './scales';
-import { IV_CHART, IV_SERIES, IvChartDatum, IvSeriesItem, ivSeriesColor } from './types';
+import { IV_CHART, IV_SERIES, IvChartDatum, IvSeriesContext, IvSeriesItem, ivSeriesColor } from './types';
 
 /** A drawn point, given to a custom `dot` template as `$implicit`. */
 export interface IvDot {
@@ -33,6 +35,22 @@ export interface IvDotContext {
 
 type Point = IvCartesianPoint | undefined;
 
+/** Provides `IV_SERIES` from a line or area, for `ivLabelList`. */
+function seriesProvider(type: Type<IvCartesianSeries>): Provider {
+  return {
+    provide: IV_SERIES,
+    useFactory: (): IvSeriesContext => {
+      const series = inject(type);
+      return {
+        get key() {
+          return series.dataKey();
+        },
+        items: series.items,
+      };
+    },
+  };
+}
+
 const DOTS_TEMPLATE = `
   @if (dotTemplate(); as tpl) {
     @for (dot of dots(); track dot.index) {
@@ -45,7 +63,7 @@ const DOTS_TEMPLATE = `
     }
   }
   @if (active(); as a) {
-    <svg:circle data-slot="chart-active-dot" class="iv-chart-dot" r="4" stroke="#fff" stroke-width="2"
+    <svg:circle data-slot="chart-active-dot" class="iv-chart-dot" r="4" stroke="var(--background)" stroke-width="2"
       [attr.cx]="a.cx" [attr.cy]="a.cy" [attr.fill]="color()" />
   }
 `;
@@ -72,7 +90,7 @@ export abstract class IvCartesianSeries {
 
   constructor() {
     effect((onCleanup) => {
-      const series = { key: this.dataKey(), stackId: this.stackKey(), kind: this.kind, el: this.el };
+      const series = { key: this.dataKey(), stackId: this.stackKey(), kind: this.kind, color: this.color, el: this.el };
       onCleanup(this.ctx.register(series));
     });
   }
@@ -99,6 +117,20 @@ export abstract class IvCartesianSeries {
     return dots;
   });
 
+  /** One item per drawn point, for `ivLabelList`. */
+  readonly items = computed<IvSeriesItem[]>(() =>
+    this.dots().map((d) => ({
+      index: d.index,
+      x: d.cx,
+      y: d.cy,
+      width: 0,
+      height: 0,
+      value: d.value,
+      fill: this.color(),
+      payload: d.payload,
+    })),
+  );
+
   protected readonly dotTemplate = computed(() => {
     const dot = this.dot();
     return dot instanceof TemplateRef ? dot : null;
@@ -119,20 +151,7 @@ export abstract class IvCartesianSeries {
   host: { 'data-slot': 'chart-line-series' },
   imports: [NgTemplateOutlet],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [
-    {
-      provide: IV_SERIES,
-      useFactory: () => {
-        const series = inject(IvLine);
-        return {
-          get key() {
-            return series.dataKey();
-          },
-          items: series.items,
-        };
-      },
-    },
-  ],
+  providers: [seriesProvider(IvLine)],
   template:
     `
     @if (linePath(); as d) {
@@ -150,19 +169,6 @@ export class IvLine extends IvCartesianSeries {
   protected stackKey(): undefined {
     return undefined;
   }
-
-  /** One item per drawn point, for `ivLabelList`. */
-  readonly items = computed<IvSeriesItem[]>(() =>
-    this.dots().map((d) => ({
-      index: d.index,
-      x: d.cx,
-      y: d.cy,
-      width: 0,
-      height: 0,
-      value: d.value,
-      fill: this.color(),
-    })),
-  );
 }
 
 /** An area from its base (0, or the series below in its stack) to its value. Recharts defaults: no dots, 1px stroke. */
@@ -171,6 +177,7 @@ export class IvLine extends IvCartesianSeries {
   host: { 'data-slot': 'chart-area-series' },
   imports: [NgTemplateOutlet],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  providers: [seriesProvider(IvArea)],
   template:
     `
     @if (areaPath(); as d) {
@@ -181,7 +188,9 @@ export class IvLine extends IvCartesianSeries {
       <svg:path data-slot="chart-area-stroke" fill="none"
         [attr.d]="d" [attr.stroke]="color()" [attr.stroke-width]="strokeWidth()" />
     }
-  ` + DOTS_TEMPLATE,
+  ` +
+    DOTS_TEMPLATE +
+    `<ng-content />`,
 })
 export class IvArea extends IvCartesianSeries {
   readonly strokeWidth = input(1);

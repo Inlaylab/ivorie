@@ -61,16 +61,30 @@ export function ivSeriesLabel(config: IvChartConfig, key: string): string {
   return config[key]?.label ?? key;
 }
 
-/** One drawn item of a series (a point, a bar or a sector), for labels. */
+/**
+ * One drawn item of a series (a point, a bar or a sector), for labels.
+ * Line and area: `x`, `y` are the point's center, `width` and `height` are 0.
+ * Bar: `x`, `y` are the top-left corner of the rect, `width` and `height` are its size.
+ */
 export interface IvSeriesItem {
   index: number;
   x: number;
   y: number;
   width: number;
   height: number;
+  /** The series value of the row. */
   value: unknown;
   fill: string;
+  /** The data row. */
+  payload: IvChartDatum;
 }
 
-/** Provided by each series part: its key and its drawn items. Gap rows have no item. */
-export const IV_SERIES = new InjectionToken<{ key: string; items: Signal<IvSeriesItem[]> }>('IV_SERIES');
+/** What a series part provides through `IV_SERIES`. */
+export interface IvSeriesContext {
+  key: string;
+  /** The drawn items. Gap rows have no item. */
+  items: Signal<IvSeriesItem[]>;
+}
+
+/** Provided by each series part: its key and its drawn items. */
+export const IV_SERIES = new InjectionToken<IvSeriesContext>('IV_SERIES');

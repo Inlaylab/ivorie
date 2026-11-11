@@ -18,11 +18,34 @@ export type IvAxisType = 'category' | 'number';
 export type IvTickFormatter = (value: any, index: number) => string;
 
 const TICK_SIZE = 6;
-const TICK_COUNT = 5;
+/**
+ * Estimated label size for `minTickGap`, at the container's 12px text: about 0.55em per
+ * character across, one line (12px) down. An estimate, so server and client agree without measuring.
+ */
+const CHAR_WIDTH = 6.6;
+const LINE_HEIGHT = 12;
 
 interface Tick {
   pos: number;
   label: string;
+}
+
+/**
+ * Recharts' `preserveEnd`: keep the last tick, then walk back and keep a tick only when
+ * `gap` px fit between its label and the last kept one.
+ */
+function spaced(ticks: Tick[], gap: number, size: (tick: Tick) => number): Tick[] {
+  const kept: Tick[] = [];
+  let end = Infinity;
+  for (let i = ticks.length - 1; i >= 0; i--) {
+    const tick = ticks[i];
+    const half = size(tick) / 2;
+    if (tick.pos + half <= end) {
+      kept.push(tick);
+      end = tick.pos - half - gap;
+    }
+  }
+  return kept.reverse();
 }
 
 const AXIS_TEMPLATE = `
@@ -62,6 +85,10 @@ export abstract class IvCartesianAxis {
   readonly axisLine = input(true);
   readonly tickMargin = input(8);
   readonly tickFormatter = input<IvTickFormatter>();
+  /** Category axis: hide a tick when its label would be closer than this many px to the next shown one. */
+  readonly minTickGap = input(5);
+  /** Number axis: about how many value ticks to draw (a d3 `ticks` hint). */
+  readonly tickCount = input(5);
   readonly class = input('');
   abstract readonly type: InputSignal<IvAxisType>;
 
@@ -74,8 +101,10 @@ export abstract class IvCartesianAxis {
 
   constructor() {
     effect((onCleanup) => {
-      const key = this.type() === 'category' ? this.dataKey() : '';
-      onCleanup(this.ctx.setCategory(key, this.side, this.hide() ? 0 : this.reserve()));
+      const category = this.type() === 'category';
+      const reserve = this.hide() || !Number.isFinite(this.reserve()) ? 0 : this.reserve();
+      const tickCount = category ? undefined : this.tickCount();
+      onCleanup(this.ctx.setCategory(category ? this.dataKey() : '', this.side, reserve, tickCount));
     });
   }
 
@@ -92,11 +121,13 @@ export abstract class IvCartesianAxis {
         const value = key ? row[key] : i;
         if (pos !== undefined) ticks.push({ pos, label: format ? format(value, i) : String(value ?? '') });
       });
-      return ticks;
+      const gap = this.minTickGap();
+      const size = (tick: Tick) => (this.side === 'x' ? tick.label.length * CHAR_WIDTH : LINE_HEIGHT);
+      return spaced(ticks, Number.isFinite(gap) ? gap : 0, size);
     }
     if (this.side === categorySide) return [];
     const value = this.ctx.value();
-    return value.ticks(TICK_COUNT).map((t, i) => ({ pos: value(t), label: format ? format(t, i) : String(t) }));
+    return this.ctx.ticks().map((t, i) => ({ pos: value(t), label: format ? format(t, i) : String(t) }));
   });
 
   protected readonly geometry = computed(() => {
@@ -120,9 +151,11 @@ export abstract class IvCartesianAxis {
 })
 export class IvXAxis extends IvCartesianAxis {
   readonly type = input<IvAxisType>('category');
+  /** Space for the tick labels under the plot. */
+  readonly height = input(30);
   protected readonly side = 'x';
   protected reserve(): number {
-    return 30;
+    return this.height();
   }
 }
 
@@ -170,7 +203,7 @@ export class IvCartesianGrid {
 
   protected readonly lines = computed(() => {
     const value = this.ctx.value();
-    const values = value.ticks(TICK_COUNT).map((t) => value(t));
+    const values = this.ctx.ticks().map((t) => value(t));
     const category = this.ctx.category();
     const categories: number[] = [];
     if (category) {

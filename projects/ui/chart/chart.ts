@@ -21,9 +21,11 @@ import {
   IvChartPayload,
   IvChartSize,
 } from './types';
-import { IvAreaChart, IvLineChart } from './cartesian';
+import { IvAreaChart, IvBarChart, IvLineChart } from './cartesian';
 import { IvCartesianGrid, IvXAxis, IvYAxis } from './axis';
 import { IvArea, IvLine } from './series';
+import { IvBar } from './bar';
+import { IvLabelList } from './label-list';
 
 const CHART_CLASSES = [
   'cn-chart relative flex aspect-video justify-center text-xs',
@@ -149,9 +151,12 @@ export const IV_CHART_IMPORTS = [
   IvChart,
   IvLineChart,
   IvAreaChart,
+  IvBarChart,
   IvXAxis,
   IvYAxis,
   IvCartesianGrid,
   IvLine,
   IvArea,
+  IvBar,
+  IvLabelList,
 ] as const;
