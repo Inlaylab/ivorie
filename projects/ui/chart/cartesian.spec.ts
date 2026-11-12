@@ -144,7 +144,7 @@ describe('Cartesian charts', () => {
       expect(d).not.toContain('NaN');
     }
     expect(paths[0].getAttribute('fill')).toBe('var(--color-mobile)');
-    expect(paths[0].getAttribute('fill-opacity')).toBe('0.4');
+    expect(paths[0].getAttribute('fill-opacity')).toBe('0.6');
     // mobile is the base of the stack: desktop's top is higher (smaller y) on every row.
     const ctx = fixture.debugElement.query((d) => d.name === 'svg').injector.get(IV_CARTESIAN);
     const mobile = ctx.points('mobile')();

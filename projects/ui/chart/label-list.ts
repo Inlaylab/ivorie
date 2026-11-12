@@ -1,14 +1,15 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
-import { cn } from '@inlaylab/ivorie/core';
+import { IvIdGenerator, cn } from '@inlaylab/ivorie/core';
 import { IV_CARTESIAN } from './cartesian';
 import { ivNumber, ivPolarPoint, ivSideAnchor } from './scales';
 import { IV_SERIES, IvSeriesItem } from './types';
 
 /**
  * `outside` is for sectors (pie, radial bar); on bars and points it acts like `top`.
+ * `insideStart` is for radial bars: the text runs along the ring from the bar's start.
  * On sectors, every other position is the centroid.
  */
-export type IvLabelPosition = 'top' | 'inside' | 'insideLeft' | 'right' | 'outside';
+export type IvLabelPosition = 'top' | 'inside' | 'insideLeft' | 'right' | 'outside' | 'insideStart';
 
 /** Recharts' label formatter. `any`, so `(value: number) => …` binds without a cast. */
 export type IvLabelFormatter = (value: any) => string;
@@ -20,6 +21,8 @@ interface Label {
   anchor: 'start' | 'middle' | 'end';
   dy: string | null;
   text: string;
+  /** `insideStart`: the arc the text follows (Recharts' radial label). */
+  path?: string;
 }
 
 /** Recharts' vertical anchors as SVG `dy`: one line of text. */
@@ -58,6 +61,23 @@ function placePolar(item: IvSeriesItem, position: IvLabelPosition, offset: numbe
 }
 
 /**
+ * Recharts' `insideStart` radial label: a near-full circle on the ring's middle radius, from
+ * `offset` degrees past the start angle, in the bar's direction. The text follows it.
+ */
+function radialPath(item: IvSeriesItem, offset: number): string {
+  const cx = item.cx ?? 0;
+  const cy = item.cy ?? 0;
+  const r = ((item.innerRadius ?? 0) + (item.outerRadius ?? 0)) / 2;
+  const start = item.startAngle ?? 0;
+  const sign = (item.endAngle ?? 0) - start >= 0 ? 1 : -1;
+  const angle = start + sign * offset;
+  const a = ivPolarPoint(cx, cy, r, angle);
+  const b = ivPolarPoint(cx, cy, r, angle + sign * 359);
+  // Recharts angles grow counter-clockwise: sweep flag 0 when they grow.
+  return `M${a.x},${a.y}A${r},${r},0,1,${sign > 0 ? 0 : 1},${b.x},${b.y}`;
+}
+
+/**
  * Text labels for each item of the series it sits in: `g[ivBar]`, `g[ivLine]`, `g[ivArea]`,
  * `g[ivPie]`, `g[ivRadialBar]`, `g[ivRadar]`.
  */
@@ -67,9 +87,16 @@ function placePolar(item: IvSeriesItem, position: IvLabelPosition, offset: numbe
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @for (label of labels(); track label.index) {
-      <svg:text [attr.x]="label.x" [attr.y]="label.y" [attr.text-anchor]="label.anchor" [attr.dy]="label.dy">{{
-        label.text
-      }}</svg:text>
+      @if (label.path) {
+        <svg:text dominant-baseline="central">
+          <svg:defs><svg:path [attr.id]="id + '-' + label.index" [attr.d]="label.path" /></svg:defs>
+          <svg:textPath [attr.href]="'#' + id + '-' + label.index">{{ label.text }}</svg:textPath>
+        </svg:text>
+      } @else {
+        <svg:text [attr.x]="label.x" [attr.y]="label.y" [attr.text-anchor]="label.anchor" [attr.dy]="label.dy">{{
+          label.text
+        }}</svg:text>
+      }
     }
   `,
 })
@@ -77,19 +104,21 @@ export class IvLabelList {
   /** Row key of the label text. Default: the series' key. */
   readonly dataKey = input<string>();
   readonly position = input<IvLabelPosition>('top');
-  /** Distance from the item, in px. */
-  readonly offset = input(12);
+  /** Distance from the item: px, or degrees for `insideStart`. Default: 12 px, 5° (Recharts). */
+  readonly offset = input<number>();
   readonly formatter = input<IvLabelFormatter>();
   readonly class = input('');
 
   private readonly series = inject(IV_SERIES);
+  /** Prefix of the `insideStart` path ids. */
+  protected readonly id = inject(IvIdGenerator).next('chart-label');
   private readonly cartesian = inject(IV_CARTESIAN, { optional: true });
 
   protected readonly labels = computed<Label[]>(() => {
     const key = this.dataKey() ?? this.series.key;
     const format = this.formatter();
     const position = this.position();
-    const offset = ivNumber(this.offset()) ?? 0;
+    const offset = ivNumber(this.offset()) ?? (position === 'insideStart' ? 5 : 12);
     const vertical = this.cartesian?.layout() === 'vertical';
     const labels: Label[] = [];
     for (const item of this.series.items()) {
@@ -97,11 +126,17 @@ export class IvLabelList {
       if (value === null || value === undefined) continue;
       // Only a bar (an item with a size) has a direction to flip.
       const negative = (ivNumber(item.value) ?? 0) < 0 && (item.width > 0 || item.height > 0);
+      const text = format ? format(value) : String(value);
+      if (position === 'insideStart' && item.midAngle !== undefined && item.startAngle !== undefined) {
+        const path = radialPath(item, offset);
+        labels.push({ index: item.index, x: 0, y: 0, anchor: 'start', dy: null, text, path });
+        continue;
+      }
       const at =
         item.midAngle === undefined
           ? place(item, position, offset, negative && vertical, negative && !vertical)
           : placePolar(item, position, offset);
-      labels.push({ index: item.index, ...at, text: format ? format(value) : String(value) });
+      labels.push({ index: item.index, ...at, text });
     }
     return labels;
   });

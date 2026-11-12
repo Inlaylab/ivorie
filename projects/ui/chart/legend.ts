@@ -64,10 +64,10 @@ export class IvChartLegend {
 
   constructor() {
     const host = inject<ElementRef<HTMLElement>>(ElementRef).nativeElement;
-    const document = inject(DOCUMENT);
+    const doc = inject(DOCUMENT);
     const destroyRef = inject(DestroyRef);
     afterNextRender(() => {
-      const view = document.defaultView;
+      const view = doc.defaultView;
       if (!view || typeof view.ResizeObserver === 'undefined') return;
       const observer = new view.ResizeObserver(() => {
         const height = host.getBoundingClientRect().height;

@@ -7,7 +7,7 @@ entry: '@inlaylab/ivorie/chart'
 
 Charts are made of parts: a container, a chart root, then grid, axes, series, tooltip and legend. You add only the parts you need. The parts and their inputs follow [Recharts](https://recharts.org), so shadcn's chart examples port almost line by line.
 
-Browse ready-made cards in [Area Charts](docs/charts-area), [Bar Charts](docs/charts-bar) and [Line Charts](docs/charts-line).
+Browse ready-made cards in [Area Charts](docs/charts-area), [Bar Charts](docs/charts-bar), [Line Charts](docs/charts-line), [Pie Charts](docs/charts-pie), [Radar Charts](docs/charts-radar), [Radial Charts](docs/charts-radial) and [Tooltips](docs/charts-tooltip).
 
 ## Usage
 
@@ -210,6 +210,17 @@ For your own markup, put an `ivChartTooltipContent` template inside. It gets the
 </iv-chart-tooltip>
 ```
 
+To change only the rows and keep the card and label, use an `ivChartTooltipItem` template. It replaces the indicator, name and value of each row (Recharts' `formatter` returning markup):
+
+```html
+<iv-chart-tooltip hideLabel>
+  <ng-template ivChartTooltipItem let-item let-label="label">
+    {{ label }}
+    <span class="ml-auto font-mono tabular-nums">{{ item.value }} kcal</span>
+  </ng-template>
+</iv-chart-tooltip>
+```
+
 ## Legend
 
 Put `iv-chart-legend` inside `iv-chart`. It shows a swatch, or the config `icon`, and the label per series. `verticalAlign="top"` puts it above the chart.
@@ -281,7 +292,7 @@ Every part also accepts `class`. Boolean inputs take a bare attribute, like shad
 | `dot` | `boolean \| IvDotProps \| TemplateRef<IvDotContext>` | line `true`, area `false` | Dots; circle props (`r`, `fill`, `stroke`, `strokeWidth`) over the default (`r` 3, background fill, series stroke); or a template given `IvDot`. |
 | `activeDot` | `boolean \| IvDotProps` | `true` | Dot at the active row; circle props over the default (`r` 4, series fill, background stroke). |
 | `fill` | `string` | series color | Area only. |
-| `fillOpacity` | `number` | `0.4` | Area only. |
+| `fillOpacity` | `number` | `0.6` | Area only, as in Recharts. |
 | `stackId` | `string` | — | Area only. Areas with the same id stack, in markup order. |
 
 ### g[ivBar]
@@ -301,8 +312,8 @@ Put it inside `g[ivBar]`, `g[ivLine]`, `g[ivArea]`, `g[ivPie]`, `g[ivRadialBar]`
 | Name | Type | Default | Description |
 |---|---|---|---|
 | `dataKey` | `string` | series key | Row key of the label text. |
-| `position` | `'top' \| 'inside' \| 'insideLeft' \| 'right' \| 'outside'` | `'top'` | Where the label sits. A negative bar's `top` is its tip. On a sector, `outside` is beyond the outer radius; any other value is the centroid. |
-| `offset` | `number` | `12` | Distance from the item, in px. |
+| `position` | `'top' \| 'inside' \| 'insideLeft' \| 'right' \| 'outside' \| 'insideStart'` | `'top'` | Where the label sits. A negative bar's `top` is its tip. On a sector, `outside` is beyond the outer radius. On a radial bar, `insideStart` runs the text along the ring from the bar's start. Any other value on a sector is the centroid. |
+| `offset` | `number` | `12` px, `5`° for `insideStart` | Distance from the item. |
 | `formatter` | `(value) => string` | — | Formats the label. |
 
 ### svg[ivPieChart], svg[ivRadarChart], svg[ivRadialChart]
@@ -316,6 +327,7 @@ Angles are degrees, as in Recharts: 0 is 3 o'clock, positive is counter-clockwis
 | `endAngle` | `number` | radar `-270`, others `360` | Where the sweep ends. The radar default goes clockwise from the top. |
 | `innerRadius` | `number \| string` | `0` | px or a percent of half the smaller side. |
 | `outerRadius` | `number \| string` | `'80%'` | px or a percent of half the smaller side. |
+| `margin` | `IvChartMargin` | `5` each side | Space around the chart. The center and radii fit the box left. Negative values grow the chart. |
 | `ariaLabel` | `string` | series names | Label of the chart (`role="img"`). |
 
 ### g[ivPie]
@@ -347,7 +359,7 @@ Center content, rendered in the SVG. Put it inside `g[ivPie]`, `g[ivRadialBar]` 
 | `polarRadius` | `number[]` | radius ticks | Ring radii in px. |
 | `stroke` | `string` | theme border | Line color. |
 
-`class` goes on each ring, as in Recharts, so `first:fill-muted` works.
+`class` goes on each ring and spoke, as in Recharts, so `first:fill-muted` works on the rings. Spokes draw over the rings.
 
 ### g[ivPolarAngleAxis]
 
@@ -366,6 +378,7 @@ Center content, rendered in the SVG. Put it inside `g[ivPie]`, `g[ivRadialBar]` 
 | `axisLine` | `boolean` | `false` | The spoke line. |
 | `angle` | `number` | `0` | The spoke's angle. |
 | `orientation` | `'left' \| 'right' \| 'middle'` | `'right'` | Label side. |
+| `stroke` | `string` | muted | Axis line and tick text color, as in Recharts. |
 | `domain` | `[number, number]` | 0 to the largest value | Radar: a fixed value range. |
 | `tickFormatter` | `(value, index) => string` | — | Formats a label. |
 
@@ -375,7 +388,7 @@ Center content, rendered in the SVG. Put it inside `g[ivPie]`, `g[ivRadialBar]` 
 |---|---|---|---|
 | `dataKey` | `string` | required | Row key of the values. A `null` value leaves the vertex out. |
 | `fill` | `string` | series color | Fill color. |
-| `fillOpacity` | `number` | `0.6` | Fill opacity. |
+| `fillOpacity` | `number` | `1` | Fill opacity, as in Recharts. |
 | `stroke` | `string` | none | Outline color. |
 | `strokeWidth` | `number` | — | Outline width. |
 | `dot` | `boolean \| TemplateRef<IvDotContext>` | `false` | Dots on the vertices, or a template given `IvDot`. |
@@ -403,7 +416,7 @@ Put it inside `iv-chart`. It opens on the active row: the pointer (hover, or a t
 | `nameKey` | `string` | — | Row key whose string value names each row's config entry (a pie's sector names). |
 | `labelKey` | `string` | — | Config key of the label. |
 | `labelFormatter` | `(label, payload) => string` | — | Formats the label. |
-| `formatter` | `(value, name, item, index) => string` | — | Replaces each row with text. For markup, use `ivChartTooltipContent`. |
+| `formatter` | `(value, name, item, index) => string` | — | Replaces each row with text. For markup, use `ivChartTooltipItem`. |
 | `cursor` | `boolean` | `true` | A muted band (bar), line (line, area) or spoke (radar) under the active row. |
 | `defaultIndex` | `number` | — | Opens on this row at start. Rendered on the server too. |
 
@@ -412,6 +425,20 @@ Put it inside `iv-chart`. It opens on the active row: the pointer (hover, or a t
 ### ng-template[ivChartTooltipContent]
 
 A custom tooltip body inside the card. The context is the rows (`$implicit: IvChartPayload[]`) and `label`, the category value: `let-payload let-label="label"`.
+
+### ng-template[ivChartTooltipItem]
+
+A custom row, inside the row's flex box. It replaces the indicator, name and value. Rows with no value or name keep the default. The context (`IvChartTooltipItemContext`):
+
+| Name | Type | Description |
+|---|---|---|
+| `$implicit` | `IvChartPayload` | The row: `key`, `name`, `value`, `color`, `row` (the data row). |
+| `value` | `unknown` | The row's value. |
+| `name` | `string` | The series key (a pie: the sector name). |
+| `label` | `string` | The config label, or `name`. |
+| `color` | `string` | The indicator color. |
+| `index` | `number` | The row's position. |
+| `payload` | `IvChartPayload[]` | All rows, e.g. for a total after the last one. |
 
 ### iv-chart-legend
 

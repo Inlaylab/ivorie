@@ -20,7 +20,7 @@ More detail: [PLAN](docs/PLAN.md) · [ARCHITECTURE](docs/ARCHITECTURE.md) · [CO
 
 ## Status
 
-**Next:** Phase 15 (1.5.0, charts and dashboards), branch `feat/charts` (from the 1.4.1 release commit). Tasks T1–T10 written below; T1–T7 done (entry, config, container; cartesian core, line and area; bar and label list; polar: pie, radar, radial; interaction: tooltip, legend, keyboard, active shape; motion, own-style tooltips, size check 39.6 kB gz of 45; docs: chart page walkthrough, Charts nav section, area/bar/line gallery of 30 cards, `dot`/`activeDot` props). Next: T8.
+**Next:** Phase 15 (1.5.0, charts and dashboards), branch `feat/charts` (from the 1.4.1 release commit). Tasks T1–T10 written below; T1–T8 done (entry, config, container; cartesian core, line and area; bar and label list; polar: pie, radar, radial; interaction: tooltip, legend, keyboard, active shape; motion, own-style tooltips, size check; docs: chart page walkthrough, Charts nav section, gallery of 70 cards (area, bar, line, pie, radar, radial, tooltip), `dot`/`activeDot` props, `ivChartTooltipItem` rows, polar `margin`, radial `insideStart` labels, Recharts radar ticks). Next: T9.
 Phase 16 (1.4.1): exit gate green. Left: PR, merge, tag `v1.4.1`, publish (ask first). `feat/charts` rebases onto `main` after that.
 Phase 17 (docs redesign): no own release; it lands later, with whichever release is open. Phase 18 (glass material and dials) moves to 1.6.0.
 Shipped: 1.0.0, 1.1.0, 1.2.0, 1.4.0 (both packages; 1.3.0 never published, its icon libraries shipped in 1.4.0). Tag `v1.4.0` is missing on the remote. Docs initial bundle is ~800 kB, mostly lucide icons (backlog: docs drop `@lucide/angular`).

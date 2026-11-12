@@ -52,7 +52,42 @@ export class IvChartTooltipContent {
   }
 }
 
+export interface IvChartTooltipItemContext {
+  /** The row's payload item. */
+  $implicit: IvChartPayload;
+  value: unknown;
+  /** The series key (a pie: the sector name). */
+  name: string;
+  /** The config label, or `name`. */
+  label: string;
+  /** The indicator color. */
+  color: string;
+  /** The row's position in the tooltip. */
+  index: number;
+  /** All rows, e.g. for a total after the last one. */
+  payload: IvChartPayload[];
+}
+
+/**
+ * A custom tooltip row (Recharts' `formatter` returning markup): replaces the indicator, name and
+ * value of each row, inside the row's flex box.
+ * `<ng-template ivChartTooltipItem let-item let-label="label" let-index="index">`.
+ */
+@Directive({ selector: 'ng-template[ivChartTooltipItem]' })
+export class IvChartTooltipItem {
+  readonly template = inject<TemplateRef<IvChartTooltipItemContext>>(TemplateRef);
+
+  static ngTemplateContextGuard(
+    _dir: IvChartTooltipItem,
+    ctx: unknown,
+  ): ctx is IvChartTooltipItemContext {
+    return true;
+  }
+}
+
 interface Row {
+  /** `ivChartTooltipItem` context, when the template is given. */
+  context: IvChartTooltipItemContext | null;
   /** `formatter` output: replaces the indicator, name and value. */
   text: string | null;
   icon: Type<unknown> | null;
@@ -108,7 +143,12 @@ function place(at: number, size: number): string {
           <div class="grid gap-1.5">
             @for (row of rows(); track $index) {
               <div data-slot="chart-tooltip-item" [class]="rowClass()">
-                @if (row.text !== null) {
+                @if (row.context && item(); as tpl) {
+                  <ng-container
+                    [ngTemplateOutlet]="tpl.template"
+                    [ngTemplateOutletContext]="row.context"
+                  />
+                } @else if (row.text !== null) {
                   {{ row.text }}
                 } @else {
                   @if (row.icon) {
@@ -162,6 +202,7 @@ export class IvChartTooltip {
   protected readonly chart = inject(IV_CHART);
   private readonly locale = inject(LOCALE_ID);
   protected readonly content = contentChild(IvChartTooltipContent);
+  protected readonly item = contentChild(IvChartTooltipItem);
 
   protected readonly hostClasses = 'pointer-events-none absolute top-0 left-0 z-10';
 
@@ -199,15 +240,31 @@ export class IvChartTooltip {
     const config = this.chart.config();
     const nameKey = this.nameKey();
     const format = this.formatter();
-    return this.payload().map((item, index) => {
+    const custom = this.item() !== undefined;
+    const payload = this.payload();
+    return payload.map((item, index) => {
       const entry = ivPayloadConfig(config, item, nameKey ?? item.name ?? item.key ?? 'value');
       const fill = item.row['fill'];
       const value = item.value;
+      const color = typeof fill === 'string' ? fill : item.color;
       return {
+        // Like Recharts' formatter: only rows with a value and a name.
+        context:
+          custom && value !== undefined && item.name
+            ? {
+                $implicit: item,
+                value,
+                name: item.name,
+                label: entry?.label ?? item.name,
+                color,
+                index,
+                payload,
+              }
+            : null,
         text:
           format && value !== undefined && item.name ? format(value, item.name, item, index) : null,
         icon: entry?.icon ?? null,
-        color: typeof fill === 'string' ? fill : item.color,
+        color,
         name: entry?.label ?? item.name,
         value:
           value === null || value === undefined

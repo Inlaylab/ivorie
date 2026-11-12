@@ -1,15 +1,7 @@
-import {
-  Component,
-  signal,
-  ɵgetDocument as getDocument,
-  ɵsetDocument as setDocument,
-} from '@angular/core';
-import { ɵgetDOM as getDOM } from '@angular/common';
+import { Component, DOCUMENT, getPlatform, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import {
-  bootstrapApplication,
-  ɵBrowserDomAdapter as BrowserDomAdapter,
-} from '@angular/platform-browser';
+import { bootstrapApplication } from '@angular/platform-browser';
+import { platformBrowserTesting } from '@angular/platform-browser/testing';
 import { provideServerRendering, renderApplication } from '@angular/platform-server';
 import { describe, expect, it } from 'vitest';
 import {
@@ -280,6 +272,49 @@ class CustomBodyHost {
   data = MONTHS;
 }
 
+@Component({
+  imports: [IV_CHART_IMPORTS],
+  template: `
+    <iv-chart [config]="config">
+      <svg ivBarChart [data]="data">
+        <g ivXAxis dataKey="month" />
+        <g ivBar dataKey="desktop" stackId="a" />
+        <g ivBar dataKey="mobile" stackId="a" />
+      </svg>
+      <iv-chart-tooltip hideLabel [defaultIndex]="1">
+        <ng-template ivChartTooltipItem let-item let-label="label" let-index="index" let-all="payload">
+          <span data-testid="row">{{ label }}={{ item.value }}</span>
+          @if (index === all.length - 1) {
+            <span data-testid="total">{{ total(item.row) }}</span>
+          }
+        </ng-template>
+      </iv-chart-tooltip>
+    </iv-chart>
+  `,
+})
+class CustomItemHost {
+  config = CONFIG;
+  data = MONTHS;
+  total = (row: IvChartDatum) => Number(row['desktop']) + Number(row['mobile']);
+}
+
+// shadcn chart-pie-legend: the pie has no nameKey; the legend names sectors by `browser`.
+@Component({
+  imports: [IV_CHART_IMPORTS],
+  template: `
+    <iv-chart [config]="config">
+      <svg ivPieChart>
+        <g ivPie [data]="data" dataKey="visitors" />
+      </svg>
+      <iv-chart-legend nameKey="browser" />
+    </iv-chart>
+  `,
+})
+class PieLegendHost {
+  config = CONFIG;
+  data = BROWSERS;
+}
+
 async function render<T>(type: new () => T, patch?: (host: T) => void) {
   const fixture = TestBed.createComponent(type);
   patch?.(fixture.componentInstance);
@@ -409,6 +444,15 @@ describe('Chart tooltip', () => {
     await pointer('pointermove', 130, 80);
     expect(text(el.querySelector('[data-testid="custom"]'))).toBe('March: 237');
     expect(card(el)!.contains(el.querySelector('[data-testid="custom"]'))).toBe(true);
+  });
+
+  it('renders each row from ivChartTooltipItem, inside the row box', async () => {
+    const { el } = await render(CustomItemHost);
+    expect(rows(el).map(text)).toEqual(['Desktop=305', 'Mobile=200 505']);
+    expect(rows(el)[1].querySelector('[data-testid="total"]')).not.toBeNull();
+    // The template replaces the default indicator, name and value.
+    expect(indicators(el).length).toBe(0);
+    expect(el.querySelectorAll('[data-testid="total"]').length).toBe(1);
   });
 
   it('opens on defaultIndex on the first render', async () => {
@@ -676,6 +720,12 @@ describe('Chart legend', () => {
     expect(items.map(text)).toEqual(['January', 'February', 'March']);
   });
 
+  it('lists every sector of a pie with no nameKey (chart-pie-legend)', async () => {
+    const { el } = await render(PieLegendHost);
+    const items = Array.from(el.querySelectorAll('[data-slot="chart-legend-item"]'));
+    expect(items.map(text)).toEqual(['Chrome', 'Safari', 'Firefox', 'Edge', 'Other']);
+  });
+
   it('lists radar series', async () => {
     const { el } = await render(RadarHost);
     const items = Array.from(el.querySelectorAll('[data-slot="chart-legend-item"]'));
@@ -729,9 +779,10 @@ async function renderOnServer(root: new () => unknown): Promise<string> {
       if (d.set) g[k] = v;
       else Object.defineProperty(g, k, d);
     }
-    // Module state, not globals: the DOM adapter (@angular/common) and core's document.
-    BrowserDomAdapter.makeCurrent();
-    setDocument(document);
+    // The server render destroys the shared platform; its module state (the DOM adapter, core's
+    // document) still points at the server's. A new browser platform puts both back: its
+    // initializer sets the browser DOM adapter, and its DOCUMENT factory sets the document.
+    if (!getPlatform()) platformBrowserTesting().injector.get(DOCUMENT);
   }
 }
 
@@ -762,8 +813,7 @@ describe('Chart tooltip on the server', () => {
     expect(html).toMatch(/Desktop[\s\S]*305/);
     expect(html).toContain('data-active');
     // The rest of this worker still sees jsdom.
-    expect(getDOM().constructor).toBe(BrowserDomAdapter);
-    expect(getDocument()).toBe(document);
+    expect(getPlatform()?.injector.get(DOCUMENT)).toBe(document);
     expect(TestBed.createComponent(BarHost).debugElement).not.toBeNull();
   });
 });

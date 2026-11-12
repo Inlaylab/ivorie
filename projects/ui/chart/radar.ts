@@ -72,7 +72,7 @@ export class IvRadar {
   readonly dataKey = input.required<string>();
   /** Fill color. Default: `var(--color-<dataKey>)`. */
   readonly fill = input<string>();
-  readonly fillOpacity = input(0.6);
+  readonly fillOpacity = input(1);
   /** Outline color. Default: none. */
   readonly stroke = input<string>();
   readonly strokeWidth = input<number>();

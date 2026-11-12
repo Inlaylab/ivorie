@@ -23,7 +23,9 @@ import { IV_CHART_IMPORTS, IvChartConfig } from '@inlaylab/ivorie/chart';
               (click)="active.set(key)"
             >
               <span class="text-muted-foreground text-xs">{{ config[key].label }}</span>
-              <span class="text-lg leading-none font-bold sm:text-3xl">{{ total[key].toLocaleString('en-US') }}</span>
+              <span class="text-lg leading-none font-bold sm:text-3xl">{{
+                total[key].toLocaleString('en-US')
+              }}</span>
             </button>
           }
         </div>
@@ -160,7 +162,16 @@ export default class ChartLineInteractive {
 
   /** Dates are UTC days: format them in UTC, so server and browser agree. */
   protected readonly day = (value: string) =>
-    new Date(value).toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' });
+    new Date(value).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      timeZone: 'UTC',
+    });
   protected readonly fullDay = (value: string) =>
-    new Date(value).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' });
+    new Date(value).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+      timeZone: 'UTC',
+    });
 }

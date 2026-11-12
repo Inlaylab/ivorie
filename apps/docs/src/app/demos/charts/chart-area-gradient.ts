@@ -18,7 +18,14 @@ import { IV_CHART_IMPORTS, IvChartConfig } from '@inlaylab/ivorie/chart';
         <iv-chart [config]="config">
           <svg ivAreaChart [data]="data" [margin]="{ left: 12, right: 12 }">
             <g ivCartesianGrid [vertical]="false" />
-            <g ivXAxis dataKey="month" [tickLine]="false" [axisLine]="false" [tickMargin]="8" [tickFormatter]="short" />
+            <g
+              ivXAxis
+              dataKey="month"
+              [tickLine]="false"
+              [axisLine]="false"
+              [tickMargin]="8"
+              [tickFormatter]="short"
+            />
             <defs>
               <linearGradient id="gradient-fill-desktop" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stop-color="var(--color-desktop)" stop-opacity="0.8" />
@@ -29,8 +36,22 @@ import { IV_CHART_IMPORTS, IvChartConfig } from '@inlaylab/ivorie/chart';
                 <stop offset="95%" stop-color="var(--color-mobile)" stop-opacity="0.1" />
               </linearGradient>
             </defs>
-            <g ivArea dataKey="mobile" curve="natural" fill="url(#gradient-fill-mobile)" stackId="a" />
-            <g ivArea dataKey="desktop" curve="natural" fill="url(#gradient-fill-desktop)" stackId="a" />
+            <g
+              ivArea
+              dataKey="mobile"
+              curve="natural"
+              [fillOpacity]="0.4"
+              fill="url(#gradient-fill-mobile)"
+              stackId="a"
+            />
+            <g
+              ivArea
+              dataKey="desktop"
+              curve="natural"
+              [fillOpacity]="0.4"
+              fill="url(#gradient-fill-desktop)"
+              stackId="a"
+            />
           </svg>
           <iv-chart-tooltip [cursor]="false" />
         </iv-chart>
@@ -41,7 +62,9 @@ import { IV_CHART_IMPORTS, IvChartConfig } from '@inlaylab/ivorie/chart';
             <div class="flex items-center gap-2 leading-none font-medium">
               Trending up by 5.2% this month <ng-icon [svg]="trendingUp" size="16" />
             </div>
-            <div class="text-muted-foreground flex items-center gap-2 leading-none">January - June 2024</div>
+            <div class="text-muted-foreground flex items-center gap-2 leading-none">
+              January - June 2024
+            </div>
           </div>
         </div>
       </iv-card-footer>

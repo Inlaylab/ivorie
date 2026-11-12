@@ -21,6 +21,7 @@ import {
   IvChartActive,
   IvChartDatum,
   IvChartLegendItem,
+  IvChartMargin,
   IvChartPayload,
   IvSeriesItem,
   IvTickFormatter,
@@ -30,12 +31,12 @@ import {
 import { IvChartLabel, ivFinite, ivLabelContext } from './chart-label';
 import {
   ivMarkupOrder,
+  ivNiceTicks,
   ivPercent,
   ivPolarPoint,
   ivSideAnchor,
   ivStack,
   ivTemplateAttribute,
-  ivValueDomain,
 } from './scales';
 import {
   IV_CHART_ROOT_CLASSES,
@@ -134,6 +135,8 @@ export abstract class IvPolarChart extends IvChartRoot {
   readonly data = input<readonly IvChartDatum[]>([]);
   readonly innerRadius = input<number | string>(0);
   readonly outerRadius = input<number | string>('80%');
+  /** Space around the chart, in px (Recharts' 5 each). Negative values grow the chart. */
+  readonly margin = input<IvChartMargin>({});
   readonly ariaLabel = input('');
   readonly class = input('');
   abstract readonly startAngle: InputSignal<number>;
@@ -148,24 +151,31 @@ export abstract class IvPolarChart extends IvChartRoot {
   private readonly radiusDomains = signal<[number, number][]>([]);
   private readonly memo = new Map<string, Signal<([number, number] | undefined)[]>>();
 
-  /** The box left for the chart once a legend takes its space. */
+  /** The box left for the chart: the size less the margin and the legend's space. */
   private readonly box = computed(() => {
     const { width, height } = this.chart.size();
-    const { top, bottom } = this.chart.reserve();
-    return { top, width, height: Math.max(0, height - top - bottom) };
+    const legend = this.chart.reserve();
+    const m = this.margin();
+    const top = ivFinite(m.top ?? MARGIN) + legend.top;
+    const left = ivFinite(m.left ?? MARGIN);
+    const right = ivFinite(m.right ?? MARGIN);
+    const bottom = ivFinite(m.bottom ?? MARGIN) + legend.bottom;
+    return {
+      top,
+      left,
+      width: Math.max(0, width - left - right),
+      height: Math.max(0, height - top - bottom),
+    };
   });
 
   protected readonly center = computed(() => {
-    const { top, width, height } = this.box();
-    return {
-      cx: MARGIN + Math.max(0, width - 2 * MARGIN) / 2,
-      cy: top + MARGIN + Math.max(0, height - 2 * MARGIN) / 2,
-    };
+    const { top, left, width, height } = this.box();
+    return { cx: left + width / 2, cy: top + height / 2 };
   });
 
   protected readonly maxRadius = computed(() => {
     const { width, height } = this.box();
-    return Math.max(0, Math.min(width - 2 * MARGIN, height - 2 * MARGIN) / 2);
+    return Math.min(width, height) / 2;
   });
 
   protected readonly radius = computed(() => {
@@ -409,9 +419,12 @@ export abstract class IvPolarChart extends IvChartRoot {
     for (const pie of this.pies()) {
       for (const item of pie.items?.() ?? []) {
         const raw = item.payload[pie.nameKey ?? 'name'];
-        const name = typeof raw === 'string' || typeof raw === 'number' ? String(raw) : pie.key;
-        if (seen.has(name)) continue;
-        seen.add(name);
+        const named = typeof raw === 'string' || typeof raw === 'number';
+        const name = named ? String(raw) : pie.key;
+        // Rings share names (stacked pies); a sector with no name is its own entry.
+        const id = named ? `name:${name}` : `row:${pie.key}:${item.index}`;
+        if (seen.has(id)) continue;
+        seen.add(id);
         items.push({ key: pie.key, name, color: item.fill, row: item.payload });
       }
     }
@@ -474,13 +487,25 @@ export class IvRadarChart extends IvPolarChart {
   readonly endAngle = input(-270);
   protected readonly name = 'Radar';
 
+  /** Recharts' radius axis: 5 round ticks from 0 (or the fixed domain); the last one is the outer ring. */
+  private readonly niceTicks = computed(() => {
+    const fixed = this.radiusDomain();
+    if (fixed && fixed.every(Number.isFinite) && fixed[0] !== fixed[1]) return null;
+    let lo = 0;
+    let hi = 0;
+    for (const [a, b] of this.extents()) {
+      lo = Math.min(lo, a, b);
+      hi = Math.max(hi, a, b);
+    }
+    return ivNiceTicks(lo, hi, RADIUS_TICKS + 1);
+  });
+
   protected valueScale() {
     const { inner, outer } = this.radius();
-    const fixed = this.radiusDomain();
-    const domain =
-      fixed && fixed.every(Number.isFinite) && fixed[0] !== fixed[1]
-        ? fixed
-        : ivValueDomain(this.extents(), RADIUS_TICKS);
+    const ticks = this.niceTicks();
+    const domain: [number, number] = ticks
+      ? [ticks[0], ticks[ticks.length - 1]]
+      : (this.radiusDomain() as [number, number]);
     return scaleLinear().domain(domain).range([inner, outer]);
   }
 
@@ -504,7 +529,8 @@ export class IvRadarChart extends IvPolarChart {
 
   protected radiusTicksOf(): IvPolarTick[] {
     const value = this.value();
-    return value.ticks(RADIUS_TICKS).map((t, index) => ({ coord: value(t), value: t, index }));
+    const ticks = this.niceTicks() ?? value.ticks(RADIUS_TICKS);
+    return ticks.map((t, index) => ({ coord: value(t), value: t, index }));
   }
 }
 
@@ -554,27 +580,14 @@ export class IvRadialChart extends IvPolarChart {
   }
 }
 
-/** Rings at the radius ticks and spokes at the angle ticks. `class` goes on each ring, like Recharts. */
+/** Rings at the radius ticks, then spokes at the angle ticks. `class` goes on each ring and spoke, like Recharts. */
 @Component({
   selector: 'g[ivPolarGrid]',
-  // `[attr.class]` replaces the user's static class on the group: it belongs to the rings.
+  // `[attr.class]` replaces the user's static class on the group: it belongs to the rings and spokes.
   host: { 'data-slot': 'chart-polar-grid', '[attr.class]': '"iv-chart-polar-grid"' },
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @let c = ctx.center();
-    @if (radialLines()) {
-      @for (line of spokes(); track $index) {
-        <svg:line
-          data-slot="chart-polar-grid-line"
-          fill="none"
-          [attr.x1]="line.x1"
-          [attr.y1]="line.y1"
-          [attr.x2]="line.x2"
-          [attr.y2]="line.y2"
-          [attr.stroke]="stroke() ?? null"
-        />
-      }
-    }
     <svg:g data-slot="chart-polar-grid-concentric">
       @for (ring of rings(); track $index) {
         @if (gridType() === 'circle') {
@@ -598,6 +611,20 @@ export class IvRadialChart extends IvPolarChart {
         }
       }
     </svg:g>
+    @if (radialLines()) {
+      @for (line of spokes(); track $index) {
+        <svg:line
+          data-slot="chart-polar-grid-line"
+          fill="none"
+          [attr.class]="ringClass() || null"
+          [attr.x1]="line.x1"
+          [attr.y1]="line.y1"
+          [attr.x2]="line.x2"
+          [attr.y2]="line.y2"
+          [attr.stroke]="stroke() ?? null"
+        />
+      }
+    }
   `,
 })
 export class IvPolarGrid {
@@ -748,6 +775,7 @@ export class IvPolarAngleAxis {
       <svg:line
         class="stroke-muted-foreground"
         fill="none"
+        [style.stroke]="stroke() ?? null"
         [attr.x1]="l.x1"
         [attr.y1]="l.y1"
         [attr.x2]="l.x2"
@@ -762,6 +790,7 @@ export class IvPolarAngleAxis {
             [attr.y]="tick.y"
             [attr.text-anchor]="anchor()"
             [attr.transform]="tick.transform"
+            [style.fill]="stroke() ?? null"
           >
             {{ tick.label }}
           </svg:text>
@@ -781,6 +810,8 @@ export class IvPolarRadiusAxis {
   /** The spoke the axis lies on, in degrees. */
   readonly angle = input(0);
   readonly orientation = input<'left' | 'right' | 'middle'>('right');
+  /** Axis line and tick text color (Recharts' `stroke`). Default: muted. */
+  readonly stroke = input<string>();
   /** Radar: a fixed value domain. Default: 0 to the largest value, rounded out. */
   readonly domain = input<[number, number]>();
   readonly tickFormatter = input<IvTickFormatter>();

@@ -17,7 +17,15 @@ import { IV_CHART_IMPORTS, IvChartConfig } from '@inlaylab/ivorie/chart';
       <iv-card-content>
         <iv-chart [config]="config">
           <svg ivBarChart [data]="data" layout="vertical" [margin]="{ left: 0 }">
-            <g ivYAxis dataKey="browser" type="category" [tickLine]="false" [tickMargin]="10" [axisLine]="false" [tickFormatter]="label" />
+            <g
+              ivYAxis
+              dataKey="browser"
+              type="category"
+              [tickLine]="false"
+              [tickMargin]="10"
+              [axisLine]="false"
+              [tickFormatter]="label"
+            />
             <g ivXAxis dataKey="visitors" type="number" hide />
             <g ivBar dataKey="visitors" [radius]="5" />
           </svg>
@@ -28,7 +36,9 @@ import { IV_CHART_IMPORTS, IvChartConfig } from '@inlaylab/ivorie/chart';
         <div class="flex gap-2 leading-none font-medium">
           Trending up by 5.2% this month <ng-icon [svg]="trendingUp" size="16" />
         </div>
-        <div class="text-muted-foreground leading-none">Showing total visitors for the last 6 months</div>
+        <div class="text-muted-foreground leading-none">
+          Showing total visitors for the last 6 months
+        </div>
       </iv-card-footer>
     </iv-card>
   `,

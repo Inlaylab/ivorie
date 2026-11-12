@@ -34,7 +34,7 @@ import { IvRadar } from './radar';
 import { IvRadialBar } from './radial-bar';
 import { IvChartLabel } from './chart-label';
 import { IvChartRoot } from './interaction';
-import { IvChartTooltip, IvChartTooltipContent } from './tooltip';
+import { IvChartTooltip, IvChartTooltipContent, IvChartTooltipItem } from './tooltip';
 import { IvChartLegend } from './legend';
 import { IvActiveShape } from './active-shape';
 
@@ -221,6 +221,7 @@ export const IV_CHART_IMPORTS = [
   IvChartLabel,
   IvChartTooltip,
   IvChartTooltipContent,
+  IvChartTooltipItem,
   IvChartLegend,
   IvActiveShape,
 ] as const;

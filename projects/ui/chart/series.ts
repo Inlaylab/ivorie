@@ -216,7 +216,7 @@ export class IvArea extends IvCartesianSeries {
   readonly strokeWidth = input(1);
   readonly dot = input<boolean | TemplateRef<IvDotContext> | IvDotProps, unknown>(false, { transform: ivDotAttribute });
   readonly fill = input<string>();
-  readonly fillOpacity = input(0.4);
+  readonly fillOpacity = input(0.6);
   readonly stackId = input<string>();
   protected readonly kind = 'area';
   protected stackKey(): string | undefined {

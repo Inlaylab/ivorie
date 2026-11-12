@@ -26,7 +26,14 @@ import { IV_CHART_IMPORTS, IvChartConfig } from '@inlaylab/ivorie/chart';
               [dot]="{ fill: 'var(--color-visitors)' }"
               [activeDot]="{ r: 6 }"
             >
-              <g ivLabelList position="top" [offset]="12" class="fill-foreground" dataKey="browser" [formatter]="label" />
+              <g
+                ivLabelList
+                position="top"
+                [offset]="12"
+                class="fill-foreground"
+                dataKey="browser"
+                [formatter]="label"
+              />
             </g>
           </svg>
           <iv-chart-tooltip [cursor]="false" indicator="line" nameKey="visitors" hideLabel />
@@ -36,7 +43,9 @@ import { IV_CHART_IMPORTS, IvChartConfig } from '@inlaylab/ivorie/chart';
         <div class="flex gap-2 leading-none font-medium">
           Trending up by 5.2% this month <ng-icon [svg]="trendingUp" size="16" />
         </div>
-        <div class="text-muted-foreground leading-none">Showing total visitors for the last 6 months</div>
+        <div class="text-muted-foreground leading-none">
+          Showing total visitors for the last 6 months
+        </div>
       </iv-card-footer>
     </iv-card>
   `,

@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest';
 import {
   IV_CHART_IMPORTS,
   IV_POLAR,
+  IvChartMargin,
   IV_SERIES,
   IvChartConfig,
   IvChartDatum,
@@ -218,6 +219,59 @@ class BareHost {
   data = MONTHS;
 }
 
+// shadcn chart-radar-radius.
+@Component({
+  imports: [IV_CHART_IMPORTS],
+  template: `
+    <iv-chart [config]="config" [initialDimension]="size">
+      <svg ivRadarChart [data]="data">
+        <g ivRadar dataKey="desktop" />
+        <g ivPolarRadiusAxis [angle]="60" tick stroke="var(--foreground)" orientation="middle" />
+      </svg>
+    </iv-chart>
+  `,
+})
+class RadarRadiusHost {
+  config = CONFIG;
+  size = SIZE;
+  data = MONTHS;
+}
+
+@Component({
+  imports: [IV_CHART_IMPORTS],
+  template: `
+    <iv-chart [config]="config" [initialDimension]="size">
+      <svg ivRadarChart [data]="data" [margin]="margin()">
+        <g ivRadar dataKey="desktop" />
+      </svg>
+    </iv-chart>
+  `,
+})
+class RadarMarginHost {
+  config = CONFIG;
+  size = SIZE;
+  data = MONTHS;
+  margin = signal<IvChartMargin>({});
+}
+
+@Component({
+  imports: [IV_CHART_IMPORTS],
+  template: `
+    <iv-chart [config]="config" [initialDimension]="size">
+      <svg ivRadialChart [data]="data" [startAngle]="-90" [endAngle]="380" [innerRadius]="30" [outerRadius]="110">
+        <g ivRadialBar dataKey="visitors" background>
+          <g ivLabelList position="insideStart" dataKey="browser" />
+        </g>
+      </svg>
+    </iv-chart>
+  `,
+})
+class RadialLabelHost {
+  config = CONFIG;
+  size = SIZE;
+  data = BROWSERS;
+}
+
 async function render<T>(type: new () => T, patch?: (host: T) => void) {
   const fixture = TestBed.createComponent(type);
   patch?.(fixture.componentInstance);
@@ -381,9 +435,10 @@ describe('Radar chart', () => {
     expect(d).toMatch(/Z$/);
     const [x, y] = d.slice(1).split(/[LZ]/)[0].split(',').map(Number);
     expect(x).toBeCloseTo(150, 6);
-    // 186 on a 0–400 radius scale over 116px.
-    expect(y).toBeCloseTo(150 - (186 / 400) * 116, 6);
+    // Recharts' 5 nice ticks: 0–320 (max 305) over 116px.
+    expect(y).toBeCloseTo(150 - (186 / 320) * 116, 6);
     expect(polar!.angles()).toEqual({ start: 90, end: -270 });
+    expect(radar[0].getAttribute('fill-opacity')).toBe('0.6');
     expect(el.querySelectorAll('[data-slot="chart-dot"]').length).toBe(6);
     expect(el.innerHTML).not.toContain('NaN');
   });
@@ -393,7 +448,11 @@ describe('Radar chart', () => {
     const grid = el.querySelector('[data-slot="chart-polar-grid"]')!;
     expect(grid.classList.contains('iv-chart-polar-grid')).toBe(true);
     expect(grid.querySelectorAll('line').length).toBe(6);
-    expect(grid.querySelectorAll('path[data-slot="chart-polar-grid-polygon"]').length).toBe(4);
+    // Rings at 80, 160, 240, 320: the last one is the outer radius, as in Recharts.
+    const rings = grid.querySelectorAll('path[data-slot="chart-polar-grid-polygon"]');
+    expect(rings.length).toBe(4);
+    expect(polar!.radiusTicks().map((t) => t.value)).toEqual([0, 80, 160, 240, 320]);
+    expect(polar!.radiusTicks().at(-1)!.coord).toBeCloseTo(polar!.radius().outer, 6);
     expect(polar!.angleKey()).toBe('month');
     const ticks = Array.from(el.querySelectorAll('[data-slot="chart-polar-angle-axis"] text'));
     expect(ticks.map((t) => t.textContent?.trim())).toEqual(MONTHS.map((r) => r['month']));
@@ -407,11 +466,14 @@ describe('Radar chart', () => {
     const grid = el.querySelector('[data-slot="chart-polar-grid"]')!;
     expect(grid.querySelectorAll('circle').length).toBe(4);
     expect(grid.querySelectorAll('path').length).toBe(0);
-    // Like Recharts, `class` goes on each ring (so `first:fill-muted` works), not on the group.
+    // Like Recharts 3, `class` goes on each ring (so `first:fill-muted` works) and spoke, not on the group.
     expect(grid.classList.contains('fill-muted')).toBe(false);
     expect(
-      Array.from(grid.querySelectorAll('circle')).every((c) => c.classList.contains('fill-muted')),
+      Array.from(grid.querySelectorAll('circle, line')).every((c) => c.classList.contains('fill-muted')),
     ).toBe(true);
+    // Spokes draw over the rings (a filled grid keeps its lines).
+    const last = grid.lastElementChild!;
+    expect(last.tagName.toLowerCase()).toBe('line');
   });
 
   it('draws no series and no NaN with no rows', async () => {
@@ -433,7 +495,64 @@ describe('Radar chart', () => {
   });
 });
 
+describe('Polar radius axis', () => {
+  it('labels the nice ticks along its spoke, colored by stroke', async () => {
+    const { el } = await render(RadarRadiusHost);
+    const texts = Array.from(
+      el.querySelectorAll<SVGTextElement>('[data-slot="chart-polar-radius-axis"] text'),
+    );
+    expect(texts.map((t) => t.textContent?.trim())).toEqual(['0', '80', '160', '240', '320']);
+    expect(texts.every((t) => t.getAttribute('text-anchor') === 'middle')).toBe(true);
+    expect(texts[0].style.fill).toBe('var(--foreground)');
+    // Recharts' Radar is opaque unless fillOpacity is set (shadcn's second series).
+    expect(el.querySelector('path[data-slot="chart-radar"]')!.getAttribute('fill-opacity')).toBe('1');
+    expect(texts[1].getAttribute('transform')).toContain('rotate(30,');
+  });
+});
+
+describe('Polar margin', () => {
+  it('fits the center and radii into the box the margin leaves (Recharts margin)', async () => {
+    const { fixture } = await render(RadarMarginHost);
+    const ctx = () =>
+      fixture.debugElement
+        .query((d) => d.attributes['ivRadarChart'] !== undefined)
+        .injector.get(IV_POLAR);
+    // 300 × 300, 5px each side: center 150, max radius 145.
+    expect(ctx().center()).toEqual({ cx: 150, cy: 150 });
+    expect(ctx().maxRadius()).toBe(145);
+    // shadcn chart-radar-legend: top -40, bottom -10, left 0, right 0.
+    fixture.componentInstance.margin.set({ top: -40, bottom: -10, left: 0, right: 0 });
+    await fixture.whenStable();
+    expect(ctx().center()).toEqual({ cx: 150, cy: 135 });
+    expect(ctx().maxRadius()).toBe(150);
+    expect(ctx().radius().outer).toBeCloseTo(120, 6);
+  });
+});
+
 describe('Radial chart', () => {
+  it('runs insideStart labels along each ring from the bar start (Recharts radial label)', async () => {
+    const { el, series } = await render(RadialLabelHost);
+    const items = series('ivRadialBar')[0].items();
+    const texts = Array.from(el.querySelectorAll('[data-slot="chart-label-list"] text'));
+    expect(texts.map((t) => t.textContent?.trim())).toEqual(BROWSERS.map((r) => r['browser']));
+    const ids = new Set<string>();
+    texts.forEach((t, i) => {
+      const ref = t.querySelector('textPath')!.getAttribute('href')!;
+      const path = el.querySelector<SVGPathElement>(`path[id="${ref.slice(1)}"]`)!;
+      expect(path).not.toBeNull();
+      ids.add(ref);
+      const d = path.getAttribute('d')!;
+      expect(d).not.toContain('NaN');
+      // Starts 5° past the start angle (-90°) on the ring's middle radius, sweeping counter-clockwise.
+      const r = (items[i].innerRadius! + items[i].outerRadius!) / 2;
+      const [x, y] = d.slice(1).split('A')[0].split(',').map(Number);
+      expect(x).toBeCloseTo(150 + r * Math.cos((85 * Math.PI) / 180), 3);
+      expect(y).toBeCloseTo(150 + r * Math.sin((85 * Math.PI) / 180), 3);
+      expect(d).toContain(`A${r},${r},0,1,0,`);
+    });
+    expect(ids.size).toBe(5);
+  });
+
   it('draws an arc per row on its own ring, with muted tracks', async () => {
     const { el, series } = await render(RadialHost);
     expect(radialBars(el).length).toBe(5);

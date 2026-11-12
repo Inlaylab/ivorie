@@ -20,7 +20,13 @@ import { IV_CHART_IMPORTS, IvChartConfig } from '@inlaylab/ivorie/chart';
             <g ivCartesianGrid [vertical]="false" />
             <g ivLine dataKey="visitors" curve="natural" [strokeWidth]="2" [dot]="colorDot">
               <ng-template #colorDot let-dot>
-                <svg:circle r="5" [attr.cx]="dot.cx" [attr.cy]="dot.cy" [attr.fill]="dot.payload.fill" [attr.stroke]="dot.payload.fill" />
+                <svg:circle
+                  r="5"
+                  [attr.cx]="dot.cx"
+                  [attr.cy]="dot.cy"
+                  [attr.fill]="dot.payload.fill"
+                  [attr.stroke]="dot.payload.fill"
+                />
               </ng-template>
             </g>
           </svg>
@@ -31,7 +37,9 @@ import { IV_CHART_IMPORTS, IvChartConfig } from '@inlaylab/ivorie/chart';
         <div class="flex gap-2 leading-none font-medium">
           Trending up by 5.2% this month <ng-icon [svg]="trendingUp" size="16" />
         </div>
-        <div class="text-muted-foreground leading-none">Showing total visitors for the last 6 months</div>
+        <div class="text-muted-foreground leading-none">
+          Showing total visitors for the last 6 months
+        </div>
       </iv-card-footer>
     </iv-card>
   `,

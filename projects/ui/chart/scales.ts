@@ -76,6 +76,46 @@ export function ivValueDomain(extents: [number, number][], tickCount = 5): [numb
   return [min, max];
 }
 
+/** Rounds float noise away (Recharts does this math with decimal.js). */
+const exact = (n: number) => Number(n.toPrecision(12));
+
+/** Recharts' getFormatStep: a round step near `rough` (1, 1.5, 2, … × 10^n). */
+function niceStep(rough: number, correction: number): number {
+  if (!(rough > 0)) return 0;
+  const digits = Math.floor(Math.log10(rough)) + 1;
+  const unit = 10 ** digits;
+  const ratio = exact(rough / unit);
+  const scale = digits !== 1 ? 0.05 : 0.1;
+  return exact((Math.ceil(exact(ratio / scale)) + correction) * scale * unit);
+}
+
+/**
+ * Recharts' getNiceTickValues: exactly `count` evenly spaced round ticks that cover `[lo, hi]`,
+ * through 0 when the range holds it. The first and last tick are the axis domain.
+ */
+export function ivNiceTicks(lo: number, hi: number, count = 5, correction = 0): number[] {
+  count = Math.max(2, count);
+  if (!Number.isFinite(lo) || !Number.isFinite(hi) || lo >= hi) {
+    return scaleLinear().domain(lo === hi && Number.isFinite(lo) ? [Math.min(0, lo), Math.max(1, lo)] : [0, 1]).nice(count).ticks(count);
+  }
+  const step = niceStep((hi - lo) / (count - 1), correction);
+  if (!(step > 0)) return [lo, hi];
+  let middle = 0;
+  if (!(lo <= 0 && hi >= 0)) {
+    middle = (lo + hi) / 2;
+    middle = exact(middle - (middle % step));
+  }
+  let below = Math.ceil(exact((middle - lo) / step));
+  let up = Math.ceil(exact((hi - middle) / step));
+  const total = below + up + 1;
+  if (total > count) return ivNiceTicks(lo, hi, count, correction + 1);
+  if (total < count) {
+    if (hi > 0) up += count - total;
+    else below += count - total;
+  }
+  return Array.from({ length: below + up + 1 }, (_, i) => exact(middle + (i - below) * step));
+}
+
 /** The center of row `index` on a category scale, or `undefined` when it is not in the domain. */
 export function ivBandCenter(scale: ScaleBand<string> | ScalePoint<string>, index: number): number | undefined {
   const start = scale(String(index));

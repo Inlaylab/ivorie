@@ -16,12 +16,24 @@ import { IV_CHART_IMPORTS, IvChartConfig } from '@inlaylab/ivorie/chart';
       </iv-card-header>
       <iv-card-content>
         <iv-chart [config]="config">
-          <svg ivAreaChart [data]="data" [margin]="{ left: 12, right: 12, top: 12 }" stackOffset="expand">
+          <svg
+            ivAreaChart
+            [data]="data"
+            [margin]="{ left: 12, right: 12, top: 12 }"
+            stackOffset="expand"
+          >
             <g ivCartesianGrid [vertical]="false" />
-            <g ivXAxis dataKey="month" [tickLine]="false" [axisLine]="false" [tickMargin]="8" [tickFormatter]="short" />
+            <g
+              ivXAxis
+              dataKey="month"
+              [tickLine]="false"
+              [axisLine]="false"
+              [tickMargin]="8"
+              [tickFormatter]="short"
+            />
             <g ivArea dataKey="other" curve="natural" [fillOpacity]="0.1" stackId="a" />
-          <g ivArea dataKey="mobile" curve="natural" stackId="a" />
-          <g ivArea dataKey="desktop" curve="natural" stackId="a" />
+            <g ivArea dataKey="mobile" curve="natural" [fillOpacity]="0.4" stackId="a" />
+            <g ivArea dataKey="desktop" curve="natural" [fillOpacity]="0.4" stackId="a" />
           </svg>
           <iv-chart-tooltip [cursor]="false" indicator="line" />
         </iv-chart>
@@ -32,7 +44,9 @@ import { IV_CHART_IMPORTS, IvChartConfig } from '@inlaylab/ivorie/chart';
             <div class="flex items-center gap-2 leading-none font-medium">
               Trending up by 5.2% this month <ng-icon [svg]="trendingUp" size="16" />
             </div>
-            <div class="text-muted-foreground flex items-center gap-2 leading-none">January - June 2024</div>
+            <div class="text-muted-foreground flex items-center gap-2 leading-none">
+              January - June 2024
+            </div>
           </div>
         </div>
       </iv-card-footer>

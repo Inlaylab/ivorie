@@ -17,7 +17,10 @@ const DAYS: Record<string, number> = { '90d': 90, '30d': 30, '7d': 7 };
           <iv-card-description>Showing total visitors for the last 3 months</iv-card-description>
         </div>
         <iv-select [(value)]="timeRange" placeholder="Last 3 months">
-          <iv-select-trigger class="hidden w-[160px] rounded-lg sm:ml-auto sm:flex" aria-label="Select a value" />
+          <iv-select-trigger
+            class="hidden w-[160px] rounded-lg sm:ml-auto sm:flex"
+            aria-label="Select a value"
+          />
           <iv-select-content class="rounded-xl">
             <iv-select-item value="90d" class="rounded-lg">Last 3 months</iv-select-item>
             <iv-select-item value="30d" class="rounded-lg">Last 30 days</iv-select-item>
@@ -48,8 +51,20 @@ const DAYS: Record<string, number> = { '90d': 90, '30d': 30, '7d': 7 };
               [minTickGap]="32"
               [tickFormatter]="day"
             />
-            <g ivArea dataKey="mobile" curve="natural" fill="url(#interactive-fill-mobile)" stackId="a" />
-            <g ivArea dataKey="desktop" curve="natural" fill="url(#interactive-fill-desktop)" stackId="a" />
+            <g
+              ivArea
+              dataKey="mobile"
+              curve="natural"
+              fill="url(#interactive-fill-mobile)"
+              stackId="a"
+            />
+            <g
+              ivArea
+              dataKey="desktop"
+              curve="natural"
+              fill="url(#interactive-fill-desktop)"
+              stackId="a"
+            />
           </svg>
           <iv-chart-tooltip [cursor]="false" [labelFormatter]="day" indicator="dot" />
           <iv-chart-legend />
@@ -170,5 +185,9 @@ export default class ChartAreaInteractive {
 
   /** Dates are UTC days: format them in UTC, so server and browser agree. */
   protected readonly day = (value: string) =>
-    new Date(value).toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' });
+    new Date(value).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      timeZone: 'UTC',
+    });
 }

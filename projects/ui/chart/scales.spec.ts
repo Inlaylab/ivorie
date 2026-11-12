@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { curveLinear, curveMonotoneX, curveNatural, curveStep } from 'd3-shape';
-import { ivCurve, ivPercent, ivStack, ivValueDomain } from './scales';
+import { ivCurve, ivNiceTicks, ivPercent, ivStack, ivValueDomain } from './scales';
 
 const rows = [
   { month: 'January', desktop: 186, mobile: 80 },
@@ -67,5 +67,28 @@ describe('ivPercent', () => {
     expect(ivPercent(-4, 200)).toBe(0);
     expect(ivPercent('-10%', 200)).toBe(0);
     expect(ivPercent('abc', 200)).toBe(0);
+  });
+});
+
+describe('ivNiceTicks (Recharts getNiceTickValues)', () => {
+  it('gives exactly count round ticks from 0 that cover the max', () => {
+    // shadcn chart-radar-default (max 305) and chart-radar-lines-only (max 207), as Recharts 3.8 draws them.
+    expect(ivNiceTicks(0, 305, 5)).toEqual([0, 80, 160, 240, 320]);
+    expect(ivNiceTicks(0, 207, 5)).toEqual([0, 55, 110, 165, 220]);
+    expect(ivNiceTicks(0, 100, 5)).toEqual([0, 25, 50, 75, 100]);
+  });
+
+  it('centers a range away from 0, and covers negatives', () => {
+    expect(ivNiceTicks(90, 275, 5)).toEqual([55, 110, 165, 220, 275]);
+    const ticks = ivNiceTicks(-40, 60, 5);
+    expect(ticks.length).toBe(5);
+    expect(ticks[0]).toBeLessThanOrEqual(-40);
+    expect(ticks[4]).toBeGreaterThanOrEqual(60);
+    expect(ticks).toContain(0);
+  });
+
+  it('never returns NaN for empty or flat data', () => {
+    for (const ticks of [ivNiceTicks(0, 0), ivNiceTicks(NaN, 3), ivNiceTicks(5, 5)])
+      expect(ticks.every(Number.isFinite)).toBe(true);
   });
 });
