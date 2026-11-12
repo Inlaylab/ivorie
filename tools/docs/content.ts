@@ -42,12 +42,13 @@ export function parseFrontmatter(md: string, file: string): { data: Frontmatter;
     return raw[key];
   };
   const section = need('section');
-  if (section !== 'guide' && section !== 'component') {
-    throw new Error(`${file}: section must be guide or component`);
+  if (section !== 'guide' && section !== 'component' && section !== 'charts') {
+    throw new Error(`${file}: section must be guide, component or charts`);
   }
   const data: Frontmatter = { title: need('title'), description: need('description'), section };
+  // Chart gallery pages need neither: no entry, no main demo, sorted by title.
   if (section === 'component') data.entry = need('entry');
-  else {
+  else if (section === 'guide') {
     data.order = Number(need('order'));
     if (Number.isNaN(data.order)) throw new Error(`${file}: order must be a number`);
   }

@@ -37,6 +37,9 @@ init options:
   --font-heading <name> Override the preset heading font (inherit = same as font)
   --radius <name>       Override the preset radius (default, none, small, medium, large)
   --icon-library <name> Override the preset icons (lucide, tabler, phosphor, hugeicons, remix)
+  --theme <name>        Accent color over the base color (base = none; blue, rose, emerald, …)
+  --chart-color <name>  Chart colors (theme = follow --theme, base = greys, or an accent)
+  --menu-accent <name>  Menu highlight (subtle, bold = primary color)
   --force               Run again over an existing setup
   -y, --yes             No prompts, use the defaults
 
@@ -72,6 +75,9 @@ const OPTIONS = {
     'font-heading': { type: 'string' },
     radius: { type: 'string' },
     'icon-library': { type: 'string' },
+    theme: { type: 'string' },
+    'chart-color': { type: 'string' },
+    'menu-accent': { type: 'string' },
     force: { type: 'boolean' },
     yes: { type: 'boolean', short: 'y' },
   },
@@ -132,6 +138,9 @@ async function main(argv: string[]): Promise<number> {
       fontHeading: v['font-heading'] as string | undefined,
       radius: v['radius'] as string | undefined,
       iconLibrary: v['icon-library'] as string | undefined,
+      theme: v['theme'] as string | undefined,
+      chartColor: v['chart-color'] as string | undefined,
+      menuAccent: v['menu-accent'] as string | undefined,
       force: v['force'] === true,
       yes: v['yes'] === true,
     });

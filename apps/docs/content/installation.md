@@ -75,7 +75,7 @@ In `src/index.html`, use the class that matches the style file:
 </body>
 ```
 
-Nova is one of ten styles: `vega`, `nova`, `maia`, `luma`, `rhea`, `glass`, `brutal`, `aurora`, `bento` and `mono`. See [Theming](docs/theming).
+Nova is one of eleven styles: `vega`, `nova`, `maia`, `luma`, `rhea`, `lyra`, `mira`, `sera`, `glass`, `bento` and `mono`. See [Theming](docs/theming).
 
 ## Use a component
 

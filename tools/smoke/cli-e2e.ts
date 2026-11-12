@@ -172,6 +172,19 @@ try {
   run('npx ivorie apply default', presetApp);
   run('npx ng build', presetApp);
   look({ primary: /--primary:\s*oklch\(0?\.205 0 0\)/, style: /\.style-nova/, body: /<body[^>]*class="[^"]*style-nova/ }, 'apply default');
+  // An accent preset: blue primary, emerald charts, bold menu accent (= primary), on sera.
+  run('npx ivorie init --yes --force --theme blue --chart-color emerald --menu-accent bold --style sera', presetApp);
+  run('npx ng build', presetApp);
+  look(
+    {
+      primary: /--primary:\s*oklch\(0?\.488 0?\.243 264\.376\)/,
+      chart: /--chart-1:\s*oklch\(0?\.845 0?\.143 164\.978\)/,
+      accent: /--accent:\s*oklch\(0?\.488 0?\.243 264\.376\)/,
+      style: /\.style-sera/,
+      body: /<body[^>]*class="[^"]*style-sera/,
+    },
+    'init --theme',
+  );
 
   // 4. A tabler app: the set is copied, wired into app.config.ts and the app builds with @ng-icons installed.
   const tablerApp = newApp('tabler-app', cliMajor);

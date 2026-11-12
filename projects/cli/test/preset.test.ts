@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { DEFAULT_PRESET, RADII, checkPreset, decodePreset, encodePreset, resolvePreset } from '../src/preset.ts';
+import { DEFAULT_PRESET, RADII, chartSource, checkPreset, decodePreset, encodePreset, lookVars, resolvePreset } from '../src/preset.ts';
 import { PRESET_GOLDEN } from './preset.fixture.ts';
 import type { RegistryIndex } from '../src/registry.ts';
 
@@ -86,4 +86,31 @@ test('iconLibrary: left out of the code when lucide, kept otherwise, checked', (
   assert.equal(resolvePreset(tabler, index).iconLibrary, 'tabler');
   const bad = encodePreset({ ...DEFAULT_PRESET, iconLibrary: 'feather' });
   assert.throws(() => resolvePreset(bad, index), /unknown iconLibrary "feather"/);
+});
+
+test('accent fields: left out of the code at their defaults, kept and checked otherwise', () => {
+  const withAccents = { ...index, accents: ['blue', 'rose'] } satisfies RegistryIndex;
+  // Old codes (no accent fields) decode to the defaults.
+  assert.deepEqual(decodePreset(CODE_1_1), { ...DEFAULT_PRESET, style: 'maia' });
+  const p = { ...DEFAULT_PRESET, theme: 'blue', chartColor: 'rose', menuAccent: 'bold' };
+  assert.deepEqual(resolvePreset(encodePreset(p), withAccents), p);
+  assert.throws(() => checkPreset({ ...DEFAULT_PRESET, theme: 'teal' }, withAccents), /unknown theme "teal" \(available: base, blue, rose\)/);
+  assert.throws(() => checkPreset({ ...DEFAULT_PRESET, chartColor: 'teal' }, withAccents), /unknown chartColor "teal"/);
+  assert.throws(() => checkPreset({ ...DEFAULT_PRESET, menuAccent: 'loud' }, withAccents), /unknown menuAccent "loud"/);
+});
+
+test('lookVars: accent over base, charts from their source, bold menu accent', () => {
+  const base = { '--primary': 'p0', '--primary-foreground': 'f0', '--accent': 'a0', '--accent-foreground': 'af0', '--chart-1': 'g1', '--chart-2': 'g2', '--chart-3': 'g3', '--chart-4': 'g4', '--chart-5': 'g5' };
+  const blue = { '--primary': 'blue', '--primary-foreground': 'white', '--chart-1': 'b1', '--chart-2': 'b2', '--chart-3': 'b3', '--chart-4': 'b4', '--chart-5': 'b5' };
+  const rose = { '--chart-1': 'r1', '--chart-2': 'r2', '--chart-3': 'r3', '--chart-4': 'r4', '--chart-5': 'r5' };
+  const subtle = lookVars(base, blue, base, 'subtle');
+  assert.equal(subtle['--primary'], 'blue');
+  assert.equal(subtle['--chart-1'], 'g1');
+  assert.equal(subtle['--accent'], 'a0');
+  const bold = lookVars(base, blue, rose, 'bold');
+  assert.equal(bold['--chart-5'], 'r5');
+  assert.equal(bold['--accent'], 'blue');
+  assert.equal(bold['--accent-foreground'], 'white');
+  assert.equal(chartSource({ theme: 'blue', chartColor: 'theme' }), 'blue');
+  assert.equal(chartSource({ theme: 'blue', chartColor: 'base' }), 'base');
 });

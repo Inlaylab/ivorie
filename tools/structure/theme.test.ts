@@ -54,7 +54,7 @@ test('theme has the shadcn accordion keyframes', () => {
   assert.ok(theme.includes('--accordion-panel-height'));
 });
 
-const SHADCN_STYLES = ['vega', 'nova', 'maia', 'luma', 'rhea'];
+const SHADCN_STYLES = ['vega', 'nova', 'maia', 'luma', 'rhea', 'lyra', 'mira', 'sera'];
 
 test('every shadcn style has a source file and a package export', () => {
   const pkg = JSON.parse(readFileSync('projects/ui/package.json', 'utf8'));
@@ -65,7 +65,7 @@ test('every shadcn style has a source file and a package export', () => {
 });
 
 // Hand-made styles: tools/styles/own/<name>.css, derived over a synced style by tools/styles/derive.ts.
-const OWN_STYLES = ['glass', 'brutal', 'aurora', 'bento', 'mono'];
+const OWN_STYLES = ['glass', 'bento', 'mono'];
 
 test('every own style has a source file and a package export', () => {
   const pkg = JSON.parse(readFileSync('projects/ui/package.json', 'utf8'));

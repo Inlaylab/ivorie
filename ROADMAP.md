@@ -1,6 +1,6 @@
 # Ivorie — Roadmap
 
-Single source for plan, status and next work. Updated 2026-11-09.
+Single source for plan, status and next work. Updated 2026-11-11.
 
 ## Goal
 
@@ -20,9 +20,10 @@ More detail: [PLAN](docs/PLAN.md) · [ARCHITECTURE](docs/ARCHITECTURE.md) · [CO
 
 ## Status
 
-**Next:** release 1.4.1 = Phase 16 + Phase 17 (docs redesign) in one commit on `release/v1.4.1`. Exit gates green: check, smoke:pack, smoke:cli, browser matrix; Phase 17 T5 done (detector clean, Lighthouse a11y 100 on Home, Playground, Blocks, review light/dark at 390/768/1440). Left: PR, merge, tag `v1.4.1`, publish (ask first).
-Then Phase 18 (1.5.0, glass material and dials): expand the outline into tasks and get an OK.
-Shipped: 1.0.0, 1.1.0, 1.2.0, 1.4.0 (both packages; 1.3.0 never published, its icon libraries shipped in 1.4.0). Docs initial bundle is ~800 kB, mostly lucide icons (backlog: docs drop `@lucide/angular`).
+**Next:** release 1.5.0 = Phase 15 (charts, dashboard blocks, accents, style swap, glass) in one commit on `release/v1.5.0`, based on `main` (1.4.1). T1–T9 done; T11–T13 (added 2026-11-13) done. Left: re-run the exit gate, fold into the release commit (force-push: ask first), PR, merge, tag `v1.5.0`, publish (ask first).
+Phase 16 + Phase 17 (1.4.1, look-token fix and docs redesign): merged to `main`. Left: tag `v1.4.1`, publish (ask first).
+Phase 18 keeps density and glass-only dials for 1.6.0; the glass rework and the accent and chart-color dials moved into 1.5.0.
+Shipped: 1.0.0, 1.1.0, 1.2.0, 1.4.0 (both packages; 1.3.0 never published, its icon libraries shipped in 1.4.0). Tag `v1.4.0` is missing on the remote. Docs initial bundle is ~800 kB, mostly lucide icons (backlog: docs drop `@lucide/angular`).
 
 | #   | Release | What                                      | Status   |
 | --- | ------- | ----------------------------------------- | -------- |
@@ -32,11 +33,11 @@ Shipped: 1.0.0, 1.1.0, 1.2.0, 1.4.0 (both packages; 1.3.0 never published, its i
 | 10  | 1.4.0   | Styles, data table, blocks                | done     |
 | 16  | 1.4.1   | Fix: radius and font follow the pick      | publish  |
 | 17  | 1.4.1   | Docs redesign: Home, Playground, Blocks   | publish  |
-| 18  | 1.5.0   | Glass material and new dials              | planned  |
-| 15  | 1.6.0   | Charts                                    | planned  |
+| 15  | 1.5.0   | Charts, dashboards, accents, styles       | release  |
+| 18  | 1.6.0   | More dials: density, glass thickness      | planned  |
 | 14  | 1.7.0   | AI-ready: AGENTS.md and MCP server        | planned  |
 
-Order is by benefit to users. New features ship as minor releases (1.x.0). A patch (1.x.y) is for bug fixes only.
+Order is by benefit to users; features come first. New features ship as minor releases (1.x.0). A patch (1.x.y) is for bug fixes only.
 
 ## Must do (now)
 
@@ -279,7 +280,7 @@ Branch `feat/v1.4.0`. Tasks are OK'd. One commit per feature (T1–T3), then the
 
 **Goal:** more than shadcn, zard and ng-primitives. New looks, a data table and ready-made blocks that work together: blocks use the data table, and every block and component follows every style. Fast to render, easy to add, easy to extend, easy to update.
 
-### T1. Styles: glass, brutal, aurora, bento, mono
+### T1. Styles: glass, brutal, aurora, bento, mono (aurora and brutal removed in 1.5.0)
 
 - Each new style is a small override file `tools/styles/own/<name>.css` with `/* @base <synced style> */`. `node tools/styles/derive.ts <name>|--all` writes `projects/ui/styles/style-<name>.css`: an own rule replaces the base rule for its hook. Re-derive after every style sync.
 - Glass (on nova): frosted panes over a vivid color field, solid with no `backdrop-filter` or with reduced transparency. Brutal (on vega): ink frames, hard shadows, a loud accent. Aurora (on vega): gradient edges and glow. Bento (on maia): tonal tiles, no outlines. Mono (on nova): monospace, square, flat.
@@ -352,7 +353,7 @@ Rule for every task: the site material styles the site chrome only. Previews (ho
 
 - Announcement pill: latest release, links to `/roadmap`.
 - Hero: H1, one line, two CTAs (Get started, Open the playground), install tabs (Package / Copy the source) with copy.
-- Wall of live cards: real components, 15 cards (the old Dashboard, Sign in, Settings, Team and Checkout scenes merged in). Columns 4/3/2/1 at 1440/1024/768/390, bottom fade, "Browse all components" over it.
+- Wall of live cards: real components, 17 cards (the old Dashboard, Sign in, Settings, Team and Checkout scenes merged in). Columns 4/3/2/1 at 1440/1024/768/390, bottom fade, "Browse all components" over it.
 - Inline style switcher above the wall: one pill per style. It re-skins only the wall and its overlays (`PlaygroundLook.attach`). No preset command or copy button on Home (changed 2026-11-11). Replaces today's side rail.
 - Package vs source: two short panes. Then the footer.
 - The wall cards live in one component, reused by T3's Wall scene.
@@ -384,15 +385,15 @@ Rule for every task: the site material styles the site chrome only. Previews (ho
 
 ---
 
-## Phase 18 — Release 1.5.0: Glass material and new dials
+## Phase 18 — Release 1.6.0: More theme dials
 
 Branch `feat/glass-material`. Outline: expand into tasks and get an OK first.
 
-- **Glass style rework** (`tools/styles/own/glass.css`): thickness ladder, rim/edge shadow stack, blur tokens, ink-pane primary button, float-in motion. Credit solid-glass (MIT) in NOTICE.md.
-- **New dials:** accent, chart color, density; glass-only thickness, rim, shadow, blur; Shuffle. Dials a style ignores are disabled.
-- **Preset v2** `ivp2_` (reads `ivp1_`), CLI `init --preset` / `apply`, only tuned variables emitted.
+- Glass rework, accent and chart-color dials: done in 1.5.0 (Phase 15 T12, T13).
+- **New dials:** density; glass-only thickness, rim, shadow, blur; float-in motion. Dials a style ignores are disabled.
+- New preset fields stay optional keys in `ivp1_` (DECISIONS 2026-11-13).
 
-**Exit gate:** preset v1/v2 round-trip, CLI look specs, contrast test, `smoke:cli` parity, `npm run check`. 1.5.0 on npm.
+**Exit gate:** preset v1/v2 round-trip, CLI look specs, contrast test, `smoke:cli` parity, `npm run check`. 1.6.0 on npm.
 
 ---
 
@@ -415,24 +416,69 @@ Scope:
 
 ---
 
-## Phase 15 — Release 1.6.0: Charts
+## Phase 15 — Release 1.5.0: Charts and dashboard blocks
 
-Branch `feat/charts`. Outline: expand into tasks and get an OK first.
+Branch `feat/charts`. Tasks written 2026-11-11, approved and done (T1–T9) on `release/v1.5.0`. Step-by-step plan (local): `docs/superpowers/plans/2026-11-11-charts.md`.
 
-**Goal:** line, area, bar and pie charts that follow the theme, like shadcn charts.
+**Goal:** dashboards built from Ivorie alone. Six chart types that feel like shadcn's, a 70-example gallery and four dashboard blocks.
 
-Scope:
+**Engine:** SVG parts on `d3-scale` + `d3-shape`, shadcn/Recharts model (DECISIONS 2026-11-11). Same Recharts prop names, so shadcn examples port line by line.
 
-1. **Engine decision** at phase start (DECISIONS line). Recommended: SVG built with `d3-scale` + `d3-shape`. It is small, renders on the server and themes with CSS vars. Alternatives: ECharts, Chart.js (canvas, no SSR output).
-2. **`@inlaylab/ivorie/chart`:** `IvChartContainer` with a config that maps series to `--color-<key>` CSS vars (like shadcn `ChartContainer`), tooltip, legend.
-3. **Charts:** line, area, bar, pie (+ donut).
-4. **Docs:** examples ported from a subset of `.ref/shadcn/apps/v4/registry/new-york-v4/charts/`.
-5. **Block `dashboard-01`:** add the chart (Phase 10 leaves a slot).
+### T1. Entry, deps, config, container
+- `@inlaylab/ivorie/chart`: `IvChart` (`iv-chart`), `IvChartConfig` (`label`, `icon` = any component, `color` or `theme: { light, dark }`), `--color-<key>` vars, scoped `<style>` for themes.
+- SSR at `initialDimension` (320 × 200), then `ResizeObserver` after render; width 0 keeps the last size.
+- Deps `d3-scale`, `d3-shape`. Style hooks `cn-chart`, `cn-chart-tooltip` synced. Counts, module smoke, registry deps.
+
+### T2. Cartesian core: line and area
+- Roots `svg[ivLineChart]`, `svg[ivAreaChart]`; `ivXAxis`, `ivYAxis`, `ivCartesianGrid`, `ivLine`, `ivArea` (curves, dots, stack, `expand`).
+- Empty data and missing values: no `NaN`, gaps in lines. `role="img"` + `aria-label`.
+
+### T3. Bar and label list
+- `svg[ivBarChart]` (horizontal, vertical), `ivBar` (stack, radius, per-row fill, negative values), `ivLabelList`.
+
+### T4. Polar: pie, radar, radial
+- `svg[ivPieChart]`, `svg[ivRadarChart]`, `svg[ivRadialChart]`; `ivPie` (donut, several rings), `ivPolarGrid`, `ivPolarAngleAxis`, `ivPolarRadiusAxis`, `ivRadar`, `ivRadialBar`.
+- Center text with `ng-template[ivChartLabel]`; `ivArc()` helper.
+
+### T5. Interaction
+- `iv-chart-tooltip` (indicator dot/line/dashed, hide label/indicator, formatters, `defaultIndex`, custom body), `iv-chart-legend`, cursor.
+- Keyboard: one tab stop, arrows move, Home/End, Escape. `activeIndex` from outside, `ng-template[ivActiveShape]`. Shrinking data clears the active point.
+
+### T6. Motion, own-style tooltips, size budget
+- Short CSS entrance, off under reduced motion.
+- Glass, bento, mono (and brutal, aurora until T11) restyle `cn-chart-tooltip`; `chart-tooltip` joins `LOOK_HOOKS`.
+- New check `size-chart`: chart entry + d3 under 45 kB gzipped (DECISIONS 2026-11-12).
+
+### T7. Docs: chart page and cartesian gallery
+- `chart.md` (first chart step by step, config, theming, tooltip, legend, a11y, API).
+- New docs section `charts`; pages area, bar, line with all 30 shadcn examples.
+
+### T8. Docs: pie, radar, radial, tooltip gallery
+- Pages pie (11), radar (14), radial (6), tooltip (9). Gallery total 70. Checked by eye against shadcn, light and dark.
+
+### T9. Dashboard blocks
+- `dashboard-01`: the slot becomes the interactive area chart (90 / 30 / 7 days).
+- New: `dashboard-02` Analytics, `dashboard-03` Sales, `dashboard-04` Product usage. Each self-contained with spec. Blocks count 19 → 22.
+
+### T11. Styles: lyra, mira, sera in; aurora, brutal out
+- Sync shadcn's lyra, mira, sera (`tools/styles/sync.ts`; it now drops commented-out rules). Remove aurora and brutal: own sources, built files, exports, docs bundles, specimens.
+- Lists: `theme.test.ts`, `check.ts` attw, `appearance-options.ts`, `STYLE_NOTES`, content pages.
+
+### T12. Accent colors
+- 17 accents from shadcn in `tools/registry/accent-colors`, registry items `theme-accent-<name>`, index `accents`.
+- Preset fields `theme`, `chartColor`, `menuAccent` (optional in `ivp1_`), CLI flags, `components.json`. One merge, `lookVars`, in the CLI and its docs copy.
+- Playground dials Accent, Chart color, Menu accent; Home accent row.
+
+### T13. Glass rework
+- Ideas from solid-glass (MIT, `.ref/solid-glass`): no border, rim + hairline + shadow, thickness by depth, neutral, ambient light from `--primary`, unlit dark page. Solid fallbacks kept. Contrast test passes for every base color.
+
+### T10. Release 1.5.0
+- Rebase on `main` once 1.4.1 has merged (ask before force-push). ARCHITECTURE line, changeset, CHANGELOG, one commit `feat: release 1.5.0 — charts and dashboard blocks`.
 
 **Exit gate:**
 
-- Charts render in SSR and hydrate with no warnings. Axe clean.
-- `npm run check` green. 1.6.0 on npm.
+- `npm run check` green (with `size-chart`), `smoke:pack`, `smoke:cli`. Charts render on the server and hydrate with no warnings (smoke-ssr). Axe clean.
+- 1.5.0 on npm (ask first).
 
 ---
 

@@ -64,3 +64,15 @@ test('a heading font alone keeps the body font', async () => {
   assert.doesNotMatch(themeCss, /--font-sans:/);
   assert.match(themeCss, /--font-heading: 'Lora Variable', serif;/);
 });
+
+test('accent preset: blue primary, emerald charts, bold menu accent', async () => {
+  const l = await look({ theme: 'blue', chartColor: 'emerald', menuAccent: 'bold' });
+  const blue = item('theme-accent-blue').cssVars;
+  const emerald = item('theme-accent-emerald').cssVars;
+  const root = l.themeCss.slice(l.themeCss.indexOf(':root {'), l.themeCss.indexOf('}', l.themeCss.indexOf(':root {')));
+  assert.ok(root.includes(`--primary: ${blue.light['--primary']};`));
+  assert.ok(root.includes(`--chart-1: ${emerald.light['--chart-1']};`));
+  assert.ok(root.includes(`--accent: ${blue.light['--primary']};`));
+  const dark = l.themeCss.slice(l.themeCss.indexOf('.dark {'));
+  assert.ok(dark.includes(`--chart-3: ${emerald.dark['--chart-3']};`));
+});

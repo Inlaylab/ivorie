@@ -121,7 +121,7 @@ const LOOK_HOOKS = [
   // Surfaces and overlays
   'card', 'card-title', 'popover-content', 'dialog-content', 'dialog-overlay', 'alert-dialog-content', 'sheet-content', 'sheet-overlay',
   'drawer-content', 'hover-card-content', 'dropdown-menu-content', 'select-content', 'combobox-content', 'command', 'tooltip-content',
-  'navigation-menu-viewport', 'sidebar-inner', 'alert', 'toast', 'item-variant-outline', 'empty',
+  'navigation-menu-viewport', 'sidebar-inner', 'alert', 'toast', 'item-variant-outline', 'empty', 'chart-tooltip',
   // Controls
   'button-variant-default', 'button-variant-outline', 'button-variant-secondary', 'button-variant-ghost', 'input', 'textarea',
   'input-group', 'select-trigger', 'native-select', 'input-otp-slot', 'checkbox', 'radio-group-item', 'switch', 'switch-thumb',
@@ -142,5 +142,18 @@ test('every own style covers every look-bearing hook', () => {
     const own = readFileSync(join(OWN, file), 'utf8');
     const missing = LOOK_HOOKS.filter((h) => !new RegExp(String.raw`\.cn-${h}(?![\w-])`).test(own));
     assert.deepEqual(missing, [], name);
+  }
+});
+
+// data-checked is a :where() variant (theme.css): a plain bg-/border- on a checkbox or radio in an own
+// style covers nova's checked primary, and the white dot vanishes (glass, bento before 1.5.0).
+test('own styles fill checkboxes and radios only under a state variant', () => {
+  for (const file of readdirSync(OWN).filter((f) => f.endsWith('.css'))) {
+    const own = readFileSync(join(OWN, file), 'utf8');
+    for (const [, selectors, body] of own.matchAll(/((?:[^{}]*\n)*?[^{}]*)\{([^{}]*)\}/g)) {
+      if (!/\.cn-(checkbox|radio-group-item)(?![\w-])/.test(selectors)) continue;
+      const plain = (body.match(/@apply ([^;]+);/)?.[1] ?? '').split(/\s+/).filter((u) => /^(bg|border)-/.test(u));
+      assert.deepEqual(plain, [], `${file}: ${selectors.trim()}`);
+    }
   }
 });

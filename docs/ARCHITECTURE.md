@@ -17,12 +17,13 @@ tools/                     scripts: checks, docs build, registry, style sync, sm
 Planned (see [ROADMAP](../ROADMAP.md)):
 - Phase 10: registry item kind `block`; `ivorie add <block>` writes to `<path>/blocks/<name>/`.
 - Phase 11: `IvIcon` + `provideIvIcons()`, one entry per icon library (`@inlaylab/ivorie/icons/<lib>`).
-- Phase 12: `@inlaylab/ivorie/chart` (SVG, `d3-scale` + `d3-shape` if the engine decision holds).
 
 ## Entry points
 - Each component has its own entry point: `import { IvButton } from '@inlaylab/ivorie/button'`.
 - Why: tree-shaking. Apps only ship what they import.
 - `core` is shared. Components may import `@inlaylab/ivorie/core`. Components import other components only through their entry point (`@inlaylab/ivorie/button`), never by relative path.
+
+- `@inlaylab/ivorie/chart` (1.5): SVG chart parts on `d3-scale` + `d3-shape` (library `dependencies`).
 
 ## Dependencies
 - **peerDependencies** (app installs them): `@angular/core|common|forms|cdk >=22.0.0 <23.0.0`, `tailwindcss ^4.0.0`, `tw-animate-css ^1.0.0`.

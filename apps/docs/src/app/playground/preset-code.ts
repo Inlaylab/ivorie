@@ -8,6 +8,9 @@ export interface Preset {
   fontHeading: string;
   radius: string;
   iconLibrary: string;
+  theme: string;
+  chartColor: string;
+  menuAccent: string;
 }
 
 export const DEFAULT_PRESET: Preset = {
@@ -17,12 +20,39 @@ export const DEFAULT_PRESET: Preset = {
   fontHeading: 'inherit',
   radius: 'default',
   iconLibrary: 'lucide',
+  theme: 'base',
+  chartColor: 'theme',
+  menuAccent: 'subtle',
 };
 
 const PREFIX = 'ivp1_';
-const KEYS = ['baseColor', 'font', 'fontHeading', 'iconLibrary', 'radius', 'style'] as const;
+const KEYS = ['baseColor', 'chartColor', 'font', 'fontHeading', 'iconLibrary', 'menuAccent', 'radius', 'style', 'theme'] as const;
 // Left out of the code at these values, so older codes stay valid.
-const OPTIONAL: Partial<Record<keyof Preset, string>> = { fontHeading: 'inherit', iconLibrary: 'lucide' };
+const OPTIONAL: Partial<Record<keyof Preset, string>> = {
+  fontHeading: 'inherit',
+  iconLibrary: 'lucide',
+  theme: 'base',
+  chartColor: 'theme',
+  menuAccent: 'subtle',
+};
+type Vars = Record<string, string>;
+/**
+ * One mode's color variables, in shadcn's order: base color, accent, chart colors, menu accent.
+ * `chart` is the base color or accent the --chart-* come from.
+ */
+export function lookVars(base: Vars, accent: Vars | undefined, chart: Vars, menuAccent: string): Vars {
+  const out = { ...base, ...accent };
+  for (const i of [1, 2, 3, 4, 5]) out[`--chart-${i}`] = chart[`--chart-${i}`];
+  if (menuAccent === 'bold') {
+    out['--accent'] = out['--primary'];
+    out['--accent-foreground'] = out['--primary-foreground'];
+  }
+  return out;
+}
+
+/** The accent the charts use: chartColor, or theme when chartColor is 'theme'. 'base' = the base color. */
+export const chartSource = (p: { theme: string; chartColor: string }): string => (p.chartColor === 'theme' ? p.theme : p.chartColor);
+
 
 export function encodePreset(p: Preset): string {
   const keys = KEYS.filter((k) => !(k in OPTIONAL) || p[k] !== OPTIONAL[k]);
@@ -40,7 +70,7 @@ export function decodePreset(code: string): Preset | null {
     const v = JSON.parse(new TextDecoder().decode(Uint8Array.from(bin, (c) => c.charCodeAt(0))));
     const ok = KEYS.every((k) => typeof v?.[k] === 'string' || (k in OPTIONAL && v?.[k] === undefined));
     if (!ok) return null;
-    return { style: v.style, baseColor: v.baseColor, font: v.font, fontHeading: v.fontHeading ?? 'inherit', radius: v.radius, iconLibrary: v.iconLibrary ?? 'lucide' };
+    return { ...DEFAULT_PRESET, ...Object.fromEntries(KEYS.filter((k) => v[k] !== undefined).map((k) => [k, v[k]])) };
   } catch {
     return null;
   }

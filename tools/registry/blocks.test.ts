@@ -10,7 +10,7 @@ const blocks = buildItems().filter((i) => i.meta.ivorie.kind === 'block');
 const byName = (n: string) => blocks.find((b) => b.name === n)!;
 
 test('every block is a registry item', () => {
-  assert.equal(blocks.length, 19);
+  assert.equal(blocks.length, 22);
   for (const b of blocks) {
     assert.ok(b.files!.length > 1, b.name);
     for (const f of b.files!) {
@@ -25,6 +25,9 @@ test('every block is a registry item', () => {
   assert.ok(byName('login-02').dependencies!.some((d) => d.startsWith('@ng-icons/core@')));
   assert.ok(byName('login-02').dependencies!.some((d) => d.startsWith('@ng-icons/lucide@')));
   assert.ok(byName('dashboard-01').registryDependencies!.includes('data-table'));
+  assert.ok(byName('dashboard-02').registryDependencies!.includes('chart'));
+  // A block lists the npm deps of the components it uses: chart brings d3.
+  for (const pkg of ['d3-scale@', 'd3-shape@']) assert.ok(byName('dashboard-02').dependencies!.some((d) => d.startsWith(pkg)), pkg);
 });
 
 test('block files keep their @inlaylab/ivorie imports (add rewrites them per app)', () => {

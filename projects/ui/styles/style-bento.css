@@ -264,6 +264,11 @@
       @apply rounded-b-xl px-(--card-spacing) [.border-t]:pt-(--card-spacing);
     }
 
+    /* MARK: Chart */
+    .cn-chart-tooltip {
+      @apply border-border/50 bg-background gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs shadow-xl;
+    }
+
     /* MARK: Checkbox */
     .cn-checkbox {
       @apply border-input dark:bg-input/30 data-checked:bg-primary data-checked:text-primary-foreground dark:data-checked:bg-primary data-checked:border-primary aria-invalid:aria-checked:border-primary aria-invalid:border-destructive dark:aria-invalid:border-destructive/50 focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 flex size-4 items-center justify-center rounded-[6px] border transition-shadow group-has-disabled/field:opacity-50 focus-visible:ring-[3px] aria-invalid:ring-[3px] group-has-[:focus-visible]/field-label:ring-0 group-has-[:focus-visible]/field-label:not-data-checked:border-input group-has-[:focus-visible]/field-label:data-checked:border-primary;
@@ -1145,6 +1150,9 @@
       --bento-well: color-mix(in oklab, var(--muted) 85%, var(--card));
       --bento-well-hover: color-mix(in oklab, var(--muted), var(--foreground) 7%);
       --bento-float-shadow: color-mix(in oklab, black 16%, transparent);
+    }
+
+    &:not(.cdk-overlay-container) {
       background-color: var(--bento-page);
     }
 
@@ -1186,12 +1194,17 @@
     .cn-combobox-content,
     .cn-command,
     .cn-navigation-menu-viewport,
+    .cn-chart-tooltip,
     .cn-toast {
       @apply rounded-3xl ring-0 shadow-[0_16px_48px_-12px_var(--bento-float-shadow)];
     }
 
     & .cn-dialog-content .cn-command {
       @apply rounded-none shadow-none;
+    }
+
+    & .cn-chart-tooltip {
+      @apply rounded-2xl border-0;
     }
 
     & .cn-sheet-content {
@@ -1233,7 +1246,7 @@
 
     .cn-checkbox,
     .cn-radio-group-item {
-      @apply border-transparent bg-(--bento-well-hover) dark:bg-(--bento-well-hover);
+      @apply data-unchecked:border-transparent data-unchecked:bg-(--bento-well-hover) dark:data-unchecked:bg-(--bento-well-hover);
     }
 
     .cn-button-variant-outline,
@@ -1370,6 +1383,7 @@
     .cn-calendar-day-button {}
     .cn-card-action {}
     .cn-carousel {}
+    .cn-chart {}
     .cn-combobox-chip-indicator-icon {}
     .cn-combobox-chip-input {}
     .cn-combobox-clear {}

@@ -1,5 +1,12 @@
 # @inlaylab/ivorie
 
+## 1.5.0
+
+### Minor Changes
+
+- Charts (`@inlaylab/ivorie/chart`): line, area, bar, pie and donut, radar and radial charts, with tooltip, legend and keyboard support. Four dashboard blocks.
+- Accent colors (17, from shadcn) with colored charts: preset fields and CLI flags `theme`, `chartColor`, `menuAccent`. New styles lyra, mira and sera; aurora and brutal removed. Glass reworked as neutral glass with edges drawn with light.
+
 ## 1.4.1
 
 ### Patch Changes

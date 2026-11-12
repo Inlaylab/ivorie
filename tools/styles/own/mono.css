@@ -15,8 +15,14 @@
 .cn-dropdown-menu-content,
 .cn-select-content,
 .cn-combobox-content,
-.cn-tooltip-content {
+.cn-tooltip-content,
+.cn-chart-tooltip {
   @apply shadow-none ring-1 ring-border;
+}
+
+/* The ring is the hairline; nova adds a border too. */
+& .cn-chart-tooltip {
+  @apply border-0;
 }
 
 .cn-button-variant-outline,

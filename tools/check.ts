@@ -26,13 +26,15 @@ interface Rule {
 
 export const steps: Step[] = [
   { name: 'build-ui', cmd: 'npx ng build ui' },
+  // Chart entry plus d3, gzipped, under 45 kB. Reads dist/ui.
+  { name: 'size-chart', cmd: 'node tools/size/chart.ts' },
   // Tools tests; some read dist/ui, so they run after build-ui.
   { name: 'test-tools', cmd: 'node --test "tools/**/*.test.ts"' },
   { name: 'publint', cmd: 'npx publint dist/ui --strict' },
   // Angular packages are ESM-only. The styles are CSS exports, not JS entries.
   {
     name: 'attw',
-    cmd: 'npx attw --pack dist/ui --profile esm-only --exclude-entrypoints ./styles/theme.css ./styles/style-vega.css ./styles/style-nova.css ./styles/style-maia.css ./styles/style-luma.css ./styles/style-rhea.css ./styles/style-glass.css ./styles/style-brutal.css ./styles/style-aurora.css ./styles/style-bento.css ./styles/style-mono.css',
+    cmd: 'npx attw --pack dist/ui --profile esm-only --exclude-entrypoints ./styles/theme.css ./styles/style-vega.css ./styles/style-nova.css ./styles/style-maia.css ./styles/style-luma.css ./styles/style-rhea.css ./styles/style-glass.css ./styles/style-lyra.css ./styles/style-mira.css ./styles/style-sera.css ./styles/style-bento.css ./styles/style-mono.css',
   },
   { name: 'test-ui', cmd: 'npx ng test ui --watch=false' },
   { name: 'test-blocks', cmd: 'npx ng test blocks --watch=false' },

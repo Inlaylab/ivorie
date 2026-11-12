@@ -25,6 +25,9 @@ export interface InitOptions extends CommonOptions {
   fontHeading?: string;
   radius?: string;
   iconLibrary?: string;
+  theme?: string;
+  chartColor?: string;
+  menuAccent?: string;
   force?: boolean;
   yes?: boolean;
 }
@@ -65,6 +68,9 @@ export async function runInit(o: InitOptions): Promise<Report> {
   if (o.fontHeading) preset.fontHeading = o.fontHeading;
   if (o.radius) preset.radius = o.radius;
   if (o.iconLibrary) preset.iconLibrary = o.iconLibrary;
+  if (o.theme) preset.theme = o.theme;
+  if (o.chartColor) preset.chartColor = o.chartColor;
+  if (o.menuAccent) preset.menuAccent = o.menuAccent;
   checkPreset(preset, index);
 
   const interactive = process.stdin.isTTY && !o.yes && !o.dryRun;
@@ -81,6 +87,9 @@ export async function runInit(o: InitOptions): Promise<Report> {
     ...(preset.fontHeading !== 'inherit' && { fontHeading: preset.fontHeading }),
     radius: preset.radius,
     iconLibrary: preset.iconLibrary as IconLibrary,
+    ...(preset.theme !== 'base' && { theme: preset.theme }),
+    ...(preset.chartColor !== 'theme' && { chartColor: preset.chartColor }),
+    ...(preset.menuAccent !== 'subtle' && { menuAccent: preset.menuAccent }),
   });
   const write = (file: string, content: string) =>
     writeFile(report, o.cwd, join(o.cwd, file), content, { overwrite: o.force, dryRun: o.dryRun });

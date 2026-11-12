@@ -15,9 +15,21 @@ describe('ComponentsPage', () => {
   it('shows one card per component page, linking to it', async () => {
     const el = await render();
     const components = PAGES.filter((p) => p.section === 'component');
-    const hrefs = [...el.querySelectorAll('li a')].map((a) => a.getAttribute('href'));
+    const section = el.querySelector('[data-testid="components-section"]')!;
+    const hrefs = [...section.querySelectorAll('li a')].map((a) => a.getAttribute('href'));
     expect(hrefs).toEqual(components.map((p) => `/docs/${p.slug}`));
     expect(el.textContent).toContain(components[0].description);
+  });
+
+  it('shows the chart example pages after the components, in their own section', async () => {
+    const el = await render();
+    const charts = PAGES.filter((p) => p.section === 'charts');
+    const all = el.querySelector('[data-testid="components-section"]')!;
+    const section = el.querySelector('[data-testid="charts-section"]')!;
+    const hrefs = [...section.querySelectorAll('li a')].map((a) => a.getAttribute('href'));
+    expect(charts.length).toBeGreaterThan(0);
+    expect(hrefs).toEqual(charts.map((p) => `/docs/${p.slug}`));
+    expect(all.compareDocumentPosition(section) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 
   it('has no axe violations', async () => {

@@ -8,6 +8,7 @@ import type { DocPage } from '../../apps/docs/src/app/content/types.ts';
 import { build as buildRegistry } from '../registry/build.ts';
 import { blockMeta, listBlocks } from '../registry/items.ts';
 import { looksModule } from './looks.ts';
+import { siteNova } from './site-style.ts';
 
 const CONTENT = 'apps/docs/content';
 const DEMOS = 'apps/docs/src/app/demos';
@@ -54,13 +55,13 @@ if (errors.length) {
   process.exit(1);
 }
 
-// Guides first by order, then components A–Z.
-pages.sort((a, b) =>
-  a.section !== b.section
-    ? a.section === 'guide'
-      ? -1
-      : 1
-    : (orders.get(a.slug)! - orders.get(b.slug)!) || a.title.localeCompare(b.title),
+// Guides first by order, then components A–Z, then the chart gallery A–Z.
+const SECTIONS = ['guide', 'component', 'charts'];
+pages.sort(
+  (a, b) =>
+    SECTIONS.indexOf(a.section) - SECTIONS.indexOf(b.section) ||
+    orders.get(a.slug)! - orders.get(b.slug)! ||
+    a.title.localeCompare(b.title),
 );
 
 rmSync(OUT, { recursive: true, force: true });
@@ -101,6 +102,7 @@ writeFileSync(
 );
 
 writeFileSync(join(OUT, 'looks.ts'), looksModule());
+writeFileSync(join(OUT, 'site-nova.css'), siteNova());
 
 // Blocks: meta and a lazy page loader in blocks.ts; the highlighted files per block in blocks/<name>.ts,
 // so the code loads only on its block page.

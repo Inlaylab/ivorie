@@ -632,6 +632,49 @@
   --shimmer-angle: calc(--value(integer) * 1deg);
 }
 
+/* Ivorie: chart entrance, once when a shape first draws (an updated `d` does not replay it).
+   Lines draw in over a path of pathLength 1; bars grow from their baseline; polar shapes fade and scale in.
+   Charts apply these through `motion-safe:`, so reduced motion shows the final frame at once. */
+@theme inline {
+  --animate-chart-draw: chart-draw 400ms ease-out;
+  --animate-chart-fade: chart-fade 400ms ease-out;
+  --animate-chart-in: chart-in 400ms ease-out;
+  --animate-chart-grow-y: chart-grow-y 400ms ease-out;
+  --animate-chart-grow-x: chart-grow-x 400ms ease-out;
+
+  @keyframes chart-draw {
+    from {
+      stroke-dasharray: 1;
+      stroke-dashoffset: 1;
+    }
+    to {
+      stroke-dasharray: 1;
+      stroke-dashoffset: 0;
+    }
+  }
+  @keyframes chart-fade {
+    from {
+      opacity: 0;
+    }
+  }
+  @keyframes chart-in {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+  }
+  @keyframes chart-grow-y {
+    from {
+      transform: scaleY(0);
+    }
+  }
+  @keyframes chart-grow-x {
+    from {
+      transform: scaleX(0);
+    }
+  }
+}
+
 /* Ivorie: indeterminate progress. A rounded segment enters from the left, stretches mid-track, and leaves on the right. */
 @theme inline {
   --animate-progress-indeterminate: progress-indeterminate 1.8s cubic-bezier(0.45, 0, 0.25, 1) infinite;

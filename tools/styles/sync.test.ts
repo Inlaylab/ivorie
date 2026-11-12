@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { buildStyle, unknownShapes } from './sync.ts';
+import { buildStyle, parse, stripComments, unknownShapes } from './sync.ts';
 
 const shadcn = `.style-maia {
   /* MARK: Badge */
@@ -54,4 +54,11 @@ test('cn-menu-translucent stays empty: shadcn menus are solid unless the translu
   const out = buildStyle('x', css, new Set(['cn-menu-translucent']));
   assert.doesNotMatch(out, /bg-popover\/70/);
   assert.match(out, /^ {4}\.cn-menu-translucent \{\}$/m);
+});
+
+test('a commented-out rule is dropped, a plain comment stays (sera)', () => {
+  const css = '  /* note */\n  /* .cn-a {\n    @apply p-1;\n  } */\n\n  .cn-b {\n    @apply p-2;\n  }\n';
+  const stripped = stripComments(css);
+  assert.ok(stripped.includes('/* note */'));
+  assert.deepEqual(parse(stripped).map((r) => r.hook), ['cn-b']);
 });

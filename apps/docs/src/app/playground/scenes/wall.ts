@@ -24,7 +24,11 @@ import { IvSlider } from '@inlaylab/ivorie/slider';
 import { IvSwitch } from '@inlaylab/ivorie/switch';
 import { IV_TABLE_IMPORTS } from '@inlaylab/ivorie/table';
 import { IV_TOGGLE_GROUP_IMPORTS } from '@inlaylab/ivorie/toggle-group';
+import { FONTS } from '../../../generated/looks';
+import { STYLES } from '../../shell/appearance-options';
 import { PlaygroundLook } from '../playground-look';
+
+const fontTitle = (name: string) => FONTS.find((f) => f.name === name)?.title ?? 'System';
 
 const MEMBERS = [
   { name: 'Ada Lovelace', email: 'ada@acme.dev', status: 'Active' },
@@ -75,6 +79,38 @@ const PAGE_SIZE = 3;
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'block columns-1 gap-4 md:columns-2 lg:columns-3 xl:columns-4 *:mb-4 *:break-inside-avoid' },
   template: `
+    <!-- The look itself first: its fonts and its colors. -->
+    <iv-card data-testid="wall-specimen">
+      <iv-card-header>
+        <iv-card-title class="text-2xl">{{ styleTitle() }}, {{ fontTitle() }}</iv-card-title>
+        <iv-card-description>Designers love packing quirky glyphs into test phrases. This one previews the type.</iv-card-description>
+      </iv-card-header>
+      <iv-card-content>
+        <ul class="grid grid-cols-6 gap-x-2 gap-y-3" aria-label="Theme colors">
+          @for (t of tokens; track t) {
+            <li class="flex min-w-0 flex-col items-center gap-1.5">
+              <span class="aspect-square w-full rounded-[calc(var(--radius)*1.2)] ring-1 ring-black/10 dark:ring-white/15" [style.background]="'var(' + t + ')'"></span>
+              <span class="text-muted-foreground w-full truncate text-center font-mono text-[0.625rem]" [title]="t">{{ t }}</span>
+            </li>
+          }
+        </ul>
+      </iv-card-content>
+    </iv-card>
+
+    <iv-card>
+      <iv-card-header>
+        <iv-card-description>Heading {{ headingTitle() }}, body {{ fontTitle() }}</iv-card-description>
+        <iv-card-title class="text-2xl leading-tight text-balance">Designing with rhythm and hierarchy.</iv-card-title>
+      </iv-card-header>
+      <iv-card-content class="text-muted-foreground flex flex-col gap-3 text-sm leading-relaxed text-pretty">
+        <p>A strong body style keeps long text readable and balances the weight of the headings.</p>
+        <p>Steady spacing and line height let readers scan a paragraph without it feeling dense.</p>
+      </iv-card-content>
+      <iv-card-footer>
+        <button ivButton variant="outline" class="w-full">Share feedback</button>
+      </iv-card-footer>
+    </iv-card>
+
     <!-- Dashboard -->
     <iv-card>
       <iv-card-header>
@@ -539,6 +575,18 @@ export class SceneWall {
   readonly prefix = input('wall');
   /** Card icons in the picked icon library. */
   protected readonly icons = inject(PlaygroundLook).icons;
+  private readonly preset = inject(PlaygroundLook).preset;
+
+  /** Theme variables shown as swatches, in theme.css order. */
+  protected readonly tokens = [
+    '--background', '--foreground', '--primary', '--secondary', '--muted', '--accent',
+    '--border', '--chart-1', '--chart-2', '--chart-3', '--chart-4', '--chart-5',
+  ];
+  protected readonly styleTitle = computed(() => STYLES.find((s) => s.name === this.preset().style)?.label ?? this.preset().style);
+  protected readonly fontTitle = computed(() => fontTitle(this.preset().font));
+  protected readonly headingTitle = computed(() =>
+    this.preset().fontHeading === 'inherit' ? this.fontTitle() : fontTitle(this.preset().fontHeading),
+  );
 
   protected readonly stats = [
     { label: 'Deploys today', value: '128', delta: '+12%', good: true, up: true },

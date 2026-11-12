@@ -9,6 +9,7 @@ import { IvToastService } from '@inlaylab/ivorie/toast';
   templateUrl: './app.html',
 })
 export class App {
+  readonly chartConfig = { visits: { label: 'Visits', color: 'var(--chart-1)' } };
   readonly people = ivDataTable({
     data: signal([{ name: 'Grace' }, { name: 'Ada' }, { name: 'Alan' }]),
     columns: [

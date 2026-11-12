@@ -37,6 +37,17 @@ test('frontmatter: soon is true only when set to true', () => {
   assert.equal(parseFrontmatter(md(guide), 'x.md').data.soon, undefined);
 });
 
+test('frontmatter: a charts page needs no entry and no order', () => {
+  const { data } = parseFrontmatter(md('title: Area Charts\ndescription: B\nsection: charts'), 'x.md');
+  assert.deepEqual(data, { title: 'Area Charts', description: 'B', section: 'charts' });
+});
+
+test('frontmatter: an unknown section throws', () => {
+  assert.throws(() => parseFrontmatter(md('title: A\ndescription: B\nsection: blog'), 'x.md'), {
+    message: 'x.md: section must be guide, component or charts',
+  });
+});
+
 test('frontmatter: no title throws', () => {
   assert.throws(() => parseFrontmatter(md('description: B\nsection: guide'), 'x.md'), {
     message: 'x.md: missing title',
@@ -130,6 +141,24 @@ test('buildPage: component page starts with its main demo', () => {
   assert.deepEqual(p.segments[0], { kind: 'demo', name: 'tabs' });
   assert.deepEqual(p.segments[1], { kind: 'install', slug: 'tabs', entry: '@inlaylab/ivorie/tabs' });
   assert.equal(p.entry, '@inlaylab/ivorie/tabs');
+});
+
+test('buildPage: a charts page has no main demo and no install, only its markers', () => {
+  const p = buildPage({
+    slug: 'charts-area',
+    file: 'charts-area.md',
+    md: md('title: Area Charts\ndescription: B\nsection: charts', '### Default\n\n<!-- demo: chart-area-default -->'),
+    demos: new Map([['chart-area-default', 'const a = 1;']]),
+    render,
+  });
+  assert.equal(p.section, 'charts');
+  assert.equal(p.entry, null);
+  assert.deepEqual(
+    p.segments.map((s) => s.kind),
+    ['html', 'demo'],
+  );
+  assert.deepEqual(p.segments[1], { kind: 'demo', name: 'chart-area-default' });
+  assert.deepEqual(p.toc, [{ id: 'default', text: 'Default', level: 3 }]);
 });
 
 test('buildPage: demo source with a long backtick run stays one code block', () => {
