@@ -1,5 +1,22 @@
 # Changelog
 
+## 1.5.0
+
+Both packages: `@inlaylab/ivorie` and `ivorie` 1.5.0. Per-package notes: `projects/ui/CHANGELOG.md`, `projects/cli/CHANGELOG.md`.
+
+- Charts (`@inlaylab/ivorie/chart`): line, area, bar, pie and donut, radar and radial. You build a chart from small parts, the way shadcn does: `iv-chart` with a series config, then axes, grid, series, labels, tooltip and legend. Colors come from `--chart-1…5` through `--color-<key>`, so themes and dark mode just work. Charts render as SVG on the server. They work with mouse, touch and keyboard (one tab stop, arrow keys, Escape). Built on `d3-scale` and `d3-shape`; the entry with d3 is about 41 kB gzipped.
+- Docs: a chart page with a step-by-step first chart, and a gallery of 70 examples (area, bar, line, pie, radar, radial, tooltip) ported from shadcn.
+- Blocks: `dashboard-01` gets its interactive area chart (90, 30 or 7 days). New `dashboard-02` (analytics), `dashboard-03` (sales) and `dashboard-04` (product usage). 22 blocks in total.
+- Every own style (glass, bento, mono) restyles the chart tooltip like its menus.
+- Accent colors: shadcn's 17 accents (red … rose) over any base color. They set `--primary`, `--secondary`, `--sidebar-primary` and the chart colors, so dashboards are no longer gray. New preset fields `theme`, `chartColor` (follow the accent, gray, or another accent) and `menuAccent` (`subtle` or `bold`). CLI flags `--theme`, `--chart-color`, `--menu-accent`; `components.json` keeps them. Old `ivp1_` codes still work. Playground: Accent, Chart color and Menu accent dials. Home: an accent row over the wall.
+- Styles: shadcn's lyra (boxy and sharp), mira (compact) and sera (editorial) are synced. Aurora and brutal are removed: their fixed hues, ink borders and offset shadows did not follow the base color, the accent or the radius scale. 11 styles in total.
+- **Upgrade note (aurora, brutal):** `@inlaylab/ivorie/styles/style-aurora.css` and `style-brutal.css` are gone, and `ivorie init --style aurora|brutal` now fails. Apps that copied the style with the CLI keep their copy and keep working. Package users: import another style and change the `style-*` class on `<body>` (glass, lyra or vega are the closest), or run `npx ivorie apply <preset>`.
+- Glass reworked, with ideas from [solid-glass](https://github.com/deeplethe/solid-glass) (MIT): neutral panes with no border, edges drawn with light (rim, hairline, contact and drop shadow), thickness by depth (control, card, floating pane), and a faint light made from `--primary` instead of a fixed violet/cyan/pink field. Dark is an even, unlit page. Solid fallbacks stay.
+- Style sync drops rules that shadcn commented out (sera).
+- Registry: a block now lists the npm packages of every component it uses, so `chart` blocks list `d3-scale` and `d3-shape`. Existing blocks' JSON gains the same transitive packages (for example `clsx`); the CLI already installed them.
+- CLI: `ivorie add chart` (or a block that uses it) also installs `@types/d3-scale` and `@types/d3-shape` as dev dependencies, so copied charts compile in a strict app. Registry items list them under `devDependencies`.
+- Apps set up with `ivorie init` on 1.4 or earlier have their own copy of `theme.css` without the `chart-*` keyframes. Charts work, but without the entrance animation until you re-run `ivorie init` (or `ivorie apply` with your preset), or copy the `--animate-chart-*` tokens and `chart-*` keyframes from the new `theme.css`.
+
 ## 1.4.1
 
 Both packages: `@inlaylab/ivorie` and `ivorie` 1.4.1. Per-package notes: `projects/ui/CHANGELOG.md`, `projects/cli/CHANGELOG.md`.

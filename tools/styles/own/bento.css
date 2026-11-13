@@ -12,6 +12,10 @@
   --bento-well: color-mix(in oklab, var(--muted) 85%, var(--card));
   --bento-well-hover: color-mix(in oklab, var(--muted), var(--foreground) 7%);
   --bento-float-shadow: color-mix(in oklab, black 16%, transparent);
+}
+
+/* The page ground. Not on the CDK overlay container: it covers the whole screen, so a ground there hides the page. */
+&:not(.cdk-overlay-container) {
   background-color: var(--bento-page);
 }
 
@@ -57,12 +61,18 @@
 .cn-combobox-content,
 .cn-command,
 .cn-navigation-menu-viewport,
+.cn-chart-tooltip,
 .cn-toast {
   @apply rounded-3xl ring-0 shadow-[0_16px_48px_-12px_var(--bento-float-shadow)];
 }
 
 & .cn-dialog-content .cn-command {
   @apply rounded-none shadow-none;
+}
+
+/* A tooltip is small: a smaller radius than a menu, the same lift. */
+& .cn-chart-tooltip {
+  @apply rounded-2xl border-0;
 }
 
 & .cn-sheet-content {
@@ -104,9 +114,10 @@
   @apply border-transparent bg-(--bento-well) first:rounded-l-2xl last:rounded-r-2xl data-[active=true]:ring-2 data-[active=true]:ring-ring/25 dark:bg-(--bento-well);
 }
 
+/* Unchecked only: data-checked is a :where() variant, so a plain fill here would cover nova's checked primary. */
 .cn-checkbox,
 .cn-radio-group-item {
-  @apply border-transparent bg-(--bento-well-hover) dark:bg-(--bento-well-hover);
+  @apply data-unchecked:border-transparent data-unchecked:bg-(--bento-well-hover) dark:data-unchecked:bg-(--bento-well-hover);
 }
 
 /* Buttons: tonal, pill-shaped (from maia); only the primary is filled with color. */

@@ -1,6 +1,6 @@
 {
   "name": "@inlaylab/ivorie",
-  "version": "1.4.1",
+  "version": "1.5.0",
   "description": "Angular components with the shadcn/ui look and behavior.",
   "license": "MIT",
   "homepage": "https://github.com/Inlaylab/ivorie#readme",
@@ -35,7 +35,9 @@
     "tslib": "^2.3.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
-    "tailwind-merge": "^3.7.0"
+    "tailwind-merge": "^3.7.0",
+    "d3-scale": "^4.0.2",
+    "d3-shape": "^3.2.0"
   },
   "exports": {
     "./styles/theme.css": {
@@ -59,11 +61,14 @@
     "./styles/style-glass.css": {
       "default": "./styles/style-glass.css"
     },
-    "./styles/style-brutal.css": {
-      "default": "./styles/style-brutal.css"
+    "./styles/style-lyra.css": {
+      "default": "./styles/style-lyra.css"
     },
-    "./styles/style-aurora.css": {
-      "default": "./styles/style-aurora.css"
+    "./styles/style-mira.css": {
+      "default": "./styles/style-mira.css"
+    },
+    "./styles/style-sera.css": {
+      "default": "./styles/style-sera.css"
     },
     "./styles/style-bento.css": {
       "default": "./styles/style-bento.css"

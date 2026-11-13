@@ -82,7 +82,7 @@ export async function runApply(input: string | undefined, o: ApplyOptions): Prom
   const write = (file: string, content: string) =>
     writeFile(report, o.cwd, join(o.cwd, file), content, { overwrite: true, dryRun: o.dryRun });
 
-  const { fontHeading: _, ...rest } = config;
+  const { fontHeading: _, theme: _t, chartColor: _c, menuAccent: _m, ...rest } = config;
   const next: ComponentsJson = {
     ...rest,
     style: preset.style,
@@ -91,6 +91,9 @@ export async function runApply(input: string | undefined, o: ApplyOptions): Prom
     ...(preset.fontHeading !== 'inherit' && { fontHeading: preset.fontHeading }),
     radius: preset.radius,
     iconLibrary: preset.iconLibrary as IconLibrary,
+    ...(preset.theme !== 'base' && { theme: preset.theme }),
+    ...(preset.chartColor !== 'theme' && { chartColor: preset.chartColor }),
+    ...(preset.menuAccent !== 'subtle' && { menuAccent: preset.menuAccent }),
   };
   edit(CONFIG_FILE, (text) => (JSON.stringify(JSON.parse(text), null, 2) === JSON.stringify(next, null, 2) ? text : JSON.stringify(next, null, 2) + '\n'));
   write(`${config.path}/styles/theme.css`, look.themeCss);

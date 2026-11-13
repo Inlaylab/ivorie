@@ -107,6 +107,19 @@ export function collectDeps(e: Entry): string[] {
   return [...pkgs].sort().map((p) => `${p}@${rangeOf(p)}`);
 }
 
+/** `@types/<pkg>` for each npm dep whose types the workspace root installs (d3 ships none), as `@types/pkg@range`, sorted. */
+export function collectDevDeps(e: Entry): string[] {
+  const root = JSON.parse(readFileSync('package.json', 'utf8')).devDependencies ?? {};
+  return collectDeps(e)
+    .map((d) => `@types/${packageOf(d).replace(/^@([^/]+)\//, '$1__')}`)
+    .filter((t) => root[t])
+    .map((t) => `${t}@${normalizeRange(root[t])}`)
+    .sort();
+}
+
+/** `@scope/pkg@^1.0.0` → `@scope/pkg`. */
+const packageOf = (dep: string) => dep.replace(/(?<=.)@[^@/]*$/, '');
+
 /** Other registry items this entry imports, sorted. */
 export function registryDeps(e: Entry): string[] {
   const names = imports(e)

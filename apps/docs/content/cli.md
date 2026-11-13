@@ -31,12 +31,15 @@ It does this, and never overwrites a file you changed:
 | `--path <dir>` | `src/app/ui` | Where components go. |
 | `--prefix <prefix>` | `iv` | Selector and class prefix: `acme` gives `<acme-tabs>`, `acmeButton`, `AcmeButton`. |
 | `--preset <name\|code>` | `default` | Theme preset. |
-| `--style <name>` | from the preset | `vega`, `nova`, `maia`, `luma`, `rhea`, `glass`, `brutal`, `aurora`, `bento` or `mono`. |
+| `--style <name>` | from the preset | `vega`, `nova`, `maia`, `luma`, `rhea`, `lyra`, `mira`, `sera`, `glass`, `bento` or `mono`. |
 | `--base-color <name>` | from the preset | `neutral`, `stone`, `zinc`, `mauve`, `olive`, `mist` or `taupe`. |
 | `--font <name>` | from the preset | `system` or a font name, for example `inter`. |
 | `--font-heading <name>` | from the preset | `inherit` (same as `--font`) or a font name. |
 | `--radius <name>` | from the preset | `default`, `none`, `small`, `medium` or `large`. |
 | `--icon-library <name>` | from the preset | `lucide`, `tabler`, `phosphor`, `hugeicons` or `remix`. |
+| `--theme <name>` | from the preset | Accent color over the base color: `base` (none) or `red`, `orange`, `amber`, `yellow`, `lime`, `green`, `emerald`, `teal`, `cyan`, `sky`, `blue`, `indigo`, `violet`, `purple`, `fuchsia`, `pink`, `rose`. |
+| `--chart-color <name>` | from the preset | `theme` (follow `--theme`), `base` (the base color's greys) or an accent name. |
+| `--menu-accent <name>` | from the preset | `subtle` or `bold` (menu highlights in the primary color). |
 | `--force` | off | Run again over an existing setup. |
 | `-y`, `--yes` | off | No prompts. |
 | `--skip-install` | off | Print the install commands instead of running them. |

@@ -106,13 +106,18 @@
                 "inject": false
               },
               {
-                "input": "apps/docs/src/styles/style-brutal.css",
-                "bundleName": "style-brutal",
+                "input": "apps/docs/src/styles/style-lyra.css",
+                "bundleName": "style-lyra",
                 "inject": false
               },
               {
-                "input": "apps/docs/src/styles/style-aurora.css",
-                "bundleName": "style-aurora",
+                "input": "apps/docs/src/styles/style-mira.css",
+                "bundleName": "style-mira",
+                "inject": false
+              },
+              {
+                "input": "apps/docs/src/styles/style-sera.css",
+                "bundleName": "style-sera",
                 "inject": false
               },
               {

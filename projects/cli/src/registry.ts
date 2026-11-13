@@ -4,13 +4,15 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { Preset } from './preset.ts';
 
-export type ItemKind = 'component' | 'lib' | 'style' | 'base-color' | 'theme-base' | 'font' | 'block';
+export type ItemKind = 'component' | 'lib' | 'style' | 'base-color' | 'theme-base' | 'font' | 'block' | 'accent';
 
 export interface RegistryIndex {
   version: string;
   items: { name: string; kind: ItemKind; registryDependencies: string[] }[];
   styles: string[];
   baseColors: string[];
+  /** Accent colors (from 1.5.0; older registries have none). */
+  accents?: string[];
   fonts: string[];
   radii: string[];
   presets: Record<string, Preset>;
@@ -30,6 +32,7 @@ export interface RegistryItem {
   title: string;
   description: string;
   dependencies?: string[];
+  devDependencies?: string[];
   registryDependencies?: string[];
   files?: RegistryFile[];
   cssVars?: { light: Record<string, string>; dark: Record<string, string> };

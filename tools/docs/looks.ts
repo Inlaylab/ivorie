@@ -4,6 +4,8 @@ import { RADII } from '../../projects/cli/src/preset.ts';
 
 // shadcn/ui order, not alphabetical: the playground shows them like this.
 const BASE_COLORS = ['neutral', 'stone', 'zinc', 'mauve', 'olive', 'mist', 'taupe'];
+// Accents in hue order (shadcn lists them A–Z), so the swatch row reads as a spectrum.
+const ACCENTS = ['red', 'orange', 'amber', 'yellow', 'lime', 'green', 'emerald', 'teal', 'cyan', 'sky', 'blue', 'indigo', 'violet', 'purple', 'fuchsia', 'pink', 'rose'];
 
 interface BaseColor {
   name: string;
@@ -19,15 +21,19 @@ interface FontOption {
   dependency: string;
 }
 
-export function looksData(): { baseColors: BaseColor[]; fonts: FontOption[]; radii: Record<string, string | null> } {
+export function looksData(): { baseColors: BaseColor[]; accents: BaseColor[]; fonts: FontOption[]; radii: Record<string, string | null> } {
   const baseColors = BASE_COLORS.map((name) => {
     const c = JSON.parse(readFileSync(`tools/registry/base-colors/${name}.json`, 'utf8'));
+    return { name, title: c.title, light: c.light, dark: c.dark };
+  });
+  const accents = ACCENTS.map((name) => {
+    const c = JSON.parse(readFileSync(`tools/registry/accent-colors/${name}.json`, 'utf8'));
     return { name, title: c.title, light: c.light, dark: c.dark };
   });
   const fonts = JSON.parse(readFileSync('tools/registry/fonts.json', 'utf8')).map(
     ({ name, title, type, family, dependency }: FontOption) => ({ name, title, type, family, dependency }),
   );
-  return { baseColors, fonts, radii: RADII };
+  return { baseColors, accents, fonts, radii: RADII };
 }
 
 export function looksModule(): string {
@@ -49,6 +55,9 @@ export interface FontOption {
 }
 
 export const BASE_COLORS: BaseColor[] = ${j(d.baseColors)};
+
+/** Accent colors: primary, secondary, chart and sidebar-primary over a base color. */
+export const ACCENTS: BaseColor[] = ${j(d.accents)};
 
 export const FONTS: FontOption[] = ${j(d.fonts)};
 

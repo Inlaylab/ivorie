@@ -3,6 +3,7 @@
 Ivorie is built on the work of these open-source projects:
 
 - **shadcn/ui** — design, Tailwind classes, component patterns and the style files (`styles/style-*.css`, from `registry/styles/`). MIT License. https://github.com/shadcn-ui/ui
+- **solid-glass** — ideas for the glass style (`styles/style-glass.css`): edges drawn with light, thickness by depth, neutral panes. MIT License. https://github.com/deeplethe/solid-glass
 - **Radix UI** — accessibility and keyboard patterns. MIT License. https://github.com/radix-ui/primitives
 - **Lucide** — icons (`@inlaylab/ivorie/icon`). ISC License. https://github.com/lucide-icons/lucide
 - **Tabler Icons** — icons (`icons/tabler`). MIT License. https://github.com/tabler/tabler-icons

@@ -1,6 +1,6 @@
 // The files and packages one preset needs. Shared by `init` and `apply`.
 import { relativeImport } from './edit.ts';
-import { RADII, type Preset } from './preset.ts';
+import { RADII, chartSource, lookVars, type Preset } from './preset.ts';
 import type { Registry } from './registry.ts';
 import { renderTheme } from './theme.ts';
 
@@ -19,18 +19,26 @@ export async function renderLook(preset: Preset, reg: Registry, path: string, st
   const styleFile = `style-${preset.style}.css`;
   const heading = preset.fontHeading === 'inherit' ? undefined : preset.fontHeading;
   const fontNames = [preset.font === 'system' ? undefined : preset.font, heading].filter((f) => f !== undefined);
-  const [base, color, style, ...fonts] = await Promise.all([
+  const chartColor = chartSource(preset);
+  const accentNames = [...new Set([preset.theme, chartColor].filter((a) => a !== 'base'))];
+  const [base, color, style, ...rest] = await Promise.all([
     reg.item('theme-base'),
     reg.item(`theme-${preset.baseColor}`),
     reg.item(`style-${preset.style}`),
+    ...accentNames.map((a) => reg.item(`theme-accent-${a}`)),
     ...fontNames.map((f) => reg.item(`font-${f}`)),
   ]);
+  const accents = rest.slice(0, accentNames.length);
+  const fonts = rest.slice(accentNames.length);
+  const accent = (name: string) => accents[accentNames.indexOf(name)]?.cssVars;
   const family = (name: string) => fonts.find((f) => f.name === `font-${name}`)!.font!.family;
 
-  const light = { ...color.cssVars!.light };
+  const vars = (mode: 'light' | 'dark') =>
+    lookVars(color.cssVars![mode], accent(preset.theme)?.[mode], accent(chartColor)?.[mode] ?? color.cssVars![mode], preset.menuAccent);
+  const light = vars('light');
   const radius = RADII[preset.radius];
   if (radius !== null && radius !== undefined) light['--radius'] = radius;
-  let themeCss = renderTheme({ base: base.files![0].content, light, dark: color.cssVars!.dark }, { imports: false });
+  let themeCss = renderTheme({ base: base.files![0].content, light, dark: vars('dark') }, { imports: false });
 
   const tokens = [
     ...(preset.font === 'system' ? [] : [`  --font-sans: ${family(preset.font)};`]),

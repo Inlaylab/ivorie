@@ -57,9 +57,14 @@ npm run check -- --only test-blocks,test-docs   # just some gates
 - **1.1** More components (popover, sheet, slider, toggle, command, …) and a docs page that lists every example.
 - **1.2** Playground: pick style, base color, font and radius, then install that look.
 - **1.4** Icon libraries (lucide, tabler, phosphor, hugeicons, remix), five new styles (glass, brutal, aurora, bento, mono), a data table and 19 blocks.
-- Next: **1.4.2** docs redesign, **1.5** glass material and new theme dials, **1.6** charts (line, area, bar, pie), then **1.7** AI-ready (AGENTS.md, MCP server).
+- **1.5** Charts (line, area, bar, pie, radar, radial), dashboard blocks, 17 accent colors with colored charts, shadcn's lyra, mira and sera styles, and a neutral glass. Aurora and brutal are gone.
+- Next: **1.6** more theme dials (density, glass thickness), then **1.7** AI-ready (AGENTS.md, MCP server).
 
 Details: [ROADMAP.md](ROADMAP.md).
+
+## Support
+
+Ivorie is free and MIT licensed. If it saves you time, you can [buy me a coffee](https://buymeacoffee.com/bhavikbhensajaliya).
 
 ## Learn more
 

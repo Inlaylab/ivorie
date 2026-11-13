@@ -58,8 +58,8 @@ describe('PlaygroundPage', () => {
     const { el } = await render();
     expect(rail(el).querySelector('h1')!.textContent!.trim()).toBe('Customize');
     const rows = [...rail(el).querySelectorAll('span[id$="-label"]')].map((s) => s.textContent!.trim());
-    expect(rows).toEqual(['Mode', 'Style', 'Base color', 'Radius', 'Icons', 'Heading font', 'Font', 'Preview width']);
-    expect(rail(el).querySelectorAll('[data-slot="select-trigger"]').length).toBe(8);
+    expect(rows).toEqual(['Mode', 'Style', 'Base color', 'Accent', 'Chart color', 'Menu accent', 'Radius', 'Icons', 'Heading font', 'Font', 'Preview width']);
+    expect(rail(el).querySelectorAll('[data-slot="select-trigger"]').length).toBe(11);
     expect(rail(el).querySelector('[data-testid="panel-command"]')!.textContent!.trim()).toBe('npx ivorie init');
   });
 
@@ -104,6 +104,7 @@ describe('PlaygroundPage', () => {
     await fixture.whenStable();
     fixture.detectChanges();
     const code = encodePreset({
+      ...DEFAULT_PRESET,
       style: 'nova',
       baseColor: 'olive',
       font: 'system',
@@ -122,6 +123,7 @@ describe('PlaygroundPage', () => {
 
   it('a preset in the URL is applied; a bad one gives the defaults', async () => {
     const code = encodePreset({
+      ...DEFAULT_PRESET,
       style: 'nova',
       baseColor: 'olive',
       font: 'inter',

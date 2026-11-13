@@ -76,7 +76,7 @@ describe('PlaygroundLook', () => {
     const { look, stage } = create();
     look.set({ style: 'maia' });
     TestBed.tick();
-    expect([...stage.classList]).toEqual(['style-maia']);
+    expect([...stage.classList].sort()).toEqual(['docs-preview', 'style-maia']);
     expect(document.body.className).toBe('style-nova');
     expect(document.getElementById('docs-style-maia')?.getAttribute('href')).toBe('style-maia.css');
   });
@@ -93,7 +93,7 @@ describe('PlaygroundLook', () => {
 
   it('load(): a valid code, a bad code, an unknown value', () => {
     const { look } = create();
-    const golden = { style: 'nova', baseColor: 'olive', font: 'inter', fontHeading: 'lora', radius: 'large', iconLibrary: 'lucide' };
+    const golden = { ...DEFAULT_PRESET, style: 'nova', baseColor: 'olive', font: 'inter', fontHeading: 'lora', radius: 'large', theme: 'blue', chartColor: 'rose', menuAccent: 'bold' };
     look.load(encodePreset(golden));
     expect(look.preset()).toEqual(golden);
     look.load('ivp1_!!');

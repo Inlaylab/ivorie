@@ -18,6 +18,7 @@ const SLOTS = [
   'calendar',
   'card',
   'carousel',
+  'chart',
   'checkbox',
   'collapsible',
   'combobox',

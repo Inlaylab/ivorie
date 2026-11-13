@@ -56,7 +56,7 @@ Add the class `dark` to `<html>`.
 
 ## Style class
 
-A style class on `<body>` selects the component look: spacing, radius, borders and shadows. Ivorie ships the five shadcn/ui styles, copied rule for rule, and five of its own:
+A style class on `<body>` selects the component look: spacing, radius, borders and shadows. Ivorie ships the eight shadcn/ui styles, copied rule for rule, and three of its own:
 
 | Style | Class | Look |
 |---|---|---|
@@ -65,9 +65,10 @@ A style class on `<body>` selects the component look: spacing, radius, borders a
 | Maia | `style-maia` | Rounded, with generous spacing. |
 | Luma | `style-luma` | Fluid, luminous and soft. |
 | Rhea | `style-rhea` | Like Luma, but compact. |
-| Glass | `style-glass` | Frosted, see-through surfaces over a soft color field. Solid when the browser has no backdrop blur or the user asks for less transparency. |
-| Brutal | `style-brutal` | Ink borders, hard offset shadows, buttons that press down. |
-| Aurora | `style-aurora` | Gradient hairline edges, a soft glow on focus and primary actions. Brings its own accent hues. |
+| Lyra | `style-lyra` | Boxy and sharp. For mono fonts. |
+| Mira | `style-mira` | Made for compact interfaces. |
+| Sera | `style-sera` | Editorial and typographic. |
+| Glass | `style-glass` | Thick panes of neutral glass. Edges drawn with light: a rim on top, a hairline, a shadow below. The faint light under the glass follows `--primary`. Solid when the browser has no backdrop blur or the user asks for less transparency. |
 | Bento | `style-bento` | Tonal tiles on a toned page, no outlines, big type. |
 | Mono | `style-mono` | Flat, with hairlines and a block caret. Font and radius follow the preset like every style; it is made for a mono font (the playground picks Geist Mono). |
 
@@ -122,9 +123,20 @@ Set `--radius` once. Other radii derive from it in `theme.css`.
 }
 ```
 
+## Accent and chart colors
+
+The base colors are near-gray, so charts are gray too. An accent adds color: it sets `--primary`, `--secondary`, `--sidebar-primary` and the chart colors `--chart-1` to `--chart-5` over the base color. The 17 accents are shadcn/ui's: red, orange, amber, yellow, lime, green, emerald, teal, cyan, sky, blue, indigo, violet, purple, fuchsia, pink and rose.
+
+- **Chart color** picks where `--chart-1…5` come from: the accent (default), the base color's grays, or another accent.
+- **Menu accent** `bold` paints menu and list highlights (`--accent`) in the primary color. `subtle` keeps the base color's.
+
+```bash
+npx ivorie init --theme blue --chart-color emerald --menu-accent bold
+```
+
 ## Presets
 
-Base color, font, heading font and radius are preset choices. Pick them in the [playground](playground), then run `npx ivorie init --preset ivp1_…` in a new app or `npx ivorie apply ivp1_…` in an existing one.
+Base color, accent, chart color, menu accent, font, heading font and radius are preset choices. Pick them in the [playground](playground), then run `npx ivorie init --preset ivp1_…` in a new app or `npx ivorie apply ivp1_…` in an existing one.
 
 | Radius | `--radius` |
 |---|---|

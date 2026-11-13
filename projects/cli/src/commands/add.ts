@@ -93,15 +93,19 @@ export async function runAdd(names: string[], o: AddOptions, report: Report = em
   const project = detectProject(o.cwd);
   // Blocks draw icons with @ng-icons/lucide; another library swaps in its package.
   const iconPkg = ICON_PACKAGES[config.iconLibrary].split('/').slice(0, 2).join('/');
-  const deps = [...new Set(items.flatMap((i) => i.dependencies ?? []))]
-    .map((d) => d.replace(/^@ng-icons\/lucide@/, `${iconPkg}@`))
-    .filter((d) => !project.deps.has(packageName(d)))
-    .sort();
-  if (deps.length) {
-    if (o.skipInstall || o.dryRun) report.notes.push(installCommand(project.pm, deps).join(' '));
+  const missing = (deps: string[]) => [...new Set(deps)].filter((d) => !project.deps.has(packageName(d))).sort();
+  const deps = missing(items.flatMap((i) => i.dependencies ?? []).map((d) => d.replace(/^@ng-icons\/lucide@/, `${iconPkg}@`)));
+  // Types for untyped packages (d3), so copied files compile in a strict app.
+  const devDeps = missing(items.flatMap((i) => i.devDependencies ?? []));
+  for (const [list, dev] of [
+    [deps, false],
+    [devDeps, true],
+  ] as const) {
+    if (!list.length) continue;
+    if (o.skipInstall || o.dryRun) report.notes.push(installCommand(project.pm, list, dev).join(' '));
     else {
-      await runInstall(project, deps);
-      report.installed.push(...deps);
+      await runInstall(project, list, dev);
+      report.installed.push(...list);
     }
   }
   return report;

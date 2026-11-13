@@ -22,12 +22,12 @@ describe('HomePage', () => {
 
   it('a style choice changes only the wall stage', async () => {
     const { el, fixture } = await render();
-    el.querySelector<HTMLInputElement>('input[name="home-style"][value="brutal"]')!.click();
+    el.querySelector<HTMLInputElement>('input[name="home-style"][value="lyra"]')!.click();
     await fixture.whenStable();
     const stage = el.querySelector<HTMLElement>('.docs-stage')!;
-    expect(stage.classList).toContain('style-brutal');
+    expect(stage.classList).toContain('style-lyra');
     expect(stage.style.getPropertyValue('--primary')).not.toBe('');
-    expect(document.body.classList).not.toContain('style-brutal');
+    expect(document.body.classList).not.toContain('style-lyra');
     expect(document.documentElement.style.getPropertyValue('--primary')).toBe('');
   });
 
@@ -36,14 +36,27 @@ describe('HomePage', () => {
     el.querySelector<HTMLInputElement>('input[name="home-style"][value="glass"]')!.click();
     await fixture.whenStable();
     const glass = el.querySelector<HTMLInputElement>('input[name="home-style"][value="glass"]')!;
-    expect(glass.getAttribute('aria-description')).toBe('Frosted, see-through surfaces.');
-    expect(el.querySelectorAll('iv-tooltip-content').length).toBe(10);
+    expect(glass.getAttribute('aria-description')).toBe('Frosted neutral glass, edges drawn with light.');
+    expect(el.querySelectorAll('iv-tooltip-content').length).toBe(11);
     expect(el.querySelector('[data-testid="home-command"]')).toBeNull();
+  });
+
+  it('an accent colors the stage primary and charts, not the page', async () => {
+    const { el, fixture } = await render();
+    const stage = el.querySelector<HTMLElement>('.docs-stage')!;
+    const grey = stage.style.getPropertyValue('--chart-1');
+    el.querySelector<HTMLInputElement>('input[name="home-accent"][value="blue"]')!.click();
+    await fixture.whenStable();
+    expect(el.querySelectorAll('input[name="home-accent"]').length).toBe(18);
+    // Blue in either mode: light 264.376, dark 265.638.
+    expect(stage.style.getPropertyValue('--primary')).toMatch(/^oklch\(0\.\d+ 0\.\d+ 26[45]\.\d+\)$/);
+    expect(stage.style.getPropertyValue('--chart-1')).not.toBe(grey);
+    expect(document.documentElement.style.getPropertyValue('--primary')).toBe('');
   });
 
   it('shows the wall of live cards and a link to every component', async () => {
     const { el } = await render();
-    expect(el.querySelectorAll('docs-scene-wall iv-card').length).toBe(15);
+    expect(el.querySelectorAll('docs-scene-wall iv-card').length).toBe(17);
     expect(el.querySelector('a[href="/docs/components"]')!.textContent).toMatch(/Browse all \d+ components/);
   });
 

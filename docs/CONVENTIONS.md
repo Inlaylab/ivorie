@@ -66,7 +66,7 @@ No `readme.md` in the library. Docs live in `apps/docs`.
 - Each example: a `### Title` and a `<!-- demo: <name>-<example> -->` marker. It renders as preview on top, code below.
 
 ## Own styles
-- Glass, brutal, aurora, bento and mono are own styles: `tools/styles/own/<name>.css`. Line 1 names a synced base: `/* @base nova */`.
+- Glass, bento and mono are own styles: `tools/styles/own/<name>.css`. Line 1 names a synced base: `/* @base nova */`.
 - A lone `.cn-x {` rule replaces the base rule for that hook. Every other block (`& {`, `.dark & {`, `& .cn-x {`, selector lists, `@supports`, `@media`) is added after the base rules.
 - `node tools/styles/derive.ts <name>|--all` writes `projects/ui/styles/style-<name>.css`. Never edit that file. `derive.test.ts` fails when it is stale.
 - New own style: add it to `package.json` exports, `tools/check.ts` (attw), `OWN_STYLES` in `tools/structure/theme.test.ts`, and the docs style lists (`appearance-options.ts`, `look-controls.ts`, `apps/docs/src/styles/`, `angular.json`). `contrast.test.ts` must pass.

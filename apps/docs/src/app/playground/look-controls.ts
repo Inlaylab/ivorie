@@ -10,22 +10,23 @@ import { NgTemplateOutlet } from '@angular/common';
 import { IvIcon } from '@inlaylab/ivorie/icon';
 import { IV_SELECT_IMPORTS } from '@inlaylab/ivorie/select';
 import { IV_TOOLTIP_IMPORTS } from '@inlaylab/ivorie/tooltip';
-import { BASE_COLORS, FONTS, RADII } from '../../generated/looks';
+import { ACCENTS, BASE_COLORS, FONTS, RADII } from '../../generated/looks';
 import { Appearance } from '../shell/appearance';
 import { STYLES } from '../shell/appearance-options';
 import { ICON_LIBRARIES, type PlaygroundLook } from './playground-look';
 import type { Preset } from './preset-code';
 
-/** One line per style: shadcn/ui's words for its five, ours for the rest. */
+/** One line per style: shadcn/ui's words for its eight, ours for the rest. */
 export const STYLE_NOTES: Record<string, string> = {
   vega: 'Clean, neutral and familiar.',
   nova: 'Less padding and margin.',
   maia: 'Rounded, with generous spacing.',
   luma: 'Fluid, luminous and soft.',
   rhea: 'Like Luma, but compact.',
-  glass: 'Frosted, see-through surfaces.',
-  brutal: 'Hard borders, offset shadows.',
-  aurora: 'Gradient edges and a soft glow.',
+  lyra: 'Boxy and sharp. For mono fonts.',
+  mira: 'Made for compact interfaces.',
+  sera: 'Editorial and typographic.',
+  glass: 'Frosted neutral glass, edges drawn with light.',
   bento: 'Tonal tiles, no outlines.',
   mono: 'Flat and dense, made for a mono font.',
 };
@@ -80,6 +81,10 @@ function swatch(light: Record<string, string>): string {
         />
         <hr class="my-1.5" />
         <ng-container [ngTemplateOutlet]="picker" [ngTemplateOutletContext]="{ key: 'baseColor', label: 'Base color', options: colorOptions, picture: swatchIcon }" />
+        <ng-container [ngTemplateOutlet]="picker" [ngTemplateOutletContext]="{ key: 'theme', label: 'Accent', options: accentOptions, picture: swatchIcon }" />
+        <ng-container [ngTemplateOutlet]="picker" [ngTemplateOutletContext]="{ key: 'chartColor', label: 'Chart color', options: chartOptions, picture: swatchIcon }" />
+        <ng-container [ngTemplateOutlet]="picker" [ngTemplateOutletContext]="{ key: 'menuAccent', label: 'Menu accent', options: menuAccentOptions, picture: swatchIcon }" />
+        <hr class="my-1.5" />
         <ng-container [ngTemplateOutlet]="picker" [ngTemplateOutletContext]="{ key: 'radius', label: 'Radius', options: radii, picture: radiusIcon }" />
         <ng-container [ngTemplateOutlet]="picker" [ngTemplateOutletContext]="{ key: 'iconLibrary', label: 'Icons', options: iconOptions, picture: libraryIcon }" />
         <hr class="my-1.5" />
@@ -267,6 +272,24 @@ export class LookControls {
     label: c.title,
     picture: swatch(c.light),
   }));
+  // Pictures: an accent shows its primary, a chart option two steps of its ramp.
+  protected readonly accentOptions = [
+    { name: 'base', label: 'None', picture: 'var(--foreground)' },
+    ...ACCENTS.map((a) => ({ name: a.name, label: a.title, picture: a.light['--primary'] })),
+  ];
+  protected readonly chartOptions = [
+    { name: 'theme', label: 'Same as accent', picture: 'linear-gradient(135deg, var(--chart-1) 50%, var(--chart-4) 50%)' },
+    { name: 'base', label: 'Gray', picture: 'linear-gradient(135deg, oklch(0.87 0 0) 50%, oklch(0.439 0 0) 50%)' },
+    ...ACCENTS.map((a) => ({
+      name: a.name,
+      label: a.title,
+      picture: `linear-gradient(135deg, ${a.light['--chart-1']} 50%, ${a.light['--chart-4']} 50%)`,
+    })),
+  ];
+  protected readonly menuAccentOptions = [
+    { name: 'subtle', label: 'Subtle', picture: 'var(--muted)' },
+    { name: 'bold', label: 'Bold', picture: 'var(--primary)' },
+  ];
   protected readonly radii = Object.keys(RADII).map((name) => ({
     name,
     label: RADIUS_LABELS[name] ?? name,

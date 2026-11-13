@@ -1,6 +1,7 @@
 import type { Type } from '@angular/core';
 
-export type DocSection = 'guide' | 'component';
+/** guide → component → charts (the chart gallery pages). */
+export type DocSection = 'guide' | 'component' | 'charts';
 export type DocSegment =
   | { kind: 'html'; html: string }
   | { kind: 'demo'; name: string }

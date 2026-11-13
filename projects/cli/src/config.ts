@@ -14,6 +14,12 @@ export interface ComponentsJson {
   fontHeading?: string;
   radius: string;
   iconLibrary: IconLibrary;
+  /** Accent color; left out when 'base' (none). */
+  theme?: string;
+  /** Chart color source; left out when 'theme'. */
+  chartColor?: string;
+  /** Left out when 'subtle'. */
+  menuAccent?: string;
   /** Where blocks go. Default: next to `path` (`src/app/ui` → `src/app/blocks`). */
   blocksPath?: string;
   registry?: string;
@@ -57,6 +63,6 @@ export function validateConfig(value: unknown): ComponentsJson {
     throw new Error(`components.json: "iconLibrary" must be one of ${ICON_LIBRARIES.join(', ')}`);
   }
   if (v['registry'] !== undefined) str(v, 'registry');
-  if (v['fontHeading'] !== undefined) str(v, 'fontHeading');
+  for (const key of ['fontHeading', 'theme', 'chartColor', 'menuAccent']) if (v[key] !== undefined) str(v, key);
   return v as unknown as ComponentsJson;
 }

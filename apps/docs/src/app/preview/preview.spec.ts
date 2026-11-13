@@ -51,6 +51,16 @@ describe('PreviewPage', () => {
     expect(document.body.classList.contains('style-nova')).toBe(false);
   });
 
+  it('the wall opens with the look: its style and fonts named, its colors as swatches', async () => {
+    const geist = encodePreset({ ...DEFAULT_PRESET, style: 'glass', font: 'geist' });
+    const { el, fixture } = await open(`/preview/scene/wall?preset=${geist}`);
+    fixture.detectChanges();
+    const first = el.querySelector('docs-scene-wall > iv-card')!;
+    expect(first.getAttribute('data-testid')).toBe('wall-specimen');
+    expect(first.querySelector('iv-card-title')!.textContent).toContain('Glass, Geist');
+    expect(first.querySelectorAll('li').length).toBe(12);
+  });
+
   it('applies a look message from the same origin', async () => {
     await open(`/preview/scene/wall?preset=${glass}`);
     post(location.origin, maia);

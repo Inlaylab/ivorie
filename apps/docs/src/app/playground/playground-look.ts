@@ -5,10 +5,10 @@ import { COMPONENT_ICONS as HUGEICONS } from '@inlaylab/ivorie/icons/hugeicons';
 import { COMPONENT_ICONS as PHOSPHOR } from '@inlaylab/ivorie/icons/phosphor';
 import { COMPONENT_ICONS as REMIX } from '@inlaylab/ivorie/icons/remix';
 import { COMPONENT_ICONS as TABLER } from '@inlaylab/ivorie/icons/tabler';
-import { BASE_COLORS, FONTS, RADII } from '../../generated/looks';
+import { ACCENTS, BASE_COLORS, FONTS, RADII } from '../../generated/looks';
 import { Appearance } from '../shell/appearance';
 import { DEFAULT_STYLE, STYLES, STYLE_FONTS, type StyleName } from '../shell/appearance-options';
-import { DEFAULT_PRESET, decodePreset, encodePreset, type Preset } from './preset-code';
+import { DEFAULT_PRESET, chartSource, decodePreset, encodePreset, lookVars, type Preset } from './preset-code';
 import { SCENE_ICONS } from './scene-icons';
 
 /** The component icon sets the preview can draw, in picker order. */
@@ -44,14 +44,23 @@ function valid(p: Preset): boolean {
     (p.font === 'system' || fonts.includes(p.font)) &&
     (p.fontHeading === 'inherit' || fonts.includes(p.fontHeading)) &&
     p.radius in RADII &&
-    ICON_LIBRARIES.some((l) => l.name === p.iconLibrary)
+    ICON_LIBRARIES.some((l) => l.name === p.iconLibrary) &&
+    (p.theme === 'base' || ACCENTS.some((a) => a.name === p.theme)) &&
+    (['theme', 'base'].includes(p.chartColor) || ACCENTS.some((a) => a.name === p.chartColor)) &&
+    ['subtle', 'bold'].includes(p.menuAccent)
   );
+}
+
+/** The color variables `ivorie` writes for this preset, one mode. Same merge as the CLI (lookVars). */
+function colorVars(p: Preset, mode: 'light' | 'dark'): Record<string, string> {
+  const color = BASE_COLORS.find((c) => c.name === p.baseColor)!;
+  const accent = (name: string) => ACCENTS.find((a) => a.name === name)?.[mode];
+  return lookVars(color[mode], accent(p.theme), accent(chartSource(p)) ?? color[mode], p.menuAccent);
 }
 
 /** The :root, .dark and font blocks `ivorie` writes into theme.css for this preset. */
 function themeCss(p: Preset): string {
-  const color = BASE_COLORS.find((c) => c.name === p.baseColor)!;
-  const light = { ...color.light, ...(RADII[p.radius] !== null && { '--radius': RADII[p.radius]! }) };
+  const light = { ...colorVars(p, 'light'), ...(RADII[p.radius] !== null && { '--radius': RADII[p.radius]! }) };
   const block = (sel: string, vars: Record<string, string>) =>
     `${sel} {\n${Object.entries(vars).map(([k, v]) => `  ${k}: ${v};\n`).join('')}}`;
   const tokens = [
@@ -59,14 +68,13 @@ function themeCss(p: Preset): string {
     ...(p.fontHeading === 'inherit' ? [] : [`  --font-heading: ${family(p.fontHeading)};`]),
   ];
   const fonts = tokens.length ? `\n\n@theme {\n${tokens.join('\n')}\n}` : '';
-  return `${block(':root', light)}\n\n${block('.dark', color.dark)}${fonts}\n`;
+  return `${block(':root', light)}\n\n${block('.dark', colorVars(p, 'dark'))}${fonts}\n`;
 }
 
 /**
  * A preset shown on the elements it is attached to (a preview area, the overlay container), never on
  * the rest of the site. Detached elements, font links and style sheets are cleaned up on destroy.
- * shortcut: the site keeps `style-nova` on <body>, so a previewed style wins only where both styles set
- * the same property (its sheet loads later). Exact isolation would need an iframe.
+ * Targets get `docs-preview`: the site's nova skips them unless the preview is nova (tools/docs/site-style.ts).
  */
 @Injectable()
 export class PlaygroundLook {
@@ -89,7 +97,7 @@ export class PlaygroundLook {
       const p = this._preset();
       const color = BASE_COLORS.find((c) => c.name === p.baseColor)!;
       const vars: Record<string, string> = {
-        ...(this.appearance.dark() ? color.dark : color.light),
+        ...colorVars(p, this.appearance.dark() ? 'dark' : 'light'),
         '--radius': RADII[p.radius] ?? color.light['--radius'],
         '--font-sans': p.font === 'system' ? SYSTEM_SANS : `${family(p.font)}, ${SYSTEM_SANS}`,
         '--font-heading': p.fontHeading === 'inherit' ? 'var(--font-sans)' : family(p.fontHeading),
@@ -103,7 +111,7 @@ export class PlaygroundLook {
           keys.add(k);
         }
         for (const c of [...el.classList]) if (c.startsWith('style-')) el.classList.remove(c);
-        el.classList.add(`style-${p.style}`);
+        el.classList.add(`style-${p.style}`, 'docs-preview');
       }
       this.loadStyleSheet(p.style);
       for (const name of [p.font, p.fontHeading]) {
@@ -116,6 +124,7 @@ export class PlaygroundLook {
       for (const [el, keys] of applied) {
         for (const k of keys) el.style.removeProperty(k);
         for (const c of [...el.classList]) if (c.startsWith('style-')) el.classList.remove(c);
+        el.classList.remove('docs-preview');
       }
       this.doc.head.querySelectorAll('link[id^="docs-font-"], link[id^="docs-style-"]').forEach((l) => l.remove());
     });

@@ -11,6 +11,7 @@ import { RouterLink } from '@angular/router';
 import { IvButton } from '@inlaylab/ivorie/button';
 import { IV_TABS_IMPORTS } from '@inlaylab/ivorie/tabs';
 import { IV_TOOLTIP_IMPORTS } from '@inlaylab/ivorie/tooltip';
+import { ACCENTS } from '../../generated/looks';
 import { PAGES } from '../../generated/pages';
 import { PlaygroundLook } from '../playground/playground-look';
 import { SceneWall } from '../playground/scenes/wall';
@@ -69,7 +70,7 @@ import { CopyButton } from '../ui/copy-button';
     <!-- The showcase: real components in the picked style, on a horizon of light. Only the stage changes. -->
     <section aria-labelledby="wall-title" class="mx-auto max-w-7xl px-4 pb-20 sm:px-6">
       <h2 id="wall-title" class="sr-only">Live components</h2>
-      <div class="mb-5 flex justify-center">
+      <div class="mb-5 flex flex-col items-center gap-3">
         <div role="radiogroup" aria-label="Style" class="docs-pane no-scrollbar relative flex max-w-full gap-0.5 overflow-x-auto rounded-full p-1">
           @for (s of styles; track s.name) {
             <iv-tooltip class="shrink-0" [delayDuration]="150">
@@ -90,6 +91,26 @@ import { CopyButton } from '../ui/copy-button';
               </label>
               <iv-tooltip-content side="bottom">{{ notes[s.name] }}</iv-tooltip-content>
             </iv-tooltip>
+          }
+        </div>
+        <!-- Accent: none (the base color's ink) or one of shadcn's accents. Charts follow it. -->
+        <div role="radiogroup" aria-label="Accent" class="flex max-w-full flex-wrap justify-center gap-1.5 px-2">
+          @for (a of accents; track a.name) {
+            <label
+              class="ring-offset-background has-checked:ring-foreground has-focus-visible:outline-ring flex size-5 cursor-pointer rounded-full ring-1 ring-black/10 ring-offset-2 transition-shadow has-checked:ring-2 has-focus-visible:outline-2 has-focus-visible:outline-offset-4 dark:ring-white/15"
+              [title]="a.title"
+            >
+              <input
+                type="radio"
+                class="sr-only"
+                name="home-accent"
+                [value]="a.name"
+                [attr.aria-label]="a.title"
+                [checked]="look.preset().theme === a.name"
+                (change)="look.set({ theme: a.name })"
+              />
+              <span class="size-full rounded-full" [style.background]="a.color" aria-hidden="true"></span>
+            </label>
           }
         </div>
       </div>
@@ -164,9 +185,13 @@ export default class HomePage {
   private readonly stage = viewChild.required<ElementRef<HTMLElement>>('stage');
   protected readonly componentCount = PAGES.filter((p) => p.section === 'component').length;
   /** The announcement pill. Update with each release. */
-  protected readonly release = { version: '1.4.1', text: 'A new site, radius and font in every style' };
+  protected readonly release = { version: '1.5.0', text: 'Charts, accent colors and new styles' };
   protected readonly styles = STYLES;
   protected readonly notes = STYLE_NOTES;
+  protected readonly accents = [
+    { name: 'base', title: 'No accent', color: 'var(--foreground)' },
+    ...ACCENTS.map((a) => ({ name: a.name, title: a.title, color: a.light['--primary'] })),
+  ];
   protected readonly installs = [
     { value: 'package', command: 'npm i @inlaylab/ivorie' },
     { value: 'source', command: 'npx ivorie init' },

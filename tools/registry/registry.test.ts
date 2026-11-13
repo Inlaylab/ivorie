@@ -71,3 +71,17 @@ test('building twice gives byte-identical output', () => {
     ['index.json', 'registry.json', ...names.map((n) => `r/${n}`)].map((f) => readFileSync(join(d, f), 'utf8'));
   assert.deepEqual(read(dirA), read(dirB));
 });
+
+test('chart and the blocks that reach it list the d3 @types as devDependencies', () => {
+  const root = JSON.parse(readFileSync('package.json', 'utf8')).devDependencies;
+  const want = ['d3-scale', 'd3-shape'].map((p) => `@types/${p}@${root[`@types/${p}`]}`);
+  const byName = (n: string) => items.find((i) => i.name === n);
+  assert.deepEqual(byName('chart').devDependencies, want);
+  assert.deepEqual(byName('dashboard-01').devDependencies, want);
+  assert.equal(byName('button').devDependencies, undefined);
+});
+
+test('a block lists the npm deps of the components it reaches, transitively', () => {
+  const login = items.find((i) => i.name === 'login-01');
+  assert.ok(login.dependencies.some((d: string) => d.startsWith('class-variance-authority@')), login.dependencies.join());
+});

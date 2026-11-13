@@ -7,19 +7,20 @@ import { fileURLToPath } from 'node:url';
 import { parseFrontmatter } from '../docs/content.ts';
 import { parseTheme } from '../../projects/cli/src/theme.ts';
 import { DEFAULT_PRESET, RADII } from '../../projects/cli/src/preset.ts';
-import { blockMeta, collectDeps, listBlocks, listEntries, registryDeps, rewriteImports } from './items.ts';
+import { blockMeta, collectDeps, collectDevDeps, listBlocks, listEntries, registryDeps, rewriteImports, type Entry } from './items.ts';
 
 const ITEM_SCHEMA = 'https://ui.shadcn.com/schema/registry-item.json';
 const REGISTRY_SCHEMA = 'https://ui.shadcn.com/schema/registry.json';
 const STYLES_DIR = 'projects/ui/styles';
 // Var maps from shadcn/ui (MIT) apps/v4/registry/themes.ts, keys as --name.
 const BASE_COLORS_DIR = 'tools/registry/base-colors';
+const ACCENT_COLORS_DIR = 'tools/registry/accent-colors';
 // From shadcn/ui (MIT) apps/v4/lib/font-definitions.ts. Each font is a @fontsource-variable package.
 const FONTS: { name: string; title: string; type: string; family: string; import: string; dependency: string }[] = JSON.parse(
   readFileSync('tools/registry/fonts.json', 'utf8'),
 );
 
-type Kind = 'component' | 'lib' | 'style' | 'base-color' | 'theme-base' | 'font' | 'block';
+type Kind = 'component' | 'lib' | 'style' | 'base-color' | 'theme-base' | 'font' | 'block' | 'accent';
 interface File {
   path: string;
   type: 'registry:file';
@@ -33,6 +34,7 @@ interface Item {
   title: string;
   description: string;
   dependencies?: string[];
+  devDependencies?: string[];
   registryDependencies?: string[];
   files?: File[];
   cssVars?: { light: Record<string, string>; dark: Record<string, string> };
@@ -74,6 +76,7 @@ const json = (v: unknown) => JSON.stringify(stable(v), null, 2) + '\n';
 export function buildItems(): Item[] {
   const items: Item[] = listEntries().map((e) => {
     const deps = collectDeps(e);
+    const devDeps = collectDevDeps(e);
     const reg = registryDeps(e);
     return {
       $schema: ITEM_SCHEMA,
@@ -81,21 +84,32 @@ export function buildItems(): Item[] {
       type: 'registry:item',
       ...docsMeta(e.name),
       ...(deps.length && { dependencies: deps }),
+      ...(devDeps.length && { devDependencies: devDeps }),
       ...(reg.length && { registryDependencies: reg }),
       files: e.files.map((f) => file(`ui/${e.name}/${f.name}`, rewriteImports(f.content))),
       meta: { ivorie: { kind: e.name === 'core' || e.name.startsWith('icons-') ? 'lib' : 'component' } },
     };
   });
 
+  // A block also lists the npm deps (and their @types) of the components it reaches (chart → d3), so its item names every package it needs.
+  const entries = new Map(listEntries().map((e) => [e.name, e]));
+  const reached = (names: string[], seen = new Set<string>()): Entry[] =>
+    names
+      .filter((n) => entries.has(n) && !seen.has(n) && seen.add(n))
+      .flatMap((n) => [entries.get(n)!, ...reached(registryDeps(entries.get(n)!), seen)]);
+
   // Blocks keep their @inlaylab/ivorie imports: add rewrites them per file, to the app's copied components.
   for (const b of listBlocks()) {
-    const deps = collectDeps(b);
+    const all = [b, ...reached(registryDeps(b))];
+    const deps = [...new Set(all.flatMap(collectDeps))].sort();
+    const devDeps = [...new Set(all.flatMap(collectDevDeps))].sort();
     items.push({
       $schema: ITEM_SCHEMA,
       name: b.name,
       type: 'registry:item',
       ...blockMeta(b),
       ...(deps.length && { dependencies: deps }),
+      ...(devDeps.length && { devDependencies: devDeps }),
       registryDependencies: registryDeps(b),
       files: b.files.map((f) => file(`blocks/${b.name}/${f.name}`, f.content)),
       meta: { ivorie: { kind: 'block' } },
@@ -126,6 +140,20 @@ export function buildItems(): Item[] {
       description: `The ${name} base color: light and dark CSS variables.`,
       cssVars: { light: color.light, dark: color.dark },
       meta: { ivorie: { kind: 'base-color' } },
+    });
+  }
+
+  for (const f of readdirSync(ACCENT_COLORS_DIR).filter((f) => f.endsWith('.json')).sort()) {
+    const name = f.slice(0, -'.json'.length);
+    const color = JSON.parse(readFileSync(join(ACCENT_COLORS_DIR, f), 'utf8'));
+    items.push({
+      $schema: ITEM_SCHEMA,
+      name: `theme-accent-${name}`,
+      type: 'registry:theme',
+      title: `Accent ${name}`,
+      description: `The ${name} accent: primary, secondary, chart and sidebar-primary colors over a base color.`,
+      cssVars: { light: color.light, dark: color.dark },
+      meta: { ivorie: { kind: 'accent' } },
     });
   }
 
@@ -176,6 +204,7 @@ export function build(out: string): void {
       blocks: kinds('block'),
       styles: kinds('style').map((n) => n.slice('style-'.length)),
       baseColors: kinds('base-color').map((n) => n.slice('theme-'.length)),
+      accents: kinds('accent').map((n) => n.slice('theme-accent-'.length)),
       fonts: ['system', ...FONTS.map((f) => f.name)],
       radii: Object.keys(RADII),
       presets: { default: DEFAULT_PRESET },

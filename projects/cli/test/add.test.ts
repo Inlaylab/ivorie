@@ -138,3 +138,21 @@ test('a remote registry over http works; a 404 names the URL', async () => {
     server.close();
   }
 });
+
+test('chart installs the d3 types as dev deps, skipping ones the project has', async () => {
+  const cwd = app();
+  const r = await runAdd(['chart'], { cwd, registry, skipInstall: true });
+  const dev = r.notes.find((n) => n.startsWith('npm install -D '));
+  assert.ok(dev, r.notes.join('\n'));
+  for (const pkg of ['@types/d3-scale@', '@types/d3-shape@']) assert.ok(dev.includes(pkg), dev);
+  const prod = r.notes.find((n) => n.startsWith('npm install ') && !n.includes(' -D '))!;
+  assert.ok(prod.includes('d3-scale@') && !prod.includes('@types/'), prod);
+
+  const pkg = JSON.parse(readFileSync(join(cwd, 'package.json'), 'utf8'));
+  pkg.devDependencies['@types/d3-scale'] = '^4.0.0';
+  writeFileSync(join(cwd, 'package.json'), JSON.stringify(pkg));
+  const again = await runAdd(['dashboard-01'], { cwd, registry, skipInstall: true, overwrite: true });
+  const dev2 = again.notes.find((n) => n.startsWith('npm install -D '))!;
+  assert.match(dev2, /@types\/d3-shape@/);
+  assert.doesNotMatch(dev2, /@types\/d3-scale@/);
+});

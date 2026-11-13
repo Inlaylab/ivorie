@@ -13,6 +13,7 @@ const GROUPS = [
     label: 'Components',
     pages: [{ slug: 'components', title: 'Overview', soon: false }, ...PAGES.filter((p) => p.section === 'component')],
   },
+  { label: 'Charts', pages: PAGES.filter((p) => p.section === 'charts') },
 ];
 
 @Component({

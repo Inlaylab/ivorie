@@ -1,59 +1,105 @@
 /* @base nova */
 /*
- * Glass: frosted panes over a vivid color field. Every surface, control, track and list is glass;
- * primary actions stay solid so they read first.
+ * Glass: thick panes of neutral glass. Ideas from solid-glass (MIT, github.com/deeplethe/solid-glass).
+ * Four rules keep it one material:
+ *   1. The finish is at the edge: a line of light on top, a hairline all round, a shadow below.
+ *      No CSS border and no gradient across the face.
+ *   2. Neutral: the panes take their color from the base color, never a hue of their own.
+ *      The faint light under the glass is made from --primary, so it follows the accent.
+ *   3. Depth is thickness: controls < cards < floating panes. Thicker is more opaque.
+ *   4. One state: hover, chosen and open all wear the same small pane of clear glass.
+ * Dark is an even, unlit page: no ambient light.
  * Nova gives the layout; these blocks only add to it, so a nova re-sync keeps working.
- * The field has its own hues: the base colors are near-gray, and glass over gray reads as plain.
  * Every tint is a token, so the fallbacks at the end turn the whole look solid by changing tokens.
  * Contrast is checked by tools/styles/contrast.test.ts against --glass-alpha, --glass-float-alpha,
- * the mesh colors and --glass-muted-mix.
- * Component templates set a few fills themselves (the active tab); those stay as they are.
+ * --glass-page and --glass-muted-mix. Charts take --chart-* as they are: grey unless an accent is picked.
  */
 
 & {
-  --glass-alpha: 0.45;
-  --glass-float-alpha: 0.62;
-  --glass-blur: 24px;
-  --glass-float-blur: 32px;
-  --glass-mesh-alpha: 0.9;
-  --glass-mesh-1: oklch(0.8 0.13 290);
-  --glass-mesh-2: oklch(0.84 0.11 205);
-  --glass-mesh-3: oklch(0.85 0.11 350);
+  --glass-alpha: 0.6;
+  --glass-float-alpha: 0.94;
+  --glass-blur: 26px;
+  --glass-saturate: 1.8;
+  --glass-control-blur: 14px;
   --glass-muted-mix: 0.62;
-  --glass-edge: color-mix(in oklab, white 60%, transparent);
-  --glass-shine: color-mix(in oklab, white 80%, transparent);
-  --glass-control: color-mix(in oklab, white 45%, transparent);
-  --glass-control-hover: color-mix(in oklab, white 68%, transparent);
-  --glass-hover: color-mix(in oklab, white 50%, transparent);
-  --glass-line: color-mix(in oklab, white 55%, transparent);
-  --glass-track: color-mix(in oklab, oklch(0.3 0.06 290) 14%, transparent);
-  --glass-shadow: color-mix(in oklab, oklch(0.35 0.08 290) 28%, transparent);
+  /* The page is a step darker than the panes, so a white pane stands off it. */
+  --glass-page: color-mix(in oklab, var(--background) 94%, var(--foreground));
+  --glass-light-1: color-mix(in oklch, var(--primary) 9%, transparent);
+  --glass-light-2: color-mix(in oklch, var(--foreground) 5%, transparent);
+  --glass-light-3: color-mix(in oklch, var(--primary) 5%, transparent);
+  /* The finish: rim (light on the top edge), inner (a faint second line), edge (hairline outside),
+     contact (the shadow it touches with), shade (the shadow below), lift (floating panes). */
+  --glass-rim: color-mix(in oklab, white 90%, transparent);
+  --glass-inner: color-mix(in oklab, white 35%, transparent);
+  --glass-edge: color-mix(in oklab, var(--foreground) 10%, transparent);
+  --glass-float-edge: color-mix(in oklab, var(--foreground) 18%, transparent);
+  --glass-under: color-mix(in oklab, var(--foreground) 12%, transparent);
+  --glass-contact: color-mix(in oklab, black 6%, transparent);
+  --glass-shade: color-mix(in oklab, black 22%, transparent);
+  --glass-lift: color-mix(in oklab, black 12%, transparent);
+  /* Clear glass: small things and the one state. On white panes it is the smoked kind. */
+  --glass-control: color-mix(in oklab, white 55%, transparent);
+  --glass-control-hover: color-mix(in oklab, var(--foreground) 9%, transparent);
+  --glass-hover: color-mix(in oklab, var(--foreground) 7%, transparent);
+  --glass-line: color-mix(in oklab, var(--foreground) 10%, transparent);
+  --glass-track: color-mix(in oklab, var(--foreground) 10%, transparent);
+  --glass-field: color-mix(in oklab, white 60%, transparent);
+  --glass-field-rim: white;
+  --glass-primary: 88%;
+  --glass-primary-hover: 78%;
+  --glass-primary-rim: color-mix(in oklab, white 30%, transparent);
+  --glass-primary-under: color-mix(in oklab, black 45%, transparent);
   --glass-card: color-mix(in oklab, var(--card) calc(var(--glass-alpha) * 100%), transparent);
   --glass-popover: color-mix(in oklab, var(--popover) calc(var(--glass-float-alpha) * 100%), transparent);
-  --glass-sidebar: color-mix(in oklab, var(--sidebar) calc(var(--glass-alpha) * 100%), transparent);
+  --glass-sidebar: color-mix(in oklab, var(--sidebar) calc(var(--glass-alpha) * 75%), transparent);
+  --glass-pane:
+    inset 0 1px 0 var(--glass-rim), inset 0 0 0 1px var(--glass-inner), 0 0 0 1px var(--glass-edge),
+    0 1px 2px var(--glass-contact), 0 12px 32px -14px var(--glass-shade);
+  --glass-float:
+    inset 0 1px 0 var(--glass-rim), inset 0 -1px 0 var(--glass-under), 0 0 0 1px var(--glass-float-edge),
+    0 24px 60px -18px var(--glass-shade), 0 6px 16px -6px var(--glass-lift);
+  --glass-small: inset 0 1px 0 var(--glass-rim), 0 0 0 1px var(--glass-edge), 0 1px 2px var(--glass-contact);
+}
+
+/* The page ground. Not on the CDK overlay container: it covers the whole screen, so a ground there hides the page. */
+&:not(.cdk-overlay-container) {
+  background-color: var(--glass-page);
   background-image:
-    radial-gradient(42rem 32rem at 8% 6%, color-mix(in oklab, var(--glass-mesh-1) calc(var(--glass-mesh-alpha) * 100%), transparent), transparent 72%),
-    radial-gradient(40rem 32rem at 96% 30%, color-mix(in oklab, var(--glass-mesh-3) calc(var(--glass-mesh-alpha) * 100%), transparent), transparent 70%),
-    radial-gradient(48rem 36rem at 40% 100%, color-mix(in oklab, var(--glass-mesh-2) calc(var(--glass-mesh-alpha) * 100%), transparent), transparent 72%);
+    radial-gradient(62rem 42rem at 12% -6rem, var(--glass-light-1), transparent 62%),
+    radial-gradient(52rem 38rem at 92% 4rem, var(--glass-light-2), transparent 60%),
+    radial-gradient(64rem 46rem at 55% 110%, var(--glass-light-3), transparent 62%);
+  background-repeat: no-repeat;
   background-attachment: fixed;
 }
 
 .dark & {
-  --glass-alpha: 0.4;
-  --glass-float-alpha: 0.58;
-  --glass-mesh-alpha: 0.85;
-  --glass-mesh-1: oklch(0.42 0.17 290);
-  --glass-mesh-2: oklch(0.45 0.12 210);
-  --glass-mesh-3: oklch(0.42 0.16 350);
+  --glass-alpha: 0.5;
+  --glass-float-alpha: 0.96;
+  --glass-saturate: 1;
   --glass-muted-mix: 0.7;
-  --glass-edge: color-mix(in oklab, white 16%, transparent);
-  --glass-shine: color-mix(in oklab, white 26%, transparent);
+  --glass-page: var(--background);
+  --glass-light-1: transparent;
+  --glass-light-2: transparent;
+  --glass-light-3: transparent;
+  --glass-rim: color-mix(in oklab, white 16%, transparent);
+  --glass-inner: color-mix(in oklab, white 4%, transparent);
+  --glass-edge: color-mix(in oklab, white 7%, transparent);
+  --glass-float-edge: color-mix(in oklab, white 9%, transparent);
+  --glass-under: transparent;
+  --glass-contact: color-mix(in oklab, black 10%, transparent);
+  --glass-shade: color-mix(in oklab, black 60%, transparent);
+  --glass-lift: color-mix(in oklab, black 22%, transparent);
   --glass-control: color-mix(in oklab, white 7%, transparent);
-  --glass-control-hover: color-mix(in oklab, white 14%, transparent);
-  --glass-hover: color-mix(in oklab, white 11%, transparent);
-  --glass-line: color-mix(in oklab, white 12%, transparent);
-  --glass-track: color-mix(in oklab, white 16%, transparent);
-  --glass-shadow: color-mix(in oklab, black 45%, transparent);
+  --glass-control-hover: color-mix(in oklab, white 11%, transparent);
+  --glass-hover: color-mix(in oklab, white 8%, transparent);
+  --glass-line: color-mix(in oklab, white 9%, transparent);
+  --glass-track: color-mix(in oklab, white 12%, transparent);
+  --glass-field: color-mix(in oklab, white 6%, transparent);
+  --glass-field-rim: color-mix(in oklab, white 15%, transparent);
+  --glass-primary: 86%;
+  --glass-primary-hover: 76%;
+  --glass-primary-rim: white;
+  --glass-primary-under: color-mix(in oklab, black 22%, transparent);
 }
 
 /* On every element, not the root: the playground sets the base colors inline on the root. */
@@ -61,22 +107,16 @@
   --muted-foreground: color-mix(in oklab, var(--foreground) calc(var(--glass-muted-mix) * 100%), var(--background));
 }
 
-/* Panes: cards and docked surfaces. The field shows through. */
+/* Panes: cards and docked surfaces. No border; the edge is drawn with light. */
 .cn-card,
-.cn-sidebar-inner,
 .cn-alert,
 .cn-item-variant-outline {
-  @apply border-(--glass-edge) ring-1 ring-(--glass-edge) backdrop-blur-(--glass-blur) backdrop-saturate-[1.8] inset-shadow-[0_1px_0_0_var(--glass-shine)] shadow-[0_16px_40px_-20px_var(--glass-shadow)];
+  @apply border-transparent bg-(--glass-card) ring-0 shadow-(--glass-pane) backdrop-blur-(--glass-blur) backdrop-saturate-(--glass-saturate);
 }
 
-& .cn-card,
-& .cn-alert,
-& .cn-item-variant-outline {
-  @apply bg-(--glass-card);
-}
-
+/* A sidebar is a pane on its edge: lit along the side facing the page. */
 & .cn-sidebar-inner {
-  @apply bg-(--glass-sidebar);
+  @apply bg-(--glass-sidebar) shadow-[inset_-1px_0_0_var(--glass-edge),inset_0_1px_0_var(--glass-inner)] backdrop-blur-(--glass-blur) backdrop-saturate-(--glass-saturate);
 }
 
 & .cn-card-title {
@@ -84,10 +124,10 @@
 }
 
 & .cn-empty {
-  @apply border-(--glass-edge) bg-(--glass-control) backdrop-blur-(--glass-blur);
+  @apply border-(--glass-edge) bg-(--glass-control) backdrop-blur-(--glass-control-blur);
 }
 
-/* Floating panes: more opaque and more blurred than cards, so text over busy content stays readable. */
+/* Floating panes: the thickest glass, lifted further off the page. */
 .cn-popover-content,
 .cn-hover-card-content,
 .cn-dialog-content,
@@ -99,34 +139,40 @@
 .cn-combobox-content,
 .cn-command,
 .cn-navigation-menu-viewport,
+.cn-chart-tooltip,
 .cn-toast {
-  @apply bg-(--glass-popover) ring-1 ring-(--glass-edge) backdrop-blur-(--glass-float-blur) backdrop-saturate-[1.8] inset-shadow-[0_1px_0_0_var(--glass-shine)] shadow-[0_24px_60px_-24px_var(--glass-shadow)];
+  @apply border-transparent bg-(--glass-popover) ring-0 shadow-(--glass-float) backdrop-blur-(--glass-blur) backdrop-saturate-(--glass-saturate);
 }
 
 /* A command list inside a dialog is part of that pane. */
 & .cn-dialog-content .cn-command {
-  @apply bg-transparent ring-0 shadow-none inset-shadow-none backdrop-blur-none;
+  @apply bg-transparent shadow-none backdrop-blur-none;
 }
 
 & .cn-tooltip-content {
-  @apply bg-[color-mix(in_oklab,var(--foreground)_78%,transparent)] backdrop-blur-md;
+  @apply bg-[color-mix(in_oklab,var(--foreground)_86%,transparent)] shadow-(--glass-small) backdrop-blur-(--glass-control-blur);
 }
 
 .cn-dialog-overlay,
 .cn-sheet-overlay {
-  @apply bg-[color-mix(in_oklab,var(--glass-shadow)_60%,transparent)] backdrop-blur-sm;
+  @apply bg-[color-mix(in_oklab,black_28%,transparent)] backdrop-blur-[2px];
 }
 
-/* Controls: frosted wells and buttons. */
+/* Fields: clear glass to type on, lit along the top. */
 .cn-input,
 .cn-textarea,
 .cn-input-group,
 .cn-select-trigger,
 .cn-native-select,
-.cn-input-otp-slot,
+.cn-input-otp-slot {
+  @apply border-(--glass-edge) bg-(--glass-field) shadow-none inset-shadow-[0_1px_0_0_var(--glass-field-rim)] backdrop-blur-(--glass-control-blur) dark:border-(--glass-edge) dark:bg-(--glass-field);
+}
+
+/* Unchecked: clear field glass. Checked: the ink pane, lit on top. data-checked is a :where() variant,
+   so a plain fill here would cover nova's checked primary: every fill is under a state. */
 .cn-checkbox,
 .cn-radio-group-item {
-  @apply border-(--glass-edge) bg-(--glass-control) shadow-none backdrop-blur-sm dark:border-(--glass-edge) dark:bg-(--glass-control);
+  @apply shadow-none data-unchecked:border-(--glass-edge) data-unchecked:bg-(--glass-field) dark:data-unchecked:border-(--glass-edge) dark:data-unchecked:bg-(--glass-field) data-checked:border-transparent data-checked:bg-[color-mix(in_oklch,var(--primary)_var(--glass-primary),transparent)] data-checked:inset-shadow-[0_1px_0_0_var(--glass-primary-rim)] dark:data-checked:border-transparent dark:data-checked:bg-[color-mix(in_oklch,var(--primary)_var(--glass-primary),transparent)];
 }
 
 .cn-select-trigger,
@@ -136,50 +182,52 @@
 
 .cn-button-variant-outline,
 .cn-button-variant-secondary {
-  @apply border-(--glass-edge) bg-(--glass-control) shadow-none backdrop-blur-md inset-shadow-[0_1px_0_0_var(--glass-shine)] hover:bg-(--glass-control-hover) aria-expanded:bg-(--glass-control-hover) dark:border-(--glass-edge) dark:bg-(--glass-control) dark:hover:bg-(--glass-control-hover);
+  @apply border-transparent bg-(--glass-control) shadow-(--glass-small) backdrop-blur-(--glass-control-blur) hover:bg-(--glass-control-hover) aria-expanded:bg-(--glass-control-hover) dark:border-transparent dark:bg-(--glass-control) dark:hover:bg-(--glass-control-hover);
 }
 
 & .cn-button-variant-ghost {
   @apply hover:bg-(--glass-hover) aria-expanded:bg-(--glass-hover) dark:hover:bg-(--glass-hover);
 }
 
-/* Primary actions stay solid and lift off the glass. */
+/* The primary button is the most solid pane: the ink's color, lit on top, shaded below.
+   Under the pointer it thins a little; pressed, it sits down and the shadow goes. */
 & .cn-button-variant-default {
-  @apply inset-shadow-[0_1px_0_0_color-mix(in_oklab,white_30%,transparent)] shadow-[0_8px_20px_-8px_color-mix(in_oklab,var(--primary)_70%,transparent)];
+  @apply bg-[color-mix(in_oklch,var(--primary)_var(--glass-primary),transparent)] shadow-[inset_0_1px_0_var(--glass-primary-rim),inset_0_-1px_0_var(--glass-primary-under),0_1px_2px_var(--glass-contact),0_8px_18px_-9px_var(--glass-shade)] backdrop-blur-(--glass-control-blur) hover:bg-[color-mix(in_oklch,var(--primary)_var(--glass-primary-hover),transparent)] active:shadow-[inset_0_1px_0_var(--glass-primary-rim),inset_0_-1px_0_var(--glass-primary-under)];
 }
 
 & .cn-pagination-link {
-  @apply backdrop-blur-sm;
+  @apply backdrop-blur-(--glass-control-blur);
 }
 
 & .cn-switch {
-  @apply border-(--glass-edge) data-unchecked:bg-(--glass-track) dark:data-unchecked:bg-(--glass-track);
+  @apply border-(--glass-edge) data-unchecked:bg-(--glass-track) data-unchecked:shadow-[inset_0_1px_2px_var(--glass-contact)] dark:data-unchecked:bg-(--glass-track);
 }
 
 & .cn-switch-thumb {
-  @apply shadow-[0_1px_4px_color-mix(in_oklab,black_25%,transparent)];
+  @apply shadow-[0_1px_3px_var(--glass-shade)];
 }
 
+/* A track is a groove: shaded under its upper lip. */
 .cn-slider-track,
 .cn-progress {
-  @apply bg-(--glass-track) ring-1 ring-(--glass-edge) ring-inset backdrop-blur-sm;
+  @apply bg-(--glass-track) shadow-[inset_0_1px_2px_var(--glass-contact)];
 }
 
 .cn-slider-range,
 .cn-progress-indicator {
-  @apply inset-shadow-[0_1px_0_0_color-mix(in_oklab,white_35%,transparent)];
+  @apply inset-shadow-[0_1px_0_0_var(--glass-primary-rim)];
 }
 
 & .cn-slider-thumb {
-  @apply border-(--glass-edge) bg-white shadow-[0_2px_8px_var(--glass-shadow)];
+  @apply border-transparent bg-white shadow-[0_0_0_1px_var(--glass-edge),0_2px_6px_var(--glass-shade)];
 }
 
+/* The one state: a small pane of clear glass. */
 .cn-toggle,
 .cn-toggle-group-item {
   @apply hover:bg-(--glass-hover) aria-pressed:bg-(--glass-control-hover) data-[state=on]:bg-(--glass-control-hover);
 }
 
-/* Lists and menus: a light frosted highlight instead of a solid one. */
 .cn-dropdown-menu-item,
 .cn-select-item {
   @apply focus:bg-(--glass-hover);
@@ -194,7 +242,7 @@
 }
 
 & .cn-sidebar-menu-button {
-  @apply hover:bg-(--glass-hover) active:bg-(--glass-hover) data-active:bg-(--glass-control-hover) data-active:inset-shadow-[0_1px_0_0_var(--glass-shine)] data-open:hover:bg-(--glass-hover);
+  @apply hover:bg-(--glass-hover) active:bg-(--glass-hover) data-active:bg-(--glass-control-hover) data-active:inset-shadow-[0_1px_0_0_var(--glass-inner)] data-open:hover:bg-(--glass-hover);
 }
 
 .cn-navigation-menu-trigger,
@@ -202,13 +250,13 @@
   @apply hover:bg-(--glass-hover) focus:bg-(--glass-hover) aria-expanded:bg-(--glass-hover) data-open:bg-(--glass-hover) data-open:hover:bg-(--glass-hover);
 }
 
-/* The active tab's fill is set by the component; the track around it is glass. */
+/* The active tab's fill is set by the component; the track around it is a groove. */
 & .cn-tabs-list {
-  @apply bg-(--glass-control) ring-1 ring-(--glass-edge) backdrop-blur-sm data-[variant=line]:bg-transparent data-[variant=line]:ring-0;
+  @apply bg-(--glass-track) shadow-[inset_0_1px_2px_var(--glass-contact)] data-[variant=line]:bg-transparent data-[variant=line]:shadow-none;
 }
 
 & .cn-tabs-trigger {
-  @apply data-active:inset-shadow-[0_1px_0_0_var(--glass-shine)];
+  @apply data-active:shadow-(--glass-small);
 }
 
 & .cn-calendar-day-button {
@@ -229,20 +277,20 @@
 }
 
 & .cn-badge {
-  @apply backdrop-blur-sm;
+  @apply backdrop-blur-(--glass-control-blur);
 }
 
 .cn-badge-variant-secondary,
 .cn-badge-variant-outline {
-  @apply border-(--glass-edge) bg-(--glass-control);
+  @apply border-transparent bg-(--glass-control) shadow-[inset_0_1px_0_var(--glass-rim),inset_0_0_0_1px_var(--glass-edge)];
 }
 
 & .cn-avatar {
-  @apply ring-2 ring-(--glass-edge);
+  @apply ring-1 ring-(--glass-edge);
 }
 
 & .cn-kbd {
-  @apply bg-(--glass-control) ring-1 ring-(--glass-edge);
+  @apply bg-(--glass-control) shadow-[inset_0_1px_0_var(--glass-rim),inset_0_0_0_1px_var(--glass-edge)];
 }
 
 & .cn-skeleton {
@@ -268,6 +316,9 @@
     --glass-control-hover: var(--muted);
     --glass-hover: var(--accent);
     --glass-track: var(--input);
+    --glass-field: var(--background);
+    --glass-primary: 100%;
+    --glass-primary-hover: 92%;
   }
 }
 
@@ -277,11 +328,16 @@
     --glass-alpha: 1;
     --glass-float-alpha: 1;
     --glass-blur: 0px;
-    --glass-float-blur: 0px;
+    --glass-control-blur: 0px;
     --glass-control: var(--background);
     --glass-control-hover: var(--muted);
     --glass-hover: var(--accent);
     --glass-track: var(--input);
-    background-image: none;
+    --glass-field: var(--background);
+    --glass-primary: 100%;
+    --glass-primary-hover: 92%;
+    --glass-light-1: transparent;
+    --glass-light-2: transparent;
+    --glass-light-3: transparent;
   }
 }
