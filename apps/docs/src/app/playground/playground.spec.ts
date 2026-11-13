@@ -33,7 +33,8 @@ async function render(url = '/playground') {
 }
 
 const rail = (el: HTMLElement) => el.querySelector('aside')!;
-const frame = (el: HTMLElement) => el.querySelector<HTMLIFrameElement>('.docs-stage iframe')!;
+const stage = (el: HTMLElement) => el.querySelector<HTMLElement>('section[aria-label="Preview"]')!;
+const frame = (el: HTMLElement) => stage(el).querySelector<HTMLIFrameElement>('iframe')!;
 // The commands live in the Get code dialog, which renders in the overlay container.
 async function openCode(el: HTMLElement, fixture: { whenStable(): Promise<unknown> }) {
   if (!document.querySelector('[data-testid="command"]')) {
@@ -58,16 +59,16 @@ describe('PlaygroundPage', () => {
     const { el } = await render();
     expect(rail(el).querySelector('h1')!.textContent!.trim()).toBe('Customize');
     const rows = [...rail(el).querySelectorAll('span[id$="-label"]')].map((s) => s.textContent!.trim());
-    expect(rows).toEqual(['Mode', 'Style', 'Base color', 'Accent', 'Chart color', 'Menu accent', 'Radius', 'Icons', 'Heading font', 'Font', 'Preview width']);
-    expect(rail(el).querySelectorAll('[data-slot="select-trigger"]').length).toBe(11);
+    expect(rows).toEqual(['Mode', 'Style', 'Base color', 'Accent', 'Chart color', 'Menu accent', 'Radius', 'Icons', 'Heading font', 'Font']);
+    expect(rail(el).querySelectorAll('[data-slot="select-trigger"]').length).toBe(10);
     expect(rail(el).querySelector('[data-testid="panel-command"]')!.textContent!.trim()).toBe('npx ivorie init');
   });
 
-  it('rows change the look, the mode and the width; style options explain themselves', async () => {
+  it('rows change the look and the mode; the width sits on the preview; style options explain themselves', async () => {
     const { el, fixture } = await render();
     const look = fixture.debugElement.injector.get(PlaygroundLook);
     const open = async (label: string) => {
-      rail(el).querySelector<HTMLElement>(`[aria-labelledby="rail-${label}-label"], [aria-labelledby="pg-${label}-label"]`)!.click();
+      rail(el).querySelector<HTMLElement>(`[aria-labelledby="rail-${label}-label"]`)!.click();
       await fixture.whenStable();
     };
     const pick = async (label: string, text: string) => {
@@ -84,7 +85,8 @@ describe('PlaygroundPage', () => {
     expect(look.preset()).toMatchObject({ style: 'glass', radius: 'large', iconLibrary: 'phosphor' });
     await pick('mode', 'Light');
     expect(document.documentElement.classList.contains('dark')).toBe(false);
-    await pick('width', 'Mobile');
+    stage(el).querySelector<HTMLInputElement>('input[name="pg-width"][value="mobile"]')!.click();
+    await fixture.whenStable();
     fixture.detectChanges();
     expect(frame(el).style.width).toBe('390px');
   });
@@ -145,9 +147,7 @@ describe('PlaygroundPage', () => {
     expect(frame(el).getAttribute('src')).toBe(
       'preview/scene/wall?preset=' + encodePreset({ ...DEFAULT_PRESET }),
     );
-    expect(el.querySelector<HTMLElement>('.docs-stage')!.style.getPropertyValue('--primary')).toBe(
-      '',
-    );
+    expect(stage(el).style.getPropertyValue('--primary')).toBe('');
     expect(document.documentElement.style.getPropertyValue('--primary')).toBe('');
   });
 

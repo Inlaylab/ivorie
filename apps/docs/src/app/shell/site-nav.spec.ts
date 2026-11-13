@@ -2,7 +2,7 @@ import { ApplicationRef } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { describe, expect, it } from 'vitest';
-import { SiteNav } from './site-nav';
+import { GROUPS, SiteNav } from './site-nav';
 import { PAGES } from '../../generated/pages';
 
 async function render() {
@@ -18,6 +18,11 @@ describe('SiteNav', () => {
     for (const page of PAGES) {
       expect(el.querySelector(`a[href="/docs/${page.slug}"]`), page.slug).not.toBeNull();
     }
+  });
+
+  it('puts every component in a named group', async () => {
+    const more = GROUPS.find((g) => g.label === 'More');
+    expect(more, more?.pages.map((p) => p.slug).join(', ')).toBeUndefined();
   });
 
   it('lists guides before components', async () => {

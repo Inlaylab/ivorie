@@ -1,17 +1,25 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input, signal } from '@angular/core';
+import { IV_ACCORDION_IMPORTS } from '@inlaylab/ivorie/accordion';
+import { IV_ALERT_IMPORTS } from '@inlaylab/ivorie/alert';
 import { IV_ALERT_DIALOG_IMPORTS } from '@inlaylab/ivorie/alert-dialog';
 import { IV_AVATAR_IMPORTS } from '@inlaylab/ivorie/avatar';
 import { IvBadge } from '@inlaylab/ivorie/badge';
+import { IV_BREADCRUMB_IMPORTS } from '@inlaylab/ivorie/breadcrumb';
 import { IvButton } from '@inlaylab/ivorie/button';
 import { IvCalendar } from '@inlaylab/ivorie/calendar';
 import { IV_CARD_IMPORTS } from '@inlaylab/ivorie/card';
+import { IV_CHART_IMPORTS, type IvChartConfig } from '@inlaylab/ivorie/chart';
 import { IvCheckbox } from '@inlaylab/ivorie/checkbox';
+import { IV_COMMAND_IMPORTS } from '@inlaylab/ivorie/command';
 import { IV_DIALOG_IMPORTS } from '@inlaylab/ivorie/dialog';
 import { IV_DROPDOWN_MENU_IMPORTS } from '@inlaylab/ivorie/dropdown-menu';
+import { IV_EMPTY_IMPORTS } from '@inlaylab/ivorie/empty';
 import { IV_FIELD_IMPORTS } from '@inlaylab/ivorie/field';
 import { IvIcon } from '@inlaylab/ivorie/icon';
 import { IV_INPUT_IMPORTS } from '@inlaylab/ivorie/input';
 import { IV_INPUT_OTP_IMPORTS } from '@inlaylab/ivorie/input-otp';
+import { IV_ITEM_IMPORTS } from '@inlaylab/ivorie/item';
+import { IV_KBD_IMPORTS } from '@inlaylab/ivorie/kbd';
 import { IV_NATIVE_SELECT_IMPORTS } from '@inlaylab/ivorie/native-select';
 import { IV_PAGINATION_IMPORTS } from '@inlaylab/ivorie/pagination';
 import { IV_POPOVER_IMPORTS } from '@inlaylab/ivorie/popover';
@@ -21,8 +29,10 @@ import { IV_SELECT_IMPORTS } from '@inlaylab/ivorie/select';
 import { IvSeparator } from '@inlaylab/ivorie/separator';
 import { IV_SHEET_IMPORTS } from '@inlaylab/ivorie/sheet';
 import { IvSlider } from '@inlaylab/ivorie/slider';
+import { IvSpinner } from '@inlaylab/ivorie/spinner';
 import { IvSwitch } from '@inlaylab/ivorie/switch';
 import { IV_TABLE_IMPORTS } from '@inlaylab/ivorie/table';
+import { IV_TABS_IMPORTS } from '@inlaylab/ivorie/tabs';
 import { IV_TOGGLE_GROUP_IMPORTS } from '@inlaylab/ivorie/toggle-group';
 import { FONTS } from '../../../generated/looks';
 import { STYLES } from '../../shell/appearance-options';
@@ -50,19 +60,27 @@ const PAGE_SIZE = 3;
 @Component({
   selector: 'docs-scene-wall',
   imports: [
+    IV_ACCORDION_IMPORTS,
+    IV_ALERT_IMPORTS,
     IV_ALERT_DIALOG_IMPORTS,
     IV_AVATAR_IMPORTS,
     IvBadge,
+    IV_BREADCRUMB_IMPORTS,
     IvButton,
     IvCalendar,
     IV_CARD_IMPORTS,
+    IV_CHART_IMPORTS,
     IvCheckbox,
+    IV_COMMAND_IMPORTS,
     IV_DIALOG_IMPORTS,
     IV_DROPDOWN_MENU_IMPORTS,
+    IV_EMPTY_IMPORTS,
     IV_FIELD_IMPORTS,
     IvIcon,
     IV_INPUT_IMPORTS,
     IV_INPUT_OTP_IMPORTS,
+    IV_ITEM_IMPORTS,
+    IV_KBD_IMPORTS,
     IV_NATIVE_SELECT_IMPORTS,
     IV_PAGINATION_IMPORTS,
     IV_POPOVER_IMPORTS,
@@ -72,8 +90,10 @@ const PAGE_SIZE = 3;
     IvSeparator,
     IV_SHEET_IMPORTS,
     IvSlider,
+    IvSpinner,
     IvSwitch,
     IV_TABLE_IMPORTS,
+    IV_TABS_IMPORTS,
     IV_TOGGLE_GROUP_IMPORTS,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -94,6 +114,31 @@ const PAGE_SIZE = 3;
             </li>
           }
         </ul>
+      </iv-card-content>
+    </iv-card>
+
+    <!-- The everyday controls in one place: buttons, fields, badges, toggles, keys. -->
+    <iv-card data-testid="wall-controls">
+      <iv-card-content class="flex flex-col gap-4">
+        <div class="flex flex-wrap gap-2">
+          <button ivButton size="sm">Button</button>
+          <button ivButton size="sm" variant="secondary">Secondary</button>
+          <button ivButton size="sm" variant="outline">Outline</button>
+          <button ivButton size="sm" variant="ghost">Ghost</button>
+        </div>
+        <input ivInput type="search" placeholder="Search" aria-label="Search" />
+        <textarea ivTextarea rows="2" placeholder="Message" aria-label="Message"></textarea>
+        <div class="flex flex-wrap items-center gap-2">
+          <iv-badge>Badge</iv-badge>
+          <iv-badge variant="secondary">Secondary</iv-badge>
+          <iv-badge variant="outline">Outline</iv-badge>
+          <span class="flex-1"></span>
+          <iv-checkbox [checked]="true" aria-label="Done" />
+          <iv-switch [checked]="true" aria-label="On" />
+        </div>
+        <div class="text-muted-foreground flex items-center gap-2 text-sm">
+          Search anywhere <kbd ivKbdGroup><kbd ivKbd>⌘</kbd><kbd ivKbd>K</kbd></kbd>
+        </div>
       </iv-card-content>
     </iv-card>
 
@@ -140,26 +185,67 @@ const PAGE_SIZE = 3;
       </iv-card-footer>
     </iv-card>
 
+    <!-- A command menu: type to filter, arrows to move. -->
+    <iv-command class="bg-card rounded-xl border shadow-sm" data-testid="wall-command">
+      <iv-command-input placeholder="Type a command or search..." />
+      <iv-command-list>
+        <iv-command-empty>No results found.</iv-command-empty>
+        <iv-command-group heading="Suggestions">
+          <iv-command-item><svg [ivIcon]="icons().clock"></svg>Schedule a deploy</iv-command-item>
+          <iv-command-item><svg [ivIcon]="icons().mail"></svg>Invite by email</iv-command-item>
+          <iv-command-item><svg [ivIcon]="icons().folderPlus"></svg>New project</iv-command-item>
+        </iv-command-group>
+        <iv-command-separator />
+        <iv-command-group heading="Settings">
+          <iv-command-item><svg [ivIcon]="icons().users"></svg>Profile<iv-command-shortcut>⌘P</iv-command-shortcut></iv-command-item>
+          <iv-command-item><svg [ivIcon]="icons().creditCard"></svg>Billing<iv-command-shortcut>⌘B</iv-command-shortcut></iv-command-item>
+          <iv-command-item><svg [ivIcon]="icons().settings"></svg>Settings<iv-command-shortcut>⌘S</iv-command-shortcut></iv-command-item>
+        </iv-command-group>
+      </iv-command-list>
+    </iv-command>
+
+    <!-- Builds: where you are, then running and finished builds in tabs. -->
     <iv-card>
-      <iv-card-header>
-        <iv-card-title class="flex items-center gap-2"><svg [ivIcon]="icons().chartLine" class="text-muted-foreground size-4"></svg>Requests</iv-card-title>
-        <iv-card-description>Per day, last 14 days.</iv-card-description>
+      <iv-card-header class="gap-2">
+        <nav ivBreadcrumb aria-label="Project">
+          <ol ivBreadcrumbList>
+            <li ivBreadcrumbItem><a ivBreadcrumbLink href="#" (click)="$event.preventDefault()">acme</a></li>
+            <li ivBreadcrumbSeparator></li>
+            <li ivBreadcrumbItem><a ivBreadcrumbLink href="#" (click)="$event.preventDefault()">web</a></li>
+            <li ivBreadcrumbSeparator></li>
+            <li ivBreadcrumbItem><span ivBreadcrumbPage>Builds</span></li>
+          </ol>
+        </nav>
+        <iv-card-title>Builds</iv-card-title>
       </iv-card-header>
-      <iv-card-content class="flex flex-col gap-3">
-        <div class="flex h-32 items-end gap-1" role="img" aria-label="Requests per day for 14 days, highest on day 10">
-          @for (d of traffic; track $index) {
-            <div class="flex h-full flex-1 flex-col justify-end gap-0.5">
-              <div class="bg-chart-3 rounded-t-[calc(var(--radius)*0.4)]" [style.height.%]="d[2]"></div>
-              <div class="bg-chart-2" [style.height.%]="d[1]"></div>
-              <div class="bg-chart-1 rounded-b-[calc(var(--radius)*0.4)]" [style.height.%]="d[0]"></div>
-            </div>
+      <iv-card-content>
+        <iv-tabs defaultValue="running">
+          <iv-tabs-list class="w-full">
+            <iv-tabs-trigger value="running">Running</iv-tabs-trigger>
+            <iv-tabs-trigger value="finished">Finished</iv-tabs-trigger>
+          </iv-tabs-list>
+          @for (tab of builds; track tab.value) {
+            <iv-tabs-content [value]="tab.value">
+              <iv-item-group class="gap-2">
+                @for (b of tab.items; track b.title) {
+                  <iv-item variant="outline" size="sm">
+                    <iv-item-media variant="icon">
+                      @if (tab.value === 'running') {
+                        <iv-spinner />
+                      } @else {
+                        <svg [ivIcon]="icons().check"></svg>
+                      }
+                    </iv-item-media>
+                    <iv-item-content>
+                      <iv-item-title>{{ b.title }}</iv-item-title>
+                      <p ivItemDescription>{{ b.detail }}</p>
+                    </iv-item-content>
+                  </iv-item>
+                }
+              </iv-item-group>
+            </iv-tabs-content>
           }
-        </div>
-        <div class="text-muted-foreground flex flex-wrap gap-3 text-xs">
-          @for (l of legend; track l.label) {
-            <span class="flex items-center gap-1.5"><span class="size-2.5 rounded-sm" [class]="l.color"></span>{{ l.label }}</span>
-          }
-        </div>
+        </iv-tabs>
       </iv-card-content>
     </iv-card>
 
@@ -496,6 +582,166 @@ const PAGE_SIZE = 3;
       </iv-card-content>
     </iv-card>
 
+    <!-- Real charts: they take the accent's chart colors. -->
+    @if (charts()) {
+      @defer (on viewport) {
+        <iv-card>
+          <iv-card-header>
+            <iv-card-title>Visitors</iv-card-title>
+            <iv-card-description>Desktop and mobile, last 6 months.</iv-card-description>
+          </iv-card-header>
+          <iv-card-content>
+            <iv-chart [config]="visitorsConfig" class="aspect-auto h-44 w-full">
+              <svg ivAreaChart [data]="visitors" [margin]="{ left: 12, right: 12 }" aria-label="Visitors per month, desktop and mobile">
+                <g ivCartesianGrid [vertical]="false" />
+                <g ivXAxis dataKey="month" [tickLine]="false" [axisLine]="false" [tickMargin]="8" />
+                <defs>
+                  <linearGradient [attr.id]="prefix() + '-fill-desktop'" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stop-color="var(--color-desktop)" stop-opacity="0.8" />
+                    <stop offset="95%" stop-color="var(--color-desktop)" stop-opacity="0.1" />
+                  </linearGradient>
+                  <linearGradient [attr.id]="prefix() + '-fill-mobile'" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stop-color="var(--color-mobile)" stop-opacity="0.8" />
+                    <stop offset="95%" stop-color="var(--color-mobile)" stop-opacity="0.1" />
+                  </linearGradient>
+                </defs>
+                <g ivArea dataKey="mobile" curve="natural" [fillOpacity]="0.4" [fill]="'url(#' + prefix() + '-fill-mobile)'" stackId="a" />
+                <g ivArea dataKey="desktop" curve="natural" [fillOpacity]="0.4" [fill]="'url(#' + prefix() + '-fill-desktop)'" stackId="a" />
+              </svg>
+              <iv-chart-tooltip [cursor]="false" />
+            </iv-chart>
+          </iv-card-content>
+          <iv-card-footer class="text-muted-foreground gap-2 text-sm">
+            <svg [ivIcon]="icons().trendingUp" class="size-4"></svg>Up 5.2% this month
+          </iv-card-footer>
+        </iv-card>
+      } @placeholder {
+        <div class="bg-card h-80 rounded-xl border" aria-hidden="true"></div>
+      }
+    }
+
+    @if (charts()) {
+      @defer (on viewport) {
+        <iv-card>
+          <iv-card-header class="items-center text-center">
+            <iv-card-title>Browsers</iv-card-title>
+            <iv-card-description>Visitors this month.</iv-card-description>
+          </iv-card-header>
+          <iv-card-content>
+            <iv-chart [config]="browsersConfig" class="mx-auto aspect-square max-h-52">
+              <svg ivPieChart aria-label="Visitors by browser">
+                <g ivPie [data]="browsers" dataKey="visitors" nameKey="browser" [innerRadius]="56" [strokeWidth]="5">
+                  <ng-template ivChartLabel let-cx="cx" let-cy="cy">
+                    <svg:text [attr.x]="cx" [attr.y]="cy" text-anchor="middle" dominant-baseline="middle">
+                      <svg:tspan [attr.x]="cx" [attr.y]="cy" class="fill-foreground text-2xl font-bold">{{ browserTotal.toLocaleString('en-US') }}</svg:tspan>
+                      <svg:tspan [attr.x]="cx" [attr.y]="cy + 22" class="fill-muted-foreground text-xs">Visitors</svg:tspan>
+                    </svg:text>
+                  </ng-template>
+                </g>
+              </svg>
+              <iv-chart-tooltip [cursor]="false" hideLabel />
+            </iv-chart>
+          </iv-card-content>
+        </iv-card>
+      } @placeholder {
+        <div class="bg-card h-80 rounded-xl border" aria-hidden="true"></div>
+      }
+    }
+
+    <!-- An alert with an action. -->
+    <iv-alert>
+      <svg [ivIcon]="icons().bell"></svg>
+      <iv-alert-title>Your trial ends in 3 days</iv-alert-title>
+      <iv-alert-description>
+        Add a card to keep your projects running.
+        <button ivButton size="sm" variant="outline" class="mt-2">Add a card</button>
+      </iv-alert-description>
+    </iv-alert>
+
+    @if (charts()) {
+      @defer (on viewport) {
+        <iv-card>
+          <iv-card-header class="items-center text-center">
+            <iv-card-title>Uptime</iv-card-title>
+            <iv-card-description>Last 30 days.</iv-card-description>
+          </iv-card-header>
+          <iv-card-content>
+            <iv-chart [config]="uptimeConfig" class="mx-auto aspect-square max-h-48">
+              <svg ivRadialChart [data]="uptime" [startAngle]="90" [endAngle]="-266" [outerRadius]="80" [innerRadius]="68" aria-label="Uptime 99.2 percent">
+                <g ivPolarGrid gridType="circle" [radialLines]="false" stroke="none" class="first:fill-muted last:fill-card" [polarRadius]="[80, 68]" />
+                <g ivRadialBar dataKey="uptime" background [cornerRadius]="10" />
+                <g ivPolarRadiusAxis>
+                  <ng-template ivChartLabel let-cx="cx" let-cy="cy">
+                    <svg:text [attr.x]="cx" [attr.y]="cy" text-anchor="middle" dominant-baseline="middle">
+                      <svg:tspan [attr.x]="cx" [attr.y]="cy" class="fill-foreground text-3xl font-bold">99.2%</svg:tspan>
+                      <svg:tspan [attr.x]="cx" [attr.y]="cy + 22" class="fill-muted-foreground text-xs">Up</svg:tspan>
+                    </svg:text>
+                  </ng-template>
+                </g>
+              </svg>
+            </iv-chart>
+          </iv-card-content>
+          <iv-card-footer class="text-muted-foreground justify-center text-sm">Last incident 12 days ago.</iv-card-footer>
+        </iv-card>
+      } @placeholder {
+        <div class="bg-card h-80 rounded-xl border" aria-hidden="true"></div>
+      }
+    }
+
+    @if (charts()) {
+      @defer (on viewport) {
+        <iv-card>
+          <iv-card-header>
+            <iv-card-title class="flex items-center gap-2"><svg [ivIcon]="icons().chartLine" class="text-muted-foreground size-4"></svg>Response time</iv-card-title>
+            <iv-card-description>Median and slowest 5%, in ms.</iv-card-description>
+          </iv-card-header>
+          <iv-card-content>
+            <iv-chart [config]="latencyConfig" class="aspect-auto h-40 w-full">
+              <svg ivLineChart [data]="latency" [margin]="{ left: 12, right: 12 }" aria-label="Response time per day, median and 95th percentile">
+                <g ivCartesianGrid [vertical]="false" />
+                <g ivXAxis dataKey="day" [tickLine]="false" [axisLine]="false" [tickMargin]="8" />
+                <g ivLine dataKey="p95" curve="monotone" [strokeWidth]="2" [dot]="false" />
+                <g ivLine dataKey="p50" curve="monotone" [strokeWidth]="2" [dot]="false" />
+              </svg>
+              <iv-chart-tooltip [cursor]="false" />
+              <iv-chart-legend />
+            </iv-chart>
+          </iv-card-content>
+        </iv-card>
+      } @placeholder {
+        <div class="bg-card h-72 rounded-xl border" aria-hidden="true"></div>
+      }
+    }
+
+    <!-- Nothing here yet: an empty state that says what to do. -->
+    <iv-empty class="bg-card rounded-xl border border-dashed">
+      <iv-empty-header>
+        <iv-empty-media variant="icon"><svg [ivIcon]="icons().share"></svg></iv-empty-media>
+        <iv-empty-title>No webhooks yet</iv-empty-title>
+        <iv-empty-description>Send events to your own server when a deploy finishes.</iv-empty-description>
+      </iv-empty-header>
+      <iv-empty-content>
+        <button ivButton size="sm"><svg [ivIcon]="icons().plus"></svg>Add a webhook</button>
+      </iv-empty-content>
+    </iv-empty>
+
+    <!-- Questions: one open at a time. -->
+    <iv-card>
+      <iv-card-header>
+        <iv-card-title>Questions</iv-card-title>
+      </iv-card-header>
+      <iv-card-content>
+        <iv-accordion type="single" value="zone">
+          @for (q of faq; track q.value) {
+            <iv-accordion-item [value]="q.value">
+              <iv-accordion-trigger>{{ q.question }}</iv-accordion-trigger>
+              <iv-accordion-content class="text-muted-foreground">{{ q.answer }}</iv-accordion-content>
+            </iv-accordion-item>
+          }
+        </iv-accordion>
+      </iv-card-content>
+    </iv-card>
+
     <iv-card>
       <iv-card-header>
         <iv-card-title class="flex items-center gap-2"><svg [ivIcon]="icons().gitBranch" class="text-muted-foreground size-4"></svg>Recent deploys</iv-card-title>
@@ -573,6 +819,8 @@ const PAGE_SIZE = 3;
 })
 export class SceneWall {
   readonly prefix = input('wall');
+  /** Chart cards, loaded when they scroll into view. Off on the home page: its first load stays light. */
+  readonly charts = input(true);
   /** Card icons in the picked icon library. */
   protected readonly icons = inject(PlaygroundLook).icons;
   private readonly preset = inject(PlaygroundLook).preset;
@@ -592,16 +840,65 @@ export class SceneWall {
     { label: 'Deploys today', value: '128', delta: '+12%', good: true, up: true },
     { label: 'Open incidents', value: '2', delta: '1 urgent', good: false, up: true },
   ];
-  /** [served, cached, errors] heights per day, in % of the bar. */
-  protected readonly traffic = [
-    [38, 14, 4], [42, 16, 3], [36, 12, 5], [48, 18, 4], [52, 20, 6], [30, 10, 2], [26, 9, 2],
-    [44, 17, 4], [56, 22, 5], [64, 24, 7], [58, 21, 5], [40, 15, 3], [34, 13, 3], [50, 19, 4],
+  protected readonly builds = [
+    {
+      value: 'running',
+      items: [
+        { title: 'Faster image resize', detail: 'main, started 1 minute ago' },
+        { title: 'Dark mode for settings', detail: 'preview, started 3 minutes ago' },
+      ],
+    },
+    {
+      value: 'finished',
+      items: [
+        { title: 'Fix login redirect', detail: 'main, 2 minutes 14 seconds' },
+        { title: 'Bump Angular to 22.1', detail: 'main, 3 minutes 2 seconds' },
+      ],
+    },
   ];
-  protected readonly legend = [
-    { label: 'Served', color: 'bg-chart-1' },
-    { label: 'Cached', color: 'bg-chart-2' },
-    { label: 'Errors', color: 'bg-chart-3' },
+  protected readonly uptime = [{ name: 'web', uptime: 99.2, fill: 'var(--color-uptime)' }];
+  protected readonly uptimeConfig: IvChartConfig = { uptime: { label: 'Uptime', color: 'var(--chart-1)' } };
+  protected readonly latency = [
+    { day: 'Mon', p50: 82, p95: 210 },
+    { day: 'Tue', p50: 78, p95: 190 },
+    { day: 'Wed', p50: 91, p95: 260 },
+    { day: 'Thu', p50: 74, p95: 175 },
+    { day: 'Fri', p50: 70, p95: 168 },
+    { day: 'Sat', p50: 66, p95: 150 },
+    { day: 'Sun', p50: 68, p95: 155 },
   ];
+  protected readonly latencyConfig: IvChartConfig = {
+    p50: { label: 'Median', color: 'var(--chart-1)' },
+    p95: { label: 'Slowest 5%', color: 'var(--chart-3)' },
+  };
+  protected readonly visitors = [
+    { month: 'Jun', desktop: 186, mobile: 80 },
+    { month: 'Jul', desktop: 305, mobile: 200 },
+    { month: 'Aug', desktop: 237, mobile: 120 },
+    { month: 'Sep', desktop: 73, mobile: 190 },
+    { month: 'Oct', desktop: 209, mobile: 130 },
+    { month: 'Nov', desktop: 214, mobile: 140 },
+  ];
+  protected readonly visitorsConfig: IvChartConfig = {
+    desktop: { label: 'Desktop', color: 'var(--chart-1)' },
+    mobile: { label: 'Mobile', color: 'var(--chart-2)' },
+  };
+  protected readonly browsers = [
+    { browser: 'chrome', visitors: 275, fill: 'var(--color-chrome)' },
+    { browser: 'safari', visitors: 200, fill: 'var(--color-safari)' },
+    { browser: 'firefox', visitors: 187, fill: 'var(--color-firefox)' },
+    { browser: 'edge', visitors: 173, fill: 'var(--color-edge)' },
+    { browser: 'other', visitors: 90, fill: 'var(--color-other)' },
+  ];
+  protected readonly browserTotal = this.browsers.reduce((sum, b) => sum + b.visitors, 0);
+  protected readonly browsersConfig: IvChartConfig = {
+    visitors: { label: 'Visitors' },
+    chrome: { label: 'Chrome', color: 'var(--chart-1)' },
+    safari: { label: 'Safari', color: 'var(--chart-2)' },
+    firefox: { label: 'Firefox', color: 'var(--chart-3)' },
+    edge: { label: 'Edge', color: 'var(--chart-4)' },
+    other: { label: 'Other', color: 'var(--chart-5)' },
+  };
 
   protected readonly done = signal(2);
   protected readonly gates = [
@@ -658,6 +955,11 @@ export class SceneWall {
     { value: 'weekly', label: 'Once a week' },
   ];
   protected readonly limit = signal(120);
+  protected readonly faq = [
+    { value: 'zone', question: 'Do I need zone.js?', answer: 'No. Every component runs zoneless, on signals.' },
+    { value: 'own', question: 'Can I change the source?', answer: 'Yes. npx ivorie add copies the files into your app.' },
+    { value: 'ssr', question: 'Does it render on the server?', answer: 'Yes, and it hydrates without warnings.' },
+  ];
   protected readonly deploys = [
     { title: 'Faster image resize', sha: '4f2a91c', status: 'Building' },
     { title: 'Fix login redirect', sha: '9b7e0d2', status: 'Ready' },

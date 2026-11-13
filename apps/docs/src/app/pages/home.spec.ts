@@ -56,8 +56,15 @@ describe('HomePage', () => {
 
   it('shows the wall of live cards and a link to every component', async () => {
     const { el } = await render();
-    expect(el.querySelectorAll('docs-scene-wall iv-card').length).toBe(17);
+    expect(el.querySelectorAll('docs-scene-wall iv-card').length).toBe(19);
+    expect(el.querySelectorAll('docs-scene-wall iv-chart').length).toBe(0);
     expect(el.querySelector('a[href="/docs/components"]')!.textContent).toMatch(/Browse all \d+ components/);
+  });
+
+  it('the hero has the install command, and no product window', async () => {
+    const { el } = await render();
+    expect(el.querySelector('[data-testid="hero-command"]')!.textContent).toContain('npx ivorie init');
+    expect(el.querySelector('iframe')).toBeNull();
   });
 
   it('has no axe violations', async () => {

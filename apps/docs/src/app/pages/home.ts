@@ -9,7 +9,6 @@ import {
 import { OverlayContainer } from '@angular/cdk/overlay';
 import { RouterLink } from '@angular/router';
 import { IvButton } from '@inlaylab/ivorie/button';
-import { IV_TABS_IMPORTS } from '@inlaylab/ivorie/tabs';
 import { IV_TOOLTIP_IMPORTS } from '@inlaylab/ivorie/tooltip';
 import { ACCENTS } from '../../generated/looks';
 import { PAGES } from '../../generated/pages';
@@ -21,15 +20,15 @@ import { CopyButton } from '../ui/copy-button';
 
 @Component({
   selector: 'docs-home',
-  imports: [RouterLink, IvButton, IV_TABS_IMPORTS, IV_TOOLTIP_IMPORTS, CopyButton, SceneWall],
+  imports: [RouterLink, IvButton, IV_TOOLTIP_IMPORTS, CopyButton, SceneWall],
   providers: [PlaygroundLook],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'block' },
   template: `
-    <!-- Hero: centered under a soft beam of light. The install command is part of the pitch. -->
+    <!-- Hero: the pitch under a soft beam of light. The components follow right below. -->
     <section aria-labelledby="hero-title" class="relative isolate overflow-hidden">
-      <div class="docs-beam pointer-events-none absolute inset-x-0 top-0 -z-10 mx-auto h-[44rem] max-w-5xl" aria-hidden="true"></div>
-      <div class="mx-auto flex max-w-4xl flex-col items-center px-4 pt-16 pb-14 text-center sm:px-6 sm:pt-24">
+      <div class="docs-beam pointer-events-none absolute inset-x-0 top-0 -z-10 mx-auto h-[40rem] max-w-5xl" aria-hidden="true"></div>
+      <div class="mx-auto flex max-w-4xl flex-col items-center px-4 pt-16 pb-16 text-center sm:px-6 sm:pt-24 sm:pb-20">
         <a
           routerLink="/roadmap"
           class="docs-pane text-muted-foreground hover:text-foreground mb-8 inline-flex items-center gap-2 rounded-full py-1 pr-3 pl-1 text-sm transition-colors duration-(--docs-dur)"
@@ -50,21 +49,12 @@ import { CopyButton } from '../ui/copy-button';
           <a ivButton size="lg" class="rounded-full px-6" routerLink="/docs/installation">Get started</a>
           <a ivButton size="lg" variant="outline" class="docs-pane rounded-full px-6" routerLink="/playground">Open the playground</a>
         </div>
-        <iv-tabs defaultValue="package" class="mt-8 w-full max-w-md items-center gap-2">
-          <iv-tabs-list aria-label="How to install">
-            <iv-tabs-trigger value="package">Package</iv-tabs-trigger>
-            <iv-tabs-trigger value="source">Copy the source</iv-tabs-trigger>
-          </iv-tabs-list>
-          @for (i of installs; track i.value) {
-            <iv-tabs-content [value]="i.value" class="w-full">
-              <div class="docs-pane flex items-center gap-3 rounded-full py-1 pr-1 pl-5 text-left font-mono text-[0.8125rem]">
-                <span class="min-w-0 flex-1 truncate"><span class="text-muted-foreground select-none">$ </span>{{ i.command }}</span>
-                <docs-copy-button [text]="i.command" [label]="'Copy ' + i.command" />
-              </div>
-            </iv-tabs-content>
-          }
-        </iv-tabs>
+        <div class="docs-pane mt-6 flex w-full max-w-xs items-center gap-3 rounded-full py-1 pr-1 pl-5 text-left font-mono text-[0.8125rem]">
+          <span class="min-w-0 flex-1 truncate" data-testid="hero-command"><span class="text-muted-foreground select-none">$ </span>{{ install }}</span>
+          <docs-copy-button [text]="install" [label]="'Copy ' + install" />
+        </div>
       </div>
+
     </section>
 
     <!-- The showcase: real components in the picked style, on a horizon of light. Only the stage changes. -->
@@ -115,16 +105,12 @@ import { CopyButton } from '../ui/copy-button';
         </div>
       </div>
 
-      <div class="relative isolate">
-        <div class="docs-horizon pointer-events-none absolute inset-x-[4%] -top-32 -z-10 h-72" aria-hidden="true"></div>
-        <div class="docs-pane relative overflow-hidden rounded-[1.75rem] p-1.5">
-          <div #stage class="docs-stage bg-background relative max-h-[46rem] overflow-hidden rounded-[1.375rem] p-3 sm:p-5">
-            <docs-scene-wall prefix="home" />
-            <!-- The wall runs on; the fade ends it and leads to the full list. -->
-            <div class="from-background via-background/90 absolute inset-x-0 bottom-0 flex h-48 items-end justify-center bg-linear-to-t to-transparent pb-6">
-              <a ivButton variant="outline" class="rounded-full" routerLink="/docs/components">Browse all {{ componentCount }} components</a>
-            </div>
-          </div>
+      <!-- The cards sit on the page itself. The stage only carries the picked look. -->
+      <div #stage class="docs-stage relative max-h-[60rem] overflow-hidden !bg-transparent">
+        <docs-scene-wall prefix="home" [charts]="false" />
+        <!-- The wall runs on; the fade ends it and leads to the full list. -->
+        <div class="absolute inset-x-0 bottom-0 flex h-48 items-end justify-center bg-linear-to-t from-(--docs-ground) via-(--docs-ground)/90 to-transparent pb-6">
+          <a ivButton variant="outline" class="docs-pane rounded-full" routerLink="/docs/components">Browse all {{ componentCount }} components</a>
         </div>
       </div>
 
@@ -183,6 +169,7 @@ import { CopyButton } from '../ui/copy-button';
 export default class HomePage {
   protected readonly look = inject(PlaygroundLook);
   private readonly stage = viewChild.required<ElementRef<HTMLElement>>('stage');
+  protected readonly install = 'npx ivorie init';
   protected readonly componentCount = PAGES.filter((p) => p.section === 'component').length;
   /** The announcement pill. Update with each release. */
   protected readonly release = { version: '1.5.0', text: 'Charts, accent colors and new styles' };
@@ -191,10 +178,6 @@ export default class HomePage {
   protected readonly accents = [
     { name: 'base', title: 'No accent', color: 'var(--foreground)' },
     ...ACCENTS.map((a) => ({ name: a.name, title: a.title, color: a.light['--primary'] })),
-  ];
-  protected readonly installs = [
-    { value: 'package', command: 'npm i @inlaylab/ivorie' },
-    { value: 'source', command: 'npx ivorie init' },
   ];
   protected readonly facts = [
     { title: 'Signals and zoneless', text: 'Signal inputs and models, OnPush, no zone.js.' },

@@ -12,14 +12,13 @@ import { NgTemplateOutlet } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { IvButton } from '@inlaylab/ivorie/button';
 import { IV_DIALOG_IMPORTS } from '@inlaylab/ivorie/dialog';
-import { IV_SELECT_IMPORTS } from '@inlaylab/ivorie/select';
 import { IV_SHEET_IMPORTS } from '@inlaylab/ivorie/sheet';
 import { PREVIEW_WIDTHS, PreviewFrame, type PreviewWidth } from '../preview/preview-frame';
 import { CopyButton } from '../ui/copy-button';
 import { LookControls } from './look-controls';
 import { PREVIEW_ICONS, PlaygroundLook } from './playground-look';
 import { DEFAULT_PRESET, encodePreset } from './preset-code';
-import { BASE_COLORS, FONTS, RADII } from '../../generated/looks';
+import { ACCENTS, BASE_COLORS, FONTS, RADII } from '../../generated/looks';
 import { STYLES } from '../shell/appearance-options';
 
 const DEFAULT_CODE = encodePreset(DEFAULT_PRESET);
@@ -31,7 +30,6 @@ type Target = 'new' | 'existing';
     NgTemplateOutlet,
     IvButton,
     IV_DIALOG_IMPORTS,
-    IV_SELECT_IMPORTS,
     IV_SHEET_IMPORTS,
     CopyButton,
     LookControls,
@@ -39,9 +37,9 @@ type Target = 'new' | 'existing';
   ],
   providers: [PlaygroundLook, PREVIEW_ICONS],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  host: { class: 'block gap-4 p-3 pb-20 sm:p-4 sm:pb-20 lg:grid lg:pb-4 lg:h-[calc(100svh-var(--header-height))] lg:grid-cols-[18rem_minmax(0,1fr)]' },
+  host: { class: 'block gap-4 p-3 pb-20 sm:p-4 sm:pb-20 lg:grid lg:pb-4 lg:h-[calc(100svh-var(--header-height))] lg:grid-cols-[17rem_minmax(0,1fr)]' },
   template: `
-    <!-- The panel: a floating card. Rows on top, the command and actions at the bottom. -->
+    <!-- The panel: one row per axis, label over value, a picture on the right. Actions at the bottom. -->
     <aside aria-labelledby="pg-title" class="docs-pane hidden min-h-0 flex-col overflow-hidden rounded-2xl lg:flex">
       <div class="flex items-center justify-between border-b py-2 pr-2 pl-4">
         <h1 id="pg-title" class="text-foreground text-sm font-semibold">Customize</h1>
@@ -51,19 +49,15 @@ type Target = 'new' | 'existing';
           </svg>
         </button>
       </div>
-      <div class="min-h-0 flex-1 overflow-y-auto p-1.5">
+      <div class="no-scrollbar min-h-0 flex-1 overflow-y-auto p-1.5">
         <docs-look-controls [look]="look" name="rail" />
-        <div class="docs-panel mt-0.5 hidden md:block">
-          <hr class="mb-2 mt-1" />
-          <ng-container [ngTemplateOutlet]="widthRow" />
-        </div>
       </div>
-      <div class="flex flex-col gap-2 border-t p-2">
-        <div class="bg-background/50 flex items-center gap-1 rounded-lg border py-0.5 pr-0.5 pl-2.5 font-mono text-xs">
+      <div class="flex flex-col gap-2 border-t p-3">
+        <div class="bg-foreground/[0.04] flex items-center gap-1 rounded-lg border py-0.5 pr-0.5 pl-2.5 font-mono text-xs">
           <span class="min-w-0 flex-1 truncate" data-testid="panel-command" [title]="command()">{{ command() }}</span>
           <docs-copy-button [text]="command()" label="Copy command" />
         </div>
-        <button ivButton variant="outline" class="w-full" (click)="shuffle()">
+        <button ivButton variant="outline" class="w-full" (click)="shuffle()" data-testid="shuffle">
           <ng-container [ngTemplateOutlet]="shuffleIcon" />
           Shuffle
         </button>
@@ -71,8 +65,25 @@ type Target = 'new' | 'existing';
       </div>
     </aside>
 
-    <!-- The stage: the wall in an iframe, in the picked look, on a big canvas. Nothing of the site leaks into it. -->
-    <section aria-label="Preview" class="docs-pane docs-stage flex min-h-[80svh] min-w-0 flex-col overflow-hidden rounded-3xl p-2 sm:p-3 lg:min-h-0">
+    <!-- The stage: one frame, the wall in the picked look. Its tools sit on top of it. Nothing of the site leaks in. -->
+    <section aria-label="Preview" class="flex h-[calc(100svh-var(--header-height)-5.5rem)] min-w-0 flex-col gap-2 lg:h-auto lg:min-h-0">
+      <div class="flex items-center gap-1">
+        <div role="radiogroup" aria-label="Preview width" class="docs-pane hidden gap-0.5 rounded-full p-1 md:flex">
+          @for (w of widths; track w.value) {
+            <label [class]="pill + ' px-3 py-1 text-sm'">
+              <input type="radio" class="sr-only" name="pg-width" [value]="w.value" [checked]="width() === w.value" (change)="width.set(w.value)" />
+              {{ w.label }}
+            </label>
+          }
+        </div>
+        <span class="flex-1"></span>
+        <div class="hidden items-center gap-1 lg:flex">
+          <button ivButton variant="ghost" class="rounded-full" (click)="copyLink()" data-testid="copy-link">
+            <ng-container [ngTemplateOutlet]="linkIcon" />
+            {{ linkCopied() ? 'Copied' : 'Copy link' }}
+          </button>
+        </div>
+      </div>
       <docs-preview-frame class="min-h-0 flex-1" path="preview/scene/wall" [code]="look.code()" [width]="width()" label="Preview" />
     </section>
 
@@ -92,38 +103,29 @@ type Target = 'new' | 'existing';
       </div>
     </ng-template>
 
-    <ng-template #widthRow>
-      <div class="docs-panel-row">
-        <span class="docs-row-label" id="pg-width-label">Preview width</span>
-        <iv-select [value]="width()" (valueChange)="width.set($any($event) ?? 'desktop')">
-          <iv-select-trigger aria-labelledby="pg-width-label" />
-          <iv-select-content>
-            @for (w of widths; track w.value) {
-              <iv-select-item [value]="w.value">{{ w.label }}</iv-select-item>
-            }
-          </iv-select-content>
-        </iv-select>
-      </div>
-    </ng-template>
-
     <ng-template #shuffleIcon>
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <path d="m18 14 4 4-4 4" /><path d="m18 2 4 4-4 4" /><path d="M2 18h1.97a4 4 0 0 0 3.3-1.7l5.45-8.6a4 4 0 0 1 3.3-1.7H22" /><path d="M2 6h1.97a4 4 0 0 1 3.3 1.7l.4.63" /><path d="M22 18h-6.04a4 4 0 0 1-3.3-1.8l-.36-.45" />
       </svg>
     </ng-template>
 
+    <ng-template #linkIcon>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" /><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+      </svg>
+    </ng-template>
+
+    <!-- Phones and tablets: the bar under the preview. -->
     <ng-template #actions>
-      <button ivButton variant="ghost" class="rounded-full" (click)="copyLink()" aria-label="Copy link" data-testid="copy-link">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-          <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" /><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
-        </svg>
+      <button ivButton variant="ghost" class="rounded-full" (click)="copyLink()" aria-label="Copy link" data-testid="copy-link-bar">
+        <ng-container [ngTemplateOutlet]="linkIcon" />
       </button>
-      <button ivButton variant="ghost" class="rounded-full" (click)="shuffle()" aria-label="Shuffle the look" data-testid="shuffle">
+      <button ivButton variant="ghost" class="rounded-full" (click)="shuffle()" aria-label="Shuffle the look" data-testid="shuffle-bar">
         <ng-container [ngTemplateOutlet]="shuffleIcon" />
       </button>
       <button ivButton class="rounded-full px-5" [ivDialogTrigger]="codeDialog" data-testid="get-code">Get code</button>
-      <span class="sr-only" aria-live="polite">{{ linkCopied() ? 'Link copied' : '' }}</span>
     </ng-template>
+    <span class="sr-only" aria-live="polite">{{ linkCopied() ? 'Link copied' : '' }}</span>
 
     <ng-template #codeDialog>
       <iv-dialog-header>
@@ -180,6 +182,9 @@ export default class PlaygroundPage {
   protected readonly target = signal<Target>('new');
   protected readonly widths = PREVIEW_WIDTHS;
   protected readonly width = signal<PreviewWidth>('desktop');
+  /** A segment on a pane: the picked one is filled. */
+  protected readonly pill =
+    'has-checked:bg-foreground has-checked:text-background text-muted-foreground hover:text-foreground has-focus-visible:outline-ring cursor-pointer rounded-full font-medium transition-colors duration-(--docs-dur) has-focus-visible:outline-2';
   /** The same inside a dialog, on a muted track. */
   protected readonly pillMuted =
     'has-checked:bg-background has-checked:text-foreground has-checked:shadow-xs text-muted-foreground hover:text-foreground has-focus-visible:outline-ring cursor-pointer rounded-full font-medium transition-colors has-focus-visible:outline-2';
@@ -225,7 +230,7 @@ export default class PlaygroundPage {
     }
   }
 
-  /** A random style, base color, radius and fonts. The icon set stays. Never the look already showing. */
+  /** A random style, base color, accent, chart color, radius and fonts. The icon set stays. Never the look already showing. */
   shuffle(random: () => number = Math.random): void {
     const any = <T>(list: readonly T[]) => list[Math.floor(random() * list.length)];
     const fonts = FONTS.map((f) => f.name);
@@ -234,6 +239,9 @@ export default class PlaygroundPage {
       this.look.set({
         style: any(STYLES).name,
         baseColor: any(BASE_COLORS).name,
+        // Half the time the base color's own ink, so plain looks still come up.
+        theme: random() < 0.5 ? 'base' : any(ACCENTS).name,
+        chartColor: random() < 0.5 ? 'theme' : any(ACCENTS).name,
         radius: any(Object.keys(RADII)),
         font: any(['system', ...fonts]),
         // Half the time the headings keep the body font.

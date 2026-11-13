@@ -17,14 +17,15 @@ type View = 'preview' | 'code';
   host: { class: 'flex flex-col gap-3' },
   template: `
     @let b = entry();
-    <div class="flex flex-wrap items-center gap-x-4 gap-y-3">
-      <div class="mr-auto min-w-0">
-        <h2 class="text-foreground text-lg font-semibold tracking-tight" [id]="b.name + '-title'">
-          <a [routerLink]="['/blocks', b.name]" class="hover:underline underline-offset-4">{{ b.title }}</a>
-        </h2>
-        <p class="text-muted-foreground text-sm text-pretty">{{ b.description }}</p>
-      </div>
-      <div class="docs-pane flex flex-wrap items-center gap-1 rounded-full p-1">
+    <div class="min-w-0">
+      <h2 class="text-foreground text-lg font-semibold tracking-tight" [id]="b.name + '-title'">
+        <a [routerLink]="['/blocks', b.name]" class="hover:underline underline-offset-4">{{ b.title }}</a>
+      </h2>
+      <p class="text-muted-foreground text-sm text-pretty">{{ b.description }}</p>
+    </div>
+    <!-- Two groups: how you look at it on the left, what you do with it on the right. -->
+    <div class="flex flex-wrap items-center justify-between gap-2">
+      <div class="docs-pane flex items-center gap-0.5 rounded-full p-1">
         <div role="radiogroup" aria-label="View" class="flex gap-0.5">
           @for (v of views; track v.value) {
             <label [class]="pill">
@@ -43,29 +44,34 @@ type View = 'preview' | 'code';
               </label>
             }
           </div>
-          <a ivButton variant="ghost" size="icon-sm" class="rounded-full" [href]="openHref()" target="_blank" rel="noopener" [attr.aria-label]="'Open ' + b.title + ' in a new tab'" data-testid="open">
+        }
+      </div>
+      <div class="flex items-center gap-1">
+        @if (view() === 'preview') {
+          <a ivButton variant="ghost" size="icon-sm" class="rounded-full" [href]="openHref()" target="_blank" rel="noopener" [attr.aria-label]="'Open ' + b.title + ' in a new tab'" [title]="'Open in a new tab'" data-testid="open">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <path d="M15 3h6v6" /><path d="M10 14 21 3" /><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
             </svg>
           </a>
-          <button ivButton type="button" variant="ghost" size="icon-sm" class="rounded-full" [attr.aria-label]="'Reload ' + b.title" (click)="frame()?.reload()" data-testid="reload">
+          <button ivButton type="button" variant="ghost" size="icon-sm" class="rounded-full" [attr.aria-label]="'Reload ' + b.title" [title]="'Reload'" (click)="frame()?.reload()" data-testid="reload">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8" /><path d="M21 3v5h-5" />
             </svg>
           </button>
         }
-        <span class="bg-border mx-1 h-5 w-px" aria-hidden="true"></span>
-        <span class="text-muted-foreground hidden pl-2 font-mono text-xs sm:inline" data-testid="command">{{ command() }}</span>
-        <docs-copy-button [text]="command()" [label]="'Copy ' + command()" />
+        <div class="docs-pane flex items-center gap-1 rounded-full py-1 pr-1 pl-4">
+          <span class="text-muted-foreground hidden font-mono text-xs sm:inline" data-testid="command">{{ command() }}</span>
+          <docs-copy-button [text]="command()" [label]="'Copy ' + command()" />
+        </div>
       </div>
     </div>
 
     @if (view() === 'preview') {
       <div class="docs-pane rounded-[1.25rem] p-1.5">
         @defer (on viewport) {
-          <docs-preview-frame class="h-[42rem]" [path]="'preview/block/' + b.name" [code]="code()" [width]="width()" [label]="b.title + ' preview'" />
+          <docs-preview-frame [class]="height()" [path]="'preview/block/' + b.name" [code]="code()" [width]="width()" [label]="b.title + ' preview'" />
         } @placeholder {
-          <iv-skeleton class="h-[42rem] w-full rounded-xl" />
+          <iv-skeleton [class]="height() + ' w-full rounded-xl'" />
         }
       </div>
     } @else {
@@ -86,6 +92,8 @@ export class BlockShowcase {
   protected readonly view = signal<View>('preview');
   protected readonly widths = PREVIEW_WIDTHS;
   protected readonly width = signal<PreviewWidth>('desktop');
+  /** Forms are small: a shorter frame, less empty page around them. App shells get the full height. */
+  protected readonly height = computed(() => (['Login', 'Sign up'].includes(this.entry().group) ? 'h-[36rem]' : 'h-[42rem]'));
   protected readonly command = computed(() => `npx ivorie add ${this.entry().name}`);
   protected readonly openHref = computed(() => `preview/block/${this.entry().name}?preset=${this.code()}`);
   protected readonly pill =

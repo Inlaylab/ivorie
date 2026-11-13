@@ -374,47 +374,47 @@
    rendered on /preview routes. Demo frames restore the theme values below, and preview stages get the
    picked look inline from PlaygroundLook, so no site value leaks into a preview.
    Hex on purpose: tools/docs/site-contrast.test.ts reads these values. */
-/* Cool, deep ground; electric indigo brand with a cyan edge. Light mode keeps the same hues, faint. */
+/* Charcoal ground, one violet. Light mode keeps the same violet on a cool white. */
 :root {
-  --docs-ground: #f6f7f9;
-  --docs-ink: #0f1115;
-  --docs-ink-muted: #5a5d68;
-  --docs-pane: rgb(255 255 255 / 0.74);
+  --docs-ground: #f7f7fa;
+  --docs-ink: #121216;
+  --docs-ink-muted: #5b5d68;
+  --docs-pane: rgb(255 255 255 / 0.78);
   --docs-pane-solid: #ffffff;
-  --docs-line: rgb(15 17 21 / 0.08);
+  --docs-line: rgb(18 18 22 / 0.08);
   --docs-rim: inset 0 1px 0 rgb(255 255 255 / 0.9);
-  --docs-shadow: 0 1px 2px rgb(16 20 48 / 0.06), 0 14px 36px -18px rgb(16 20 48 / 0.24);
-  --docs-glow-a: rgb(91 108 255 / 0.26);
-  --docs-glow-b: rgb(56 200 255 / 0.22);
-  --docs-glow-c: rgb(91 108 255 / 0.1);
-  --docs-beam: rgb(91 108 255 / 0.16);
-  --docs-beam-core: rgb(91 108 255 / 0.2);
+  --docs-shadow: 0 1px 2px rgb(24 20 60 / 0.06), 0 14px 36px -18px rgb(24 20 60 / 0.22);
+  --docs-glow-a: rgb(110 94 255 / 0.22);
+  --docs-glow-b: rgb(150 130 255 / 0.16);
+  --docs-glow-c: rgb(110 94 255 / 0.09);
+  --docs-beam: rgb(110 94 255 / 0.14);
+  --docs-beam-core: rgb(110 94 255 / 0.18);
   --docs-ease: cubic-bezier(0.16, 1, 0.3, 1);
   --docs-dur: 220ms;
-  /* Brand: the logo dot, badges, focus and the hero light. */
-  --brand: #4453e6;
-  --brand-soft: #e8ebff;
-  --brand-ink: #3240c8;
-  --brand-cyan: #0ea5d9;
+  /* Brand: the logo dot, badges, focus, the hero light. Solid: buttons with white text (5.7:1). */
+  --brand: #5b4bf0;
+  --brand-solid: #5b4bf0;
+  --brand-soft: #ecebff;
+  --brand-ink: #4636d8;
 }
 .dark {
-  --docs-ground: #08090d;
-  --docs-ink: #f2f3f6;
-  --docs-ink-muted: #9c9fab;
-  --docs-pane: rgb(255 255 255 / 0.035);
-  --docs-pane-solid: #12141a;
+  --docs-ground: #17171d;
+  --docs-ink: #f3f3f6;
+  --docs-ink-muted: #a3a3ae;
+  --docs-pane: rgb(255 255 255 / 0.04);
+  --docs-pane-solid: #1f1f27;
   --docs-line: rgb(255 255 255 / 0.08);
-  --docs-rim: inset 0 1px 0 rgb(255 255 255 / 0.07);
-  --docs-shadow: 0 1px 2px rgb(0 0 0 / 0.5), 0 18px 44px -18px rgb(0 0 0 / 0.8);
-  --docs-glow-a: rgb(110 124 255 / 0.5);
-  --docs-glow-b: rgb(56 200 255 / 0.34);
-  --docs-glow-c: rgb(110 124 255 / 0.14);
-  --docs-beam: rgb(170 185 255 / 0.26);
-  --docs-beam-core: rgb(124 140 255 / 0.38);
-  --brand: #7c8cff;
-  --brand-soft: rgb(124 140 255 / 0.16);
-  --brand-ink: #b9c2ff;
-  --brand-cyan: #38c8ff;
+  --docs-rim: inset 0 1px 0 rgb(255 255 255 / 0.06);
+  --docs-shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 18px 44px -18px rgb(0 0 0 / 0.7);
+  --docs-glow-a: rgb(124 108 255 / 0.3);
+  --docs-glow-b: rgb(160 145 255 / 0.18);
+  --docs-glow-c: rgb(124 108 255 / 0.12);
+  --docs-beam: rgb(160 148 255 / 0.18);
+  --docs-beam-core: rgb(124 108 255 / 0.3);
+  --brand: #8b7dff;
+  --brand-solid: #5b4bf0;
+  --brand-soft: rgb(139 125 255 / 0.16);
+  --brand-ink: #c4bcff;
 }
 /* The site re-points a few theme tokens at the material, so shared chrome (sidebar, prose, inputs) follows. */
 .docs-shell {
@@ -424,6 +424,9 @@
   --border: var(--docs-line);
   --card: var(--docs-pane-solid);
   --ring: var(--brand);
+  /* Site buttons: the one violet. Demo frames and previews put the theme's primary back. */
+  --primary: var(--brand-solid);
+  --primary-foreground: #ffffff;
   background:
     radial-gradient(70rem 30rem at 50% -14rem, var(--docs-glow-c), transparent 70%),
     var(--docs-ground);
@@ -438,6 +441,8 @@
   --border: oklch(0.922 0 0);
   --card: oklch(1 0 0);
   --ring: oklch(0.708 0 0);
+  --primary: oklch(0.205 0 0);
+  --primary-foreground: oklch(0.985 0 0);
 }
 .dark .docs-preview {
   --background: oklch(0.145 0 0);
@@ -446,6 +451,8 @@
   --border: oklch(1 0 0 / 10%);
   --card: oklch(0.205 0 0);
   --ring: oklch(0.556 0 0);
+  --primary: oklch(0.922 0 0);
+  --primary-foreground: oklch(0.205 0 0);
 }
 body {
   background: var(--docs-ground);
@@ -489,19 +496,6 @@ html {
     conic-gradient(from 180deg at 50% -6rem, transparent 158deg, var(--docs-beam) 180deg, transparent 202deg);
   filter: blur(28px);
   mask-image: linear-gradient(to bottom, black 30%, transparent 92%);
-}
-/* Home showcase: a blue-cyan horizon behind the top edge of the wall, like light over a product shot. */
-.docs-horizon {
-  background:
-    radial-gradient(40% 45% at 50% 62%, var(--docs-glow-b), transparent 70%),
-    radial-gradient(62% 60% at 50% 62%, var(--docs-glow-a), transparent 74%);
-  filter: blur(36px);
-}
-/* Roadmap: light behind the release in progress. */
-.docs-next-glow {
-  background:
-    radial-gradient(40rem 22rem at 100% 0%, var(--docs-glow-a), transparent 70%),
-    radial-gradient(30rem 18rem at 70% 120%, var(--docs-glow-b), transparent 70%);
 }
 /* Text drawn by CSS, so it is not part of the element's text (select labels read text). */
 .docs-glyph::before {

@@ -122,101 +122,93 @@ export const ROADMAP: {
   },
 ];
 
-/** `/roadmap`: what is next first, then what is planned, then what shipped, newest first. */
+/** `/roadmap`: one timeline. The future on top (planned, then up next), then what shipped, newest first. */
 @Component({
   selector: 'docs-roadmap',
   imports: [RouterLink, IvButton],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'block' },
   template: `
-    <div class="mx-auto max-w-6xl px-4 pt-14 pb-24 sm:px-6 sm:pt-20">
-      <header class="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
-        <div class="max-w-xl">
-          <h1 class="font-display text-foreground text-[clamp(2.25rem,5vw,3.5rem)] leading-none font-semibold tracking-[-0.025em]">Roadmap</h1>
-          <p class="text-muted-foreground mt-4 text-lg text-pretty">
-            What is out, and what we are building next, one release at a time. The order can change as we learn what you need.
-          </p>
-        </div>
-        <dl class="docs-pane grid grid-cols-3 divide-x divide-(--docs-line) rounded-2xl" data-testid="counts">
-          @for (c of counts; track c.label) {
-            <div class="flex flex-col-reverse gap-0.5 px-5 py-3 sm:px-6">
-              <dt class="text-muted-foreground text-sm">{{ c.label }}</dt>
-              <dd class="text-foreground text-2xl font-semibold tabular-nums">{{ c.count }}</dd>
-            </div>
-          }
-        </dl>
+    <div class="mx-auto max-w-5xl px-4 pt-14 pb-24 sm:px-6 sm:pt-20">
+      <header class="max-w-xl">
+        <h1 class="font-display text-foreground text-[clamp(2.25rem,5vw,3.5rem)] leading-none font-semibold tracking-[-0.025em]">Roadmap</h1>
+        <p class="text-muted-foreground mt-4 text-lg text-pretty">
+          What is out, and what we are building next, one release at a time. The order can change as we learn what you need.
+        </p>
       </header>
 
-      <!-- Up next: the one release in progress. -->
-      <section aria-labelledby="next-title" class="mt-14">
-        <h2 id="next-title" class="text-foreground mb-4 flex items-center gap-2.5 text-sm font-medium">
-          <span class="relative flex size-2.5" aria-hidden="true">
-            <span class="docs-ring-once absolute inset-0 rounded-full bg-(--brand)"></span>
-            <span class="relative size-2.5 rounded-full bg-(--brand)"></span>
-          </span>
-          Up next
-        </h2>
-        <article class="docs-pane relative isolate overflow-hidden rounded-3xl p-6 sm:p-10" data-state="next">
-          <div class="docs-next-glow pointer-events-none absolute inset-0 -z-10" aria-hidden="true"></div>
-          <div class="flex flex-col gap-4 sm:max-w-2xl">
-            <span class="self-start rounded-full bg-(--brand-soft) px-2.5 py-0.5 font-mono text-xs font-medium text-(--brand-ink)">{{ next.version }}</span>
-            <h3 class="font-display text-foreground text-2xl font-semibold tracking-[-0.03em] text-balance sm:text-3xl">{{ next.title }}</h3>
-            <p class="text-muted-foreground text-lg text-pretty">{{ next.summary }}</p>
-          </div>
-        </article>
-      </section>
-
-      <!-- Planned: after that, in order. -->
-      <section aria-labelledby="planned-title" class="mt-14">
-        <h2 id="planned-title" class="text-foreground mb-4 text-sm font-medium">Planned</h2>
-        <ol class="grid gap-4 md:grid-cols-3">
-          @for (item of planned; track item.title) {
-            <li class="docs-pane flex flex-col gap-3 rounded-2xl p-5 sm:p-6" data-state="planned">
-              <span class="text-muted-foreground self-start rounded-full border px-2.5 py-0.5 font-mono text-xs">{{ item.version }}</span>
-              <h3 class="text-foreground text-lg font-semibold tracking-tight">{{ item.title }}</h3>
+      <ol class="mt-14 flex flex-col" aria-label="Releases, newest on top">
+        <!-- Planned: furthest first. A dashed card on a faint line. -->
+        @for (item of planned; track item.title) {
+          <li [class]="row">
+            <h2 [class]="version + ' text-muted-foreground'"><span class="sr-only">Release </span>{{ item.version }}</h2>
+            <span class="flex flex-col items-center" aria-hidden="true">
+              <span class="bg-background mt-1.5 size-2.5 shrink-0 rounded-full border border-(--docs-ink-muted)"></span>
+              <span class="my-1.5 w-px flex-1 bg-(--docs-line)"></span>
+            </span>
+            <article class="mb-8 flex flex-col gap-1 rounded-2xl border border-dashed p-4 sm:p-5" data-state="planned">
+              <span class="text-muted-foreground text-xs font-medium">Planned</span>
+              <h3 class="text-foreground font-semibold tracking-tight">{{ item.title }}</h3>
               <p class="text-muted-foreground text-sm text-pretty">{{ item.summary }}</p>
-            </li>
-          }
-        </ol>
-      </section>
+            </article>
+          </li>
+        }
 
-      <!-- Shipped: newest first, grouped by release. -->
-      <section aria-labelledby="shipped-title" class="mt-16">
-        <h2 id="shipped-title" class="text-foreground mb-6 text-sm font-medium">Shipped</h2>
-        <ol class="flex flex-col">
-          @for (release of shipped; track release.version; let last = $last) {
-            <li class="grid grid-cols-[3.5rem_1rem_minmax(0,1fr)] gap-x-3 sm:grid-cols-[6rem_1rem_minmax(0,1fr)] sm:gap-x-4">
-              <span class="text-foreground pt-0.5 text-right font-mono text-sm font-medium tabular-nums">{{ release.version }}</span>
-              <span class="flex flex-col items-center" aria-hidden="true">
-                <span class="mt-1.5 size-2.5 shrink-0 rounded-full bg-(--brand) ring-4 ring-(--brand-soft)"></span>
-                @if (!last) {
-                  <span class="my-1.5 w-px flex-1 bg-(--docs-line)"></span>
-                }
-              </span>
-              <ul class="flex flex-col gap-3" [class.pb-10]="!last">
-                @for (item of release.items; track item.title) {
-                  <li class="docs-pane group rounded-2xl" data-state="shipped">
-                    @if (item.link) {
-                      <a [routerLink]="item.link" class="focus-visible:ring-ring flex flex-col gap-1 rounded-2xl p-4 outline-none focus-visible:ring-2 sm:p-5">
-                        <h3 class="text-foreground flex items-center justify-between gap-3 font-semibold tracking-tight">
-                          {{ item.title }}
-                          <svg class="text-muted-foreground group-hover:text-foreground size-4 shrink-0 transition-transform duration-(--docs-dur) group-hover:translate-x-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
-                        </h3>
-                        <p class="text-muted-foreground text-sm text-pretty">{{ item.summary }}</p>
-                      </a>
-                    } @else {
-                      <div class="flex flex-col gap-1 p-4 sm:p-5">
-                        <h3 class="text-foreground font-semibold tracking-tight">{{ item.title }}</h3>
-                        <p class="text-muted-foreground text-sm text-pretty">{{ item.summary }}</p>
-                      </div>
-                    }
-                  </li>
-                }
-              </ul>
-            </li>
-          }
-        </ol>
-      </section>
+        <!-- Up next: the release in progress. The line turns violet from here down. -->
+        <li [class]="row">
+          <h2 [class]="version + ' text-foreground font-semibold'"><span class="sr-only">Release </span>{{ next.version }}</h2>
+          <span class="flex flex-col items-center" aria-hidden="true">
+            <span class="relative mt-1 flex size-3.5 shrink-0">
+              <span class="docs-ring-once absolute inset-0 rounded-full bg-(--brand)"></span>
+              <span class="relative size-3.5 rounded-full bg-(--brand) ring-4 ring-(--brand-soft)"></span>
+            </span>
+            <span class="my-1.5 w-0.5 flex-1 bg-(--brand)"></span>
+          </span>
+          <article
+            class="docs-pane relative isolate mb-10 flex flex-col gap-3 overflow-hidden rounded-2xl p-5 sm:p-7"
+            style="border-color: color-mix(in oklab, var(--brand) 45%, transparent)"
+            data-state="next"
+          >
+            <div class="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(36rem_14rem_at_100%_0%,var(--docs-glow-a),transparent_70%)]" aria-hidden="true"></div>
+            <span class="self-start rounded-full bg-(--brand-soft) px-2.5 py-0.5 text-xs font-medium text-(--brand-ink)">Up next</span>
+            <h3 class="font-display text-foreground text-2xl font-semibold tracking-[-0.02em] text-balance">{{ next.title }}</h3>
+            <p class="text-muted-foreground text-pretty">{{ next.summary }}</p>
+          </article>
+        </li>
+
+        <!-- Shipped: one row per release, its items as tiles. -->
+        @for (release of shipped; track release.version; let last = $last) {
+          <li [class]="row" data-testid="release">
+            <h2 [class]="version + ' text-foreground'"><span class="sr-only">Release </span>{{ release.version }}</h2>
+            <span class="flex flex-col items-center" aria-hidden="true">
+              <span class="mt-1.5 size-2.5 shrink-0 rounded-full bg-(--brand)"></span>
+              @if (!last) {
+                <span class="my-1.5 w-0.5 flex-1 bg-(--brand)/50"></span>
+              }
+            </span>
+            <ul class="grid gap-3 sm:grid-cols-2" [class.pb-8]="!last">
+              @for (item of release.items; track item.title) {
+                <li class="docs-pane group rounded-2xl" data-state="shipped">
+                  @if (item.link) {
+                    <a [routerLink]="item.link" class="focus-visible:ring-ring flex h-full flex-col gap-1 rounded-2xl p-4 outline-none focus-visible:ring-2">
+                      <h3 class="text-foreground flex items-center justify-between gap-3 font-semibold tracking-tight">
+                        {{ item.title }}
+                        <svg class="text-muted-foreground group-hover:text-foreground size-4 shrink-0 transition-transform duration-(--docs-dur) group-hover:translate-x-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+                      </h3>
+                      <p class="text-muted-foreground text-sm text-pretty">{{ item.summary }}</p>
+                    </a>
+                  } @else {
+                    <div class="flex flex-col gap-1 p-4">
+                      <h3 class="text-foreground font-semibold tracking-tight">{{ item.title }}</h3>
+                      <p class="text-muted-foreground text-sm text-pretty">{{ item.summary }}</p>
+                    </div>
+                  }
+                </li>
+              }
+            </ul>
+          </li>
+        }
+      </ol>
 
       <div class="docs-pane mt-16 flex flex-col items-start gap-4 rounded-3xl p-6 sm:flex-row sm:items-center sm:justify-between sm:p-8">
         <div>
@@ -230,16 +222,15 @@ export const ROADMAP: {
 })
 export default class RoadmapPage {
   protected readonly next = ROADMAP.find((i) => i.state === 'next')!;
-  protected readonly planned = ROADMAP.filter((i) => i.state === 'planned');
+  /** Furthest first: the timeline runs from the future down. */
+  protected readonly planned = ROADMAP.filter((i) => i.state === 'planned').reverse();
+  /** A timeline row: version, the line, the content. */
+  protected readonly row = 'grid grid-cols-[3rem_1rem_minmax(0,1fr)] gap-x-3 sm:grid-cols-[4.5rem_1rem_minmax(0,1fr)] sm:gap-x-5';
+  protected readonly version = 'pt-0.5 text-right font-mono text-sm tabular-nums';
   /** Shipped items grouped by release, newest release first. */
   protected readonly shipped = [...new Set(ROADMAP.filter((i) => i.state === 'shipped').map((i) => i.version!))]
     .reverse()
     .map((version) => ({ version, items: ROADMAP.filter((i) => i.state === 'shipped' && i.version === version) }));
-  protected readonly counts = [
-    { label: 'Shipped', count: ROADMAP.filter((i) => i.state === 'shipped').length },
-    { label: 'Up next', count: 1 },
-    { label: 'Planned', count: this.planned.length },
-  ];
 
   constructor() {
     inject(Meta).updateTag({
