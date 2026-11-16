@@ -248,3 +248,9 @@
 & .cn-field-separator-content {
   @apply bg-transparent px-0;
 }
+
+/* Destructive text sits on a toned surface here: mixed toward the foreground, so it keeps 4.5:1. */
+.cn-badge-variant-destructive,
+.cn-button-variant-destructive {
+  @apply text-[color-mix(in_oklab,var(--destructive),var(--foreground)_28%)];
+}

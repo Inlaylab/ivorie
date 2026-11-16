@@ -34,7 +34,7 @@ export const steps: Step[] = [
   // Angular packages are ESM-only. The styles are CSS exports, not JS entries.
   {
     name: 'attw',
-    cmd: 'npx attw --pack dist/ui --profile esm-only --exclude-entrypoints ./styles/theme.css ./styles/style-vega.css ./styles/style-nova.css ./styles/style-maia.css ./styles/style-luma.css ./styles/style-rhea.css ./styles/style-glass.css ./styles/style-lyra.css ./styles/style-mira.css ./styles/style-sera.css ./styles/style-bento.css ./styles/style-mono.css',
+    cmd: 'npx attw --pack dist/ui --profile esm-only --exclude-entrypoints ./styles/theme.css ./styles/style-vega.css ./styles/style-nova.css ./styles/style-maia.css ./styles/style-luma.css ./styles/style-rhea.css ./styles/style-glass.css ./styles/style-lyra.css ./styles/style-mira.css ./styles/style-sera.css ./styles/style-bento.css ./styles/style-mono.css ./styles/style-graphite.css ./styles/style-tint.css',
   },
   { name: 'test-ui', cmd: 'npx ng test ui --watch=false' },
   { name: 'test-blocks', cmd: 'npx ng test blocks --watch=false' },

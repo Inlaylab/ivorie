@@ -4,13 +4,13 @@ Angular components with the [shadcn/ui](https://github.com/shadcn-ui/ui) look an
 Accessibility and keyboard patterns follow [Radix UI](https://github.com/radix-ui/primitives).
 Built for Angular 22 (minimum) and Tailwind CSS 4: signals, zoneless, server rendering and keyboard support.
 
-- **`@inlaylab/ivorie`**: the npm package. 53 components, one entry point each (`@inlaylab/ivorie/button`), and 10 styles. Works in standalone, NgModule, SSR and zoneless apps.
-- **`ivorie`**: a CLI that copies component source into your app, so you own and edit it. It also adds 19 ready-made blocks: login, sign-up, sidebar and dashboard pages.
+- **`@inlaylab/ivorie`**: the npm package. 54 components, one entry point each (`@inlaylab/ivorie/button`), and 13 styles. Works in standalone, NgModule, SSR and zoneless apps.
+- **`ivorie`**: a CLI that copies component source into your app, so you own and edit it. It also adds 22 ready-made blocks: login, sign-up, sidebar and dashboard pages.
 
 ## Use the package
 
 ```bash
-npm i @inlaylab/ivorie @angular/cdk @lucide/angular
+npm i @inlaylab/ivorie @angular/cdk
 npm i -D tailwindcss @tailwindcss/postcss tw-animate-css
 ```
 
@@ -58,6 +58,7 @@ npm run check -- --only test-blocks,test-docs   # just some gates
 - **1.2** Playground: pick style, base color, font and radius, then install that look.
 - **1.4** Icon libraries (lucide, tabler, phosphor, hugeicons, remix), five new styles (glass, brutal, aurora, bento, mono), a data table and 19 blocks.
 - **1.5** Charts (line, area, bar, pie, radar, radial), dashboard blocks, 17 accent colors with colored charts, shadcn's lyra, mira and sera styles, and a neutral glass. Aurora and brutal are gone.
+- **1.5.1** Two new styles, Graphite and Tint (13 in total), a more terminal Mono, and fixes for icons in a collapsed sidebar.
 - Next: **1.6** more theme dials (density, glass thickness), then **1.7** AI-ready (AGENTS.md, MCP server).
 
 Details: [ROADMAP.md](ROADMAP.md).

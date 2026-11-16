@@ -1176,6 +1176,29 @@
       caret-shape: block;
     }
 
+    & ::selection {
+      background-color: var(--foreground);
+      color: var(--background);
+    }
+
+    .cn-table-head,
+    .cn-sidebar-group-label,
+    .cn-dropdown-menu-label {
+      @apply text-xs tracking-widest uppercase;
+    }
+
+    & .cn-sidebar-menu-button {
+      @apply data-active:shadow-[inset_2px_0_0_var(--primary)];
+    }
+
+    & .cn-tabs-trigger {
+      @apply data-active:shadow-none data-active:ring-1 data-active:ring-border;
+    }
+
+    & .cn-kbd {
+      @apply bg-transparent ring-1 ring-border;
+    }
+
     /* MARK: No rule in mono */
     .cn-accordion {}
     .cn-accordion-trigger-icon {}

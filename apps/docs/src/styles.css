@@ -1,8 +1,8 @@
 /* theme.css already imports tailwindcss and tw-animate-css. */
 @import "../../../projects/ui/styles/theme.css";
-/* The site's style: nova, kept out of previews of another style (tools/docs/site-style.ts).
+/* The site's style: glass (DEFAULT_STYLE), kept out of previews of another style (tools/docs/site-style.ts).
    Previewed styles are separate bundles: src/styles/style-*.css. */
-@import "./generated/site-nova.css";
+@import "./generated/site-style.css";
 /* Geist, self-hosted: the check and the SSR smoke run without network. */
 @import "@fontsource-variable/geist";
 @import "@fontsource-variable/geist-mono";
@@ -173,6 +173,15 @@
   background-color: color-mix(in oklab, var(--background) 88%, var(--foreground));
   color: var(--foreground);
 }
+/* Own styles bring their page: tiles and panes are tuned against it (bento separates by tone alone). On a
+   preview page the look is on <body>: the style's ground shows there, and the canvas over it is clear.
+   On the site (Home wall) the stage itself carries the style and is already clear. */
+body.docs-preview:where(.style-glass, .style-bento, .style-graphite, .style-tint) {
+  background: revert-layer;
+}
+body.docs-preview:where(.style-glass, .style-bento, .style-graphite, .style-tint) .docs-stage {
+  background-color: transparent;
+}
 
 /* Playground style tiles: a tiny specimen of each look, drawn in CSS with the site colors.
    One card and one button; each style changes only what makes it itself. */
@@ -188,18 +197,6 @@
 }
 .docs-specimen-sm {
   height: 2.5rem;
-}
-/* A 16px specimen for list rows: the card only. */
-.docs-specimen-xs {
-  width: 1rem;
-  height: 1rem;
-  flex-shrink: 0;
-  border-radius: 0.25rem;
-}
-.docs-specimen-xs .docs-specimen-card {
-  inset: 3px !important;
-  border-radius: calc(var(--sp-card-r) * 0.4);
-  box-shadow: none !important;
 }
 /* Playground panel rows: a small label over the value, a picture on the right, the whole row is the button. */
 .docs-panel-row {
@@ -369,6 +366,33 @@
   font-weight: 600;
   color: var(--foreground);
 }
+/* Graphite: a matte pane with a lit top edge, on a toned page. */
+.docs-specimen[data-style='graphite'] {
+  background: color-mix(in oklab, var(--background) 93%, var(--foreground));
+}
+.docs-specimen[data-style='graphite'] .docs-specimen-card {
+  border-color: transparent;
+  box-shadow:
+    inset 0 1px 0 color-mix(in oklab, white 70%, transparent),
+    0 0 0 1px color-mix(in oklab, var(--foreground) 14%, transparent),
+    0 1px 2px color-mix(in oklab, black 12%, transparent);
+}
+.dark .docs-specimen[data-style='graphite'] .docs-specimen-card {
+  background: color-mix(in oklab, var(--background) 90%, white);
+  box-shadow:
+    inset 0 1px 0 color-mix(in oklab, white 12%, transparent),
+    0 0 0 1px color-mix(in oklab, white 8%, transparent),
+    0 1px 2px black;
+}
+/* Tint: page, pane and line take a wash of the primary. */
+.docs-specimen[data-style='tint'] {
+  background: color-mix(in oklab, var(--background) 88%, var(--primary));
+}
+.docs-specimen[data-style='tint'] .docs-specimen-card {
+  border-color: color-mix(in oklab, var(--primary) 30%, transparent);
+  background: color-mix(in oklab, var(--background) 96%, var(--primary));
+  box-shadow: 0 6px 14px -8px color-mix(in oklab, var(--primary) 40%, transparent);
+}
 
 /* Site material: smoky glass, dark-first. Site chrome only: .docs-shell is the site wrapper and is not
    rendered on /preview routes. Demo frames restore the theme values below, and preview stages get the
@@ -384,18 +408,19 @@
   --docs-line: rgb(18 18 22 / 0.08);
   --docs-rim: inset 0 1px 0 rgb(255 255 255 / 0.9);
   --docs-shadow: 0 1px 2px rgb(24 20 60 / 0.06), 0 14px 36px -18px rgb(24 20 60 / 0.22);
-  --docs-glow-a: rgb(110 94 255 / 0.22);
-  --docs-glow-b: rgb(150 130 255 / 0.16);
-  --docs-glow-c: rgb(110 94 255 / 0.09);
-  --docs-beam: rgb(110 94 255 / 0.14);
-  --docs-beam-core: rgb(110 94 255 / 0.18);
+  --docs-glow-a: rgb(124 58 237 / 0.22);
+  --docs-glow-b: rgb(167 130 250 / 0.16);
+  --docs-glow-c: rgb(124 58 237 / 0.09);
+  --docs-beam: rgb(124 58 237 / 0.14);
+  --docs-beam-core: rgb(124 58 237 / 0.18);
   --docs-ease: cubic-bezier(0.16, 1, 0.3, 1);
   --docs-dur: 220ms;
-  /* Brand: the logo dot, badges, focus, the hero light. Solid: buttons with white text (5.7:1). */
-  --brand: #5b4bf0;
-  --brand-solid: #5b4bf0;
-  --brand-soft: #ecebff;
-  --brand-ink: #4636d8;
+  /* Brand: the logo dot, badges, focus, the hero light. The violet accent's own --primary (light #7008e7,
+     dark #5d0ec0), so the site and the Glass preview are one purple. Solid: buttons with white text. */
+  --brand: #7008e7;
+  --brand-solid: #7008e7;
+  --brand-soft: #f0e9ff;
+  --brand-ink: #5d00c3;
 }
 .dark {
   --docs-ground: #17171d;
@@ -406,15 +431,15 @@
   --docs-line: rgb(255 255 255 / 0.08);
   --docs-rim: inset 0 1px 0 rgb(255 255 255 / 0.06);
   --docs-shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 18px 44px -18px rgb(0 0 0 / 0.7);
-  --docs-glow-a: rgb(124 108 255 / 0.3);
-  --docs-glow-b: rgb(160 145 255 / 0.18);
-  --docs-glow-c: rgb(124 108 255 / 0.12);
-  --docs-beam: rgb(160 148 255 / 0.18);
-  --docs-beam-core: rgb(124 108 255 / 0.3);
-  --brand: #8b7dff;
-  --brand-solid: #5b4bf0;
-  --brand-soft: rgb(139 125 255 / 0.16);
-  --brand-ink: #c4bcff;
+  --docs-glow-a: rgb(139 92 246 / 0.3);
+  --docs-glow-b: rgb(180 150 252 / 0.18);
+  --docs-glow-c: rgb(139 92 246 / 0.12);
+  --docs-beam: rgb(180 150 252 / 0.18);
+  --docs-beam-core: rgb(139 92 246 / 0.3);
+  --brand: #a387fd;
+  --brand-solid: #5d0ec0;
+  --brand-soft: rgb(163 135 253 / 0.16);
+  --brand-ink: #ccc0ff;
 }
 /* The site re-points a few theme tokens at the material, so shared chrome (sidebar, prose, inputs) follows. */
 .docs-shell {
@@ -433,7 +458,8 @@
   background-repeat: no-repeat;
   color: var(--docs-ink);
 }
-/* Demo frames show the real default look: the theme values back. */
+/* Demo frames show the site's look (DOCS_PRESET: neutral base, violet accent), the same as the Home wall.
+   Values: the violet accent in generated/looks.ts. A playground stage sets its own picks inline over these. */
 .docs-preview {
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
@@ -441,8 +467,15 @@
   --border: oklch(0.922 0 0);
   --card: oklch(1 0 0);
   --ring: oklch(0.708 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.491 0.27 292.581);
+  --primary-foreground: oklch(0.969 0.016 293.756);
+  --sidebar-primary: oklch(0.541 0.281 293.009);
+  --sidebar-primary-foreground: oklch(0.969 0.016 293.756);
+  --chart-1: oklch(0.811 0.111 293.571);
+  --chart-2: oklch(0.606 0.25 292.717);
+  --chart-3: oklch(0.541 0.281 293.009);
+  --chart-4: oklch(0.491 0.27 292.581);
+  --chart-5: oklch(0.432 0.232 292.759);
 }
 .dark .docs-preview {
   --background: oklch(0.145 0 0);
@@ -451,8 +484,9 @@
   --border: oklch(1 0 0 / 10%);
   --card: oklch(0.205 0 0);
   --ring: oklch(0.556 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
+  --primary: oklch(0.432 0.232 292.759);
+  --primary-foreground: oklch(0.969 0.016 293.756);
+  --sidebar-primary: oklch(0.606 0.25 292.717);
 }
 body {
   background: var(--docs-ground);
@@ -515,5 +549,35 @@ html {
   to {
     transform: scale(2.2);
     opacity: 0;
+  }
+}
+
+/* Style switch (PlaygroundLook): only the wall changes, out then in, never two looks on top of each other. */
+.docs-stage {
+  view-transition-name: docs-stage;
+}
+::view-transition-group(root),
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+}
+::view-transition-group(docs-stage) {
+  animation-duration: 0s;
+}
+::view-transition-old(docs-stage) {
+  animation: docs-vt-out 110ms ease-in both;
+}
+::view-transition-new(docs-stage) {
+  animation: docs-vt-in 200ms ease-out 90ms both;
+}
+@keyframes docs-vt-out {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes docs-vt-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
   }
 }

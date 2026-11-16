@@ -3,7 +3,7 @@ import { cva, VariantProps } from 'class-variance-authority'
 import { cn } from '@inlaylab/ivorie/core'
 
 export const buttonVariants = cva(
-  "cn-button group/button inline-flex shrink-0 items-center justify-center whitespace-nowrap transition-all outline-none select-none disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0",
+  "cn-button group/button inline-flex shrink-0 items-center justify-center whitespace-nowrap transition-all outline-none select-none disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_ng-icon]:shrink-0",
   {
     variants: {
       variant: {

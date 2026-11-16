@@ -10,7 +10,6 @@ import { OverlayContainer } from '@angular/cdk/overlay';
 import { RouterLink } from '@angular/router';
 import { IvButton } from '@inlaylab/ivorie/button';
 import { IV_TOOLTIP_IMPORTS } from '@inlaylab/ivorie/tooltip';
-import { ACCENTS } from '../../generated/looks';
 import { PAGES } from '../../generated/pages';
 import { PlaygroundLook } from '../playground/playground-look';
 import { SceneWall } from '../playground/scenes/wall';
@@ -30,10 +29,12 @@ import { CopyButton } from '../ui/copy-button';
       <div class="docs-beam pointer-events-none absolute inset-x-0 top-0 -z-10 mx-auto h-[40rem] max-w-5xl" aria-hidden="true"></div>
       <div class="mx-auto flex max-w-4xl flex-col items-center px-4 pt-16 pb-16 text-center sm:px-6 sm:pt-24 sm:pb-20">
         <a
-          routerLink="/roadmap"
+          href="https://github.com/Inlaylab/ivorie"
+          target="_blank"
+          rel="noreferrer"
           class="docs-pane text-muted-foreground hover:text-foreground mb-8 inline-flex items-center gap-2 rounded-full py-1 pr-3 pl-1 text-sm transition-colors duration-(--docs-dur)"
         >
-          <span class="bg-(--brand-soft) text-(--brand-ink) rounded-full px-2 py-0.5 text-xs font-medium">{{ release.version }}</span>
+          <span class="bg-(--brand-soft) text-(--brand-ink) rounded-full px-2 py-0.5 text-xs font-medium tabular-nums">v{{ release.version }}</span>
           {{ release.text }}
         </a>
         <h1
@@ -60,8 +61,8 @@ import { CopyButton } from '../ui/copy-button';
     <!-- The showcase: real components in the picked style, on a horizon of light. Only the stage changes. -->
     <section aria-labelledby="wall-title" class="mx-auto max-w-7xl px-4 pb-20 sm:px-6">
       <h2 id="wall-title" class="sr-only">Live components</h2>
-      <div class="mb-5 flex flex-col items-center gap-3">
-        <div role="radiogroup" aria-label="Style" class="docs-pane no-scrollbar relative flex max-w-full gap-0.5 overflow-x-auto rounded-full p-1">
+      <div class="mb-5 flex flex-col items-center">
+        <div role="radiogroup" aria-label="Style" class="docs-pane no-scrollbar relative flex max-w-full gap-0.5 overflow-x-auto rounded-full p-1 max-lg:[mask-image:linear-gradient(to_right,black_calc(100%-2.5rem),transparent)]">
           @for (s of styles; track s.name) {
             <iv-tooltip class="shrink-0" [delayDuration]="150">
               <label
@@ -81,26 +82,6 @@ import { CopyButton } from '../ui/copy-button';
               </label>
               <iv-tooltip-content side="bottom">{{ notes[s.name] }}</iv-tooltip-content>
             </iv-tooltip>
-          }
-        </div>
-        <!-- Accent: none (the base color's ink) or one of shadcn's accents. Charts follow it. -->
-        <div role="radiogroup" aria-label="Accent" class="flex max-w-full flex-wrap justify-center gap-1.5 px-2">
-          @for (a of accents; track a.name) {
-            <label
-              class="ring-offset-background has-checked:ring-foreground has-focus-visible:outline-ring flex size-5 cursor-pointer rounded-full ring-1 ring-black/10 ring-offset-2 transition-shadow has-checked:ring-2 has-focus-visible:outline-2 has-focus-visible:outline-offset-4 dark:ring-white/15"
-              [title]="a.title"
-            >
-              <input
-                type="radio"
-                class="sr-only"
-                name="home-accent"
-                [value]="a.name"
-                [attr.aria-label]="a.title"
-                [checked]="look.preset().theme === a.name"
-                (change)="look.set({ theme: a.name })"
-              />
-              <span class="size-full rounded-full" [style.background]="a.color" aria-hidden="true"></span>
-            </label>
           }
         </div>
       </div>
@@ -150,10 +131,15 @@ import { CopyButton } from '../ui/copy-button';
       <div class="text-muted-foreground mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-8 text-sm sm:px-6">
         <span class="flex items-center gap-2">
           <span class="docs-brand-gradient size-1.5 rounded-full" aria-hidden="true"></span>
+          <!-- Credit the work this stands on, the way shadcn/ui ports do. -->
           <span
-            >Ivorie is made by
-            <a href="https://github.com/Inlaylab" target="_blank" rel="noreferrer" class="text-foreground font-medium hover:underline">Inlaylab</a>.
-            MIT license.</span
+            >By
+            <a href="https://github.com/Inlaylab" target="_blank" rel="noreferrer" class="text-foreground font-medium underline underline-offset-4 hover:no-underline">Inlaylab</a>.
+            Built on
+            <a href="https://ui.shadcn.com" target="_blank" rel="noreferrer" class="text-foreground underline underline-offset-4 hover:no-underline">shadcn/ui</a>
+            and
+            <a href="https://www.radix-ui.com/primitives" target="_blank" rel="noreferrer" class="text-foreground underline underline-offset-4 hover:no-underline">Radix UI</a>
+            patterns. MIT license.</span
           >
         </span>
         <nav aria-label="Footer" class="flex flex-wrap gap-x-5 gap-y-2">
@@ -171,14 +157,10 @@ export default class HomePage {
   private readonly stage = viewChild.required<ElementRef<HTMLElement>>('stage');
   protected readonly install = 'npx ivorie init';
   protected readonly componentCount = PAGES.filter((p) => p.section === 'component').length;
-  /** The announcement pill. Update with each release. */
-  protected readonly release = { version: '1.5.0', text: 'Charts, accent colors and new styles' };
+  /** The pill over the hero: the current version, and that the code is open. Bump the version with each release. */
+  protected readonly release = { version: '1.5.1', text: 'Free and open source on GitHub' };
   protected readonly styles = STYLES;
   protected readonly notes = STYLE_NOTES;
-  protected readonly accents = [
-    { name: 'base', title: 'No accent', color: 'var(--foreground)' },
-    ...ACCENTS.map((a) => ({ name: a.name, title: a.title, color: a.light['--primary'] })),
-  ];
   protected readonly facts = [
     { title: 'Signals and zoneless', text: 'Signal inputs and models, OnPush, no zone.js.' },
     { title: 'Server rendering', text: 'Renders on the server, hydrates without warnings.' },

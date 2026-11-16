@@ -243,6 +243,8 @@ describe('IvSidebar', () => {
     expect(homeButton.getAttribute('aria-current')).toBe('page')
     expect(inbox.querySelector('button')!.classList).toContain('cn-sidebar-menu-button-variant-outline')
     expect(sidebarMenuButtonVariants({ size: 'sm' })).toContain('cn-sidebar-menu-button-size-sm')
+    // Collapsed to icons, the button clips: ng-icon hosts (overflow:hidden, so min-width 0) must not shrink.
+    expect(homeButton.classList).toContain('group-data-[collapsible=icon]:*:shrink-0')
   })
 
   it('menu button tooltip shows only while collapsed', async () => {

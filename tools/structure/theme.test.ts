@@ -65,7 +65,7 @@ test('every shadcn style has a source file and a package export', () => {
 });
 
 // Hand-made styles: tools/styles/own/<name>.css, derived over a synced style by tools/styles/derive.ts.
-const OWN_STYLES = ['glass', 'bento', 'mono'];
+const OWN_STYLES = ['glass', 'bento', 'mono', 'graphite', 'tint'];
 
 test('every own style has a source file and a package export', () => {
   const pkg = JSON.parse(readFileSync('projects/ui/package.json', 'utf8'));

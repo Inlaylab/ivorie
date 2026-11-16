@@ -1372,6 +1372,11 @@
       @apply bg-transparent px-0;
     }
 
+    .cn-badge-variant-destructive,
+    .cn-button-variant-destructive {
+      @apply text-[color-mix(in_oklab,var(--destructive),var(--foreground)_28%)];
+    }
+
     /* MARK: No rule in bento */
     .cn-accordion-trigger-icon {}
     .cn-alert-dialog-action {}

@@ -1,5 +1,14 @@
 # @inlaylab/ivorie
 
+## 1.5.1
+
+### Patch Changes
+
+- Sidebar: menu buttons no longer shrink their children while collapsed to icons, so `<ng-icon>` icons, team logos and avatars keep their size instead of clipping.
+- New styles: Graphite and Tint (13 in total). Mono reads more like a terminal.
+- `<ng-icon>` icons no longer shrink in tight rows (buttons, menus, tabs, toggles, sidebar).
+- Glass, bento, graphite and tint: destructive text keeps 4.5:1.
+
 ## 1.5.0
 
 ### Minor Changes

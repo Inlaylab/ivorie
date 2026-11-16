@@ -242,7 +242,7 @@ export class IvCommandItem implements Highlightable {
 
   protected readonly classes = computed(() =>
     cn(
-      'cn-command-item group/command-item relative flex cursor-default items-center outline-hidden select-none data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0',
+      'cn-command-item group/command-item relative flex cursor-default items-center outline-hidden select-none data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_ng-icon]:shrink-0',
       this.class()
     )
   )

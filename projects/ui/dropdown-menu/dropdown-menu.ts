@@ -372,7 +372,7 @@ export class IvDropdownMenuItem extends IvMenuItemBase {
 
   readonly classes = computed(() =>
     cn(
-      'cn-dropdown-menu-item group/dropdown-menu-item relative flex cursor-default items-center outline-hidden select-none data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0',
+      'cn-dropdown-menu-item group/dropdown-menu-item relative flex cursor-default items-center outline-hidden select-none data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_ng-icon]:shrink-0',
       this.class(),
     ),
   )
@@ -387,7 +387,7 @@ export class IvDropdownMenuItem extends IvMenuItemBase {
 }
 
 const checkItemClasses =
-  'relative flex cursor-default items-center outline-hidden select-none data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0'
+  'relative flex cursor-default items-center outline-hidden select-none data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_ng-icon]:shrink-0'
 
 @Component({
   selector: 'iv-dropdown-menu-checkbox-item',
@@ -572,7 +572,7 @@ export class IvDropdownMenuSubTrigger extends IvMenuItemBase implements AfterVie
 
   readonly classes = computed(() =>
     cn(
-      'cn-dropdown-menu-sub-trigger flex cursor-default items-center outline-hidden select-none data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0',
+      'cn-dropdown-menu-sub-trigger flex cursor-default items-center outline-hidden select-none data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_ng-icon]:shrink-0',
       this.class(),
     ),
   )

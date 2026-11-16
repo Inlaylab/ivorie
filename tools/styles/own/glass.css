@@ -45,10 +45,11 @@
   --glass-track: color-mix(in oklab, var(--foreground) 10%, transparent);
   --glass-field: color-mix(in oklab, white 60%, transparent);
   --glass-field-rim: white;
-  --glass-primary: 88%;
-  --glass-primary-hover: 78%;
-  --glass-primary-rim: color-mix(in oklab, white 30%, transparent);
-  --glass-primary-under: color-mix(in oklab, black 45%, transparent);
+  --glass-primary: 100%;
+  --glass-primary-hover: 90%;
+  /* The ink pane is solid colour, lit only faintly on top: a strong rim reads as gloss. */
+  --glass-primary-rim: color-mix(in oklab, white 16%, transparent);
+  --glass-primary-under: color-mix(in oklab, black 20%, transparent);
   --glass-card: color-mix(in oklab, var(--card) calc(var(--glass-alpha) * 100%), transparent);
   --glass-popover: color-mix(in oklab, var(--popover) calc(var(--glass-float-alpha) * 100%), transparent);
   --glass-sidebar: color-mix(in oklab, var(--sidebar) calc(var(--glass-alpha) * 75%), transparent);
@@ -96,10 +97,10 @@
   --glass-track: color-mix(in oklab, white 12%, transparent);
   --glass-field: color-mix(in oklab, white 6%, transparent);
   --glass-field-rim: color-mix(in oklab, white 15%, transparent);
-  --glass-primary: 86%;
-  --glass-primary-hover: 76%;
-  --glass-primary-rim: white;
-  --glass-primary-under: color-mix(in oklab, black 22%, transparent);
+  --glass-primary: 100%;
+  --glass-primary-hover: 90%;
+  --glass-primary-rim: color-mix(in oklab, white 14%, transparent);
+  --glass-primary-under: color-mix(in oklab, black 18%, transparent);
 }
 
 /* On every element, not the root: the playground sets the base colors inline on the root. */
@@ -340,4 +341,10 @@
     --glass-light-2: transparent;
     --glass-light-3: transparent;
   }
+}
+
+/* Destructive text sits on a toned surface here: mixed toward the foreground, so it keeps 4.5:1. */
+.cn-badge-variant-destructive,
+.cn-button-variant-destructive {
+  @apply text-[color-mix(in_oklab,var(--destructive),var(--foreground)_28%)];
 }

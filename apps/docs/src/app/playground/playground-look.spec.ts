@@ -5,7 +5,7 @@ import { BASE_COLORS } from '../../generated/looks';
 import { Appearance } from '../shell/appearance';
 import { IV_ICONS } from '@inlaylab/ivorie/icon';
 import { COMPONENT_ICONS as TABLER } from '@inlaylab/ivorie/icons/tabler';
-import { PREVIEW_ICONS, PlaygroundLook } from './playground-look';
+import { DOCS_PRESET, PREVIEW_ICONS, PlaygroundLook } from './playground-look';
 import { DEFAULT_PRESET, encodePreset } from './preset-code';
 
 const olive = BASE_COLORS.find((c) => c.name === 'olive')!;
@@ -39,7 +39,7 @@ describe('PlaygroundLook', () => {
   it('applies the base color to the attached element only, for light then dark', () => {
     const { look, stage, appearance } = create();
     appearance.setMode('light');
-    look.set({ baseColor: 'olive' });
+    look.set({ baseColor: 'olive', theme: 'base' });
     TestBed.tick();
     expect(stage.style.getPropertyValue('--primary')).toBe(olive.light['--primary']);
     expect(inlineVars(html())).toEqual([]);
@@ -76,7 +76,7 @@ describe('PlaygroundLook', () => {
     const { look, stage } = create();
     look.set({ style: 'maia' });
     TestBed.tick();
-    expect([...stage.classList].sort()).toEqual(['docs-preview', 'style-maia']);
+    expect([...stage.classList].sort()).toEqual(['docs-other', 'docs-preview', 'style-maia']);
     expect(document.body.className).toBe('style-nova');
     expect(document.getElementById('docs-style-maia')?.getAttribute('href')).toBe('style-maia.css');
   });
@@ -97,16 +97,29 @@ describe('PlaygroundLook', () => {
     look.load(encodePreset(golden));
     expect(look.preset()).toEqual(golden);
     look.load('ivp1_!!');
-    expect(look.preset()).toEqual(DEFAULT_PRESET);
+    expect(look.preset()).toEqual(DOCS_PRESET);
     look.load(encodePreset({ ...golden, baseColor: 'slate' }));
-    expect(look.preset()).toEqual(DEFAULT_PRESET);
+    expect(look.preset()).toEqual(DOCS_PRESET);
     look.load(null);
-    expect(look.preset()).toEqual(DEFAULT_PRESET);
+    expect(look.preset()).toEqual(DOCS_PRESET);
+  });
+
+  it('a style brings its colors, but never over a color you picked; graphite stays grey', () => {
+    const { look } = create();
+    expect(look.preset()).toMatchObject({ style: 'glass', baseColor: 'neutral', theme: 'violet' });
+    look.set({ style: 'nova' });
+    expect(look.preset()).toMatchObject({ baseColor: 'zinc', theme: 'indigo' });
+    look.set({ theme: 'red' });
+    look.set({ style: 'tint' });
+    // The base color came with nova, so it follows; the accent was picked, so it stays.
+    expect(look.preset()).toMatchObject({ baseColor: 'mauve', theme: 'red' });
+    look.set({ style: 'graphite', theme: 'base' });
+    expect(look.preset()).toMatchObject({ baseColor: 'zinc', theme: 'base' });
   });
 
   it('code and css follow the preset', () => {
     const { look } = create();
-    expect(look.code()).toBe(encodePreset(DEFAULT_PRESET));
+    expect(look.code()).toBe(encodePreset(DOCS_PRESET));
     look.set({ baseColor: 'olive', radius: 'large', font: 'inter' });
     expect(look.css()).toContain(`:root {\n  --background: ${olive.light['--background']};`);
     expect(look.css()).toContain('  --radius: 0.875rem;');

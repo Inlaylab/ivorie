@@ -5,6 +5,10 @@ import { afterEach, describe, expect, it } from 'vitest';
 import PlaygroundPage from './playground';
 import { PlaygroundLook } from './playground-look';
 import { DEFAULT_PRESET, encodePreset } from './preset-code';
+import { DOCS_PRESET } from './playground-look';
+
+// The playground starts on the site's style (glass); `ivorie init` alone gives the CLI default (nova).
+const START = encodePreset(DOCS_PRESET);
 import { STYLES } from '../shell/appearance-options';
 
 @Component({ template: '' })
@@ -61,7 +65,7 @@ describe('PlaygroundPage', () => {
     const rows = [...rail(el).querySelectorAll('span[id$="-label"]')].map((s) => s.textContent!.trim());
     expect(rows).toEqual(['Mode', 'Style', 'Base color', 'Accent', 'Chart color', 'Menu accent', 'Radius', 'Icons', 'Heading font', 'Font']);
     expect(rail(el).querySelectorAll('[data-slot="select-trigger"]').length).toBe(10);
-    expect(rail(el).querySelector('[data-testid="panel-command"]')!.textContent!.trim()).toBe('npx ivorie init');
+    expect(rail(el).querySelector('[data-testid="panel-command"]')!.textContent!.trim()).toBe(`npx ivorie init --preset ${START}`);
   });
 
   it('rows change the look and the mode; the width sits on the preview; style options explain themselves', async () => {
@@ -77,7 +81,7 @@ describe('PlaygroundPage', () => {
       await fixture.whenStable();
     };
     await open('style');
-    expect(document.querySelectorAll('[role="option"] iv-tooltip').length).toBe(STYLES.length);
+    expect(document.querySelectorAll('[role="option"] .docs-style-icon').length).toBe(STYLES.length);
     [...document.querySelectorAll<HTMLElement>('[role="option"]')].find((o) => o.textContent!.trim() === 'Glass')!.click();
     await fixture.whenStable();
     await pick('radius', 'Large');
@@ -91,9 +95,13 @@ describe('PlaygroundPage', () => {
     expect(frame(el).style.width).toBe('390px');
   });
 
-  it('the default look gives the plain commands', async () => {
+  it('the start look (glass) names its preset; the CLI default (nova) gives the plain commands', async () => {
     const { el, fixture } = await render();
     await openCode(el, fixture);
+    expect(command()).toBe(`npx ivorie init --preset ${START}`);
+    fixture.debugElement.injector.get(PlaygroundLook).load(encodePreset(DEFAULT_PRESET));
+    await fixture.whenStable();
+    fixture.detectChanges();
     expect(command()).toBe('npx ivorie init');
     existing().click();
     await fixture.whenStable();
@@ -106,8 +114,7 @@ describe('PlaygroundPage', () => {
     await fixture.whenStable();
     fixture.detectChanges();
     const code = encodePreset({
-      ...DEFAULT_PRESET,
-      style: 'nova',
+      ...DOCS_PRESET,
       baseColor: 'olive',
       font: 'system',
       fontHeading: 'inherit',
@@ -137,15 +144,15 @@ describe('PlaygroundPage', () => {
     expect(good.fixture.debugElement.injector.get(PlaygroundLook).preset().baseColor).toBe('olive');
     TestBed.resetTestingModule();
     const bad = await render('/playground?preset=garbage');
-    expect(bad.fixture.debugElement.injector.get(PlaygroundLook).code()).toBe(encodePreset({ ...DEFAULT_PRESET }));
+    expect(bad.fixture.debugElement.injector.get(PlaygroundLook).code()).toBe(START);
   });
 
-  it('the stage is an iframe on the preview route; the page keeps nova', async () => {
+  it('the stage is an iframe on the preview route; the page keeps the site style', async () => {
     const { el, fixture } = await render();
     fixture.debugElement.injector.get(PlaygroundLook).set({ baseColor: 'olive' });
     await fixture.whenStable();
     expect(frame(el).getAttribute('src')).toBe(
-      'preview/scene/wall?preset=' + encodePreset({ ...DEFAULT_PRESET }),
+      'preview/scene/wall?preset=' + START,
     );
     expect(stage(el).style.getPropertyValue('--primary')).toBe('');
     expect(document.documentElement.style.getPropertyValue('--primary')).toBe('');

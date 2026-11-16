@@ -106,6 +106,20 @@ export const ROADMAP: {
     link: '/playground',
   },
   {
+    title: 'Graphite and Tint',
+    summary: 'Two new styles: Graphite (matte solid panes with lit edges) and Tint (every surface carries your accent). Mono reads more like a terminal.',
+    state: 'shipped',
+    version: '1.5.1',
+    link: '/playground',
+  },
+  {
+    title: 'Colors for every style',
+    summary: 'Each style now opens in a base color and accent that suit it. Glass opens in violet, the look of this site and its demos.',
+    state: 'shipped',
+    version: '1.5.1',
+    link: '/playground',
+  },
+  {
     title: 'More theme dials',
     summary: 'Density and glass material dials in the playground and the CLI.',
     state: 'next',

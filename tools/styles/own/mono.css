@@ -1,6 +1,6 @@
 /* @base nova */
 /*
- * Mono: a terminal. Flat surfaces with hairlines, a block caret.
+ * Mono: a terminal. Flat surfaces with hairlines, a block caret, inverted selection, spaced capital labels.
  * Nova gives the compact layout; these blocks only add to it.
  * Font and radius come from the theme like every style: pair it with a mono font and radius none
  * (the playground picks Geist Mono when you switch to it).
@@ -41,4 +41,30 @@
 .cn-textarea {
   caret-color: var(--primary);
   caret-shape: block;
+}
+
+/* Selected text is inverted, like a terminal. */
+& ::selection {
+  background-color: var(--foreground);
+  color: var(--background);
+}
+
+/* Labels over data are small spaced capitals. */
+.cn-table-head,
+.cn-sidebar-group-label,
+.cn-dropdown-menu-label {
+  @apply text-xs tracking-widest uppercase;
+}
+
+/* The current item wears a cursor bar on its left edge. */
+& .cn-sidebar-menu-button {
+  @apply data-active:shadow-[inset_2px_0_0_var(--primary)];
+}
+
+& .cn-tabs-trigger {
+  @apply data-active:shadow-none data-active:ring-1 data-active:ring-border;
+}
+
+& .cn-kbd {
+  @apply bg-transparent ring-1 ring-border;
 }

@@ -39,7 +39,7 @@ describe('BlockPage', () => {
     const { el, fixture } = await render();
     const frame = el.querySelector('iframe')!;
     const post = vi.spyOn(frame.contentWindow!, 'postMessage');
-    el.querySelector<HTMLInputElement>('input[name="block-style"][value="glass"]')!.click();
+    el.querySelector<HTMLInputElement>('input[name="block-style"][value="nova"]')!.click();
     await fixture.whenStable();
     expect(post).toHaveBeenCalledWith({ type: 'ivorie-look', preset: expect.stringMatching(/^ivp1_/) }, location.origin);
   });

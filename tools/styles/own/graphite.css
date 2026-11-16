@@ -1,0 +1,270 @@
+/* @base nova */
+/*
+ * Graphite: matte solid panes, the calm dense look of a pro tool.
+ *   1. Solid: no blur, no transparency. A pane is one step off the page tone.
+ *   2. The edge is drawn with light: a fine line on the top lip, a hairline round, a short shadow below.
+ *   3. Wells: fields and tracks are pressed in, a step darker than the pane they sit on.
+ *   4. Neutral: every tone is mixed from the base color, so base color, accent and radius still apply.
+ * Nova gives the compact layout; these blocks only add to it, so a nova re-sync keeps working.
+ * Contrast is checked by tools/styles/contrast.test.ts against --graphite-page and --graphite-muted-mix.
+ */
+
+& {
+  --graphite-muted-mix: 0.6;
+  /* The page is a step darker than the panes, so a white pane stands off it. */
+  --graphite-page: color-mix(in oklab, var(--background) 95%, var(--foreground));
+  --graphite-pane: var(--card);
+  --graphite-raise: var(--popover);
+  --graphite-well: color-mix(in oklab, var(--background) 97%, var(--foreground));
+  --graphite-control: color-mix(in oklab, var(--card) 96%, var(--foreground));
+  --graphite-control-hover: color-mix(in oklab, var(--card) 91%, var(--foreground));
+  --graphite-hover: color-mix(in oklab, var(--foreground) 6%, transparent);
+  --graphite-active: color-mix(in oklab, var(--foreground) 10%, transparent);
+  --graphite-line: color-mix(in oklab, var(--foreground) 12%, transparent);
+  --graphite-line-strong: color-mix(in oklab, var(--foreground) 20%, transparent);
+  --graphite-rim: white;
+  --graphite-press: color-mix(in oklab, black 7%, transparent);
+  --graphite-contact: color-mix(in oklab, black 8%, transparent);
+  --graphite-shade: color-mix(in oklab, black 18%, transparent);
+  --graphite-primary-rim: color-mix(in oklab, white 22%, transparent);
+  --graphite-card: inset 0 1px 0 var(--graphite-rim), 0 0 0 1px var(--graphite-line), 0 1px 2px var(--graphite-contact);
+  --graphite-float:
+    inset 0 1px 0 var(--graphite-rim), 0 0 0 1px var(--graphite-line-strong), 0 4px 10px -4px var(--graphite-contact),
+    0 18px 40px -16px var(--graphite-shade);
+  --graphite-small: inset 0 1px 0 var(--graphite-rim), 0 0 0 1px var(--graphite-line), 0 1px 1px var(--graphite-contact);
+}
+
+/* The page ground. Not on the CDK overlay container: it covers the whole screen, so a ground there hides the page. */
+&:not(.cdk-overlay-container) {
+  background-color: var(--graphite-page);
+}
+
+.dark & {
+  --graphite-muted-mix: 0.68;
+  --graphite-page: var(--background);
+  --graphite-pane: color-mix(in oklab, var(--card) 96%, white);
+  --graphite-raise: color-mix(in oklab, var(--popover) 93%, white);
+  --graphite-well: color-mix(in oklab, var(--background) 88%, black);
+  --graphite-control: color-mix(in oklab, var(--card) 90%, white);
+  --graphite-control-hover: color-mix(in oklab, var(--card) 84%, white);
+  --graphite-hover: color-mix(in oklab, white 6%, transparent);
+  --graphite-active: color-mix(in oklab, white 10%, transparent);
+  --graphite-line: color-mix(in oklab, white 8%, transparent);
+  --graphite-line-strong: color-mix(in oklab, white 12%, transparent);
+  --graphite-rim: color-mix(in oklab, white 9%, transparent);
+  --graphite-press: color-mix(in oklab, black 40%, transparent);
+  --graphite-contact: color-mix(in oklab, black 40%, transparent);
+  --graphite-shade: color-mix(in oklab, black 70%, transparent);
+  --graphite-primary-rim: color-mix(in oklab, white 55%, transparent);
+}
+
+/* On every element, not the root: the playground sets the base colors inline on the root. */
+& :where(*) {
+  --muted-foreground: color-mix(in oklab, var(--foreground) calc(var(--graphite-muted-mix) * 100%), var(--background));
+}
+
+/* Panes: cards and docked surfaces. No border; the edge is the lit lip and a hairline. */
+.cn-card,
+.cn-alert,
+.cn-item-variant-outline {
+  @apply border-transparent bg-(--graphite-pane) ring-0 shadow-(--graphite-card);
+}
+
+& .cn-card-title {
+  @apply tracking-tight;
+}
+
+& .cn-empty {
+  @apply border-(--graphite-line-strong) bg-(--graphite-well);
+}
+
+/* A sidebar is part of the page: one hairline on the side facing the content. */
+& .cn-sidebar-inner {
+  @apply bg-(--graphite-page) group-data-[variant=floating]:bg-(--graphite-pane) group-data-[variant=floating]:ring-0 group-data-[variant=floating]:shadow-(--graphite-card);
+}
+
+/* Floating panes: a step lighter again, lifted off the page. */
+.cn-popover-content,
+.cn-hover-card-content,
+.cn-dialog-content,
+.cn-alert-dialog-content,
+.cn-sheet-content,
+.cn-drawer-content,
+.cn-dropdown-menu-content,
+.cn-select-content,
+.cn-combobox-content,
+.cn-command,
+.cn-navigation-menu-viewport,
+.cn-chart-tooltip,
+.cn-toast {
+  @apply border-transparent bg-(--graphite-raise) ring-0 shadow-(--graphite-float);
+}
+
+/* A command list inside a dialog is part of that pane. */
+& .cn-dialog-content .cn-command {
+  @apply bg-transparent shadow-none;
+}
+
+.cn-dialog-overlay,
+.cn-sheet-overlay {
+  @apply bg-[color-mix(in_oklab,black_45%,transparent)];
+}
+
+/* Wells: fields are pressed in, shaded under their upper lip. */
+.cn-input,
+.cn-textarea,
+.cn-input-group,
+.cn-select-trigger,
+.cn-native-select,
+.cn-input-otp-slot {
+  @apply border-(--graphite-line-strong) bg-(--graphite-well) shadow-none inset-shadow-[0_1px_2px_0_var(--graphite-press)] dark:border-(--graphite-line-strong) dark:bg-(--graphite-well);
+}
+
+.cn-select-trigger,
+.cn-native-select {
+  @apply hover:bg-(--graphite-well) dark:hover:bg-(--graphite-well);
+}
+
+/* Unchecked: a well. Checked keeps nova's primary, lit on top. data-checked is a :where() variant,
+   so a plain fill here would cover the checked primary: every fill is under a state. */
+.cn-checkbox,
+.cn-radio-group-item {
+  @apply shadow-none data-unchecked:border-(--graphite-line-strong) data-unchecked:bg-(--graphite-well) data-unchecked:inset-shadow-[0_1px_2px_0_var(--graphite-press)] dark:data-unchecked:border-(--graphite-line-strong) dark:data-unchecked:bg-(--graphite-well) data-checked:inset-shadow-[0_1px_0_0_var(--graphite-primary-rim)];
+}
+
+/* Controls: small raised keys. */
+.cn-button-variant-outline,
+.cn-button-variant-secondary {
+  @apply border-transparent bg-(--graphite-control) shadow-(--graphite-small) hover:bg-(--graphite-control-hover) aria-expanded:bg-(--graphite-control-hover) dark:border-transparent dark:bg-(--graphite-control) dark:hover:bg-(--graphite-control-hover);
+}
+
+& .cn-button-variant-ghost {
+  @apply hover:bg-(--graphite-hover) aria-expanded:bg-(--graphite-hover) dark:hover:bg-(--graphite-hover);
+}
+
+/* The primary key: lit on its top lip, and it sits down when pressed. */
+& .cn-button-variant-default {
+  @apply shadow-[inset_0_1px_0_var(--graphite-primary-rim),0_1px_2px_var(--graphite-contact)] active:shadow-[inset_0_1px_2px_var(--graphite-press)];
+}
+
+& .cn-switch {
+  @apply border-(--graphite-line) data-unchecked:bg-(--graphite-active) data-unchecked:inset-shadow-[0_1px_2px_0_var(--graphite-press)] dark:data-unchecked:bg-(--graphite-active);
+}
+
+& .cn-switch-thumb {
+  @apply shadow-[0_1px_2px_var(--graphite-shade)];
+}
+
+/* A track is a groove. */
+.cn-slider-track,
+.cn-progress {
+  @apply bg-(--graphite-active) inset-shadow-[0_1px_2px_0_var(--graphite-press)];
+}
+
+.cn-slider-range,
+.cn-progress-indicator {
+  @apply inset-shadow-[0_1px_0_0_var(--graphite-primary-rim)];
+}
+
+& .cn-slider-thumb {
+  @apply shadow-[0_0_0_1px_var(--graphite-line-strong),0_1px_3px_var(--graphite-shade)];
+}
+
+/* One state tone for hover, a stronger one for chosen. */
+.cn-toggle,
+.cn-toggle-group-item {
+  @apply hover:bg-(--graphite-hover) aria-pressed:bg-(--graphite-active) data-[state=on]:bg-(--graphite-active);
+}
+
+.cn-dropdown-menu-item,
+.cn-select-item {
+  @apply focus:bg-(--graphite-active);
+}
+
+& .cn-combobox-item {
+  @apply data-highlighted:bg-(--graphite-active);
+}
+
+& .cn-command-item {
+  @apply data-selected:bg-(--graphite-active);
+}
+
+& .cn-sidebar-menu-button {
+  @apply hover:bg-(--graphite-hover) active:bg-(--graphite-hover) data-active:bg-(--graphite-active) data-active:shadow-[inset_0_0_0_1px_var(--graphite-line)] data-open:hover:bg-(--graphite-hover);
+}
+
+.cn-navigation-menu-trigger,
+.cn-menubar-trigger {
+  @apply hover:bg-(--graphite-hover) focus:bg-(--graphite-hover) aria-expanded:bg-(--graphite-active) data-open:bg-(--graphite-active) data-open:hover:bg-(--graphite-active);
+}
+
+/* The tab track is a groove; the active tab is a raised key in it. */
+& .cn-tabs-list {
+  @apply bg-(--graphite-active) inset-shadow-[0_1px_2px_0_var(--graphite-press)] data-[variant=line]:bg-transparent data-[variant=line]:inset-shadow-none;
+}
+
+& .cn-tabs-trigger {
+  @apply data-active:shadow-(--graphite-small);
+}
+
+& .cn-calendar-day-button {
+  @apply hover:bg-(--graphite-hover);
+}
+
+/* Data. */
+& .cn-table-head {
+  @apply text-muted-foreground text-xs font-medium tracking-wide uppercase;
+}
+
+& .cn-table-row {
+  @apply border-(--graphite-line) hover:bg-(--graphite-hover) data-[state=selected]:bg-(--graphite-active);
+}
+
+& .cn-accordion-item {
+  @apply border-(--graphite-line);
+}
+
+.cn-badge-variant-secondary,
+.cn-badge-variant-outline {
+  @apply border-transparent bg-(--graphite-control) shadow-[inset_0_0_0_1px_var(--graphite-line)];
+}
+
+& .cn-avatar {
+  @apply ring-1 ring-(--graphite-line);
+}
+
+& .cn-kbd {
+  @apply bg-(--graphite-control) shadow-[inset_0_1px_0_var(--graphite-rim),inset_0_0_0_1px_var(--graphite-line),0_1px_0_var(--graphite-line-strong)];
+}
+
+& .cn-skeleton {
+  @apply bg-(--graphite-active);
+}
+
+/* A field separator masks its line with a solid label; the pane tone differs from the page, so the line is two halves. */
+& .cn-field-separator {
+  @apply flex items-center gap-2 before:h-px before:flex-1 before:bg-(--graphite-line-strong) after:h-px after:flex-1 after:bg-(--graphite-line-strong) [&>div]:hidden;
+}
+
+& .cn-field-separator-content {
+  @apply bg-transparent px-0;
+}
+
+/* Tags are squarer than nova's pills, like labels in a pro tool. */
+& .cn-badge {
+  @apply rounded-md;
+}
+
+& .cn-tooltip-content {
+  @apply shadow-[0_0_0_1px_var(--graphite-line),0_6px_14px_-6px_var(--graphite-shade)];
+}
+
+& .cn-pagination-link {
+  @apply hover:bg-(--graphite-hover);
+}
+
+/* Destructive text sits on a toned surface here: mixed toward the foreground, so it keeps 4.5:1. */
+.cn-badge-variant-destructive,
+.cn-button-variant-destructive {
+  @apply text-[color-mix(in_oklab,var(--destructive),var(--foreground)_28%)];
+}

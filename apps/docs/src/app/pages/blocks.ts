@@ -4,7 +4,8 @@ import { Meta } from '@angular/platform-browser';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { map } from 'rxjs';
 import { BLOCKS } from '../../generated/blocks';
-import { DEFAULT_PRESET, encodePreset } from '../playground/preset-code';
+import { DOCS_PRESET } from '../playground/playground-look';
+import { encodePreset } from '../playground/preset-code';
 import { BlockShowcase } from './block-showcase';
 
 /** Category tabs. The tab is in the URL (`?category=`); Featured has no query. */
@@ -56,7 +57,7 @@ const CATEGORIES = [
 })
 export default class BlocksPage {
   protected readonly categories = CATEGORIES;
-  protected readonly code = encodePreset(DEFAULT_PRESET);
+  protected readonly code = encodePreset(DOCS_PRESET);
   private readonly query = toSignal(inject(ActivatedRoute).queryParamMap.pipe(map((q) => q.get('category'))));
   protected readonly category = computed(() => CATEGORIES.find((c) => c.value === this.query()) ?? CATEGORIES[0]);
   protected readonly blocks = computed(() => {

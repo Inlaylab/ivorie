@@ -101,8 +101,8 @@
                 "inject": false
               },
               {
-                "input": "apps/docs/src/styles/style-glass.css",
-                "bundleName": "style-glass",
+                "input": "apps/docs/src/styles/style-nova.css",
+                "bundleName": "style-nova",
                 "inject": false
               },
               {
@@ -128,6 +128,16 @@
               {
                 "input": "apps/docs/src/styles/style-mono.css",
                 "bundleName": "style-mono",
+                "inject": false
+              },
+              {
+                "input": "apps/docs/src/styles/style-graphite.css",
+                "bundleName": "style-graphite",
+                "inject": false
+              },
+              {
+                "input": "apps/docs/src/styles/style-tint.css",
+                "bundleName": "style-tint",
                 "inject": false
               }
             ],
@@ -166,7 +176,67 @@
             "pack": {
               "tsConfig": "apps/docs/tsconfig.pack.json",
               "styles": [
-                "apps/docs/src/styles.pack.css"
+                "apps/docs/src/styles.pack.css",
+                {
+                  "input": "apps/docs/src/styles/style-vega.css",
+                  "bundleName": "style-vega",
+                  "inject": false
+                },
+                {
+                  "input": "apps/docs/src/styles/style-maia.css",
+                  "bundleName": "style-maia",
+                  "inject": false
+                },
+                {
+                  "input": "apps/docs/src/styles/style-luma.css",
+                  "bundleName": "style-luma",
+                  "inject": false
+                },
+                {
+                  "input": "apps/docs/src/styles/style-rhea.css",
+                  "bundleName": "style-rhea",
+                  "inject": false
+                },
+                {
+                  "input": "apps/docs/src/styles/style-nova.css",
+                  "bundleName": "style-nova",
+                  "inject": false
+                },
+                {
+                  "input": "apps/docs/src/styles/style-lyra.css",
+                  "bundleName": "style-lyra",
+                  "inject": false
+                },
+                {
+                  "input": "apps/docs/src/styles/style-mira.css",
+                  "bundleName": "style-mira",
+                  "inject": false
+                },
+                {
+                  "input": "apps/docs/src/styles/style-sera.css",
+                  "bundleName": "style-sera",
+                  "inject": false
+                },
+                {
+                  "input": "apps/docs/src/styles/style-bento.css",
+                  "bundleName": "style-bento",
+                  "inject": false
+                },
+                {
+                  "input": "apps/docs/src/styles/style-mono.css",
+                  "bundleName": "style-mono",
+                  "inject": false
+                },
+                {
+                  "input": "apps/docs/src/styles/style-graphite.css",
+                  "bundleName": "style-graphite",
+                  "inject": false
+                },
+                {
+                  "input": "apps/docs/src/styles/style-tint.css",
+                  "bundleName": "style-tint",
+                  "inject": false
+                }
               ]
             }
           },

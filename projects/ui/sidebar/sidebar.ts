@@ -357,7 +357,7 @@ export class IvSidebarGroup {}
 export class IvSidebarGroupLabel {
   readonly class = input('')
   readonly classes = computed(() =>
-    cn('cn-sidebar-group-label flex shrink-0 items-center outline-hidden [&>svg]:shrink-0', this.class()),
+    cn('cn-sidebar-group-label flex shrink-0 items-center outline-hidden [&>svg]:shrink-0 [&>ng-icon]:shrink-0', this.class()),
   )
 }
 
@@ -372,7 +372,7 @@ export class IvSidebarGroupAction {
   readonly class = input('')
   readonly classes = computed(() =>
     cn(
-      'cn-sidebar-group-action flex aspect-square items-center justify-center outline-hidden transition-transform group-data-[collapsible=icon]:hidden after:absolute after:-inset-2 md:after:hidden [&>svg]:shrink-0',
+      'cn-sidebar-group-action flex aspect-square items-center justify-center outline-hidden transition-transform group-data-[collapsible=icon]:hidden after:absolute after:-inset-2 md:after:hidden [&>svg]:shrink-0 [&>ng-icon]:shrink-0',
       this.class(),
     ),
   )
@@ -408,7 +408,7 @@ export class IvSidebarMenu {}
 export class IvSidebarMenuItem {}
 
 export const sidebarMenuButtonVariants = cva(
-  'cn-sidebar-menu-button peer/menu-button group/menu-button flex w-full items-center overflow-hidden outline-hidden disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 [&_svg]:size-4 [&_svg]:shrink-0 [&>span:last-child]:truncate',
+  'cn-sidebar-menu-button peer/menu-button group-data-[collapsible=icon]:*:shrink-0 group/menu-button flex w-full items-center overflow-hidden outline-hidden disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 [&_svg]:size-4 [&_svg]:shrink-0 [&_ng-icon]:shrink-0 [&>span:last-child]:truncate',
   {
     variants: {
       variant: {
@@ -520,7 +520,7 @@ export class IvSidebarMenuAction {
 
   readonly classes = computed(() =>
     cn(
-      'cn-sidebar-menu-action flex items-center justify-center outline-hidden transition-transform group-data-[collapsible=icon]:hidden after:absolute after:-inset-2 md:after:hidden [&>svg]:shrink-0',
+      'cn-sidebar-menu-action flex items-center justify-center outline-hidden transition-transform group-data-[collapsible=icon]:hidden after:absolute after:-inset-2 md:after:hidden [&>svg]:shrink-0 [&>ng-icon]:shrink-0',
       this.showOnHover() &&
         'group-focus-within/menu-item:opacity-100 group-hover/menu-item:opacity-100 peer-data-active/menu-button:text-sidebar-accent-foreground aria-expanded:opacity-100 md:opacity-0',
       this.class(),
@@ -616,7 +616,7 @@ export class IvSidebarMenuSubButton {
 
   readonly classes = computed(() =>
     cn(
-      'cn-sidebar-menu-sub-button flex min-w-0 -translate-x-px items-center overflow-hidden outline-hidden group-data-[collapsible=icon]:hidden disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 [&>span:last-child]:truncate [&>svg]:shrink-0',
+      'cn-sidebar-menu-sub-button flex min-w-0 -translate-x-px items-center overflow-hidden outline-hidden group-data-[collapsible=icon]:hidden disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 [&>span:last-child]:truncate [&>svg]:shrink-0 [&>ng-icon]:shrink-0',
       this.class(),
     ),
   )

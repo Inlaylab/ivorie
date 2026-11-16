@@ -555,7 +555,7 @@ export class IvComboboxItem implements Highlightable, OnInit {
 
   protected readonly classes = computed(() =>
     cn(
-      'cn-combobox-item relative flex w-full cursor-default items-center outline-hidden select-none data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0',
+      'cn-combobox-item relative flex w-full cursor-default items-center outline-hidden select-none data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_ng-icon]:shrink-0',
       this.class(),
     )
   )

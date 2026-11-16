@@ -1,0 +1,265 @@
+/* @base nova */
+/*
+ * Tint: the whole UI carries the accent hue. Page, panes, lines and states take a light wash of
+ * --primary instead of grey, so one accent pick colors everything.
+ *   1. Every wash is mixed from --primary: with no accent it is a quiet grey, with one it is the brand.
+ *   2. Lines are tinted, not grey. Shadows are soft and take the hue too.
+ *   3. States deepen the wash: hover < chosen. Text stays the base foreground, for contrast.
+ * Nova gives the compact layout; these blocks only add to it, so a nova re-sync keeps working.
+ * Contrast is checked by tools/styles/contrast.test.ts against --tint-page and --tint-muted-mix.
+ */
+
+& {
+  --tint-muted-mix: 0.62;
+  /* The hue every wash is made from. Dark lifts it, so a deep accent still shows on dark panes. */
+  --tint-hue: var(--primary);
+  --tint-page: color-mix(in oklab, var(--background) 95%, var(--primary));
+  --tint-pane: color-mix(in oklab, var(--card) 98%, var(--primary));
+  --tint-raise: color-mix(in oklab, var(--popover) 98.5%, var(--primary));
+  --tint-field: color-mix(in oklab, var(--background) 98.5%, var(--primary));
+  --tint-soft: color-mix(in oklab, var(--tint-hue) 9%, transparent);
+  --tint-soft-hover: color-mix(in oklab, var(--tint-hue) 15%, transparent);
+  --tint-hover: color-mix(in oklab, var(--tint-hue) 8%, transparent);
+  --tint-active: color-mix(in oklab, var(--tint-hue) 14%, transparent);
+  --tint-line: color-mix(in oklab, var(--tint-hue) 16%, transparent);
+  --tint-line-strong: color-mix(in oklab, var(--tint-hue) 26%, transparent);
+  --tint-shade: color-mix(in oklab, var(--primary) 22%, transparent);
+  --tint-card: 0 0 0 1px var(--tint-line), 0 1px 2px var(--tint-hover), 0 10px 28px -16px var(--tint-shade);
+  --tint-float: 0 0 0 1px var(--tint-line-strong), 0 6px 14px -6px var(--tint-hover), 0 22px 48px -18px var(--tint-shade);
+}
+
+/* The page ground. Not on the CDK overlay container: it covers the whole screen, so a ground there hides the page. */
+&:not(.cdk-overlay-container) {
+  background-color: var(--tint-page);
+}
+
+.dark & {
+  --tint-muted-mix: 0.7;
+  --tint-hue: color-mix(in oklab, var(--primary) 55%, white);
+  --tint-page: color-mix(in oklab, var(--background) 96%, var(--primary));
+  --tint-pane: color-mix(in oklab, var(--card) 95%, var(--primary));
+  --tint-raise: color-mix(in oklab, var(--popover) 93%, var(--primary));
+  --tint-field: color-mix(in oklab, var(--background) 94%, var(--primary));
+  --tint-soft: color-mix(in oklab, var(--tint-hue) 12%, transparent);
+  --tint-soft-hover: color-mix(in oklab, var(--tint-hue) 19%, transparent);
+  --tint-hover: color-mix(in oklab, var(--tint-hue) 9%, transparent);
+  --tint-active: color-mix(in oklab, var(--tint-hue) 16%, transparent);
+  --tint-line: color-mix(in oklab, var(--tint-hue) 18%, transparent);
+  --tint-line-strong: color-mix(in oklab, var(--tint-hue) 30%, transparent);
+  --tint-shade: color-mix(in oklab, black 55%, transparent);
+}
+
+/* On every element, not the root: the playground sets the base colors inline on the root. */
+& :where(*) {
+  --muted-foreground: color-mix(in oklab, var(--foreground) calc(var(--tint-muted-mix) * 100%), var(--background));
+}
+
+/* Panes: a tinted hairline and a soft shadow in the hue. */
+.cn-card,
+.cn-alert,
+.cn-item-variant-outline {
+  @apply border-transparent bg-(--tint-pane) ring-0 shadow-(--tint-card);
+}
+
+& .cn-card-title {
+  @apply tracking-tight;
+}
+
+& .cn-empty {
+  @apply border-(--tint-line-strong) bg-(--tint-hover);
+}
+
+& .cn-sidebar-inner {
+  @apply bg-(--tint-page) group-data-[variant=floating]:bg-(--tint-pane) group-data-[variant=floating]:ring-0 group-data-[variant=floating]:shadow-(--tint-card);
+}
+
+.cn-popover-content,
+.cn-hover-card-content,
+.cn-dialog-content,
+.cn-alert-dialog-content,
+.cn-sheet-content,
+.cn-drawer-content,
+.cn-dropdown-menu-content,
+.cn-select-content,
+.cn-combobox-content,
+.cn-command,
+.cn-navigation-menu-viewport,
+.cn-chart-tooltip,
+.cn-toast {
+  @apply border-transparent bg-(--tint-raise) ring-0 shadow-(--tint-float);
+}
+
+/* A command list inside a dialog is part of that pane. */
+& .cn-dialog-content .cn-command {
+  @apply bg-transparent shadow-none;
+}
+
+/* Fields: a tinted line; focus keeps the theme ring. */
+.cn-input,
+.cn-textarea,
+.cn-input-group,
+.cn-select-trigger,
+.cn-native-select,
+.cn-input-otp-slot {
+  @apply border-(--tint-line-strong) bg-(--tint-field) shadow-none dark:border-(--tint-line-strong) dark:bg-(--tint-field);
+}
+
+.cn-select-trigger,
+.cn-native-select {
+  @apply hover:bg-(--tint-hover) dark:hover:bg-(--tint-hover);
+}
+
+/* Unchecked only: data-checked is a :where() variant, so a plain fill here would cover nova's checked primary. */
+.cn-checkbox,
+.cn-radio-group-item {
+  @apply shadow-none data-unchecked:border-(--tint-line-strong) data-unchecked:bg-(--tint-field) dark:data-unchecked:border-(--tint-line-strong) dark:data-unchecked:bg-(--tint-field);
+}
+
+/* Quiet buttons are a wash of the hue. */
+& .cn-button-variant-secondary {
+  @apply bg-(--tint-soft) hover:bg-(--tint-soft-hover) aria-expanded:bg-(--tint-soft-hover) dark:bg-(--tint-soft) dark:hover:bg-(--tint-soft-hover);
+}
+
+& .cn-button-variant-outline {
+  @apply border-(--tint-line-strong) bg-(--tint-field) shadow-none hover:bg-(--tint-hover) aria-expanded:bg-(--tint-hover) dark:border-(--tint-line-strong) dark:bg-(--tint-field) dark:hover:bg-(--tint-hover);
+}
+
+& .cn-button-variant-ghost {
+  @apply hover:bg-(--tint-hover) aria-expanded:bg-(--tint-hover) dark:hover:bg-(--tint-hover);
+}
+
+& .cn-button-variant-default {
+  @apply shadow-[0_1px_2px_var(--tint-hover),0_8px_18px_-10px_var(--tint-shade)];
+}
+
+& .cn-switch {
+  @apply data-unchecked:bg-(--tint-line-strong) dark:data-unchecked:bg-(--tint-line-strong);
+}
+
+.cn-slider-track,
+.cn-progress {
+  @apply bg-(--tint-active);
+}
+
+.cn-toggle,
+.cn-toggle-group-item {
+  @apply hover:bg-(--tint-hover) aria-pressed:bg-(--tint-active) data-[state=on]:bg-(--tint-active);
+}
+
+.cn-dropdown-menu-item,
+.cn-select-item {
+  @apply focus:bg-(--tint-active);
+}
+
+& .cn-combobox-item {
+  @apply data-highlighted:bg-(--tint-active);
+}
+
+& .cn-command-item {
+  @apply data-selected:bg-(--tint-active);
+}
+
+& .cn-sidebar-menu-button {
+  @apply hover:bg-(--tint-hover) active:bg-(--tint-hover) data-active:bg-(--tint-active) data-open:hover:bg-(--tint-hover);
+}
+
+.cn-navigation-menu-trigger,
+.cn-menubar-trigger {
+  @apply hover:bg-(--tint-hover) focus:bg-(--tint-hover) aria-expanded:bg-(--tint-active) data-open:bg-(--tint-active) data-open:hover:bg-(--tint-active);
+}
+
+& .cn-tabs-list {
+  @apply bg-(--tint-soft) data-[variant=line]:bg-transparent;
+}
+
+& .cn-tabs-trigger {
+  @apply data-active:shadow-[0_0_0_1px_var(--tint-line),0_1px_2px_var(--tint-hover)];
+}
+
+& .cn-calendar-day-button {
+  @apply hover:bg-(--tint-hover);
+}
+
+/* Data. */
+& .cn-table-row {
+  @apply border-(--tint-line) hover:bg-(--tint-hover) data-[state=selected]:bg-(--tint-active);
+}
+
+& .cn-accordion-item {
+  @apply border-(--tint-line);
+}
+
+& .cn-badge-variant-secondary {
+  @apply bg-(--tint-soft);
+}
+
+& .cn-badge-variant-outline {
+  @apply border-(--tint-line-strong);
+}
+
+& .cn-avatar-fallback {
+  @apply bg-(--tint-soft);
+}
+
+& .cn-kbd {
+  @apply bg-(--tint-soft);
+}
+
+& .cn-skeleton {
+  @apply bg-(--tint-active);
+}
+
+/* A field separator masks its line with a solid label; the pane tone differs from the page, so the line is two halves. */
+& .cn-field-separator {
+  @apply flex items-center gap-2 before:h-px before:flex-1 before:bg-(--tint-line-strong) after:h-px after:flex-1 after:bg-(--tint-line-strong) [&>div]:hidden;
+}
+
+& .cn-field-separator-content {
+  @apply bg-transparent px-0;
+}
+
+/* Every badge sits on a hairline in the hue. */
+& .cn-badge {
+  @apply shadow-[0_0_0_1px_var(--tint-line)];
+}
+
+& .cn-tooltip-content {
+  @apply shadow-[0_6px_14px_-6px_var(--tint-shade)];
+}
+
+& .cn-pagination-link {
+  @apply hover:bg-(--tint-hover);
+}
+
+.cn-dialog-overlay,
+.cn-sheet-overlay {
+  @apply bg-[color-mix(in_oklab,black_32%,transparent)];
+}
+
+& .cn-switch-thumb {
+  @apply shadow-[0_1px_3px_var(--tint-shade)];
+}
+
+/* The filled part glows a little in the hue. */
+.cn-slider-range,
+.cn-progress-indicator {
+  @apply shadow-[0_0_10px_-2px_var(--tint-shade)];
+}
+
+& .cn-slider-thumb {
+  @apply border-(--tint-line-strong) shadow-[0_1px_4px_var(--tint-shade)];
+}
+
+& .cn-table-head {
+  @apply bg-(--tint-hover);
+}
+
+& .cn-avatar {
+  @apply ring-1 ring-(--tint-line-strong);
+}
+
+/* Destructive text sits on a toned surface here: mixed toward the foreground, so it keeps 4.5:1. */
+.cn-badge-variant-destructive,
+.cn-button-variant-destructive {
+  @apply text-[color-mix(in_oklab,var(--destructive),var(--foreground)_28%)];
+}

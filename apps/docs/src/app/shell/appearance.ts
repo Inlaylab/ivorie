@@ -33,7 +33,7 @@ function parse(raw: string | null): AppearanceState {
   }
 }
 
-/** Light / dark / system on <html>. Browser only; the server renders dark (index.html). The site style is always nova. */
+/** Light / dark / system on <html>. Browser only; the server renders dark (index.html). The site style is always DEFAULT_STYLE (glass). */
 @Injectable({ providedIn: 'root' })
 export class Appearance {
   private readonly doc = inject(DOCUMENT);

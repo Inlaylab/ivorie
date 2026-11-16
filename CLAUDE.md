@@ -57,4 +57,4 @@ Repo: https://github.com/shadcn-ui/ui (MIT). Our components copy its classes, va
 - `ROADMAP.md` — status, must do, phases 8–15 (releases 1.1–1.6) with tasks, backlog.
 - `CHANGELOG.md` — release notes. `.changeset/` — pending version notes (from Phase 8 T0).
 - `.github/workflows/` — `ci.yml` (checks), `release.yml` (manual npm publish), `docs.yml` (GitHub Pages).
-- `docs/` — PLAN (why), ARCHITECTURE, CONVENTIONS, COMPAT, DECISIONS, DEPLOY.
+- `docs/` — PLAN (why), ARCHITECTURE, CONVENTIONS, COMPAT, DECISIONS, DEPLOY, LAUNCH (post drafts).

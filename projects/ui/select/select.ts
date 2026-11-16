@@ -239,7 +239,7 @@ export class IvSelectTrigger {
 
   protected readonly classes = computed(() =>
     cn(
-      'cn-select-trigger flex w-fit items-center justify-between whitespace-nowrap outline-none disabled:cursor-not-allowed disabled:opacity-50 *:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center [&_svg]:pointer-events-none [&_svg]:shrink-0 ' +
+      'cn-select-trigger flex w-fit items-center justify-between whitespace-nowrap outline-none disabled:cursor-not-allowed disabled:opacity-50 *:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_ng-icon]:shrink-0 ' +
       'data-active:border-primary/40 data-active:bg-primary/5',
       this.class(),
     )
@@ -380,7 +380,7 @@ export class IvSelectItem implements Highlightable {
   // Focus stays on the trigger (aria-activedescendant), so data-highlighted marks the active option.
   protected readonly classes = computed(() =>
     cn(
-      'cn-select-item relative flex w-full cursor-default items-center outline-hidden select-none data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 ' +
+      'cn-select-item relative flex w-full cursor-default items-center outline-hidden select-none data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_ng-icon]:shrink-0 ' +
       'data-highlighted:bg-accent data-highlighted:text-accent-foreground',
       this.class(),
     )

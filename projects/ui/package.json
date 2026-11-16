@@ -1,6 +1,6 @@
 {
   "name": "@inlaylab/ivorie",
-  "version": "1.5.0",
+  "version": "1.5.1",
   "description": "Angular components with the shadcn/ui look and behavior.",
   "license": "MIT",
   "homepage": "https://github.com/Inlaylab/ivorie#readme",
@@ -75,6 +75,12 @@
     },
     "./styles/style-mono.css": {
       "default": "./styles/style-mono.css"
+    },
+    "./styles/style-graphite.css": {
+      "default": "./styles/style-graphite.css"
+    },
+    "./styles/style-tint.css": {
+      "default": "./styles/style-tint.css"
     }
   },
   "sideEffects": [

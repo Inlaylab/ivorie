@@ -1,5 +1,12 @@
 # ivorie
 
+## 1.5.1
+
+### Patch Changes
+
+- Sidebar: menu buttons no longer shrink their children while collapsed to icons, so `<ng-icon>` icons, team logos and avatars keep their size instead of clipping.
+- `--style graphite` and `--style tint`: two new styles in the registry.
+
 ## 1.5.0
 
 ### Minor Changes

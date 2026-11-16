@@ -9,7 +9,6 @@ import {
 import { NgTemplateOutlet } from '@angular/common';
 import { IvIcon } from '@inlaylab/ivorie/icon';
 import { IV_SELECT_IMPORTS } from '@inlaylab/ivorie/select';
-import { IV_TOOLTIP_IMPORTS } from '@inlaylab/ivorie/tooltip';
 import { ACCENTS, BASE_COLORS, FONTS, RADII } from '../../generated/looks';
 import { Appearance } from '../shell/appearance';
 import { STYLES } from '../shell/appearance-options';
@@ -29,6 +28,8 @@ export const STYLE_NOTES: Record<string, string> = {
   glass: 'Frosted neutral glass, edges drawn with light.',
   bento: 'Tonal tiles, no outlines.',
   mono: 'Flat and dense, made for a mono font.',
+  graphite: 'Matte solid panes, lit edges, pressed-in fields.',
+  tint: 'Every surface carries a wash of the accent.',
 };
 const RADIUS_LABELS: Record<string, string> = {
   default: 'Default',
@@ -50,7 +51,7 @@ function swatch(light: Record<string, string>): string {
 /** Full (playground panel): one row per axis, label over value; style options have tooltips. Compact (block page): style tiles and color swatches. */
 @Component({
   selector: 'docs-look-controls',
-  imports: [NgTemplateOutlet, IV_SELECT_IMPORTS, IV_TOOLTIP_IMPORTS, IvIcon],
+  imports: [NgTemplateOutlet, IV_SELECT_IMPORTS, IvIcon],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'flex flex-col gap-5' },
   template: `
@@ -77,7 +78,7 @@ function swatch(light: Record<string, string>): string {
         <ng-container [ngTemplateOutlet]="picker" [ngTemplateOutletContext]="{ key: 'mode', label: 'Mode', options: modeOptions, picture: modeIcon }" />
         <ng-container
           [ngTemplateOutlet]="picker"
-          [ngTemplateOutletContext]="{ key: 'style', label: 'Style', options: styleOptions, picture: styleIcon, notes: notes }"
+          [ngTemplateOutletContext]="{ key: 'style', label: 'Style', options: styleOptions, picture: styleIcon }"
         />
         <hr class="my-1.5" />
         <ng-container [ngTemplateOutlet]="picker" [ngTemplateOutletContext]="{ key: 'baseColor', label: 'Base color', options: colorOptions, picture: swatchIcon }" />
@@ -147,9 +148,8 @@ function swatch(light: Record<string, string>): string {
       </fieldset>
     </ng-template>
 
-    <!-- One row: the label over the picked value, the value's picture on the right. Options show their picture;
-         style options explain themselves in a tooltip. -->
-    <ng-template #picker let-key="key" let-label="label" let-options="options" let-picture="picture" let-notes="notes">
+    <!-- One row: the label over the picked value, the value's picture on the right. Options show their picture. -->
+    <ng-template #picker let-key="key" let-label="label" let-options="options" let-picture="picture">
       <div class="docs-panel-row">
         <span class="docs-row-label" [id]="name() + '-' + key + '-label'">{{ label }}</span>
         <span class="docs-row-picture">
@@ -157,18 +157,12 @@ function swatch(light: Record<string, string>): string {
         </span>
         <iv-select [value]="valueOf(key)" (valueChange)="pick(key, $event)">
           <iv-select-trigger [aria-labelledby]="name() + '-' + key + '-label'" />
-          <iv-select-content>
+          <!-- Tall enough for all 13 styles: a list you can see whole needs no scrolling. -->
+          <iv-select-content class="max-h-[min(30rem,80svh)]">
             @for (o of options; track o.name) {
               <iv-select-item [value]="o.name">
                 <ng-container [ngTemplateOutlet]="picture" [ngTemplateOutletContext]="{ $implicit: o.picture }" />
-                @if (notes) {
-                  <iv-tooltip class="block flex-1" [delayDuration]="200">
-                    <span ivTooltipTrigger class="block">{{ o.label }}</span>
-                    <iv-tooltip-content side="right" [sideOffset]="16">{{ notes[o.name] }}</iv-tooltip-content>
-                  </iv-tooltip>
-                } @else {
-                  {{ o.label }}
-                }
+                {{ o.label }}
               </iv-select-item>
             }
           </iv-select-content>
@@ -215,8 +209,58 @@ function swatch(light: Record<string, string>): string {
         aria-hidden="true"
       ></span>
     </ng-template>
+    <!-- A style as one line icon: its shape in a glance. Corner and form follow the style (maia round, sera square,
+         luma a pill, mira a diamond); own styles show their idea (glass a lit pane, bento tiles, mono a prompt,
+         graphite a solid key, tint a wash). Ink only: color is the accent's job. -->
     <ng-template #styleIcon let-style>
-      <span class="docs-specimen docs-specimen-xs" [attr.data-style]="style" aria-hidden="true"><span class="docs-specimen-card"></span></span>
+      <svg class="docs-style-icon text-foreground/75 size-4 shrink-0" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" aria-hidden="true">
+        @switch (style) {
+          @case ('glass') {
+            <rect x="2" y="2.5" width="12" height="11" rx="3" />
+            <path d="M4.5 5h7" stroke-linecap="round" />
+          }
+          @case ('vega') {
+            <rect x="2.5" y="2.5" width="11" height="11" rx="2.5" />
+          }
+          @case ('nova') {
+            <rect x="2" y="4" width="12" height="8" rx="2" />
+          }
+          @case ('maia') {
+            <circle cx="8" cy="8" r="5.5" />
+          }
+          @case ('luma') {
+            <rect x="1.5" y="4.5" width="13" height="7" rx="3.5" />
+          }
+          @case ('rhea') {
+            <rect x="2" y="5.5" width="12" height="5" rx="2.5" />
+          }
+          @case ('lyra') {
+            <path d="M8 2l5.2 3v6L8 14l-5.2-3V5z" />
+          }
+          @case ('mira') {
+            <path d="M8 2.2L13.8 8 8 13.8 2.2 8z" />
+          }
+          @case ('sera') {
+            <rect x="2.5" y="2.5" width="11" height="11" />
+          }
+          @case ('bento') {
+            <rect x="2" y="2" width="5" height="5" rx="1.5" />
+            <rect x="9" y="2" width="5" height="5" rx="1.5" />
+            <rect x="2" y="9" width="5" height="5" rx="1.5" />
+            <rect x="9" y="9" width="5" height="5" rx="1.5" />
+          }
+          @case ('mono') {
+            <path d="M3 4.5l3.5 3.5L3 11.5M8.5 12H13" stroke-linecap="round" />
+          }
+          @case ('graphite') {
+            <rect x="2.5" y="2.5" width="11" height="11" rx="2.5" fill="currentColor" fill-opacity="0.85" />
+          }
+          @case ('tint') {
+            <circle cx="8" cy="8" r="5.5" />
+            <path d="M8 2.5a5.5 5.5 0 0 1 0 11z" fill="currentColor" stroke="none" />
+          }
+        }
+      </svg>
     </ng-template>
     <ng-template #modeIcon let-dark>
       <span

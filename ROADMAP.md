@@ -20,6 +20,7 @@ More detail: [PLAN](docs/PLAN.md) · [ARCHITECTURE](docs/ARCHITECTURE.md) · [CO
 
 ## Status
 
+**Patch 1.5.1** (`fix/previews-collapsed-icons`, one commit): collapsed sidebar icons and `ng-icon` shrink fixed; docs demo cards styled again; new styles Graphite and Tint (13); Mono polish; glass is the docs default (CLI default stays nova); a base color and accent per style in the docs; site review fixes; `docs/LAUNCH.md`. Left: PR, merge, tag `v1.5.1`, publish (ask first), then post the launch drafts.
 **Next:** release 1.5.0 = Phase 15 (charts, dashboard blocks, accents, style swap, glass) in one commit on `release/v1.5.0`, based on `main` (1.4.1). T1–T9 done; T11–T13 (added 2026-11-13) done. Left: re-run the exit gate, fold into the release commit (force-push: ask first), PR, merge, tag `v1.5.0`, publish (ask first).
 Phase 16 + Phase 17 (1.4.1, look-token fix and docs redesign): merged to `main`. Left: tag `v1.4.1`, publish (ask first).
 Phase 18 keeps density and glass-only dials for 1.6.0; the glass rework and the accent and chart-color dials moved into 1.5.0.

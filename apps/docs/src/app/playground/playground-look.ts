@@ -7,8 +7,11 @@ import { COMPONENT_ICONS as REMIX } from '@inlaylab/ivorie/icons/remix';
 import { COMPONENT_ICONS as TABLER } from '@inlaylab/ivorie/icons/tabler';
 import { ACCENTS, BASE_COLORS, FONTS, RADII } from '../../generated/looks';
 import { Appearance } from '../shell/appearance';
-import { DEFAULT_STYLE, STYLES, STYLE_FONTS, type StyleName } from '../shell/appearance-options';
+import { DEFAULT_STYLE, STYLES, STYLE_COLORS, STYLE_FONTS, type StyleName } from '../shell/appearance-options';
 import { DEFAULT_PRESET, chartSource, decodePreset, encodePreset, lookVars, type Preset } from './preset-code';
+
+/** Where the docs start: the CLI default preset (kept equal to the CLI's), in the site's own style and its colors. */
+export const DOCS_PRESET: Preset = { ...DEFAULT_PRESET, style: DEFAULT_STYLE, ...STYLE_COLORS[DEFAULT_STYLE] };
 import { SCENE_ICONS } from './scene-icons';
 
 /** The component icon sets the preview can draw, in picker order. */
@@ -74,14 +77,14 @@ function themeCss(p: Preset): string {
 /**
  * A preset shown on the elements it is attached to (a preview area, the overlay container), never on
  * the rest of the site. Detached elements, font links and style sheets are cleaned up on destroy.
- * Targets get `docs-preview`: the site's nova skips them unless the preview is nova (tools/docs/site-style.ts).
+ * Targets get `docs-preview`: the site's own style skips them unless the preview is that style (tools/docs/site-style.ts).
  */
 @Injectable()
 export class PlaygroundLook {
   private readonly doc = inject(DOCUMENT);
   private readonly appearance = inject(Appearance);
   private readonly browser = isPlatformBrowser(inject(PLATFORM_ID));
-  private readonly _preset = signal<Preset>({ ...DEFAULT_PRESET });
+  private readonly _preset = signal<Preset>({ ...DOCS_PRESET });
   private readonly targets = signal<HTMLElement[]>([]);
 
   readonly preset = this._preset.asReadonly();
@@ -103,16 +106,28 @@ export class PlaygroundLook {
         '--font-heading': p.fontHeading === 'inherit' ? 'var(--font-sans)' : family(p.fontHeading),
         'font-family': 'var(--font-sans)',
       };
-      for (const el of this.targets()) {
-        const keys = applied.get(el) ?? new Set<string>();
-        applied.set(el, keys);
-        for (const [k, v] of Object.entries(vars)) {
-          el.style.setProperty(k, v);
-          keys.add(k);
+      const targets = this.targets();
+      const apply = () => {
+        for (const el of targets) {
+          const keys = applied.get(el) ?? new Set<string>();
+          applied.set(el, keys);
+          for (const [k, v] of Object.entries(vars)) {
+            el.style.setProperty(k, v);
+            keys.add(k);
+          }
+          for (const c of [...el.classList]) if (c.startsWith('style-')) el.classList.remove(c);
+          el.classList.add(`style-${p.style}`, 'docs-preview');
+          // The site's own style skips a preview in another style (tools/docs/site-style.ts).
+          el.classList.toggle('docs-other', p.style !== DEFAULT_STYLE);
         }
-        for (const c of [...el.classList]) if (c.startsWith('style-')) el.classList.remove(c);
-        el.classList.add(`style-${p.style}`, 'docs-preview');
-      }
+      };
+      // A style change cross-fades instead of snapping, unless motion is reduced. The sheets are
+      // preloaded on attach, so the new class finds its sheet and no unstyled frame shows.
+      const styleChanged = !!targets[0] && !targets[0].classList.contains(`style-${p.style}`);
+      const fade =
+        styleChanged && 'startViewTransition' in this.doc && !this.doc.defaultView?.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+      if (fade) this.doc.startViewTransition(apply);
+      else apply();
       this.loadStyleSheet(p.style);
       for (const name of [p.font, p.fontHeading]) {
         const font = FONTS.find((f) => f.name === name);
@@ -124,7 +139,7 @@ export class PlaygroundLook {
       for (const [el, keys] of applied) {
         for (const k of keys) el.style.removeProperty(k);
         for (const c of [...el.classList]) if (c.startsWith('style-')) el.classList.remove(c);
-        el.classList.remove('docs-preview');
+        el.classList.remove('docs-preview', 'docs-other');
       }
       this.doc.head.querySelectorAll('link[id^="docs-font-"], link[id^="docs-style-"]').forEach((l) => l.remove());
     });
@@ -132,7 +147,13 @@ export class PlaygroundLook {
 
   /** Shows the look on this element too. */
   attach(el: HTMLElement): void {
-    if (this.browser) this.targets.update((t) => (t.includes(el) ? t : [...t, el]));
+    if (!this.browser) return;
+    this.targets.update((t) => (t.includes(el) ? t : [...t, el]));
+    // Every style's sheet, fetched while the page is idle, so a later switch finds it in place.
+    const win = this.doc.defaultView;
+    const load = () => STYLES.forEach((s) => this.loadStyleSheet(s.name));
+    if (win && 'requestIdleCallback' in win) win.requestIdleCallback(load, { timeout: 3000 });
+    else setTimeout(load, 1500);
   }
 
   set(patch: Partial<Preset>): void {
@@ -145,6 +166,14 @@ export class PlaygroundLook {
         if (to) next.font = to;
         else if (from && p.font === from) next.font = DEFAULT_PRESET.font;
       }
+      // It brings its colors too, but only over colors that came with the style you leave: your own pick stays.
+      if (patch.style && patch.style !== p.style) {
+        const from = STYLE_COLORS[p.style as StyleName];
+        const to = STYLE_COLORS[patch.style as StyleName];
+        for (const key of ['baseColor', 'theme'] as const) {
+          if (!(key in patch) && from && to && p[key] === from[key]) next[key] = to[key];
+        }
+      }
       return next;
     });
   }
@@ -152,7 +181,7 @@ export class PlaygroundLook {
   /** A share code from the URL. Anything invalid or unknown gives the defaults. */
   load(code: string | null): void {
     const p = code ? decodePreset(code) : null;
-    this._preset.set(p && valid(p) ? p : { ...DEFAULT_PRESET });
+    this._preset.set(p && valid(p) ? p : { ...DOCS_PRESET });
   }
 
   /** The default style is in the main CSS; the others are separate bundles (angular.json, inject: false). */
@@ -166,11 +195,13 @@ export class PlaygroundLook {
     for (const f of FONTS) this.link(`docs-font-${f.name}`, fontHref(f.dependency));
   }
 
-  private link(id: string, href: string): void {
-    if (this.doc.getElementById(id)) return;
+  private link(id: string, href: string): HTMLLinkElement {
+    const old = this.doc.getElementById(id) as HTMLLinkElement | null;
+    if (old) return old;
     const link = this.doc.head.appendChild(this.doc.createElement('link'));
     link.id = id;
     link.rel = 'stylesheet';
     link.setAttribute('href', href);
+    return link;
   }
 }

@@ -16,12 +16,15 @@ import { IV_SHEET_IMPORTS } from '@inlaylab/ivorie/sheet';
 import { PREVIEW_WIDTHS, PreviewFrame, type PreviewWidth } from '../preview/preview-frame';
 import { CopyButton } from '../ui/copy-button';
 import { LookControls } from './look-controls';
-import { PREVIEW_ICONS, PlaygroundLook } from './playground-look';
+import { DOCS_PRESET, PREVIEW_ICONS, PlaygroundLook } from './playground-look';
 import { DEFAULT_PRESET, encodePreset } from './preset-code';
 import { ACCENTS, BASE_COLORS, FONTS, RADII } from '../../generated/looks';
 import { STYLES } from '../shell/appearance-options';
 
-const DEFAULT_CODE = encodePreset(DEFAULT_PRESET);
+// Where the playground starts (glass): this look has no ?preset= and Reset goes back to it.
+const START_CODE = encodePreset(DOCS_PRESET);
+// What `ivorie init` does on its own (nova): only this look needs no --preset.
+const CLI_DEFAULT_CODE = encodePreset(DEFAULT_PRESET);
 type Target = 'new' | 'existing';
 
 @Component({
@@ -189,9 +192,9 @@ export default class PlaygroundPage {
   protected readonly pillMuted =
     'has-checked:bg-background has-checked:text-foreground has-checked:shadow-xs text-muted-foreground hover:text-foreground has-focus-visible:outline-ring cursor-pointer rounded-full font-medium transition-colors has-focus-visible:outline-2';
   protected readonly linkCopied = signal(false);
-  protected readonly isDefault = computed(() => this.look.code() === DEFAULT_CODE);
+  protected readonly isDefault = computed(() => this.look.code() === START_CODE);
   protected readonly command = computed(() => {
-    const code = this.isDefault() ? null : this.look.code();
+    const code = this.look.code() === CLI_DEFAULT_CODE ? null : this.look.code();
     if (this.target() === 'existing') return `npx ivorie apply ${code ?? 'default'}`;
     return code ? `npx ivorie init --preset ${code}` : 'npx ivorie init';
   });

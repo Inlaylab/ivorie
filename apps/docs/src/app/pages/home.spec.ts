@@ -37,18 +37,18 @@ describe('HomePage', () => {
     await fixture.whenStable();
     const glass = el.querySelector<HTMLInputElement>('input[name="home-style"][value="glass"]')!;
     expect(glass.getAttribute('aria-description')).toBe('Frosted neutral glass, edges drawn with light.');
-    expect(el.querySelectorAll('iv-tooltip-content').length).toBe(11);
+    expect(el.querySelectorAll('iv-tooltip-content').length).toBe(13);
     expect(el.querySelector('[data-testid="home-command"]')).toBeNull();
   });
 
-  it('an accent colors the stage primary and charts, not the page', async () => {
+  it('a style brings its own colors to the stage, not the page; there is no accent row', async () => {
     const { el, fixture } = await render();
     const stage = el.querySelector<HTMLElement>('.docs-stage')!;
     const grey = stage.style.getPropertyValue('--chart-1');
-    el.querySelector<HTMLInputElement>('input[name="home-accent"][value="blue"]')!.click();
+    el.querySelector<HTMLInputElement>('input[name="home-style"][value="vega"]')!.click();
     await fixture.whenStable();
-    expect(el.querySelectorAll('input[name="home-accent"]').length).toBe(18);
-    // Blue in either mode: light 264.376, dark 265.638.
+    expect(el.querySelectorAll('input[name="home-accent"]').length).toBe(0);
+    // Vega opens in blue, in either mode: light 264.376, dark 265.638.
     expect(stage.style.getPropertyValue('--primary')).toMatch(/^oklch\(0\.\d+ 0\.\d+ 26[45]\.\d+\)$/);
     expect(stage.style.getPropertyValue('--chart-1')).not.toBe(grey);
     expect(document.documentElement.style.getPropertyValue('--primary')).toBe('');

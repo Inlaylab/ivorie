@@ -3,7 +3,7 @@ import { cva, VariantProps } from 'class-variance-authority'
 import { cn } from '@inlaylab/ivorie/core'
 
 export const emptyMediaVariants = cva(
-  'cn-empty-media flex shrink-0 items-center justify-center [&_svg]:pointer-events-none [&_svg]:shrink-0',
+  'cn-empty-media flex shrink-0 items-center justify-center [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_ng-icon]:shrink-0',
   {
     variants: {
       variant: {

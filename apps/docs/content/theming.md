@@ -70,7 +70,9 @@ A style class on `<body>` selects the component look: spacing, radius, borders a
 | Sera | `style-sera` | Editorial and typographic. |
 | Glass | `style-glass` | Thick panes of neutral glass. Edges drawn with light: a rim on top, a hairline, a shadow below. The faint light under the glass follows `--primary`. Solid when the browser has no backdrop blur or the user asks for less transparency. |
 | Bento | `style-bento` | Tonal tiles on a toned page, no outlines, big type. |
-| Mono | `style-mono` | Flat, with hairlines and a block caret. Font and radius follow the preset like every style; it is made for a mono font (the playground picks Geist Mono). |
+| Mono | `style-mono` | A terminal: flat, with hairlines, a block caret, inverted selection and spaced capital labels. Font and radius follow the preset like every style; it is made for a mono font (the playground picks Geist Mono). |
+| Graphite | `style-graphite` | Matte solid panes, no blur. A fine line of light on the top edge, a hairline round, a short shadow below. Fields and tracks are pressed in. |
+| Tint | `style-tint` | Page, panes, lines and states take a light wash of `--primary`. Pick an accent and the whole UI carries its hue. |
 
 Import the file for each style you use, then set its class:
 

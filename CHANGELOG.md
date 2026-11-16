@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.5.1
+
+Both packages: `@inlaylab/ivorie` and `ivorie` 1.5.1. Per-package notes: `projects/ui/CHANGELOG.md`, `projects/cli/CHANGELOG.md`.
+
+- Sidebar collapsed to icons: menu buttons no longer shrink their children. `<ng-icon>` hosts have `overflow: hidden`, so they could shrink to 0 px wide; icons, team logos and avatars now keep their size (sidebar-07, dashboard-01, dashboard-03).
+- Docs: component page demos are styled again. The site's nova skipped every `.docs-preview`, demo cards included; now it skips only previews that name another style.
+- New styles: **Graphite** (matte solid panes, a line of light on the top edge, pressed-in fields) and **Tint** (page, panes, lines and states take a wash of `--primary`, so the accent colors the whole UI). 13 styles in total. Import `@inlaylab/ivorie/styles/style-graphite.css` or `style-tint.css` and set `style-graphite` or `style-tint` on `<body>`, or pass `--style graphite|tint` to the CLI.
+- Mono reads more like a terminal: inverted text selection, spaced capital labels (table heads, sidebar and menu labels), a cursor bar on the active sidebar item, outlined keys.
+- `<ng-icon>` icons no longer shrink in a tight row: buttons, menu items, select and combobox items, tabs, toggles and sidebar parts hold `ng-icon` as they hold `svg`.
+- Glass, bento, graphite and tint: destructive text (badge, button) is mixed toward the foreground, so it keeps 4.5:1 on their toned surfaces.
+- Docs: glass is the site's style and the first in every style list. The playground and the block previews start on glass. `ivorie init` still defaults to nova. Each style opens in a base color and accent that suit it; a color you picked stays when you switch style.
+- Docs: the playground shows `npx ivorie init` alone only for the CLI default look. README counts and install line corrected. Launch post drafts in `docs/LAUNCH.md`.
+- Docs: each style opens in a palette that suits it (glass violet, nova indigo, maia orange, sera red, bento green, mono emerald, graphite grey, and more); the site's violet is the violet accent, so the site and Glass match. Glass primary buttons and checks are solid, not glossy. The style list shows one line icon per style. The home wall drops its accent row and switches style with a short fade, its sheets preloaded. The home footer credits shadcn/ui and Radix UI. Component page demos show the site's look (neutral base, violet accent), like the home wall. Style lists put Ivorie's own five first (glass, graphite, tint, mono, bento), then shadcn's eight.
+
 ## 1.5.0
 
 Both packages: `@inlaylab/ivorie` and `ivorie` 1.5.0. Per-package notes: `projects/ui/CHANGELOG.md`, `projects/cli/CHANGELOG.md`.
