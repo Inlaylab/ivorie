@@ -6,14 +6,17 @@ import { IV_RADIO_GROUP_IMPORTS } from '@inlaylab/ivorie/radio-group';
   imports: [IV_RADIO_GROUP_IMPORTS],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <iv-radio-group [(value)]="plan" class="gap-3">
-      @for (option of plans; track option.value) {
-        <label class="flex cursor-pointer items-center gap-2 text-sm">
-          <iv-radio-group-item [value]="option.value" />
-          {{ option.label }}
-        </label>
-      }
-    </iv-radio-group>
+    <div class="flex flex-col gap-3">
+      <p class="text-muted-foreground text-sm">Click a label to select.</p>
+      <iv-radio-group [(value)]="plan" class="gap-3">
+        @for (option of plans; track option.value) {
+          <label class="flex cursor-pointer items-center gap-2 text-sm">
+            <iv-radio-group-item [value]="option.value" />
+            {{ option.label }}
+          </label>
+        }
+      </iv-radio-group>
+    </div>
   `,
 })
 export default class RadioGroupWithLabelsDemo {

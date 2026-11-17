@@ -8,8 +8,8 @@ import { IvButton } from '@inlaylab/ivorie/button';
   template: `
     <div class="flex flex-wrap gap-2">
       <button ivButton>Default</button>
-      <button ivButton variant="outline">Outline</button>
       <button ivButton variant="secondary">Secondary</button>
+      <button ivButton variant="outline">Outline</button>
       <button ivButton variant="ghost">Ghost</button>
       <button ivButton variant="destructive">Destructive</button>
       <button ivButton variant="link">Link</button>

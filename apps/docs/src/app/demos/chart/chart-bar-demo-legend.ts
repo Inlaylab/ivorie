@@ -36,8 +36,8 @@ export default class ChartBarDemoLegend {
   ];
 
   protected readonly config: IvChartConfig = {
-    desktop: { label: 'Desktop', color: '#2563eb' },
-    mobile: { label: 'Mobile', color: '#60a5fa' },
+    desktop: { label: 'Desktop', color: 'var(--chart-1)' },
+    mobile: { label: 'Mobile', color: 'var(--chart-2)' },
   };
 
   protected readonly short = (month: string) => month.slice(0, 3);

@@ -60,7 +60,8 @@ import { IV_SIDEBAR_IMPORTS } from '@inlaylab/ivorie/sidebar';
                 </li>
               </ul>
             </iv-sidebar-group>
-            <iv-sidebar-group>
+            <!-- Named items have no icon, so the group hides when the sidebar collapses. -->
+            <iv-sidebar-group class="group-data-[collapsible=icon]:hidden">
               <iv-sidebar-group-label>Projects</iv-sidebar-group-label>
               <iv-sidebar-group-action title="Add project">
                 <svg lucidePlus></svg><span class="sr-only">Add project</span>

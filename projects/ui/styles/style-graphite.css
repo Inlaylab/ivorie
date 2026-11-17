@@ -1246,6 +1246,10 @@
       @apply border-(--graphite-line-strong) bg-(--graphite-well) shadow-none inset-shadow-[0_1px_2px_0_var(--graphite-press)] dark:border-(--graphite-line-strong) dark:bg-(--graphite-well);
     }
 
+    & .cn-input-group-input {
+      @apply bg-transparent shadow-none backdrop-blur-none inset-shadow-none dark:bg-transparent;
+    }
+
     .cn-select-trigger,
     .cn-native-select {
       @apply hover:bg-(--graphite-well) dark:hover:bg-(--graphite-well);
@@ -1259,6 +1263,14 @@
     .cn-button-variant-outline,
     .cn-button-variant-secondary {
       @apply border-transparent bg-(--graphite-control) shadow-(--graphite-small) hover:bg-(--graphite-control-hover) aria-expanded:bg-(--graphite-control-hover) dark:border-transparent dark:bg-(--graphite-control) dark:hover:bg-(--graphite-control-hover);
+    }
+
+    & .cn-button-variant-secondary {
+      @apply bg-clip-border shadow-none bg-[color-mix(in_oklab,var(--primary)_12%,transparent)] text-primary hover:bg-[color-mix(in_oklab,var(--primary)_18%,transparent)] aria-expanded:bg-[color-mix(in_oklab,var(--primary)_18%,transparent)] dark:bg-[color-mix(in_oklab,var(--primary)_20%,transparent)] dark:hover:bg-[color-mix(in_oklab,var(--primary)_26%,transparent)];
+    }
+
+    & .cn-button-variant-outline {
+      @apply border-(--graphite-line-strong) shadow-none dark:border-(--graphite-line-strong);
     }
 
     & .cn-button-variant-ghost {

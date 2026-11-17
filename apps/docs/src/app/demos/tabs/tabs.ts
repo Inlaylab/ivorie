@@ -11,8 +11,8 @@ import { IV_TABS_IMPORTS } from '@inlaylab/ivorie/tabs';
         <iv-tabs-trigger value="account">Account</iv-tabs-trigger>
         <iv-tabs-trigger value="password">Password</iv-tabs-trigger>
       </iv-tabs-list>
-      <iv-tabs-content value="account">Make changes to your account here.</iv-tabs-content>
-      <iv-tabs-content value="password">Change your password here.</iv-tabs-content>
+      <iv-tabs-content value="account">Update your name, email and profile photo.</iv-tabs-content>
+      <iv-tabs-content value="password">Choose a new password. Use at least 12 characters.</iv-tabs-content>
     </iv-tabs>
   `,
 })

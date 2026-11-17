@@ -12,9 +12,9 @@ import { IV_TABS_IMPORTS } from '@inlaylab/ivorie/tabs';
         <iv-tabs-trigger value="analytics">Analytics</iv-tabs-trigger>
         <iv-tabs-trigger value="reports">Reports</iv-tabs-trigger>
       </iv-tabs-list>
-      <iv-tabs-content value="overview">Overview panel</iv-tabs-content>
-      <iv-tabs-content value="analytics">Analytics panel</iv-tabs-content>
-      <iv-tabs-content value="reports">Reports panel</iv-tabs-content>
+      <iv-tabs-content value="overview">Key numbers for the last 30 days.</iv-tabs-content>
+      <iv-tabs-content value="analytics">Traffic, sources and conversions.</iv-tabs-content>
+      <iv-tabs-content value="reports">Download and schedule reports.</iv-tabs-content>
     </iv-tabs>
   `,
 })

@@ -11,8 +11,8 @@ import { IV_TABS_IMPORTS } from '@inlaylab/ivorie/tabs';
         <iv-tabs-trigger value="stable">Stable</iv-tabs-trigger>
         <iv-tabs-trigger value="beta" [disabled]="true">Beta</iv-tabs-trigger>
       </iv-tabs-list>
-      <iv-tabs-content value="stable">Stable panel</iv-tabs-content>
-      <iv-tabs-content value="beta">Beta panel</iv-tabs-content>
+      <iv-tabs-content value="stable">The current release, ready for production.</iv-tabs-content>
+      <iv-tabs-content value="beta">Early features. Not available yet.</iv-tabs-content>
     </iv-tabs>
   `,
 })

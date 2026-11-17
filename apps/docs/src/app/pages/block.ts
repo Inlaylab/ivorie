@@ -51,7 +51,7 @@ const AUTH_API = [
               <div role="radiogroup" aria-label="Preview width" class="docs-pane hidden gap-0.5 rounded-full p-1 md:flex">
                 @for (w of widths; track w.value) {
                   <label
-                    class="has-checked:bg-foreground has-checked:text-background text-muted-foreground hover:text-foreground has-focus-visible:outline-ring cursor-pointer rounded-full px-3 py-1 text-sm font-medium transition-colors has-focus-visible:outline-2"
+                    class="has-checked:bg-primary has-checked:text-primary-foreground text-muted-foreground hover:text-foreground has-focus-visible:outline-ring cursor-pointer rounded-full px-3 py-1 text-sm font-medium transition-colors has-focus-visible:outline-2"
                   >
                     <input type="radio" class="sr-only" name="block-width" [value]="w.value" [checked]="width() === w.value" (change)="width.set(w.value)" />
                     {{ w.label }}

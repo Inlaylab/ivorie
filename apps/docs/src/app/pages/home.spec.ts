@@ -1,6 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { afterEach, describe, expect, it } from 'vitest';
+import { STYLES } from '../shell/appearance-options';
 import HomePage from './home';
 
 async function render() {
@@ -65,6 +66,29 @@ describe('HomePage', () => {
     const { el } = await render();
     expect(el.querySelector('[data-testid="hero-command"]')!.textContent).toContain('npx ivorie init');
     expect(el.querySelector('iframe')).toBeNull();
+  });
+
+  it('the hero claims the real style count', async () => {
+    const { el } = await render();
+    const h1 = el.querySelector('h1')!.textContent!.replace(/\s+/g, ' ');
+    expect(h1).toContain(`${STYLES.length} styles. One codebase.`);
+    expect(h1).toContain('Built for Angular.');
+  });
+
+  it('the same code sits outside the stage, so it never restyles', async () => {
+    const { el, fixture } = await render();
+    el.querySelector<HTMLInputElement>('input[name="home-style"][value="lyra"]')!.click();
+    await fixture.whenStable();
+    const chip = el.querySelector('[data-testid="same-code"]')!;
+    expect(chip.textContent).toContain('<button ivButton>Save</button>');
+    expect(chip.closest('.docs-stage')).toBeNull();
+  });
+
+  it('the three facts sit in one row', async () => {
+    const { el } = await render();
+    const facts = el.querySelectorAll('[data-testid="facts"] li');
+    expect(facts.length).toBe(3);
+    expect(facts[0].textContent).toContain('Signals and zoneless');
   });
 
   it('has no axe violations', async () => {

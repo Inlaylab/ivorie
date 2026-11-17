@@ -32,6 +32,7 @@
   --glass-rim: color-mix(in oklab, white 90%, transparent);
   --glass-inner: color-mix(in oklab, white 35%, transparent);
   --glass-edge: color-mix(in oklab, var(--foreground) 10%, transparent);
+  --glass-field-line: color-mix(in oklab, var(--foreground) 22%, transparent);
   --glass-float-edge: color-mix(in oklab, var(--foreground) 18%, transparent);
   --glass-under: color-mix(in oklab, var(--foreground) 12%, transparent);
   --glass-contact: color-mix(in oklab, black 6%, transparent);
@@ -85,6 +86,7 @@
   --glass-rim: color-mix(in oklab, white 16%, transparent);
   --glass-inner: color-mix(in oklab, white 4%, transparent);
   --glass-edge: color-mix(in oklab, white 7%, transparent);
+  --glass-field-line: color-mix(in oklab, white 16%, transparent);
   --glass-float-edge: color-mix(in oklab, white 9%, transparent);
   --glass-under: transparent;
   --glass-contact: color-mix(in oklab, black 10%, transparent);
@@ -166,7 +168,11 @@
 .cn-select-trigger,
 .cn-native-select,
 .cn-input-otp-slot {
-  @apply border-(--glass-edge) bg-(--glass-field) shadow-none inset-shadow-[0_1px_0_0_var(--glass-field-rim)] backdrop-blur-(--glass-control-blur) dark:border-(--glass-edge) dark:bg-(--glass-field);
+  @apply border-(--glass-field-line) bg-(--glass-field) shadow-none inset-shadow-[0_1px_0_0_var(--glass-field-rim)] backdrop-blur-(--glass-control-blur) dark:border-(--glass-field-line) dark:bg-(--glass-field);
+}
+
+& .cn-input-group-input {
+  @apply bg-transparent shadow-none backdrop-blur-none inset-shadow-none dark:bg-transparent;
 }
 
 /* Unchecked: clear field glass. Checked: the ink pane, lit on top. data-checked is a :where() variant,
@@ -184,6 +190,14 @@
 .cn-button-variant-outline,
 .cn-button-variant-secondary {
   @apply border-transparent bg-(--glass-control) shadow-(--glass-small) backdrop-blur-(--glass-control-blur) hover:bg-(--glass-control-hover) aria-expanded:bg-(--glass-control-hover) dark:border-transparent dark:bg-(--glass-control) dark:hover:bg-(--glass-control-hover);
+}
+
+& .cn-button-variant-secondary {
+  @apply bg-clip-border shadow-none bg-[color-mix(in_oklab,var(--primary)_12%,transparent)] text-primary hover:bg-[color-mix(in_oklab,var(--primary)_18%,transparent)] aria-expanded:bg-[color-mix(in_oklab,var(--primary)_18%,transparent)] dark:bg-[color-mix(in_oklab,var(--primary)_20%,transparent)] dark:hover:bg-[color-mix(in_oklab,var(--primary)_26%,transparent)];
+}
+
+& .cn-button-variant-outline {
+  @apply border-border shadow-none dark:border-input;
 }
 
 & .cn-button-variant-ghost {

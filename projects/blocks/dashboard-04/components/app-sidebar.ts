@@ -1,9 +1,8 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core'
 import { RouterLink, RouterLinkActive } from '@angular/router'
 import { NgIcon } from '@ng-icons/core'
-import { lucideZap } from '@ng-icons/lucide'
 import { IV_SIDEBAR_IMPORTS } from '@inlaylab/ivorie/sidebar'
-import { navMain, user } from '../data'
+import { ivorieLogo, navMain, user } from '../data'
 import { NavUser } from './nav-user'
 
 /** The sidebar: the logo, each section with its links nested under it, and the user. Floats over the page. */
@@ -21,7 +20,7 @@ import { NavUser } from './nav-user'
                 <ng-icon [svg]="logo" size="16" />
               </span>
               <span class="flex flex-col gap-0.5 leading-none">
-                <span class="font-medium">Relay</span>
+                <span class="font-medium">Ivorie</span>
                 <span class="text-xs">Team plan</span>
               </span>
             </a>
@@ -53,7 +52,7 @@ import { NavUser } from './nav-user'
   `,
 })
 export class AppSidebar {
-  protected readonly logo = lucideZap
+  protected readonly logo = ivorieLogo
   protected readonly nav = navMain
   protected readonly user = user
 }

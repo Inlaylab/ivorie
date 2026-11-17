@@ -8,7 +8,13 @@ import { IvSwitch } from '@inlaylab/ivorie/switch';
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <form [formGroup]="form" class="flex flex-col items-center gap-3">
-      <iv-switch formControlName="darkMode" aria-label="Dark mode" />
+      <label class="flex w-72 cursor-pointer items-center justify-between gap-4 text-sm">
+        <span class="grid gap-0.5">
+          <span class="font-medium">Dark mode</span>
+          <span class="text-muted-foreground">Use a dark theme across the app.</span>
+        </span>
+        <iv-switch formControlName="darkMode" />
+      </label>
       <p class="text-muted-foreground text-sm">Value: {{ form.value.darkMode }}</p>
     </form>
   `,

@@ -8,6 +8,7 @@ import { LucideItalic } from '@lucide/angular';
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="flex flex-col items-center gap-3">
+      <p class="text-muted-foreground text-sm">Outline style with a text label.</p>
       <button ivToggle variant="outline" [(pressed)]="italic"><svg lucideItalic aria-hidden="true"></svg>Italic</button>
       <p class="text-muted-foreground text-sm">Pressed: {{ italic() }}</p>
     </div>

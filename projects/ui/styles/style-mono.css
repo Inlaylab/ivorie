@@ -1176,6 +1176,10 @@
       caret-shape: block;
     }
 
+    & .cn-input-group-input {
+      @apply bg-transparent shadow-none backdrop-blur-none inset-shadow-none dark:bg-transparent;
+    }
+
     & ::selection {
       background-color: var(--foreground);
       color: var(--background);

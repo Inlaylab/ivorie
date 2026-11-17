@@ -1,6 +1,6 @@
 {
   "name": "ivorie",
-  "version": "1.5.1",
+  "version": "1.5.2",
   "scripts": {
     "ng": "ng",
     "start": "node tools/docs/build.ts && ng serve docs",

@@ -172,6 +172,28 @@
 .docs-stage {
   background-color: color-mix(in oklab, var(--background) 88%, var(--foreground));
   color: var(--foreground);
+  position: relative;
+  isolation: isolate;
+}
+/* The dotted canvas: a faint dot grid under a soft centre light, faded out toward the edges. Neutral, so it suits every style and accent. */
+.docs-stage::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image:
+    radial-gradient(color-mix(in oklab, var(--foreground) 16%, transparent) 1px, transparent 1.5px),
+    radial-gradient(48rem 28rem at 50% 0, color-mix(in oklab, var(--foreground) 4%, transparent), transparent 70%);
+  background-size: 20px 20px, auto;
+  mask-image: radial-gradient(ellipse 80% 70% at 50% 25%, black 30%, transparent 85%);
+}
+/* The windows show the components, not the glass page light: its tinted corners go, its ground stays. */
+.docs-stage.style-glass,
+body.docs-preview.style-glass {
+  --glass-light-1: transparent;
+  --glass-light-2: transparent;
+  --glass-light-3: transparent;
 }
 /* Own styles bring their page: tiles and panes are tuned against it (bento separates by tone alone). On a
    preview page the look is on <body>: the style's ground shows there, and the canvas over it is clear.
@@ -410,7 +432,7 @@ body.docs-preview:where(.style-glass, .style-bento, .style-graphite, .style-tint
   --docs-shadow: 0 1px 2px rgb(24 20 60 / 0.06), 0 14px 36px -18px rgb(24 20 60 / 0.22);
   --docs-glow-a: rgb(124 58 237 / 0.22);
   --docs-glow-b: rgb(167 130 250 / 0.16);
-  --docs-glow-c: rgb(124 58 237 / 0.09);
+  --docs-glow-c: rgb(255 255 255 / 0.9);
   --docs-beam: rgb(124 58 237 / 0.14);
   --docs-beam-core: rgb(124 58 237 / 0.18);
   --docs-ease: cubic-bezier(0.16, 1, 0.3, 1);
@@ -433,7 +455,7 @@ body.docs-preview:where(.style-glass, .style-bento, .style-graphite, .style-tint
   --docs-shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 18px 44px -18px rgb(0 0 0 / 0.7);
   --docs-glow-a: rgb(139 92 246 / 0.3);
   --docs-glow-b: rgb(180 150 252 / 0.18);
-  --docs-glow-c: rgb(139 92 246 / 0.12);
+  --docs-glow-c: rgb(255 255 255 / 0.05);
   --docs-beam: rgb(180 150 252 / 0.18);
   --docs-beam-core: rgb(139 92 246 / 0.3);
   --brand: #a387fd;

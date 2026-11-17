@@ -120,6 +120,13 @@ export const ROADMAP: {
     link: '/playground',
   },
   {
+    title: 'Clearer buttons and fields',
+    summary: 'Outline and secondary buttons look different in every style, glass fields have stronger borders, and each style opens in its own hue.',
+    state: 'shipped',
+    version: '1.5.2',
+    link: '/playground',
+  },
+  {
     title: 'More theme dials',
     summary: 'Density and glass material dials in the playground and the CLI.',
     state: 'next',

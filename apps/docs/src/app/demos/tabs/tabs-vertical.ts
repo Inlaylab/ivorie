@@ -12,9 +12,9 @@ import { IV_TABS_IMPORTS } from '@inlaylab/ivorie/tabs';
         <iv-tabs-trigger value="billing">Billing</iv-tabs-trigger>
         <iv-tabs-trigger value="notifications">Notifications</iv-tabs-trigger>
       </iv-tabs-list>
-      <iv-tabs-content value="profile">Profile panel</iv-tabs-content>
-      <iv-tabs-content value="billing">Billing panel</iv-tabs-content>
-      <iv-tabs-content value="notifications">Notifications panel</iv-tabs-content>
+      <iv-tabs-content value="profile">Edit your public profile.</iv-tabs-content>
+      <iv-tabs-content value="billing">Manage your plan and invoices.</iv-tabs-content>
+      <iv-tabs-content value="notifications">Choose which alerts you get.</iv-tabs-content>
     </iv-tabs>
   `,
 })

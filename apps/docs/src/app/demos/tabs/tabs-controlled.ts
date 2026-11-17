@@ -8,13 +8,13 @@ import { IV_TABS_IMPORTS } from '@inlaylab/ivorie/tabs';
   template: `
     <iv-tabs [(value)]="active" class="w-80">
       <iv-tabs-list>
-        <iv-tabs-trigger value="a">A</iv-tabs-trigger>
-        <iv-tabs-trigger value="b">B</iv-tabs-trigger>
+        <iv-tabs-trigger value="a">Overview</iv-tabs-trigger>
+        <iv-tabs-trigger value="b">Activity</iv-tabs-trigger>
       </iv-tabs-list>
-      <iv-tabs-content value="a">Panel A</iv-tabs-content>
-      <iv-tabs-content value="b">Panel B</iv-tabs-content>
+      <iv-tabs-content value="a">A summary of your project.</iv-tabs-content>
+      <iv-tabs-content value="b">Recent changes from your team.</iv-tabs-content>
     </iv-tabs>
-    <p class="mt-3 text-sm text-muted-foreground">Active tab: {{ active() }}</p>
+    <p class="mt-3 text-sm text-muted-foreground">Bound with [(value)]. Active tab: {{ active() }}</p>
   `,
 })
 export default class TabsControlledDemo {

@@ -6,9 +6,12 @@ import { IvSwitch } from '@inlaylab/ivorie/switch';
   imports: [IvSwitch],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <label class="flex cursor-pointer items-center gap-2 text-sm font-medium">
+    <label class="flex w-72 cursor-pointer items-center justify-between gap-4 text-sm">
+      <span class="grid gap-0.5">
+        <span class="font-medium">Email alerts</span>
+        <span class="text-muted-foreground">Send a summary to your inbox each day.</span>
+      </span>
       <iv-switch [(checked)]="emailAlerts" />
-      Email alerts
     </label>
   `,
 })

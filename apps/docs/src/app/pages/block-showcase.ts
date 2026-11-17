@@ -97,5 +97,5 @@ export class BlockShowcase {
   protected readonly command = computed(() => `npx ivorie add ${this.entry().name}`);
   protected readonly openHref = computed(() => `preview/block/${this.entry().name}?preset=${this.code()}`);
   protected readonly pill =
-    'has-checked:bg-foreground has-checked:text-background text-muted-foreground hover:text-foreground has-focus-visible:outline-ring cursor-pointer rounded-full px-3 py-1 text-sm font-medium transition-colors duration-(--docs-dur) has-focus-visible:outline-2';
+    'has-checked:bg-primary has-checked:text-primary-foreground text-muted-foreground hover:text-foreground has-focus-visible:outline-ring cursor-pointer rounded-full px-3 py-1 text-sm font-medium transition-colors duration-(--docs-dur) has-focus-visible:outline-2';
 }

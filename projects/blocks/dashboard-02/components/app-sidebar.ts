@@ -1,9 +1,8 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core'
 import { RouterLink } from '@angular/router'
 import { NgIcon } from '@ng-icons/core'
-import { lucideChartLine } from '@ng-icons/lucide'
 import { IV_SIDEBAR_IMPORTS } from '@inlaylab/ivorie/sidebar'
-import { navMain, navSecondary, properties, user } from '../data'
+import { ivorieLogo, navMain, navSecondary, properties, user } from '../data'
 import { NavMain } from './nav-main'
 import { NavProperties } from './nav-properties'
 import { NavSecondary } from './nav-secondary'
@@ -24,7 +23,7 @@ import { NavUser } from './nav-user'
                 <ng-icon [svg]="logo" size="16" />
               </span>
               <span class="grid flex-1 text-left text-sm leading-tight">
-                <span class="truncate font-medium">Pulse</span>
+                <span class="truncate font-medium">Ivorie</span>
                 <span class="truncate text-xs">Analytics</span>
               </span>
             </a>
@@ -43,7 +42,7 @@ import { NavUser } from './nav-user'
   `,
 })
 export class AppSidebar {
-  protected readonly logo = lucideChartLine
+  protected readonly logo = ivorieLogo
   protected readonly nav = navMain
   protected readonly properties = properties
   protected readonly secondary = navSecondary

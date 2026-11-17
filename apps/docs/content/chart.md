@@ -54,8 +54,8 @@ The config names and colors each series. It holds no data, so many charts can sh
 
 ```ts
 protected readonly config: IvChartConfig = {
-  desktop: { label: 'Desktop', color: '#2563eb' },
-  mobile: { label: 'Mobile', color: '#60a5fa' },
+  desktop: { label: 'Desktop', color: 'var(--chart-1)' },
+  mobile: { label: 'Mobile', color: 'var(--chart-2)' },
 };
 ```
 

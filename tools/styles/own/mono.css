@@ -43,6 +43,10 @@
   caret-shape: block;
 }
 
+& .cn-input-group-input {
+  @apply bg-transparent shadow-none backdrop-blur-none inset-shadow-none dark:bg-transparent;
+}
+
 /* Selected text is inverted, like a terminal. */
 & ::selection {
   background-color: var(--foreground);

@@ -41,7 +41,7 @@ const CATEGORIES = [
             routerLink="/blocks"
             [queryParams]="{ category: c.value === 'featured' ? null : c.value }"
             [attr.aria-current]="category().value === c.value ? 'page' : null"
-            class="aria-[current=page]:bg-foreground aria-[current=page]:text-background text-muted-foreground hover:text-foreground shrink-0 rounded-full px-4 py-1.5 text-sm font-medium transition-colors duration-(--docs-dur)"
+            class="aria-[current=page]:bg-primary aria-[current=page]:text-primary-foreground text-muted-foreground hover:text-foreground shrink-0 rounded-full px-4 py-1.5 text-sm font-medium transition-colors duration-(--docs-dur)"
             >{{ c.label }}</a
           >
         }

@@ -7,7 +7,10 @@ import { LucideUnderline } from '@lucide/angular';
   imports: [IvToggle, LucideUnderline],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <button ivToggle disabled aria-label="Toggle underline"><svg lucideUnderline aria-hidden="true"></svg></button>
+    <div class="flex flex-col items-center gap-3">
+      <button ivToggle disabled aria-label="Toggle underline"><svg lucideUnderline aria-hidden="true"></svg></button>
+      <p class="text-muted-foreground text-sm">Underline is unavailable.</p>
+    </div>
   `,
 })
 export default class ToggleDisabledDemo {}

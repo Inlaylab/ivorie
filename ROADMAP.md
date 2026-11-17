@@ -20,14 +20,14 @@ Why and how: [PLAN](docs/PLAN.md) · [ARCHITECTURE](docs/ARCHITECTURE.md) · [CO
 
 ## Status
 
-**Latest: 1.5.1**, both packages on npm. Nothing in progress.
+**Latest: 1.5.2**, both packages on npm. Nothing in progress.
 
 **Next:** Phase 18 (1.6.0). It is an outline: expand it into tasks and get an OK first.
 
 Open items:
 
 - Post the launch drafts in [docs/LAUNCH.md](docs/LAUNCH.md).
-- Tags: `v1.0.0`…`v1.5.1` are on GitHub. The old tags `1.1.0`…`1.5.1` (no `v`) remain because the GitHub releases point to them. Retarget each release to its `v` tag, then delete the old tags.
+- Tags: `v1.0.0`…`v1.5.1` are on GitHub; tag `v1.5.2` after the merge. The old tags `1.1.0`…`1.5.1` (no `v`) remain because the GitHub releases point to them. Retarget each release to its `v` tag, then delete the old tags.
 
 | Release | What                                  | Status  |
 | ------- | ------------------------------------- | ------- |

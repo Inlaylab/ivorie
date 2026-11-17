@@ -1236,6 +1236,10 @@
       @apply rounded-2xl border-transparent bg-(--bento-well) shadow-none focus-visible:border-transparent focus-visible:ring-2 focus-visible:ring-ring/25 dark:bg-(--bento-well) dark:hover:bg-(--bento-well-hover);
     }
 
+    & .cn-input-group-input {
+      @apply bg-transparent shadow-none backdrop-blur-none inset-shadow-none dark:bg-transparent;
+    }
+
     & .cn-input-group {
       @apply has-[[data-slot=input-group-control]:focus-visible]:border-transparent has-[[data-slot=input-group-control]:focus-visible]:ring-2 has-[[data-slot=input-group-control]:focus-visible]:ring-ring/25;
     }
@@ -1252,6 +1256,14 @@
     .cn-button-variant-outline,
     .cn-button-variant-secondary {
       @apply border-transparent bg-(--bento-well) shadow-none hover:bg-(--bento-well-hover) aria-expanded:bg-(--bento-well-hover) dark:bg-(--bento-well) dark:hover:bg-(--bento-well-hover);
+    }
+
+    & .cn-button-variant-secondary {
+      @apply bg-clip-border bg-[color-mix(in_oklab,var(--primary)_12%,transparent)] text-primary hover:bg-[color-mix(in_oklab,var(--primary)_18%,transparent)] aria-expanded:bg-[color-mix(in_oklab,var(--primary)_18%,transparent)] dark:bg-[color-mix(in_oklab,var(--primary)_20%,transparent)] dark:hover:bg-[color-mix(in_oklab,var(--primary)_26%,transparent)];
+    }
+
+    & .cn-button-variant-outline {
+      @apply border-border dark:border-input;
     }
 
     & .cn-button-variant-ghost {

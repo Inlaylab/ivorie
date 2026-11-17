@@ -6,16 +6,19 @@ import { IV_RADIO_GROUP_IMPORTS } from '@inlaylab/ivorie/radio-group';
   imports: [IV_RADIO_GROUP_IMPORTS],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <iv-radio-group [(value)]="plan" class="gap-3">
-      <label class="flex cursor-pointer items-center gap-2 text-sm">
-        <iv-radio-group-item value="starter" />
-        Starter
-      </label>
-      <label class="flex items-center gap-2 text-sm">
-        <iv-radio-group-item value="enterprise" [disabled]="true" />
-        Enterprise (unavailable)
-      </label>
-    </iv-radio-group>
+    <div class="flex flex-col gap-3">
+      <p class="text-muted-foreground text-sm">One item is disabled.</p>
+      <iv-radio-group [(value)]="plan" class="gap-3">
+        <label class="flex cursor-pointer items-center gap-2 text-sm">
+          <iv-radio-group-item value="starter" />
+          Starter
+        </label>
+        <label class="flex items-center gap-2 text-sm">
+          <iv-radio-group-item value="enterprise" [disabled]="true" />
+          Enterprise (unavailable)
+        </label>
+      </iv-radio-group>
+    </div>
   `,
 })
 export default class RadioGroupDisabledItemDemo {

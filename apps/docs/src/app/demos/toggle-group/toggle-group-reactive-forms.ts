@@ -8,6 +8,7 @@ import { IV_TOGGLE_GROUP_IMPORTS, ToggleGroupValue } from '@inlaylab/ivorie/togg
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="flex flex-col items-center gap-3">
+      <p class="text-muted-foreground text-sm">Select the days you work.</p>
       <iv-toggle-group type="multiple" size="sm" aria-label="Days" [formControl]="days">
         @for (d of week; track d) {
           <button ivToggleGroupItem [value]="d">{{ d }}</button>

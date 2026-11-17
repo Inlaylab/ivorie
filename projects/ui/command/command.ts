@@ -90,7 +90,7 @@ export class IvCommand {
   host: { 'data-slot': 'command-input-wrapper', 'class': 'cn-command-input-wrapper block' },
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="cn-command-input-group flex items-center">
+    <div class="cn-command-input-group flex items-center gap-2 pl-2">
       <svg ivIcon="search" class="cn-command-input-icon shrink-0" aria-hidden="true"></svg>
       <input
         data-slot="command-input"

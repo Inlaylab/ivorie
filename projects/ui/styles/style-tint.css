@@ -1232,6 +1232,10 @@
       @apply border-(--tint-line-strong) bg-(--tint-field) shadow-none dark:border-(--tint-line-strong) dark:bg-(--tint-field);
     }
 
+    & .cn-input-group-input {
+      @apply bg-transparent shadow-none backdrop-blur-none inset-shadow-none dark:bg-transparent;
+    }
+
     .cn-select-trigger,
     .cn-native-select {
       @apply hover:bg-(--tint-hover) dark:hover:bg-(--tint-hover);

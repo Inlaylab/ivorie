@@ -22,7 +22,7 @@ export interface NavItem {
   items?: { title: string; url: string }[]
 }
 
-export const user = { name: 'shadcn', email: 'm@example.com', initials: 'CN' }
+export const user = { name: 'Ivorie', email: 'hello@example.com', initials: 'IV' }
 
 export const teams = [
   { name: 'Acme Inc', logo: lucideGalleryVerticalEnd, plan: 'Enterprise' },

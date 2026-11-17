@@ -7,6 +7,7 @@ import { IV_TOGGLE_GROUP_IMPORTS, ToggleGroupValue } from '@inlaylab/ivorie/togg
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="flex flex-col items-center gap-3">
+      <p class="text-muted-foreground text-sm">Choose one layout.</p>
       <iv-toggle-group type="single" variant="outline" [spacing]="0" aria-label="View" [(value)]="view">
         <button ivToggleGroupItem value="list">List</button>
         <button ivToggleGroupItem value="grid">Grid</button>

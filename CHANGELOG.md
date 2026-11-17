@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.5.2
+
+Both packages: `@inlaylab/ivorie` and `ivorie` 1.5.2. Per-package notes: `projects/ui/CHANGELOG.md`, `projects/cli/CHANGELOG.md`.
+
+- Glass, graphite and bento: outline and secondary buttons no longer look the same. Outline has a visible border and no shadow; secondary is a soft tint of `--primary` with primary text and no ring.
+- Glass: field borders (input, textarea, input group, select, OTP) are stronger, through a new `--glass-field-line` token.
+- Glass, graphite, bento, mono and tint: the input inside an input group stays transparent, so it no longer covers the group's border (combobox).
+- Command: the search icon has spacing from the input.
+- Blocks: dashboard-01 to 04 show the Ivorie mark and name in the sidebar, and the demo user in dashboard-01 to 04, sidebar-07 and sidebar-08 is Ivorie.
+- Docs home: the hero reads "13 styles. One codebase. Built for Angular." A same-code chip sits under the style picker, the facts sit in one row with icons, and the wall is wider with no clipped card edges.
+- Docs: a neutral site glow, and a dotted canvas behind the home wall and the playground. The glass corner light is off inside these windows. Active toggles on home, blocks and the playground use the primary color.
+- Docs: each style opens in its own hue. Tint opens in fuchsia, mono in amber, lyra in yellow and mira in emerald.
+- Docs: demos for radio group, switch, toggle, toggle group and tabs have labels and short descriptions. Chart demos use the theme's chart colors. The sidebar demos' Projects group hides in icon mode.
+
 ## 1.5.1
 
 Both packages: `@inlaylab/ivorie` and `ivorie` 1.5.1. Per-package notes: `projects/ui/CHANGELOG.md`, `projects/cli/CHANGELOG.md`.

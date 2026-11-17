@@ -18,12 +18,16 @@ export interface NavItem {
   items?: { title: string; url: string }[]
 }
 
-export const user = { name: 'Leo Martin', email: 'leo@northwind.shop', initials: 'LM' }
+// The Ivorie mark, one color: it takes the text color, so it follows the theme.
+export const ivorieLogo =
+  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="17 16 129 129" fill="currentColor"><path d="M55.04 18.86c2.6-1.53 5.21-1.53 7.81 0l64.56 38c2.32 1.36 3.47 3.41 3.47 6.13v49.59c0 2.04-.87 2.55-2.6 1.53L84.43 88.3c-1.45-.85-2.17-2.13-2.17-3.83V36.63c0-1.02-.43-1.28-1.3-.77L34.3 63.33c-1.45.85-2.17.42-2.17-1.28V35.41c0-2.04.87-3.58 2.61-4.6z"/><path d="M32.13 85.05c0-2.04.87-3.58 2.6-4.6L68.92 60.32c.87-.51 1.3-.26 1.3.77v33.67c0 1.7.72 2.98 2.17 3.83l38.84 22.86c1.74 1.02 1.74 2.04 0 3.07l-30.77 18.11c-2.6 1.53-5.21 1.53-7.82 0L35.16 120.57c-2.02-1.19-3.04-2.98-3.04-5.37z"/></svg>'
+
+export const user = { name: 'Ivorie', email: 'hello@example.com', initials: 'IV' }
 
 export const teams = [
-  { name: 'Northwind', logo: lucideShoppingBag, plan: 'Store' },
-  { name: 'Northwind Outlet', logo: lucideStar, plan: 'Store' },
-  { name: 'Northwind Trade', logo: lucideBuilding2, plan: 'Wholesale' },
+  { name: 'Ivorie', logo: ivorieLogo, plan: 'Store' },
+  { name: 'Ivorie Outlet', logo: lucideStar, plan: 'Store' },
+  { name: 'Ivorie Trade', logo: lucideBuilding2, plan: 'Wholesale' },
 ]
 
 export const navMain: NavItem[] = [

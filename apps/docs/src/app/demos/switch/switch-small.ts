@@ -6,9 +6,15 @@ import { IvSwitch } from '@inlaylab/ivorie/switch';
   imports: [IvSwitch],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="flex items-center gap-4">
-      <iv-switch size="sm" [checked]="true" aria-label="Small" />
-      <iv-switch aria-label="Default" />
+    <div class="flex flex-col gap-4 text-sm">
+      <label class="flex cursor-pointer items-center gap-3">
+        <iv-switch size="sm" [checked]="true" />
+        Small
+      </label>
+      <label class="flex cursor-pointer items-center gap-3">
+        <iv-switch />
+        Default
+      </label>
     </div>
   `,
 })

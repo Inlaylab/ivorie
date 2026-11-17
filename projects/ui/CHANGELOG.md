@@ -1,5 +1,11 @@
 # @inlaylab/ivorie
 
+## 1.5.2
+
+### Patch Changes
+
+- Outline and secondary buttons differ in glass, graphite and bento: outline has a visible border, secondary is a soft primary tint with no ring. Glass field borders are stronger. In glass, graphite, bento, mono and tint, the input inside an input group stays transparent, so combobox borders show. The command input's search icon has spacing. Blocks use the Ivorie brand: dashboard-01 to 04 show the Ivorie mark and name, and the demo user in dashboards and sidebar-07 and sidebar-08 is Ivorie.
+
 ## 1.5.1
 
 ### Patch Changes

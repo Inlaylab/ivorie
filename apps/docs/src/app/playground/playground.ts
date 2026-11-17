@@ -187,7 +187,7 @@ export default class PlaygroundPage {
   protected readonly width = signal<PreviewWidth>('desktop');
   /** A segment on a pane: the picked one is filled. */
   protected readonly pill =
-    'has-checked:bg-foreground has-checked:text-background text-muted-foreground hover:text-foreground has-focus-visible:outline-ring cursor-pointer rounded-full font-medium transition-colors duration-(--docs-dur) has-focus-visible:outline-2';
+    'has-checked:bg-primary has-checked:text-primary-foreground text-muted-foreground hover:text-foreground has-focus-visible:outline-ring cursor-pointer rounded-full font-medium transition-colors duration-(--docs-dur) has-focus-visible:outline-2';
   /** The same inside a dialog, on a muted track. */
   protected readonly pillMuted =
     'has-checked:bg-background has-checked:text-foreground has-checked:shadow-xs text-muted-foreground hover:text-foreground has-focus-visible:outline-ring cursor-pointer rounded-full font-medium transition-colors has-focus-visible:outline-2';
