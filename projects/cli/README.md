@@ -1,12 +1,15 @@
 # ivorie
 
-Copy [Ivorie](https://github.com/Inlaylab/ivorie) Angular components into your app, shadcn/ui style.
-Needs Angular 22 and Node 22.22.3+ or 24.15+.
+Copy [Ivorie](https://github.com/Inlaylab/ivorie) Angular components and blocks into your app, shadcn/ui style. You own the source.
+
+Needs Angular 22 and Node 22.22.3+ or 24.15+. **Docs:** https://inlaylab.github.io/ivorie/docs/cli
 
 ```bash
-npx ivorie init            # theme, style, components.json, Tailwind PostCSS
-npx ivorie add button dialog
-npx ivorie migrate src     # update code written for the old ui-* components
+npx ivorie init                    # theme, style, components.json, Tailwind PostCSS
+npx ivorie add button dialog       # components land in src/app/ui/
+npx ivorie add login-01            # blocks land in src/app/blocks/
+npx ivorie apply ivp1_…            # change the look: a preset or a playground code
+npx ivorie migrate icons --from lucide --to tabler
 ```
 
 - `init` writes `components.json`, `<path>/styles/theme.css`, the style file and `core`. It adds the CSS imports to your styles file and the style class to `<body>`.

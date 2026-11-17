@@ -12,7 +12,7 @@ git -C .ref/shadcn sparse-checkout set apps/v4/registry packages/shadcn
 
 - Component: `.ref/shadcn/apps/v4/registry/bases/radix/ui/<name>.tsx`. Copy its structure classes and its `cn-*` hook classes, names unchanged.
 - Look: the `.cn-*` rules in `registry/styles/style-<name>.css` go into `projects/ui/styles/style-<name>.css`, inside `@layer components { .style-<name> { … } }`. Every hook needs a rule in every style file (empty `{}` is fine). The `test-tools` check enforces it.
-- First style: maia. More styles are new CSS files, no component changes.
+- A new style is a new CSS file. No component changes.
 - If ours differ, use shadcn unless DECISIONS.md says otherwise.
 - Behavior and a11y: shadcn uses Radix. Check Radix docs for keyboard and ARIA, then build it with Angular CDK.
 - Port ideas, not React code. `asChild` → attribute selector (`a[ivButton]`).
@@ -73,7 +73,7 @@ No `readme.md` in the library. Docs live in `apps/docs`.
 
 ## Add a component
 1. `projects/ui/<name>/`: `ng-package.json` (copy from `badge`), `public-api.ts`, `<name>.ts`, `<name>.spec.ts` (Vitest + axe).
-2. Style hooks: `node tools/styles/sync.ts <style>` for vega, nova, maia, luma, rhea, then `node tools/styles/derive.ts --all`. `tools/styles/coverage.test.ts` must pass.
+2. Style hooks: `node tools/styles/sync.ts <style>` for vega, nova, maia, luma, rhea, lyra, mira, sera, then `node tools/styles/derive.ts --all`. `tools/styles/coverage.test.ts` must pass.
 3. Count bumps: `tools/registry/items.test.ts` (entry count); `tools/smoke/module-imports.test.ts` (only with `IV_<NAME>_IMPORTS`).
 4. Module smoke: `apps/module-smoke/src/app/app.module.ts`, `app.html`, and the `data-slot` in `app.spec.ts`.
 5. Docs: page + main demo + example demos (see Docs). `npm run docs:content` regenerates `apps/docs/src/generated/`.
