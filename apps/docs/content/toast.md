@@ -21,6 +21,10 @@ export const appConfig: ApplicationConfig = {
 const toast = inject(IvToastService);
 
 const id = toast.show('Saved', 'success');
+toast.show('Message archived', 'info', {
+  description: 'Moved to Archive.',
+  action: { label: 'Undo', onClick: () => restore() },
+});
 toast.show('Could not save', 'destructive', { duration: 0 }); // 0 = stays until dismissed
 toast.dismiss(id);
 toast.dismissAll();
@@ -60,9 +64,11 @@ Every part also accepts `class`.
 | Name | Type | Default | Description |
 |---|---|---|---|
 | `duration` | `number` | by variant | Ms until auto-close. `0` stays. Defaults: success 3000, info 5000, warning 6000, destructive 10000. |
+| `description` | `string` | — | A second, quieter line under the message. Plain text. |
+| `action` | `ToastAction` | — | `{ label, onClick }`: a button that runs `onClick`, then closes the toast. |
 | `icon` | `string` | variant icon | Legacy names: `check_circle`, `error`, `warning`, `info`. Anything else uses the variant icon. |
 
-`ToastItem` is `{ id, message, variant, icon?, duration }`.
+`ToastItem` is `{ id, message, variant, icon?, duration, description?, action? }`.
 
 ### provideIvToast
 

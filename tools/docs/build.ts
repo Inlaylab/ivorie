@@ -8,7 +8,9 @@ import type { DocPage } from '../../apps/docs/src/app/content/types.ts';
 import { build as buildRegistry } from '../registry/build.ts';
 import { blockMeta, listBlocks } from '../registry/items.ts';
 import { looksModule } from './looks.ts';
-import { siteStyle } from './site-style.ts';
+import { cliPin, packStyles, siteLook, siteStyle } from './site-style.ts';
+import { parseChangelog } from './changelog.ts';
+import { DEFAULT_PRESET } from '../../projects/cli/src/preset.ts';
 
 const CONTENT = 'apps/docs/content';
 const DEMOS = 'apps/docs/src/app/demos';
@@ -37,6 +39,7 @@ const render = createRenderer(await createHighlighter());
 const pages: DocPage[] = [];
 const orders = new Map<string, number>();
 const soon = new Set<string>();
+const start = new Set<string>();
 for (const file of readdirSync(CONTENT).filter((f) => f.endsWith('.md') && !f.startsWith('_'))) {
   const slug = basename(file, '.md');
   const md = readFileSync(join(CONTENT, file), 'utf8');
@@ -45,6 +48,7 @@ for (const file of readdirSync(CONTENT).filter((f) => f.endsWith('.md') && !f.st
     const { data } = parseFrontmatter(md, file);
     orders.set(slug, data.order ?? 0);
     if (data.soon) soon.add(slug);
+    if (data.group === 'start') start.add(slug);
   } catch (e) {
     errors.push((e as Error).message);
   }
@@ -88,6 +92,7 @@ const entries = pages.map((p) => {
   return (
     `  {\n    ${fields.join(',\n    ')},\n    order: ${orders.get(p.slug)},\n` +
     (soon.has(p.slug) ? '    soon: true,\n' : '') +
+    (start.has(p.slug) ? "    group: 'start',\n" : '') +
     `    load: () => import('./pages/${p.slug}').then((m) => m.default),\n  },`
   );
 });
@@ -108,14 +113,35 @@ writeFileSync(
 );
 
 writeFileSync(join(OUT, 'looks.ts'), looksModule());
-// The site's style is the one on <body> in index.html (DEFAULT_STYLE in appearance-options.ts names the same).
-const siteStyleName = /<body class="style-([a-z]+)"/.exec(readFileSync('apps/docs/src/index.html', 'utf8'))?.[1];
-if (!siteStyleName) throw new Error('docs: no style-<name> class on <body> in apps/docs/src/index.html');
+// The changelog page: CHANGELOG.md, one entry per release, notes rendered like any docs page.
+const releases = parseChangelog(readFileSync('CHANGELOG.md', 'utf8')).map(({ body, ...r }) => ({ ...r, html: render(body).html }));
+writeFileSync(
+  join(OUT, 'changelog.ts'),
+  `${HEADER}export interface ChangelogRelease {
+  version: string;
+  date: string;
+  title: string;
+  html: string;
+}
+
+export const CHANGELOG: ChangelogRelease[] = ${JSON.stringify(releases, null, 2)};
+`,
+);
+// The site theme is the one on <body> in index.html (DEFAULT_THEME in appearance-options.ts names the same).
+const siteStyleName = /<body class="theme-([a-z]+)"/.exec(readFileSync('apps/docs/src/index.html', 'utf8'))?.[1];
+if (!siteStyleName) throw new Error('docs: no theme-<name> class on <body> in apps/docs/src/index.html');
+if (siteStyleName !== DEFAULT_PRESET.theme) throw new Error(`docs: <body> has theme-${siteStyleName}, the default theme is ${DEFAULT_PRESET.theme}`);
 writeFileSync(join(OUT, 'site-style.css'), siteStyle(siteStyleName));
+// The site's colors: the default preset as `ivorie init` writes it (DOCS_PRESET is THEMES.slate, the same preset).
+writeFileSync(join(OUT, 'site-look.css'), siteLook(DEFAULT_PRESET));
+write('apps/docs/src/styles.pack.css', packStyles(readFileSync('apps/docs/src/styles.css', 'utf8'), siteStyleName));
+// Copied commands name the CLI minor: the site can deploy before npm has the release, and an older CLI
+// reads the new flags another way.
+writeFileSync(join(OUT, 'cli.ts'), `${HEADER}export const IVORIE = '${cliPin(JSON.parse(readFileSync('projects/cli/package.json', 'utf8')).version)}';\n`);
 
 // Blocks: meta and a lazy page loader in blocks.ts; the highlighted files per block in blocks/<name>.ts,
 // so the code loads only on its block page.
-const GROUPS: Record<string, string> = { login: 'Login', signup: 'Sign up', sidebar: 'Sidebar', dashboard: 'Dashboard' };
+const GROUPS: Record<string, string> = { login: 'Login', signup: 'Sign up', sidebar: 'Sidebar', dashboard: 'Dashboard', stats: 'Data', usage: 'Data', status: 'Data' };
 const pascal = (name: string) => name.split('-').map((p) => p[0].toUpperCase() + p.slice(1)).join('');
 const blocks = listBlocks();
 mkdirSync(join(OUT, 'blocks'), { recursive: true });

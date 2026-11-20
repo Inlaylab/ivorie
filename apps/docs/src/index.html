@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" class="dark" style="color-scheme: dark">
+<html lang="en" style="color-scheme: light">
 <head>
   <meta charset="utf-8">
   <title>Ivorie</title>
@@ -9,15 +9,15 @@
   <link rel="icon" type="image/x-icon" href="favicon.ico" sizes="any">
   <link rel="icon" type="image/svg+xml" href="app.svg">
 </head>
-<body class="style-glass">
+<body class="theme-slate">
   <!-- Apply the saved appearance before first paint. Must never throw. -->
   <script>
     (function () {
       try {
         var s = JSON.parse(localStorage.getItem('ivorie-docs:appearance') || 'null') || {};
-        // Dark-first: no saved mode means dark. The server markup is already dark.
-        var dark = !s.mode || s.mode === 'dark' || (s.mode === 'system' && matchMedia('(prefers-color-scheme: dark)').matches);
-        if (!dark) document.documentElement.classList.remove('dark');
+        // No saved mode means system. The server markup is light; dark is added before first paint.
+        var dark = s.mode === 'dark' || (s.mode !== 'light' && matchMedia('(prefers-color-scheme: dark)').matches);
+        if (dark) document.documentElement.classList.add('dark');
         document.documentElement.style.colorScheme = dark ? 'dark' : 'light';
       } catch (e) {}
     })();

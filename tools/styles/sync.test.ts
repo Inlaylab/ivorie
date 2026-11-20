@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { buildStyle, parse, stripComments, unknownShapes } from './sync.ts';
+import { buildStyle, classicExtras, parse, stripComments, switchInSpacing, unknownShapes } from './sync.ts';
 
 const shadcn = `.style-maia {
   /* MARK: Badge */
@@ -26,7 +26,7 @@ const shadcn = `.style-maia {
 
 test('keeps only used hooks, in shadcn order, with their MARK', () => {
   const css = buildStyle('maia', shadcn, new Set(['cn-button-size-sm', 'cn-button']));
-  assert.ok(css.includes('@layer components {\n  .style-maia {\n    /* MARK: Button */\n    .cn-button {\n      @apply rounded-4xl border;\n    }\n'));
+  assert.ok(css.includes('@layer components {\n  :is(.theme-maia, .style-maia) {\n    /* MARK: Button */\n    .cn-button {\n      @apply rounded-4xl border;\n    }\n'));
   assert.ok(css.includes('    .cn-button-size-sm {\n      @apply h-8\n        gap-1;\n    }\n'));
   assert.ok(!css.includes('cn-badge'));
   assert.ok(!css.includes('cn-button-size-lg'));
@@ -61,4 +61,27 @@ test('a commented-out rule is dropped, a plain comment stays (sera)', () => {
   const stripped = stripComments(css);
   assert.ok(stripped.includes('/* note */'));
   assert.deepEqual(parse(stripped).map((r) => r.hook), ['cn-b']);
+});
+
+test('switchInSpacing: the switch track moves from px to spacing units', () => {
+  const rule = { mark: 'Switch', hook: 'cn-switch', lines: ['  .cn-switch {', '    @apply data-[size=default]:h-[18.4px] w-[32px] ring-[3px];', '  }'] };
+  assert.equal(switchInSpacing(rule).lines[1], '    @apply data-[size=default]:h-[calc(--spacing(4.6))] w-[calc(--spacing(8))] ring-[3px];');
+  const other = { ...rule, hook: 'cn-switch-thumb' };
+  assert.equal(switchInSpacing(other), other);
+});
+
+test('a classic layer lands after the shadcn rules, its header comment dropped', () => {
+  const layer = '/*\n * Maia layer.\n */\n\n& .cn-button {\n  @apply tracking-tight;\n}\n';
+  const css = buildStyle('maia', shadcn, new Set(['cn-button']), layer);
+  assert.ok(css.includes('    /* MARK: Style extras */\n    & .cn-button {\n      @apply tracking-tight;\n    }\n'));
+  assert.ok(!css.includes('Maia layer.'));
+  assert.ok(css.includes('Ivorie layer: tools/styles/classic/maia.css.'));
+  assert.deepEqual(classicExtras(''), []);
+});
+
+test("Ivorie's own parts get their plain rule when shadcn has none for the hook", () => {
+  const parts = '/* MARK: Meter */\n.cn-meter-tick {\n  @apply bg-muted;\n}\n\n/* MARK: Button */\n.cn-button {\n  @apply hidden;\n}\n';
+  const css = buildStyle('maia', shadcn, new Set(['cn-button', 'cn-meter-tick']), '', parts);
+  assert.ok(css.includes('    /* MARK: Meter */\n    .cn-meter-tick {\n      @apply bg-muted;\n    }\n'));
+  assert.ok(!css.includes('@apply hidden;'), 'a shadcn rule wins over a part rule');
 });

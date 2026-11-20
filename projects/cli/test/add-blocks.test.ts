@@ -28,7 +28,7 @@ function app(over: Partial<ComponentsJson> = {}) {
     $schema: 'https://ivorie.dev/schema/components.json',
     path: 'src/app/ui',
     prefix: 'iv',
-    style: 'nova',
+    theme: 'nova',
     tailwind: { css: 'src/styles.css', baseColor: 'neutral' },
     font: 'system',
     radius: 'default',

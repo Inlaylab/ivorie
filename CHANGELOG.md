@@ -1,6 +1,27 @@
 # Changelog
 
-## 1.5.2
+One entry per release: a `## X.Y.Z — YYYY-MM-DD` heading, a one-line title, then the notes. The docs changelog page parses this file, so keep that heading format.
+
+## 1.6.0 — 2026-11-24
+
+Themes and dials, rich parts, data blocks, a new site.
+
+Both packages: `@inlaylab/ivorie` and `ivorie` 1.6.0. Per-package notes: `projects/ui/CHANGELOG.md`, `projects/cli/CHANGELOG.md`.
+
+- One concept: theme. `styles/theme-<name>.css`, `class="theme-<name>"`, `ivorie init --theme <name|code>` and `--accent <color>`; `components.json` uses `theme` and `accent`. The 1.5 names keep working until 2.0, and `ivorie apply` moves an app to the new ones. Old `ivp1_` codes are unchanged.
+- New default theme: Slate (zinc with the blue accent, Geist, small radius). `ivorie init` starts on it. Glass keeps violet as its own default.
+- Graphite is renamed Slate. `graphite` keeps working until 2.0: `theme-graphite.css`, `style-graphite.css`, `class="theme-graphite"`, `--theme graphite` and share codes that say graphite all give slate. New package files: `@inlaylab/ivorie/styles/theme-slate.css` and `style-slate.css`.
+- Dials: density, contrast and motion for every theme; panels, rim, shadow, blur and ambient where the theme takes them. Density sets `--spacing` on `:root`, so it scales all of your app's Tailwind spacing, not only Ivorie parts; the default theme leaves it at `default`. High contrast also darkens muted text in Ivorie's own themes. New themes: Midnight and Clay.
+- `components.json` keeps the dials you set (`preset`), so `ivorie apply <theme>` no longer resets them.
+- Rich parts: `iv-meter`, `iv-gauge`, `iv-stat`, `iv-delta`, `iv-tracker`, `iv-bar-list` and `svg[ivSparkline]`. Every theme styles them. `ivorie add` warns when your theme file predates them; run `ivorie apply` to update it.
+- Blocks: `stats-01`, `usage-01` and `status-01`. 25 blocks in total.
+- CLI: `init` and `apply` change only Ivorie's own theme classes and imports, so your `theme-dark` class and `theme-overrides.css` import stay.
+- Fixes: the switch scales with density; vertical tabs in Glass; calendar colors through CSS variables; the data-table footer wraps on a phone and keeps the page size; a select with a leading icon or color chip keeps its value next to it; toasts pause while hovered or focused.
+- Docs: a new site look on the default theme, with no glow or blur, following your OS light or dark setting. New guides: Introduction, Forms, Server rendering and Accessibility. A changelog page replaces the roadmap page (`/roadmap` redirects). Theme tiles show real parts. The playground puts Copy init command first, and copied commands pin `npx ivorie@1.6`. The wall leads with Overview, Status, Usage and Top pages cards.
+
+## 1.5.2 — 2026-11-17
+
+Clearer buttons and fields, branded blocks.
 
 Both packages: `@inlaylab/ivorie` and `ivorie` 1.5.2. Per-package notes: `projects/ui/CHANGELOG.md`, `projects/cli/CHANGELOG.md`.
 
@@ -14,7 +35,9 @@ Both packages: `@inlaylab/ivorie` and `ivorie` 1.5.2. Per-package notes: `projec
 - Docs: each style opens in its own hue. Tint opens in fuchsia, mono in amber, lyra in yellow and mira in emerald.
 - Docs: demos for radio group, switch, toggle, toggle group and tabs have labels and short descriptions. Chart demos use the theme's chart colors. The sidebar demos' Projects group hides in icon mode.
 
-## 1.5.1
+## 1.5.1 — 2026-11-16
+
+Graphite and Tint, icon and preview fixes.
 
 Both packages: `@inlaylab/ivorie` and `ivorie` 1.5.1. Per-package notes: `projects/ui/CHANGELOG.md`, `projects/cli/CHANGELOG.md`.
 
@@ -28,7 +51,9 @@ Both packages: `@inlaylab/ivorie` and `ivorie` 1.5.1. Per-package notes: `projec
 - Docs: the playground shows `npx ivorie init` alone only for the CLI default look. README counts and install line corrected. Launch post drafts in `docs/LAUNCH.md`.
 - Docs: each style opens in a palette that suits it (glass violet, nova indigo, maia orange, sera red, bento green, mono emerald, graphite grey, and more); the site's violet is the violet accent, so the site and Glass match. Glass primary buttons and checks are solid, not glossy. The style list shows one line icon per style. The home wall drops its accent row and switches style with a short fade, its sheets preloaded. The home footer credits shadcn/ui and Radix UI. Component page demos show the site's look (neutral base, violet accent), like the home wall. Style lists put Ivorie's own five first (glass, graphite, tint, mono, bento), then shadcn's eight.
 
-## 1.5.0
+## 1.5.0 — 2026-11-13
+
+Charts and dashboard blocks.
 
 Both packages: `@inlaylab/ivorie` and `ivorie` 1.5.0. Per-package notes: `projects/ui/CHANGELOG.md`, `projects/cli/CHANGELOG.md`.
 
@@ -45,7 +70,9 @@ Both packages: `@inlaylab/ivorie` and `ivorie` 1.5.0. Per-package notes: `projec
 - CLI: `ivorie add chart` (or a block that uses it) also installs `@types/d3-scale` and `@types/d3-shape` as dev dependencies, so copied charts compile in a strict app. Registry items list them under `devDependencies`.
 - Apps set up with `ivorie init` on 1.4 or earlier have their own copy of `theme.css` without the `chart-*` keyframes. Charts work, but without the entrance animation until you re-run `ivorie init` (or `ivorie apply` with your preset), or copy the `--animate-chart-*` tokens and `chart-*` keyframes from the new `theme.css`.
 
-## 1.4.1
+## 1.4.1 — 2026-11-09
+
+Radius and font follow your pick.
 
 Both packages: `@inlaylab/ivorie` and `ivorie` 1.4.1. Per-package notes: `projects/ui/CHANGELOG.md`, `projects/cli/CHANGELOG.md`.
 
@@ -53,7 +80,9 @@ Both packages: `@inlaylab/ivorie` and `ivorie` 1.4.1. Per-package notes: `projec
 - Mono takes font and radius from the theme like every style. It no longer forces radius 0 and the mono font. To keep the old look, pick a mono font and radius none. The playground picks Geist Mono when you switch to Mono.
 - Docs redesign (smoky glass, dark-first). Home: a wall of live components with an inline style switcher. Playground: one compact panel, the wall as the only preview, Copy link, Shuffle and Get code. Blocks: category tabs and full-width previews with a toolbar. The site look never reaches the previews.
 
-## 1.4.0
+## 1.4.0 — 2026-11-05
+
+Own styles, data table and blocks.
 
 Both packages: `@inlaylab/ivorie` and `ivorie` 1.4.0. Per-package notes: `projects/ui/CHANGELOG.md`, `projects/cli/CHANGELOG.md`.
 
@@ -63,7 +92,9 @@ Both packages: `@inlaylab/ivorie` and `ivorie` 1.4.0. Per-package notes: `projec
 - Sidebar: `a[ivSidebarMenuButton]` and `button[ivSidebarMenuButton]` for router links and menu triggers.
 - Docs: `/blocks` with live previews and code, a style gallery in the playground with an isolated preview frame and width toggle, a live install command on the home page.
 
-## 1.3.0
+## 1.3.0 — 2026-11-04
+
+Icon libraries.
 
 Both packages: `@inlaylab/ivorie` and `ivorie` 1.3.0. Per-package notes: `projects/ui/CHANGELOG.md`, `projects/cli/CHANGELOG.md`.
 
@@ -72,7 +103,9 @@ Both packages: `@inlaylab/ivorie` and `ivorie` 1.3.0. Per-package notes: `projec
 - Default style is now nova (was maia). Old share codes keep their style.
 - Docs: the playground picks the icon library and shows icons in every scene; look options are dropdowns.
 
-## 1.2.0
+## 1.2.0 — 2026-11-02
+
+Presets and the playground.
 
 Both packages: `@inlaylab/ivorie` and `ivorie` 1.2.0. Per-package notes: `projects/ui/CHANGELOG.md`, `projects/cli/CHANGELOG.md`.
 
@@ -82,7 +115,9 @@ Both packages: `@inlaylab/ivorie` and `ivorie` 1.2.0. Per-package notes: `projec
 - Fixes: menus are solid (no see-through panels on long lists); the sidebar's mobile drawer works when the sidebar is nested in a layout element.
 - Docs: new playground at `/playground` (pick a look, copy one command), new home page, floating header with one light/dark button, docs sidebar with a filter.
 
-## 1.1.0
+## 1.1.0 — 2026-11-02
+
+17 new components.
 
 Both packages: `@inlaylab/ivorie` and `ivorie` 1.1.0. Per-package notes: `projects/ui/CHANGELOG.md`, `projects/cli/CHANGELOG.md`.
 
@@ -93,7 +128,9 @@ Both packages: `@inlaylab/ivorie` and `ivorie` 1.1.0. Per-package notes: `projec
 - Docs: components index at `/docs/components`; every example shows preview and code together.
 - Release: Changesets (one version for both packages); npm Trusted Publishing.
 
-## 1.0.0
+## 1.0.0 — 2026-10-29
+
+First release.
 
 First release of `@inlaylab/ivorie` and the `ivorie` CLI.
 

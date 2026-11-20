@@ -1,0 +1,69 @@
+/*
+ * Ivorie's own parts: hooks shadcn/ui has no rule for. Their plain look lives here, not in the component,
+ * so a theme can change it: sync.ts adds these rules to every synced theme, and own themes inherit them.
+ * Only lone `.cn-x {` rules, each under a MARK.
+ */
+
+/* MARK: Bar List */
+.cn-bar-list-bar {
+  @apply bg-primary/15 rounded-md;
+}
+
+/* MARK: Delta */
+.cn-delta {
+  @apply rounded-md px-1.5 py-0.5 text-xs font-medium data-[tone=good]:bg-emerald-500/12 data-[tone=good]:text-emerald-700 dark:data-[tone=good]:text-emerald-400 data-[tone=bad]:bg-destructive/10 data-[tone=bad]:text-destructive data-[tone=neutral]:bg-muted data-[tone=neutral]:text-muted-foreground;
+}
+
+/* MARK: Gauge */
+.cn-gauge-segment {
+  @apply bg-muted stroke-muted data-filled:bg-primary data-filled:stroke-primary rounded-full;
+}
+
+.cn-gauge-scale {
+  @apply text-muted-foreground text-[0.625rem] tabular-nums;
+}
+
+/* MARK: Meter */
+.cn-meter-track {
+  @apply has-[.cn-meter-fill]:bg-muted has-[.cn-meter-fill]:rounded-full;
+}
+
+.cn-meter-tick {
+  @apply bg-muted data-filled:bg-primary rounded-full;
+}
+
+.cn-meter-fill {
+  @apply bg-primary rounded-full;
+}
+
+/* MARK: Sparkline */
+.cn-sparkline {
+  @apply text-primary;
+}
+
+/* MARK: Stat */
+.cn-stat {
+  @apply bg-card text-card-foreground rounded-xl border p-4;
+}
+
+.cn-stat-icon {
+  @apply bg-muted text-foreground rounded-lg;
+}
+
+.cn-stat-label {
+  @apply text-muted-foreground text-sm;
+}
+
+.cn-stat-value {
+  @apply text-2xl font-semibold tracking-tight;
+}
+
+.cn-stat-description {
+  @apply text-muted-foreground text-xs;
+}
+
+/* MARK: Tracker */
+/* Status colors, not the accent: green reads as healthy at a glance, orange and red as trouble. */
+.cn-tracker-bar {
+  @apply rounded-[2px] data-[status=ok]:bg-[var(--tracker-ok,var(--color-emerald-500))] data-[status=warn]:bg-orange-500 dark:data-[status=warn]:bg-orange-400 data-[status=error]:bg-destructive data-[status=none]:bg-muted;
+}

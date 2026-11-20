@@ -15,16 +15,18 @@ import { IV_DIALOG_IMPORTS } from '@inlaylab/ivorie/dialog';
 import { IV_SHEET_IMPORTS } from '@inlaylab/ivorie/sheet';
 import { PREVIEW_WIDTHS, PreviewFrame, type PreviewWidth } from '../preview/preview-frame';
 import { CopyButton } from '../ui/copy-button';
-import { LookControls } from './look-controls';
+import { ThemeControls } from './theme-controls';
+import { Appearance } from '../shell/appearance';
 import { DOCS_PRESET, PREVIEW_ICONS, PlaygroundLook } from './playground-look';
-import { DEFAULT_PRESET, encodePreset } from './preset-code';
+import { encodePreset } from './preset-code';
 import { ACCENTS, BASE_COLORS, FONTS, RADII } from '../../generated/looks';
-import { STYLES } from '../shell/appearance-options';
+import { THEME_LIST } from '../shell/appearance-options';
+import { IVORIE } from '../../generated/cli';
 
-// Where the playground starts (glass): this look has no ?preset= and Reset goes back to it.
+// Where the playground starts: the glass theme, also what `ivorie init` does on its own. No ?preset=, no --theme.
 const START_CODE = encodePreset(DOCS_PRESET);
-// What `ivorie init` does on its own (nova): only this look needs no --preset.
-const CLI_DEFAULT_CODE = encodePreset(DEFAULT_PRESET);
+// Shuffle never lands on a legacy style.
+const PICKABLE_THEMES = THEME_LIST.filter((t) => t.group !== 'legacy');
 type Target = 'new' | 'existing';
 
 @Component({
@@ -35,12 +37,12 @@ type Target = 'new' | 'existing';
     IV_DIALOG_IMPORTS,
     IV_SHEET_IMPORTS,
     CopyButton,
-    LookControls,
+    ThemeControls,
     PreviewFrame,
   ],
   providers: [PlaygroundLook, PREVIEW_ICONS],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  host: { class: 'block gap-4 p-3 pb-20 sm:p-4 sm:pb-20 lg:grid lg:pb-4 lg:h-[calc(100svh-var(--header-height))] lg:grid-cols-[17rem_minmax(0,1fr)]' },
+  host: { class: 'block gap-4 p-3 pb-20 sm:p-4 sm:pb-20 lg:grid lg:pb-4 lg:h-[calc(100svh-var(--header-height))] lg:grid-cols-[19.5rem_minmax(0,1fr)]' },
   template: `
     <!-- The panel: one row per axis, label over value, a picture on the right. Actions at the bottom. -->
     <aside aria-labelledby="pg-title" class="docs-pane hidden min-h-0 flex-col overflow-hidden rounded-2xl lg:flex">
@@ -52,19 +54,22 @@ type Target = 'new' | 'existing';
           </svg>
         </button>
       </div>
-      <div class="no-scrollbar min-h-0 flex-1 overflow-y-auto p-1.5">
-        <docs-look-controls [look]="look" name="rail" />
+      <div class="no-scrollbar min-h-0 flex-1 overflow-y-auto px-4 py-3">
+        <docs-theme-controls [look]="look" name="rail" />
       </div>
       <div class="flex flex-col gap-2 border-t p-3">
         <div class="bg-foreground/[0.04] flex items-center gap-1 rounded-lg border py-0.5 pr-0.5 pl-2.5 font-mono text-xs">
           <span class="min-w-0 flex-1 truncate" data-testid="panel-command" [title]="command()">{{ command() }}</span>
           <docs-copy-button [text]="command()" label="Copy command" />
         </div>
-        <button ivButton variant="outline" class="w-full" (click)="shuffle()" data-testid="shuffle">
-          <ng-container [ngTemplateOutlet]="shuffleIcon" />
-          Shuffle
-        </button>
-        <button ivButton class="w-full" [ivDialogTrigger]="codeDialog">Get code</button>
+        <button ivButton class="w-full" (click)="copyCommand()" data-testid="copy-init">{{ commandCopied() ? 'Copied' : 'Copy init command' }}</button>
+        <div class="grid grid-cols-2 gap-2">
+          <button ivButton variant="outline" [ivDialogTrigger]="codeDialog">Get code</button>
+          <button ivButton variant="outline" (click)="shuffle()" data-testid="shuffle">
+            <ng-container [ngTemplateOutlet]="shuffleIcon" />
+            Shuffle
+          </button>
+        </div>
       </div>
     </aside>
 
@@ -76,6 +81,14 @@ type Target = 'new' | 'existing';
             <label [class]="pill + ' px-3 py-1 text-sm'">
               <input type="radio" class="sr-only" name="pg-width" [value]="w.value" [checked]="width() === w.value" (change)="width.set(w.value)" />
               {{ w.label }}
+            </label>
+          }
+        </div>
+        <div role="radiogroup" aria-label="Mode" class="docs-pane flex gap-0.5 rounded-full p-1">
+          @for (m of modes; track m.value) {
+            <label [class]="pill + ' px-3 py-1 text-sm'">
+              <input type="radio" class="sr-only" name="pg-mode" [value]="m.value" [checked]="(appearance.dark() ? 'dark' : 'light') === m.value" (change)="appearance.setMode(m.value)" />
+              {{ m.label }}
             </label>
           }
         </div>
@@ -91,7 +104,7 @@ type Target = 'new' | 'existing';
     </section>
 
     <!-- Small screens: the controls open in a sheet; the actions stay in a bar. -->
-    <div class="docs-pane docs-pane-blur fixed inset-x-3 bottom-3 z-20 flex items-center gap-1 rounded-full p-1 lg:hidden">
+    <div class="docs-pane fixed inset-x-3 bottom-3 z-20 flex items-center gap-1 rounded-full p-1 lg:hidden">
       <button ivButton variant="ghost" class="rounded-full" [ivSheetTrigger]="sheet" [ivSheetConfig]="{ side: 'bottom' }">Customize</button>
       <span class="flex-1"></span>
       <ng-container [ngTemplateOutlet]="actions" />
@@ -102,7 +115,7 @@ type Target = 'new' | 'existing';
         <iv-sheet-description>The preview changes behind this panel.</iv-sheet-description>
       </iv-sheet-header>
       <div class="flex max-h-[60svh] flex-col overflow-y-auto px-2 pb-6">
-        <docs-look-controls [look]="look" name="sheet" />
+        <docs-theme-controls [look]="look" name="sheet" />
       </div>
     </ng-template>
 
@@ -172,6 +185,11 @@ type Target = 'new' | 'existing';
 })
 export default class PlaygroundPage {
   protected readonly look = inject(PlaygroundLook);
+  protected readonly appearance = inject(Appearance);
+  protected readonly modes = [
+    { value: 'light' as const, label: 'Light' },
+    { value: 'dark' as const, label: 'Dark' },
+  ];
   private readonly doc = inject(DOCUMENT);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
@@ -194,9 +212,9 @@ export default class PlaygroundPage {
   protected readonly linkCopied = signal(false);
   protected readonly isDefault = computed(() => this.look.code() === START_CODE);
   protected readonly command = computed(() => {
-    const code = this.look.code() === CLI_DEFAULT_CODE ? null : this.look.code();
-    if (this.target() === 'existing') return `npx ivorie apply ${code ?? 'default'}`;
-    return code ? `npx ivorie init --preset ${code}` : 'npx ivorie init';
+    const code = this.isDefault() ? null : this.look.code();
+    if (this.target() === 'existing') return `${IVORIE} apply ${code ?? 'default'}`;
+    return code ? `${IVORIE} init --theme ${code}` : `${IVORIE} init`;
   });
 
   constructor() {
@@ -222,6 +240,19 @@ export default class PlaygroundPage {
   }
 
   /** The URL already holds the preset. */
+  protected readonly commandCopied = signal(false);
+
+  /** The panel's main action: the command that installs this exact setup. */
+  protected async copyCommand(): Promise<void> {
+    try {
+      await this.doc.defaultView!.navigator.clipboard.writeText(this.command());
+      this.commandCopied.set(true);
+      setTimeout(() => this.commandCopied.set(false), 1500);
+    } catch {
+      // Clipboard blocked: the command is shown above the button, selectable.
+    }
+  }
+
   protected async copyLink(): Promise<void> {
     try {
       const win = this.doc.defaultView!;
@@ -240,11 +271,11 @@ export default class PlaygroundPage {
     const before = this.look.code();
     for (let i = 0; i < 10 && this.look.code() === before; i++) {
       this.look.set({
-        style: any(STYLES).name,
+        theme: any(PICKABLE_THEMES).name,
         baseColor: any(BASE_COLORS).name,
         // Half the time the base color's own ink, so plain looks still come up.
-        theme: random() < 0.5 ? 'base' : any(ACCENTS).name,
-        chartColor: random() < 0.5 ? 'theme' : any(ACCENTS).name,
+        accent: random() < 0.5 ? 'base' : any(ACCENTS).name,
+        chartColor: random() < 0.5 ? 'accent' : any(ACCENTS).name,
         radius: any(Object.keys(RADII)),
         font: any(['system', ...fonts]),
         // Half the time the headings keep the body font.

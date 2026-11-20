@@ -5,11 +5,17 @@ import { looksData, looksModule } from './looks.ts';
 import * as cli from '../../projects/cli/src/preset.ts';
 import * as docs from '../../apps/docs/src/app/playground/preset-code.ts';
 import { PRESET_GOLDEN } from '../../projects/cli/test/preset.fixture.ts';
+import { THEMES, THEME_ORDER } from '../registry/themes.ts';
+import { themeNames } from '../styles/hooks.ts';
+import { LEGACY_THEMES } from '../registry/build.ts';
 
 test('docs share codes are the CLI share codes', () => {
   assert.deepEqual(docs.DEFAULT_PRESET, cli.DEFAULT_PRESET);
-  const accent = { ...PRESET_GOLDEN.preset, theme: 'blue', chartColor: 'rose', menuAccent: 'bold' };
-  for (const p of [cli.DEFAULT_PRESET, PRESET_GOLDEN.preset, { ...PRESET_GOLDEN.preset, fontHeading: 'inherit' }, accent]) {
+  assert.deepEqual(docs.FILL_PRESET, cli.FILL_PRESET);
+  assert.deepEqual(docs.DIALS, cli.DIALS);
+  const accent = { ...PRESET_GOLDEN.preset, accent: 'blue', chartColor: 'rose', menuAccent: 'bold' };
+  const dials = { ...PRESET_GOLDEN.preset, density: 'compact', contrast: 'soft', motion: 'off', panels: 'solid', rim: 'none', shadow: 'deep', blur: 'low' };
+  for (const p of [cli.DEFAULT_PRESET, PRESET_GOLDEN.preset, { ...PRESET_GOLDEN.preset, fontHeading: 'inherit' }, accent, dials]) {
     assert.equal(docs.encodePreset(p), cli.encodePreset(p));
     assert.deepEqual(docs.decodePreset(cli.encodePreset(p)), cli.decodePreset(cli.encodePreset(p)));
   }
@@ -21,7 +27,24 @@ test('docs lookVars is the CLI lookVars', () => {
   for (const menu of ['subtle', 'bold']) {
     assert.deepEqual(docs.lookVars(neutral.light, blue.light, rose.light, menu), cli.lookVars(neutral.light, blue.light, rose.light, menu));
   }
-  assert.equal(docs.chartSource({ theme: 'blue', chartColor: 'theme' }), cli.chartSource({ theme: 'blue', chartColor: 'theme' }));
+  assert.equal(docs.chartSource({ accent: 'blue', chartColor: 'accent' }), cli.chartSource({ accent: 'blue', chartColor: 'accent' }));
+});
+
+test('docs dial CSS is the CLI dial CSS', () => {
+  const neutral = looksData().baseColors[0];
+  const all = Object.keys(cli.DIALS) as cli.DialKey[];
+  for (const [dial, values] of Object.entries(cli.DIALS)) {
+    for (const value of values) {
+      const p = { ...cli.FILL_PRESET, [dial]: value };
+      assert.deepEqual(docs.dialVars(p, all), cli.dialVars(p, all));
+      assert.deepEqual(docs.droppedDials(p, cli.SHARED_DIALS), cli.droppedDials(p, cli.SHARED_DIALS));
+    }
+  }
+  for (const level of cli.DIALS.contrast) {
+    for (const mode of ['light', 'dark'] as const) assert.deepEqual(docs.contrastVars(neutral[mode], level), cli.contrastVars(neutral[mode], level));
+  }
+  assert.equal(docs.MOTION_OFF_CSS, cli.MOTION_OFF_CSS);
+  assert.deepEqual(docs.SHARED_DIALS, cli.SHARED_DIALS);
 });
 
 test('looks data: 17 accents, every accent file listed', () => {
@@ -46,4 +69,30 @@ test('looks module is TS that exports the data', () => {
   assert.match(src, /export const ACCENTS: BaseColor\[\] = \[/);
   assert.match(src, /export const FONTS: FontOption\[\] = \[/);
   assert.match(src, /export const RADII: Record<string, string \| null> = \{/);
+});
+
+test('looks data: the themes, dials per theme and legacy themes come from the registry', () => {
+  const d = looksData();
+  assert.deepEqual(d.themes, THEMES);
+  assert.deepEqual(d.themeOrder, THEME_ORDER);
+  assert.deepEqual(d.themeDials.glass, ['density', 'contrast', 'motion', 'panels', 'rim', 'shadow', 'blur', 'ambient']);
+  assert.deepEqual(d.themeDials.nova, ['density', 'contrast', 'motion']);
+  // One per theme; a renamed theme's old file (theme-graphite.css) is an alias, not a theme.
+  assert.equal(Object.keys(d.themeDials).length, themeNames().length);
+  assert.deepEqual(d.legacyThemes, LEGACY_THEMES);
+  const src = looksModule();
+  assert.match(src, /export const THEME_ORDER = \[/);
+  assert.match(src, /export const THEMES: Record<ThemeName, Preset> = \{/);
+  assert.match(src, /export const THEME_DIALS: Record<string, DialKey\[\]> = \{/);
+  assert.match(src, /export const LEGACY_THEMES: string\[\] = \[/);
+});
+
+// Every constant the docs copy shares with the CLI is the same value, so the copy cannot drift.
+test('docs preset constants are the CLI constants', () => {
+  const shared = Object.keys(docs).filter((k) => typeof (docs as Record<string, unknown>)[k] !== 'function');
+  assert.ok(shared.length >= 6, shared.join(', '));
+  for (const k of shared) {
+    assert.ok(k in cli, `${k} is in the docs copy but not the CLI`);
+    assert.deepEqual((docs as Record<string, unknown>)[k], (cli as Record<string, unknown>)[k], k);
+  }
 });

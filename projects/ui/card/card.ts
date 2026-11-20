@@ -6,6 +6,7 @@ import { cn } from '@inlaylab/ivorie/core'
   host: {
     'data-slot': 'card',
     '[attr.data-size]': 'size()',
+    '[attr.data-emphasis]': 'emphasis()',
     '[class]': 'classes()',
   },
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -13,6 +14,8 @@ import { cn } from '@inlaylab/ivorie/core'
 })
 export class IvCard {
   readonly size = input<'default' | 'sm'>('default');
+  /** 'hero' marks the lead card. Ivorie styles give it a stronger look; Classic styles show a normal card. */
+  readonly emphasis = input<'default' | 'hero'>('default');
   readonly class = input('');
 
   protected readonly classes = computed(() =>

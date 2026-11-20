@@ -19,8 +19,8 @@ export interface AppearanceState {
 export const APPEARANCE_KEY = 'ivorie-docs:appearance';
 
 const MODES: readonly ColorMode[] = ['light', 'dark', 'system'];
-/** Dark-first: with no saved choice the site is dark. 'system' still works when saved. */
-const DEFAULTS: AppearanceState = { mode: 'dark' };
+/** With no saved choice the site follows the OS. */
+const DEFAULTS: AppearanceState = { mode: 'system' };
 
 function parse(raw: string | null): AppearanceState {
   try {
@@ -33,7 +33,7 @@ function parse(raw: string | null): AppearanceState {
   }
 }
 
-/** Light / dark / system on <html>. Browser only; the server renders dark (index.html). The site style is always DEFAULT_STYLE (glass). */
+/** Light / dark / system on <html>. Browser only; the server renders light (index.html). The site has its own theme (generated/site-style.css, site-look.css). */
 @Injectable({ providedIn: 'root' })
 export class Appearance {
   private readonly doc = inject(DOCUMENT);

@@ -295,6 +295,12 @@ describe('IvDataTablePagination', () => {
     expect(pageText(el)).toBe('Page 3 of 3')
   })
 
+  it('phones keep the page size select (it wraps, it does not hide)', async () => {
+    const { el } = await render(Full)
+    const size = el.querySelector<HTMLElement>('[data-slot="data-table-pagination"] [data-slot="select-trigger"]')!.closest('div')!
+    expect(size.classList).not.toContain('hidden')
+  })
+
   it('the page size select changes the page size', async () => {
     const { el, settle } = await render(Full)
     el.querySelector<HTMLElement>('[data-slot="data-table-pagination"] [data-slot="select-trigger"]')!.click()

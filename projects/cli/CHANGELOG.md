@@ -1,5 +1,26 @@
 # ivorie
 
+## 1.6.0
+
+### Minor Changes
+
+- New default theme: Slate (zinc with the blue accent, Geist, small radius). `ivorie init` starts on it. Density stays default: the density dial sets `--spacing` on `:root`, so it scales all of your app's Tailwind spacing, not only Ivorie parts. Glass keeps violet as its own default.
+- Graphite is renamed Slate. `graphite` keeps working until 2.0: `theme-graphite.css`, `style-graphite.css`, `class="theme-graphite"`, `--theme graphite` and share codes that say graphite all give slate.
+- Package: `@inlaylab/ivorie/styles/theme-slate.css` and `style-slate.css`.
+- Docs: a new site look running on the default theme, no glow or blur; the site follows your OS light or dark setting. New guides: Introduction, Forms, Server rendering and Accessibility. A changelog page replaces the roadmap page (`/roadmap` redirects). Theme tiles show real parts. The playground puts Copy init command first.
+
+- Themes are the one concept. `styles/theme-<name>.css` and `class="theme-<name>"` replace `style-<name>`; `ivorie init --theme <name|code>` and `--accent <color>` replace `--preset`, `--style` and `--theme <accent>`; `components.json` uses `theme` and `accent`. The old names keep working until 2.0, with a note, and `ivorie apply` moves an app to the new ones. Old `ivp1_` codes are unchanged.
+
+  The switch now scales with the density dial: on compact themes (Mira, Graphite) the checked thumb reached only part of the track.
+
+- Rich parts: `iv-meter` (tick-bar meter with two labels), `iv-gauge` (radial or capsule segments; the ring shows its range at both ends), `iv-stat` (icon chip, label, value, description), `iv-delta` (up/down change, `invert` for lower-is-better), `iv-tracker` (green, amber and red status bars with tooltips), `iv-bar-list` (ranked bars) and `svg[ivSparkline]`. Every theme styles them. New component icons: `arrow-down`, `copy`.
+
+  Fixes: vertical tabs in Glass no longer turn into an ellipse; calendar day colors come from CSS variables, so themes recolor them; the data-table footer fits a phone; grouped buttons in Glass and Bento have matching ends.
+
+  Pre-publish fixes: `init` and `apply` change only Ivorie's own theme classes and imports; `components.json` keeps the dials you set (`preset`); `ivorie add` warns when your theme file predates the rich parts; high contrast darkens muted text in own themes; toasts pause while hovered or focused; the data-table footer keeps the page size on a phone; a select with a leading chip keeps its value next to it.
+
+  Blocks: `stats-01` (a KPI row of stat cards with delta and sparkline), `usage-01` (plan usage with meters and an upgrade action) and `status-01` (a status page with a tracker per service, an uptime gauge and incidents). 25 blocks in total.
+
 ## 1.5.2
 
 ### Patch Changes

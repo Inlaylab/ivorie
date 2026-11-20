@@ -22,7 +22,9 @@ export const contentRoutes: Routes = [
       },
       { path: 'blocks', loadComponent: () => import('./blocks'), title: 'Blocks · Ivorie' },
       { path: 'blocks/:name', loadComponent: () => import('./block'), title: 'Block · Ivorie' },
-      { path: 'roadmap', loadComponent: () => import('./roadmap'), title: 'Roadmap · Ivorie' },
+      { path: 'changelog', loadComponent: () => import('./changelog'), title: 'Changelog · Ivorie' },
+      // The 1.6 roadmap page became the changelog; old links still land.
+      { path: 'roadmap', pathMatch: 'full', redirectTo: 'changelog' },
       {
         path: 'preview/:kind/:name',
         loadComponent: () => import('../preview/preview'),

@@ -6,12 +6,17 @@ import { parseArgs } from 'node:util';
 import { fileURLToPath } from 'node:url';
 import { parseFrontmatter } from '../docs/content.ts';
 import { parseTheme } from '../../projects/cli/src/theme.ts';
-import { DEFAULT_PRESET, RADII } from '../../projects/cli/src/preset.ts';
+import { DIALS, RADII, SHARED_DIALS, type DialKey } from '../../projects/cli/src/preset.ts';
+import { THEME_INFO, THEMES } from './themes.ts';
 import { blockMeta, collectDeps, collectDevDeps, listBlocks, listEntries, registryDeps, rewriteImports, type Entry } from './items.ts';
+import { themeNames } from '../styles/hooks.ts';
 
 const ITEM_SCHEMA = 'https://ui.shadcn.com/schema/registry-item.json';
 const REGISTRY_SCHEMA = 'https://ui.shadcn.com/schema/registry.json';
 const STYLES_DIR = 'projects/ui/styles';
+const OWN_STYLES_DIR = 'tools/styles/own';
+/** Still built and resolved, hidden from pickers, removed in 2.0. */
+export const LEGACY_THEMES = Object.keys(THEME_INFO).filter((t) => THEME_INFO[t].group === 'legacy');
 // Var maps from shadcn/ui (MIT) apps/v4/registry/themes.ts, keys as --name.
 const BASE_COLORS_DIR = 'tools/registry/base-colors';
 const ACCENT_COLORS_DIR = 'tools/registry/accent-colors';
@@ -20,7 +25,7 @@ const FONTS: { name: string; title: string; type: string; family: string; import
   readFileSync('tools/registry/fonts.json', 'utf8'),
 );
 
-type Kind = 'component' | 'lib' | 'style' | 'base-color' | 'theme-base' | 'font' | 'block' | 'accent';
+type Kind = 'component' | 'lib' | 'theme' | 'base-color' | 'theme-base' | 'font' | 'block' | 'accent';
 interface File {
   path: string;
   type: 'registry:file';
@@ -116,16 +121,17 @@ export function buildItems(): Item[] {
     });
   }
 
-  for (const f of readdirSync(STYLES_DIR).filter((f) => /^style-[a-z]+\.css$/.test(f)).sort()) {
-    const style = f.slice('style-'.length, -'.css'.length);
+  for (const f of themeNames().sort().map((n) => `theme-${n}.css`)) {
+    const style = f.slice('theme-'.length, -'.css'.length);
     items.push({
       $schema: ITEM_SCHEMA,
+      // Item names keep `style-`: `theme-<color>` already names the base colors.
       name: `style-${style}`,
       type: 'registry:item',
-      title: `Style ${style}`,
-      description: `The ${style} component style (cn-* rules).`,
+      title: `Theme ${style}`,
+      description: `The ${style} theme (cn-* rules).`,
       files: [file(`ui/styles/${f}`, readFileSync(join(STYLES_DIR, f), 'utf8').replace(/\r\n/g, '\n'))],
-      meta: { ivorie: { kind: 'style' } },
+      meta: { ivorie: { kind: 'theme' } },
     });
   }
 
@@ -184,6 +190,16 @@ export function buildItems(): Item[] {
   return items.sort((a, b) => a.name.localeCompare(b.name));
 }
 
+/** The dials a theme takes: an own theme's `@dials` line, or the shared dials for a Classic theme. */
+export function themeDials(style: string): DialKey[] {
+  const own = join(OWN_STYLES_DIR, `${style}.css`);
+  if (!existsSync(own)) return [...SHARED_DIALS];
+  const dials = /\/\* @dials ([a-z ]+) \*\//.exec(readFileSync(own, 'utf8'))?.[1].split(' ');
+  if (!dials) throw new Error(`${own}: no /* @dials … */ line`);
+  for (const dial of dials) if (!(dial in DIALS)) throw new Error(`${own}: unknown dial "${dial}"`);
+  return dials as DialKey[];
+}
+
 export function build(out: string): void {
   const items = buildItems();
   rmSync(out, { recursive: true, force: true });
@@ -192,6 +208,7 @@ export function build(out: string): void {
 
   const kinds = (k: Kind) => items.filter((i) => i.meta.ivorie.kind === k).map((i) => i.name);
   const version = JSON.parse(readFileSync('projects/ui/package.json', 'utf8')).version;
+  const themes = kinds('theme').map((n) => n.slice('style-'.length));
   writeFileSync(
     join(out, 'index.json'),
     json({
@@ -202,12 +219,15 @@ export function build(out: string): void {
         registryDependencies: i.registryDependencies ?? [],
       })),
       blocks: kinds('block'),
-      styles: kinds('style').map((n) => n.slice('style-'.length)),
+      themes,
+      themeDials: Object.fromEntries(themes.map((theme) => [theme, themeDials(theme)])),
+      legacyThemes: LEGACY_THEMES,
       baseColors: kinds('base-color').map((n) => n.slice('theme-'.length)),
       accents: kinds('accent').map((n) => n.slice('theme-accent-'.length)),
       fonts: ['system', ...FONTS.map((f) => f.name)],
       radii: Object.keys(RADII),
-      presets: { default: DEFAULT_PRESET },
+      // graphite: the 1.5 name of slate, so a 1.5 CLI still finds it. shortcut: alias until 2.0.
+      presets: { default: THEMES.slate, ...THEMES, graphite: THEMES.slate },
     }),
   );
   writeFileSync(

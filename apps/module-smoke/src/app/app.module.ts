@@ -44,6 +44,13 @@ import { IV_KBD_IMPORTS } from '@inlaylab/ivorie/kbd';
 import { IV_NATIVE_SELECT_IMPORTS } from '@inlaylab/ivorie/native-select';
 import { IV_PAGINATION_IMPORTS } from '@inlaylab/ivorie/pagination';
 import { IvProgress } from '@inlaylab/ivorie/progress';
+import { IvBarList } from '@inlaylab/ivorie/bar-list';
+import { IvDelta } from '@inlaylab/ivorie/delta';
+import { IvGauge } from '@inlaylab/ivorie/gauge';
+import { IvMeter } from '@inlaylab/ivorie/meter';
+import { IvSparkline } from '@inlaylab/ivorie/sparkline';
+import { IV_STAT_IMPORTS } from '@inlaylab/ivorie/stat';
+import { IvTracker } from '@inlaylab/ivorie/tracker';
 import { IV_RADIO_GROUP_IMPORTS } from '@inlaylab/ivorie/radio-group';
 import { IV_SCROLL_AREA_IMPORTS } from '@inlaylab/ivorie/scroll-area';
 import { IV_SELECT_IMPORTS } from '@inlaylab/ivorie/select';
@@ -116,6 +123,13 @@ import { App } from './app';
     IvCalendar,
     IvCheckbox,
     IvProgress,
+    IvBarList,
+    IvDelta,
+    IvGauge,
+    IvMeter,
+    IvSparkline,
+    ...IV_STAT_IMPORTS,
+    IvTracker,
     IvSeparator,
     IvSkeleton,
     IvSpinner,

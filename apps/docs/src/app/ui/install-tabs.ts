@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { IV_TABS_IMPORTS } from '@inlaylab/ivorie/tabs';
 import { CopyButton } from './copy-button';
+import { IVORIE } from '../../generated/cli';
 
 /** How to get a component: copy it with the CLI, or import it from the npm package. */
 @Component({
@@ -33,5 +34,5 @@ import { CopyButton } from './copy-button';
 export class InstallTabs {
   readonly slug = input.required<string>();
   readonly entry = input.required<string>();
-  protected readonly cli = computed(() => `npx ivorie add ${this.slug()}`);
+  protected readonly cli = computed(() => `${IVORIE} add ${this.slug()}`);
 }

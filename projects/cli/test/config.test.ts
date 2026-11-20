@@ -9,7 +9,7 @@ const valid: ComponentsJson = {
   $schema: 'https://ivorie.dev/schema/components.json',
   path: 'src/app/ui',
   prefix: 'iv',
-  style: 'maia',
+  theme: 'maia',
   tailwind: { css: 'src/styles.css', baseColor: 'neutral' },
   font: 'system',
   radius: 'default',
@@ -36,4 +36,10 @@ test('readConfig reads components.json or says to run init', () => {
   assert.throws(() => readConfig(dir), { message: 'components.json not found — run "ivorie init"' });
   writeFileSync(join(dir, 'components.json'), JSON.stringify(valid));
   assert.deepEqual(readConfig(dir), valid);
+});
+
+test('"preset" (the saved look with its dials) must be a string when present', () => {
+  const base = { $schema: 'x', path: 'src/app/ui', prefix: 'iv', theme: 'slate', tailwind: { css: 'src/styles.css', baseColor: 'zinc' }, font: 'geist', radius: 'small', iconLibrary: 'lucide' };
+  assert.equal(validateConfig({ ...base, preset: 'ivp1_x' }).preset, 'ivp1_x');
+  assert.throws(() => validateConfig({ ...base, preset: 3 }), /"preset" must be a non-empty string/);
 });

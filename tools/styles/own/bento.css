@@ -1,7 +1,11 @@
 /* @base maia */
+/* @dials density contrast motion panels rim shadow */
 /*
  * Bento: tonal tiles instead of outlines. The page is a soft tone; cards are lighter tiles on it;
  * fields and tracks are wells pressed into the tile. No borders, no rings, big calm type.
+ * The chosen item is an ink pill (--foreground fill). The hero card is filled with --primary.
+ * Dials: --iv-panel-solid (1 = solid tiles, the default; 0 = --bento-alpha), --iv-rim scales the
+ * top light, --iv-shadow the contact and float shadows.
  * Maia gives the round, roomy layout; these blocks only add to it.
  */
 
@@ -11,7 +15,20 @@
   --bento-tile: var(--card);
   --bento-well: color-mix(in oklab, var(--muted) 85%, var(--card));
   --bento-well-hover: color-mix(in oklab, var(--muted), var(--foreground) 7%);
-  --bento-float-shadow: color-mix(in oklab, black 16%, transparent);
+  --bento-float-shadow: color-mix(in oklab, black min(100%, calc(16% * var(--iv-shadow, 1))), transparent);
+  /* Tiles after the panels dial: solid by default, --bento-alpha when translucent. */
+  --bento-alpha: 0.72;
+  --bento-pane-alpha: calc(var(--iv-panel-solid, 1) + (1 - var(--iv-panel-solid, 1)) * var(--bento-alpha));
+  --bento-tile-pane: color-mix(in oklab, var(--bento-tile) calc(var(--bento-pane-alpha) * 100%), transparent);
+  --bento-rim: color-mix(in oklab, white min(100%, calc(70% * var(--iv-rim, 1))), transparent);
+  --bento-shade: color-mix(in oklab, black min(100%, calc(5% * var(--iv-shadow, 1))), transparent);
+  --bento-tile-shadow: inset 0 1px 0 var(--bento-rim), 0 1px 3px var(--bento-shade);
+  --bento-chosen: var(--foreground);
+  --bento-chosen-foreground: var(--background);
+  /* The hero fill stays solid whatever the panels dial says. */
+  --bento-hero: var(--primary);
+  --bento-hero-foreground: var(--primary-foreground);
+  --bento-hero-alpha: 1;
 }
 
 /* The page ground. Not on the CDK overlay container: it covers the whole screen, so a ground there hides the page. */
@@ -25,20 +42,38 @@
   --bento-tile: color-mix(in oklab, var(--card), white 3%);
   --bento-well: color-mix(in oklab, var(--muted), white 4%);
   --bento-well-hover: color-mix(in oklab, var(--muted), white 10%);
-  --bento-float-shadow: color-mix(in oklab, black 60%, transparent);
+  --bento-float-shadow: color-mix(in oklab, black min(100%, calc(60% * var(--iv-shadow, 1))), transparent);
+  --bento-rim: color-mix(in oklab, white min(100%, calc(6% * var(--iv-rim, 1))), transparent);
+  --bento-shade: color-mix(in oklab, black min(100%, calc(30% * var(--iv-shadow, 1))), transparent);
 }
 
 /* Muted text sits on the toned page too: mixed a little darker. On every element, not the root,
    because the playground sets the base colors inline on the root. */
 & :where(*) {
-  --muted-foreground: color-mix(in oklab, var(--foreground) calc(var(--bento-muted-mix) * 100%), var(--background));
+  --muted-foreground: color-mix(in oklab, var(--foreground) calc((1 - var(--iv-muted-keep, 1) * (1 - var(--bento-muted-mix))) * 100%), var(--background));
 }
 
 /* Tiles: tone, not lines. */
+.cn-stat,
 .cn-card,
 .cn-alert,
 .cn-item-variant-outline {
-  @apply rounded-3xl border-0 bg-(--bento-tile) ring-0 shadow-none;
+  @apply rounded-3xl border-0 bg-(--bento-tile-pane) ring-0 shadow-(--bento-tile-shadow);
+}
+
+/* The hero card is filled. Its muted text follows the fill. */
+& .cn-card[data-emphasis='hero'] {
+  @apply bg-(--bento-hero) text-(--bento-hero-foreground) shadow-none;
+}
+
+& .cn-card[data-emphasis='hero'] :where(*) {
+  --muted-foreground: var(--bento-hero-foreground);
+}
+
+/* On the accent fill, controls take the ink: a checked switch or a primary button would vanish otherwise. */
+& .cn-card[data-emphasis='hero'] {
+  --primary: var(--bento-hero-foreground);
+  --primary-foreground: var(--bento-hero);
 }
 
 .cn-card-title,
@@ -85,7 +120,7 @@
 
 /* The sidebar sits on the page tone; its floating variant is a tile. */
 & .cn-sidebar-inner {
-  @apply bg-transparent group-data-[variant=floating]:rounded-3xl group-data-[variant=floating]:bg-(--bento-tile) group-data-[variant=floating]:ring-0 group-data-[variant=floating]:shadow-none;
+  @apply bg-transparent group-data-[variant=floating]:rounded-3xl group-data-[variant=floating]:bg-(--bento-tile-pane) group-data-[variant=floating]:ring-0 group-data-[variant=floating]:shadow-(--bento-tile-shadow);
 }
 
 & .cn-tooltip-content {
@@ -177,6 +212,11 @@
   @apply hover:bg-(--bento-well) aria-pressed:bg-(--bento-well-hover) data-[state=on]:bg-(--bento-well-hover);
 }
 
+/* The chosen item in a group is an ink pill. */
+& .cn-toggle-group-item {
+  @apply data-[state=on]:bg-(--bento-chosen) data-[state=on]:text-(--bento-chosen-foreground) data-[state=on]:hover:bg-(--bento-chosen);
+}
+
 /* Lists and menus: a tonal highlight, rounded like a tile. */
 .cn-dropdown-menu-item,
 .cn-select-item {
@@ -191,9 +231,13 @@
   @apply rounded-xl data-selected:bg-(--bento-well);
 }
 
-/* The active page is a tile lifted off the page tone. */
+/* The active page is an ink pill. */
 & .cn-sidebar-menu-button {
-  @apply rounded-xl hover:bg-(--bento-well) data-active:bg-(--bento-tile) data-active:font-medium data-active:shadow-sm;
+  @apply rounded-xl hover:bg-(--bento-well) data-active:bg-(--bento-chosen) data-active:font-medium data-active:text-(--bento-chosen-foreground) data-active:hover:bg-(--bento-chosen) data-active:hover:text-(--bento-chosen-foreground);
+}
+
+& .cn-navigation-menu-link {
+  @apply data-[active=true]:bg-(--bento-chosen) data-[active=true]:text-(--bento-chosen-foreground) data-[active=true]:hover:bg-(--bento-chosen) data-[active=true]:focus:bg-(--bento-chosen);
 }
 
 .cn-navigation-menu-trigger,
@@ -205,8 +249,9 @@
   @apply rounded-2xl bg-(--bento-well) data-[variant=line]:bg-transparent;
 }
 
+/* The active tab is an ink pill. Important: the trigger's own active colors are utilities. */
 & .cn-tabs-trigger {
-  @apply rounded-xl data-active:shadow-sm;
+  @apply rounded-xl data-active:bg-(--bento-chosen)! data-active:text-(--bento-chosen-foreground)! data-active:shadow-none group-data-[variant=line]/tabs-list:data-active:bg-transparent! group-data-[variant=line]/tabs-list:data-active:text-foreground!;
 }
 
 & .cn-calendar-day-button {
@@ -226,7 +271,11 @@
   @apply border-0 even:bg-[color-mix(in_oklab,var(--bento-well)_55%,transparent)] hover:bg-(--bento-well) data-[state=selected]:bg-(--bento-well-hover);
 }
 
-/* Accordion items are tiles of their own. */
+/* Accordion items are tiles of their own: no frame around them. */
+& .cn-accordion {
+  @apply overflow-visible rounded-none border-0;
+}
+
 & .cn-accordion-item {
   @apply mb-2 rounded-2xl border-0 bg-(--bento-well) px-4 not-last:border-b-0;
 }
@@ -265,4 +314,98 @@
 .cn-badge-variant-destructive,
 .cn-button-variant-destructive {
   @apply text-[color-mix(in_oklab,var(--destructive),var(--foreground)_28%)];
+}
+
+/* Less transparency asked for: tiles turn solid. */
+@media (prefers-reduced-transparency: reduce) {
+  &,
+  .dark & {
+    --iv-panel-solid: 1;
+  }
+}
+
+/* Shape: big round pills; the chosen tab is an ink pill in a pill-shaped well. */
+& .cn-button,
+& .cn-button-size-xs,
+& .cn-button-size-sm,
+& .cn-button-size-icon-xs,
+& .cn-button-size-icon-sm,
+& .cn-tabs-list,
+& .cn-tabs-trigger,
+& .cn-toggle,
+& .cn-toggle-size-sm {
+  @apply rounded-full;
+}
+
+/* Navigation and grouping: the current item is an ink pill; groups are tonal, never outlined. */
+& .cn-breadcrumb-page {
+  @apply rounded-full bg-(--bento-well) px-2 py-0.5 font-medium;
+}
+
+& .cn-pagination-link[data-active] {
+  @apply border-transparent bg-(--bento-chosen) text-(--bento-chosen-foreground) shadow-none hover:bg-(--bento-chosen) hover:text-(--bento-chosen-foreground);
+}
+
+/* The calendar reads its day colours from these vars (calendar.ts). */
+& .cn-calendar {
+  --calendar-selected: var(--bento-chosen);
+  --calendar-selected-foreground: var(--bento-chosen-foreground);
+  --calendar-range: var(--bento-well-hover);
+}
+
+& .cn-calendar-caption {
+  @apply font-semibold;
+}
+
+/* Pill buttons in a group: the group's ends take one corner, so the first and last button match (the base
+   forces rounded-lg on the last end; a full corner on the first would read as a half circle). */
+& .cn-button-group {
+  @apply [&>[data-slot]]:rounded-lg;
+}
+
+& .cn-button-group-text {
+  @apply border-transparent bg-(--bento-well);
+}
+
+& .cn-button-group-separator {
+  @apply bg-transparent;
+}
+
+& .cn-resizable-handle {
+  @apply bg-transparent;
+}
+
+& .cn-resizable-handle-icon {
+  @apply h-8 w-1.5 rounded-full bg-(--bento-well-hover);
+}
+
+& .cn-label {
+  @apply font-semibold;
+}
+
+/* Rich parts: a stat nests in a well; the icon chip is an ink pill; tracks are tonal. */
+& .cn-stat {
+  @apply rounded-2xl bg-(--bento-well) shadow-none;
+}
+
+& .cn-stat-icon {
+  @apply rounded-full bg-(--bento-chosen) text-(--bento-chosen-foreground);
+}
+
+& .cn-meter-tick:not([data-filled]),
+& span.cn-gauge-segment:not([data-filled]),
+& .cn-tracker-bar[data-status='none'] {
+  @apply bg-(--bento-well-hover);
+}
+
+& path.cn-gauge-segment:not([data-filled]) {
+  @apply stroke-(--bento-well-hover);
+}
+
+& .cn-bar-list-bar {
+  @apply rounded-lg bg-[color-mix(in_oklab,var(--primary)_16%,var(--bento-well))];
+}
+
+& .cn-delta {
+  @apply rounded-full;
 }

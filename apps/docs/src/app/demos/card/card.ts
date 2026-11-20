@@ -24,9 +24,9 @@ import { IvButton } from '@inlaylab/ivorie/button';
           <input ivInput id="card-email" type="email" value="maya@acme.dev" />
         </iv-field>
       </iv-card-content>
-      <iv-card-footer class="gap-2">
+      <iv-card-footer class="justify-end gap-2">
         <button ivButton variant="outline">Cancel</button>
-        <button ivButton class="ml-auto">Save changes</button>
+        <button ivButton>Save changes</button>
       </iv-card-footer>
     </iv-card>
   `,

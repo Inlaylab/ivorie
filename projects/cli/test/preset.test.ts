@@ -1,37 +1,37 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { DEFAULT_PRESET, RADII, chartSource, checkPreset, decodePreset, encodePreset, lookVars, resolvePreset } from '../src/preset.ts';
+import { DEFAULT_PRESET, DIALS, FILL_PRESET, SHARED_DIALS, dialVars, savedLook, withSavedDials, RADII, chartSource, checkPreset, decodePreset, encodePreset, lookVars, resolvePreset } from '../src/preset.ts';
 import { PRESET_GOLDEN } from './preset.fixture.ts';
 import type { RegistryIndex } from '../src/registry.ts';
 
 const index = {
   version: '0.0.0',
   items: [],
-  styles: ['nova'],
+  themes: ['nova'],
   baseColors: ['neutral'],
   fonts: ['system'],
   radii: ['default'],
-  presets: { default: DEFAULT_PRESET },
+  presets: { default: FILL_PRESET },
 } satisfies RegistryIndex;
 
 test('encode then decode returns the same preset', () => {
-  const code = encodePreset(DEFAULT_PRESET);
+  const code = encodePreset(FILL_PRESET);
   assert.match(code, /^ivp1_[A-Za-z0-9_-]+$/);
-  assert.deepEqual(decodePreset(code), DEFAULT_PRESET);
+  assert.deepEqual(decodePreset(code), FILL_PRESET);
 });
 
-test('undefined and "default" resolve to the default preset', () => {
-  assert.deepEqual(resolvePreset(undefined, index), DEFAULT_PRESET);
-  assert.deepEqual(resolvePreset('default', index), DEFAULT_PRESET);
+test('undefined and "default" resolve to the index default', () => {
+  assert.deepEqual(resolvePreset(undefined, index), FILL_PRESET);
+  assert.deepEqual(resolvePreset('default', index), FILL_PRESET);
 });
 
-test('a code with an unknown style throws with the options', () => {
-  const code = encodePreset({ ...DEFAULT_PRESET, style: 'luma' });
-  assert.throws(() => resolvePreset(code, index), { message: 'unknown style "luma" (available: nova)' });
+test('a code with an unknown theme throws with the options', () => {
+  const code = encodePreset({ ...FILL_PRESET, theme: 'luma' });
+  assert.throws(() => resolvePreset(code, index), { message: 'unknown theme "luma" (available: nova)' });
 });
 
 test('an unknown name throws', () => {
-  assert.throws(() => resolvePreset('xyz', index), { message: 'unknown preset "xyz"' });
+  assert.throws(() => resolvePreset('xyz', index), { message: 'unknown theme "xyz"' });
 });
 
 test('a bad code throws', () => {
@@ -44,12 +44,12 @@ const CODE_1_1 =
   'ivp1_eyJiYXNlQ29sb3IiOiJuZXV0cmFsIiwiZm9udCI6InN5c3RlbSIsInJhZGl1cyI6ImRlZmF1bHQiLCJzdHlsZSI6Im1haWEifQ';
 
 test('the 1.1 default (maia) still gives the 1.1 code', () => {
-  assert.equal(encodePreset({ ...DEFAULT_PRESET, style: 'maia' }), CODE_1_1);
+  assert.equal(encodePreset({ ...FILL_PRESET, theme: 'maia' }), CODE_1_1);
 });
 
 test('a 1.1 code decodes with fontHeading inherit', () => {
-  assert.deepEqual(decodePreset(CODE_1_1), { ...DEFAULT_PRESET, style: 'maia', fontHeading: 'inherit' });
-  assert.equal(DEFAULT_PRESET.fontHeading, 'inherit');
+  assert.deepEqual(decodePreset(CODE_1_1), { ...FILL_PRESET, theme: 'maia', fontHeading: 'inherit' });
+  assert.equal(FILL_PRESET.fontHeading, 'inherit');
 });
 
 test('the golden preset round-trips to its code', () => {
@@ -59,7 +59,7 @@ test('the golden preset round-trips to its code', () => {
 
 const full = {
   ...index,
-  styles: ['maia', 'nova'],
+  themes: ['maia', 'nova'],
   baseColors: ['neutral', 'olive'],
   fonts: ['system', 'inter', 'lora'],
   radii: Object.keys(RADII),
@@ -70,7 +70,7 @@ test('checkPreset accepts the golden preset', () => {
 });
 
 test('fontHeading must be inherit or a real font, not system', () => {
-  assert.throws(() => checkPreset({ ...DEFAULT_PRESET, fontHeading: 'system' }, full), {
+  assert.throws(() => checkPreset({ ...FILL_PRESET, fontHeading: 'system' }, full), {
     message: 'unknown fontHeading "system" (available: inherit, inter, lora)',
   });
 });
@@ -80,23 +80,23 @@ test('RADII: default keeps the style radius, the rest set --radius', () => {
 });
 
 test('iconLibrary: left out of the code when lucide, kept otherwise, checked', () => {
-  assert.equal(encodePreset(DEFAULT_PRESET), encodePreset({ ...DEFAULT_PRESET, iconLibrary: undefined as unknown as string }));
-  const tabler = encodePreset({ ...DEFAULT_PRESET, iconLibrary: 'tabler' });
-  assert.notEqual(tabler, encodePreset(DEFAULT_PRESET));
+  assert.equal(encodePreset(FILL_PRESET), encodePreset({ ...FILL_PRESET, iconLibrary: undefined as unknown as string }));
+  const tabler = encodePreset({ ...FILL_PRESET, iconLibrary: 'tabler' });
+  assert.notEqual(tabler, encodePreset(FILL_PRESET));
   assert.equal(resolvePreset(tabler, index).iconLibrary, 'tabler');
-  const bad = encodePreset({ ...DEFAULT_PRESET, iconLibrary: 'feather' });
+  const bad = encodePreset({ ...FILL_PRESET, iconLibrary: 'feather' });
   assert.throws(() => resolvePreset(bad, index), /unknown iconLibrary "feather"/);
 });
 
 test('accent fields: left out of the code at their defaults, kept and checked otherwise', () => {
   const withAccents = { ...index, accents: ['blue', 'rose'] } satisfies RegistryIndex;
   // Old codes (no accent fields) decode to the defaults.
-  assert.deepEqual(decodePreset(CODE_1_1), { ...DEFAULT_PRESET, style: 'maia' });
-  const p = { ...DEFAULT_PRESET, theme: 'blue', chartColor: 'rose', menuAccent: 'bold' };
+  assert.deepEqual(decodePreset(CODE_1_1), { ...FILL_PRESET, theme: 'maia' });
+  const p = { ...FILL_PRESET, accent: 'blue', chartColor: 'rose', menuAccent: 'bold' };
   assert.deepEqual(resolvePreset(encodePreset(p), withAccents), p);
-  assert.throws(() => checkPreset({ ...DEFAULT_PRESET, theme: 'teal' }, withAccents), /unknown theme "teal" \(available: base, blue, rose\)/);
-  assert.throws(() => checkPreset({ ...DEFAULT_PRESET, chartColor: 'teal' }, withAccents), /unknown chartColor "teal"/);
-  assert.throws(() => checkPreset({ ...DEFAULT_PRESET, menuAccent: 'loud' }, withAccents), /unknown menuAccent "loud"/);
+  assert.throws(() => checkPreset({ ...FILL_PRESET, accent: 'teal' }, withAccents), /unknown accent "teal" \(available: base, blue, rose\)/);
+  assert.throws(() => checkPreset({ ...FILL_PRESET, chartColor: 'teal' }, withAccents), /unknown chartColor "teal"/);
+  assert.throws(() => checkPreset({ ...FILL_PRESET, menuAccent: 'loud' }, withAccents), /unknown menuAccent "loud"/);
 });
 
 test('lookVars: accent over base, charts from their source, bold menu accent', () => {
@@ -111,6 +111,78 @@ test('lookVars: accent over base, charts from their source, bold menu accent', (
   assert.equal(bold['--chart-5'], 'r5');
   assert.equal(bold['--accent'], 'blue');
   assert.equal(bold['--accent-foreground'], 'white');
-  assert.equal(chartSource({ theme: 'blue', chartColor: 'theme' }), 'blue');
-  assert.equal(chartSource({ theme: 'blue', chartColor: 'base' }), 'base');
+  assert.equal(chartSource({ accent: 'blue', chartColor: 'accent' }), 'blue');
+  assert.equal(chartSource({ accent: 'blue', chartColor: 'base' }), 'base');
+});
+
+const OLD_CODES = [CODE_1_1, PRESET_GOLDEN.code];
+
+test('old codes are unchanged: they round-trip and every dial is at its default', () => {
+  for (const code of OLD_CODES) {
+    const p = decodePreset(code);
+    assert.equal(encodePreset(p), code);
+    for (const [dial, values] of Object.entries(DIALS)) assert.equal(p[dial as keyof typeof DIALS], values[0]);
+  }
+});
+
+test('dials round-trip, and dials at their default stay out of the code', () => {
+  const p = { ...FILL_PRESET, density: 'compact', rim: 'strong' };
+  assert.deepEqual(decodePreset(encodePreset(p)), p);
+  const json = Buffer.from(encodePreset(FILL_PRESET).slice('ivp1_'.length), 'base64url').toString();
+  for (const dial of Object.keys(DIALS)) assert.doesNotMatch(json, new RegExp(`"${dial}"`));
+});
+
+test('an unknown dial value throws with the options', () => {
+  assert.throws(() => checkPreset({ ...FILL_PRESET, rim: 'max' }, full), {
+    message: 'unknown rim "max" (available: default, none, subtle, strong)',
+  });
+});
+
+test('a named preset from an older registry is filled with neutral values', () => {
+  const old = { ...index, presets: { default: { theme: 'nova', baseColor: 'neutral', font: 'system', radius: 'default' } as never } };
+  assert.equal(resolvePreset(undefined, old).accent, 'base');
+});
+
+test('the default preset is the slate theme with the blue accent', () => {
+  assert.deepEqual(DEFAULT_PRESET, { ...FILL_PRESET, theme: 'slate', baseColor: 'zinc', accent: 'blue', font: 'geist', radius: 'small' });
+});
+
+test('ambient: a dial with its own values, checked like the others', () => {
+  assert.deepEqual(DIALS.ambient, ['default', 'off', 'soft', 'vivid']);
+  assert.throws(() => checkPreset({ ...FILL_PRESET, ambient: 'max' }, full), {
+    message: 'unknown ambient "max" (available: default, off, soft, vivid)',
+  });
+});
+
+test('graphite, the 1.5 name of slate: a code that says graphite decodes to slate', () => {
+  const code = encodePreset({ ...DEFAULT_PRESET, theme: 'graphite' });
+  assert.equal(decodePreset(code).theme, 'slate');
+});
+
+test('contrast high also writes --iv-muted-keep, the muted share own themes keep', () => {
+  assert.deepEqual(dialVars({ ...DEFAULT_PRESET, contrast: 'high' }, SHARED_DIALS), { '--iv-muted-keep': '0.7' });
+  assert.deepEqual(dialVars({ ...DEFAULT_PRESET, contrast: 'soft' }, SHARED_DIALS), {});
+});
+
+// Dials measured against each theme's own preset: a theme's defaults (mono snappy, mira compact) are not user choices.
+const dialIndex = { ...index, themes: ['slate', 'mono', 'mira'], presets: {
+  default: { ...FILL_PRESET, theme: 'slate' },
+  slate: { ...FILL_PRESET, theme: 'slate' },
+  mono: { ...FILL_PRESET, theme: 'mono', motion: 'snappy' },
+  mira: { ...FILL_PRESET, theme: 'mira', density: 'compact' },
+} } satisfies RegistryIndex;
+
+test("savedLook keeps only dials the user set: a theme's own dial defaults are not saved", () => {
+  assert.equal(savedLook({ ...FILL_PRESET, theme: 'mono', motion: 'snappy' }, dialIndex), undefined);
+  assert.equal(savedLook({ ...FILL_PRESET, theme: 'mira', density: 'compact' }, dialIndex), undefined);
+  assert.ok(savedLook({ ...FILL_PRESET, theme: 'mono', motion: 'snappy', rim: 'strong' }, dialIndex));
+});
+
+test("withSavedDials carries only the user's dials: the new theme keeps its own defaults", () => {
+  const saved = encodePreset({ ...FILL_PRESET, theme: 'mono', motion: 'snappy', rim: 'strong' });
+  const slate = { ...FILL_PRESET, theme: 'slate' };
+  assert.deepEqual(withSavedDials(slate, saved, dialIndex), { ...slate, rim: 'strong' });
+  const mono = { ...FILL_PRESET, theme: 'mono', motion: 'snappy' };
+  assert.deepEqual(withSavedDials(mono, encodePreset({ ...slate, rim: 'strong' }), dialIndex), { ...mono, rim: 'strong' });
+  assert.equal(withSavedDials(mono, undefined, dialIndex), mono);
 });

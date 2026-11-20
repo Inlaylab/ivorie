@@ -830,9 +830,10 @@
   body {
     @apply bg-background text-foreground;
   }
-  /* The radius scale resolves where it is declared (:root). Re-declare it on every style root, so a
-     --radius set there (a style, a preview) reaches the var(--radius-*) uses in the style files. */
-  :where([class*="style-"]) {
+  /* The radius scale resolves where it is declared (:root). Re-declare it on every theme root, so a
+     --radius set there (a theme, a preview) reaches the var(--radius-*) uses in the theme files.
+     style- is the 1.5 class, kept until 2.0. */
+  :where([class^="theme-"], [class*=" theme-"], [class^="style-"], [class*=" style-"]) {
     --radius-sm: calc(var(--radius) * 0.6);
     --radius-md: calc(var(--radius) * 0.8);
     --radius-lg: var(--radius);

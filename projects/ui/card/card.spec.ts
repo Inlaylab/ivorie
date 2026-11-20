@@ -6,7 +6,7 @@ import { IV_CARD_IMPORTS } from '@inlaylab/ivorie/card'
 @Component({
   imports: [IV_CARD_IMPORTS],
   template: `
-    <iv-card [size]="size()" class="max-w-sm">
+    <iv-card [size]="size()" [emphasis]="emphasis()" class="max-w-sm">
       <iv-card-header>
         <iv-card-title>Title</iv-card-title>
         <iv-card-description>Text</iv-card-description>
@@ -19,6 +19,7 @@ import { IV_CARD_IMPORTS } from '@inlaylab/ivorie/card'
 })
 class Host {
   size = signal<'default' | 'sm'>('default')
+  emphasis = signal<'default' | 'hero'>('default')
 }
 
 async function setup() {
@@ -49,6 +50,14 @@ describe('IvCard', () => {
     fixture.componentInstance.size.set('sm')
     await fixture.whenStable()
     expect(part('card').dataset['size']).toBe('sm')
+  })
+
+  it('emphasis hero sets data-emphasis; default renders default', async () => {
+    const { fixture, part } = await setup()
+    expect(part('card').dataset['emphasis']).toBe('default')
+    fixture.componentInstance.emphasis.set('hero')
+    await fixture.whenStable()
+    expect(part('card').dataset['emphasis']).toBe('hero')
   })
 
   it('has no axe violations', async () => {

@@ -2,6 +2,7 @@
 title: Installation
 description: Add Ivorie to an Angular app in a few steps.
 section: guide
+group: start
 order: 1
 ---
 
@@ -33,9 +34,9 @@ npx ivorie init
 npx ivorie add button
 ```
 
-`init` sets up the theme, the style and Tailwind, and installs what they need. `add` copies the component into `src/app/ui/`. Then use it as shown in [Use a component](docs/installation#use-a-component).
+`init` sets up the theme and Tailwind, and installs what they need. `add` copies the component into `src/app/ui/`. Then use it as shown in [Use a component](docs/installation#use-a-component).
 
-Want a custom look? Build one in the [playground](playground) and copy its `init` command. See [CLI](docs/cli) for every option.
+Want another theme? Pick or tune one in the [playground](playground) and copy its `init` command. See [CLI](docs/cli) for every option.
 
 ## Install the package
 
@@ -54,28 +55,28 @@ Create `.postcssrc.json` in the project root:
 { "plugins": { "@tailwindcss/postcss": {} } }
 ```
 
-### 3. Import the styles
+### 3. Import the theme
 
 In `src/styles.css`:
 
 ```css
 @import "@inlaylab/ivorie/styles/theme.css";
-@import "@inlaylab/ivorie/styles/style-nova.css";
+@import "@inlaylab/ivorie/styles/theme-slate.css";
 ```
 
 `theme.css` already imports `tailwindcss` and `tw-animate-css`. Do not import them again.
 
-### 4. Set the style class
+### 4. Set the theme class
 
-In `src/index.html`, use the class that matches the style file:
+In `src/index.html`, use the class that matches the theme file:
 
 ```html
-<body class="style-nova">
+<body class="theme-slate">
   <app-root></app-root>
 </body>
 ```
 
-Nova is one of thirteen styles: `vega`, `nova`, `maia`, `luma`, `rhea`, `lyra`, `mira`, `sera`, `glass`, `bento`, `mono`, `graphite` and `tint`. See [Theming](docs/theming).
+Slate is the default and one of fifteen themes: Ivorie's `slate`, `glass`, `bento`, `clay`, `midnight`, `tint` and `mono`; shadcn/ui's `nova`, `luma`, `mira` and `sera`; and the legacy `vega`, `maia`, `rhea` and `lyra`. See [Theming](docs/theming).
 
 ## Use a component
 

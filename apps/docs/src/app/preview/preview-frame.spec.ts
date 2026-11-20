@@ -27,6 +27,12 @@ describe('PreviewFrame', () => {
     expect(iframe.title).toBe('Preview');
   });
 
+  it('the frame takes its height from the host: no own minimum to overflow a fixed-height page', async () => {
+    const { iframe } = await render();
+    expect(iframe.className).not.toMatch(/\bmin-h-\[/);
+    expect(iframe.classList).toContain('h-full');
+  });
+
   it('a code change posts a message and keeps src', async () => {
     const { fixture, host, iframe } = await render();
     const post = vi.spyOn(iframe.contentWindow!, 'postMessage');

@@ -1,0 +1,32 @@
+/*
+ * Sera, Ivorie layer: editorial. Type does the work: tabs and the breadcrumb read as underlined text,
+ * rules are hairlines, nothing floats. Appended to the synced shadcn rules by tools/styles/sync.ts. Keep it thin.
+ */
+
+& {
+  /* Tracker: ok follows the accent, but this accent reads as a warning or an error, so ok stays green. */
+}
+
+& .cn-tabs-list {
+  @apply group-data-horizontal/tabs:border-b group-data-horizontal/tabs:border-border bg-transparent p-0;
+}
+
+& .cn-tabs-trigger {
+  @apply rounded-none border-0 bg-transparent shadow-none data-active:bg-transparent data-active:shadow-none data-active:underline data-active:decoration-2 data-active:underline-offset-8 dark:data-active:bg-transparent;
+}
+
+& .cn-breadcrumb-link {
+  @apply underline decoration-border underline-offset-4 hover:decoration-foreground;
+}
+
+& .cn-pagination-link[data-active] {
+  @apply border-transparent bg-transparent underline decoration-2 underline-offset-4 shadow-none;
+}
+
+& .cn-card,
+& .cn-popover-content,
+& .cn-dropdown-menu-content,
+& .cn-select-content,
+& .cn-hover-card-content {
+  @apply shadow-none;
+}

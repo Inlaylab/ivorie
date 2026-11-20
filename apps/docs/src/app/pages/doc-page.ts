@@ -30,11 +30,19 @@ import type { DocPageData } from './doc-page.resolver';
           }
         </header>
 
+        <!-- Below xl the side table of contents is hidden: the same links fold up here. -->
+        @if (p.toc.length) {
+          <details data-toc class="mb-8 rounded-lg border px-4 xl:hidden">
+            <summary class="text-foreground flex min-h-11 cursor-pointer items-center text-sm font-medium">On this page</summary>
+            <div class="pb-3"><docs-toc [items]="p.toc" [titled]="false" /></div>
+          </details>
+        }
+
         <!-- Keyed by slug: a new page rebuilds every segment instead of reusing frames by index. -->
         @for (r of [resolved]; track r.page.slug) {
           @for (seg of r.page.segments; track $index) {
             @if (seg.kind === 'html') {
-              <div class="docs-prose prose dark:prose-invert max-w-none" [innerHTML]="seg.html | trustedHtml"></div>
+              <div class="docs-prose prose dark:prose-invert max-w-[70ch]" [innerHTML]="seg.html | trustedHtml"></div>
             } @else if (seg.kind === 'install') {
               <docs-install [slug]="seg.slug" [entry]="seg.entry" />
             } @else {

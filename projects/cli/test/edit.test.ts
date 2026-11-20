@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import path from 'node:path';
-import { ensureCssImports, relativeImport, setBodyStyleClass, setIconProvider } from '../src/edit.ts';
+import { ensureCssImports, relativeImport, setBodyThemeClass, setIconProvider } from '../src/edit.ts';
 
 const IMPORTS = ['@import "tailwindcss";', '@import "tw-animate-css";'];
 
@@ -37,13 +37,21 @@ test('ensureCssImports is idempotent', () => {
   assert.equal(ensureCssImports(once, IMPORTS), once);
 });
 
-test('setBodyStyleClass adds, appends and replaces the style class', () => {
-  assert.equal(setBodyStyleClass('<body>', 'maia'), '<body class="style-maia">');
-  assert.equal(setBodyStyleClass('<body class="mat-typography">', 'maia'), '<body class="mat-typography style-maia">');
-  assert.equal(setBodyStyleClass('<body class="a style-luma b">', 'maia'), '<body class="a b style-maia">');
-  const once = setBodyStyleClass('<html><body id="x">\n</body></html>', 'maia');
-  assert.equal(once, '<html><body id="x" class="style-maia">\n</body></html>');
-  assert.equal(setBodyStyleClass(once, 'maia'), once);
+const KNOWN = ['maia', 'luma', 'slate', 'glass', 'nova', 'graphite'];
+
+test('setBodyThemeClass adds, appends and replaces the theme class (and a 1.5 style class)', () => {
+  assert.equal(setBodyThemeClass('<body>', 'maia', KNOWN), '<body class="theme-maia">');
+  assert.equal(setBodyThemeClass('<body class="mat-typography">', 'maia', KNOWN), '<body class="mat-typography theme-maia">');
+  assert.equal(setBodyThemeClass('<body class="a theme-luma b">', 'maia', KNOWN), '<body class="a b theme-maia">');
+  assert.equal(setBodyThemeClass('<body class="a style-luma b">', 'maia', KNOWN), '<body class="a b theme-maia">');
+  const once = setBodyThemeClass('<html><body id="x">\n</body></html>', 'maia', KNOWN);
+  assert.equal(once, '<html><body id="x" class="theme-maia">\n</body></html>');
+  assert.equal(setBodyThemeClass(once, 'maia', KNOWN), once);
+});
+
+test("setBodyThemeClass keeps the app's own theme-* and style-* classes", () => {
+  assert.equal(setBodyThemeClass('<body class="theme-dark mat-typography">', 'slate', KNOWN), '<body class="theme-dark mat-typography theme-slate">');
+  assert.equal(setBodyThemeClass('<body class="theme-glass style-nova style-guide x">', 'slate', KNOWN), '<body class="style-guide x theme-slate">');
 });
 
 test('relativeImport uses / and ./ on every OS', () => {

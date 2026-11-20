@@ -1,7 +1,7 @@
 {
   "name": "ivorie",
-  "version": "1.5.2",
-  "description": "Copy Ivorie Angular components into your app.",
+  "version": "1.6.0",
+  "description": "Copy Ivorie into your app: Angular components with shadcn/ui's behavior, and looks of their own.",
   "type": "module",
   "license": "MIT",
   "homepage": "https://github.com/Inlaylab/ivorie#readme",

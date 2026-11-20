@@ -19,5 +19,6 @@ export class IvSpinner {
   readonly label = input('Loading');
   readonly class = input('');
 
-  protected readonly classes = computed(() => cn('inline-flex animate-spin motion-reduce:animate-[spin_2.4s_linear_infinite]', this.class()))
+  protected readonly classes = computed(() => // will-change: the spin runs on its own layer, so it does not repaint a glass pane's backdrop blur every frame.
+    cn('inline-flex animate-spin will-change-transform motion-reduce:animate-[spin_2.4s_linear_infinite]', this.class()))
 }

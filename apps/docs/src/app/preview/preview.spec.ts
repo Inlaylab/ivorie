@@ -5,8 +5,8 @@ import { App } from '../app';
 import { routes } from '../app.routes';
 import { DEFAULT_PRESET, encodePreset } from '../playground/preset-code';
 
-const glass = encodePreset({ ...DEFAULT_PRESET, style: 'glass' });
-const maia = encodePreset({ ...DEFAULT_PRESET, style: 'maia' });
+const glass = encodePreset({ ...DEFAULT_PRESET, theme: 'glass' });
+const maia = encodePreset({ ...DEFAULT_PRESET, theme: 'maia' });
 
 /** The whole site at a URL: App with its shell, routed like the real thing. */
 async function open(url: string) {
@@ -14,7 +14,7 @@ async function open(url: string) {
     configurable: true,
     value: () => ({ matches: false, addEventListener: () => {}, removeEventListener: () => {}, addListener: () => {}, removeListener: () => {} }),
   });
-  document.body.className = 'style-nova';
+  document.body.className = 'theme-nova';
   TestBed.configureTestingModule({ providers: [provideRouter(routes)] });
   const fixture = TestBed.createComponent(App);
   await TestBed.inject(Router).navigateByUrl(url);
@@ -47,30 +47,31 @@ describe('PreviewPage', () => {
 
   it('the look is on body, in place of the site style', async () => {
     await open(`/preview/scene/wall?preset=${glass}`);
-    expect(document.body.classList.contains('style-glass')).toBe(true);
-    expect(document.body.classList.contains('style-nova')).toBe(false);
+    expect(document.body.classList.contains('theme-glass')).toBe(true);
+    expect(document.body.classList.contains('theme-nova')).toBe(false);
   });
 
-  it('the wall opens with the look: its style and fonts named, its colors as swatches', async () => {
-    const geist = encodePreset({ ...DEFAULT_PRESET, style: 'glass', font: 'geist' });
+  it('the wall opens with the theme: its style and fonts named, its colors as swatches, on a color backdrop', async () => {
+    const geist = encodePreset({ ...DEFAULT_PRESET, theme: 'glass', font: 'geist' });
     const { el, fixture } = await open(`/preview/scene/wall?preset=${geist}`);
     fixture.detectChanges();
-    const first = el.querySelector('docs-scene-wall > iv-card')!;
+    const first = el.querySelector('docs-scene-wall iv-card')!;
     expect(first.getAttribute('data-testid')).toBe('wall-specimen');
     expect(first.querySelector('iv-card-title')!.textContent).toContain('Glass, Geist');
     expect(first.querySelectorAll('li').length).toBe(12);
+    expect(el.querySelector('docs-scene-wall > .docs-backdrop')).not.toBeNull();
   });
 
   it('applies a look message from the same origin', async () => {
     await open(`/preview/scene/wall?preset=${glass}`);
     post(location.origin, maia);
-    expect(document.body.classList.contains('style-maia')).toBe(true);
+    expect(document.body.classList.contains('theme-maia')).toBe(true);
   });
 
   it('ignores messages from other origins', async () => {
     await open(`/preview/scene/wall?preset=${glass}`);
     post('https://evil.test', maia);
-    expect(document.body.classList.contains('style-glass')).toBe(true);
+    expect(document.body.classList.contains('theme-glass')).toBe(true);
   });
 
   // The parent answers with its current look: a look picked before the frame listened is not lost.
@@ -104,12 +105,13 @@ describe('PreviewPage', () => {
   });
 
   it('other pages keep the site shell', async () => {
-    const { el } = await open('/roadmap');
+    const { el } = await open('/changelog');
     expect(el.querySelector('docs-site-header')).not.toBeNull();
   });
 
+  // The whole wall: axe needs longer than the default when the suite runs in full.
   it('has no axe violations', async () => {
     const { el } = await open('/preview/scene/wall');
     await expect(el).toHaveNoViolations();
-  });
+  }, 60_000);
 });

@@ -17,6 +17,8 @@ export interface Frontmatter {
   order?: number;
   /** `soon: true`: the page is a placeholder; the nav marks it. */
   soon?: boolean;
+  /** Guides only. `group: start`: listed under "Get started"; other guides go under "Guides". */
+  group?: 'start';
 }
 
 export type Render = (md: string, slugs?: Map<string, number>) => { html: string; toc: TocItem[] };
@@ -53,6 +55,10 @@ export function parseFrontmatter(md: string, file: string): { data: Frontmatter;
     if (Number.isNaN(data.order)) throw new Error(`${file}: order must be a number`);
   }
   if (raw['soon'] === 'true') data.soon = true;
+  if (raw['group'] !== undefined) {
+    if (raw['group'] !== 'start' || section !== 'guide') throw new Error(`${file}: group must be start, on a guide`);
+    data.group = 'start';
+  }
   return { data, body: md.slice(m[0].length) };
 }
 

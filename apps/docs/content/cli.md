@@ -2,6 +2,7 @@
 title: CLI
 description: Copy components into your app with npx ivorie, shadcn/ui style.
 section: guide
+group: start
 order: 3
 ---
 
@@ -18,10 +19,10 @@ npx ivorie init
 It does this, and never overwrites a file you changed:
 
 1. Writes `components.json`.
-2. Writes `<path>/styles/theme.css` and the style file, for example `style-nova.css`.
+2. Writes `<path>/styles/theme.css` (your colors, fonts and dials) and the theme file, for example `theme-slate.css`.
 3. Copies `core` (`cn`, ids, positions, the Ivorie config).
-4. Adds `@import` lines to your styles file: Tailwind, `tw-animate-css`, the preset fonts, the theme and the style.
-5. Adds `class="style-nova"` to `<body>` in `index.html`.
+4. Adds `@import` lines to your styles file: Tailwind, `tw-animate-css`, the theme's fonts, `theme.css` and the theme file.
+5. Adds `class="theme-slate"` to `<body>` in `index.html`.
 6. Writes `.postcssrc.json` for `@tailwindcss/postcss`, if no PostCSS config loads it yet.
 7. Installs `@angular/cdk`, `tw-animate-css`, the `core` deps, the font packages and Tailwind.
 
@@ -30,16 +31,15 @@ It does this, and never overwrites a file you changed:
 | `--project <name>` | the only app | App in `angular.json`. Needed when there are several. |
 | `--path <dir>` | `src/app/ui` | Where components go. |
 | `--prefix <prefix>` | `iv` | Selector and class prefix: `acme` gives `<acme-tabs>`, `acmeButton`, `AcmeButton`. |
-| `--preset <name\|code>` | `default` | Theme preset. |
-| `--style <name>` | from the preset | `vega`, `nova`, `maia`, `luma`, `rhea`, `lyra`, `mira`, `sera`, `glass`, `bento`, `mono`, `graphite` or `tint`. |
-| `--base-color <name>` | from the preset | `neutral`, `stone`, `zinc`, `mauve`, `olive`, `mist` or `taupe`. |
-| `--font <name>` | from the preset | `system` or a font name, for example `inter`. |
-| `--font-heading <name>` | from the preset | `inherit` (same as `--font`) or a font name. |
-| `--radius <name>` | from the preset | `default`, `none`, `small`, `medium` or `large`. |
-| `--icon-library <name>` | from the preset | `lucide`, `tabler`, `phosphor`, `hugeicons` or `remix`. |
-| `--theme <name>` | from the preset | Accent color over the base color: `base` (none) or `red`, `orange`, `amber`, `yellow`, `lime`, `green`, `emerald`, `teal`, `cyan`, `sky`, `blue`, `indigo`, `violet`, `purple`, `fuchsia`, `pink`, `rose`. |
-| `--chart-color <name>` | from the preset | `theme` (follow `--theme`), `base` (the base color's greys) or an accent name. |
-| `--menu-accent <name>` | from the preset | `subtle` or `bold` (menu highlights in the primary color). |
+| `--theme <name\|code>` | `glass` | A theme (`glass`, `bento`, `midnight`, `clay`, `slate`, `mono`, `tint`, `nova`, `luma`, `mira`, `sera`) or a code from the playground. |
+| `--accent <name>` | the theme's | Accent color over the base color: `base` (none) or `red`, `orange`, `amber`, `yellow`, `lime`, `green`, `emerald`, `teal`, `cyan`, `sky`, `blue`, `indigo`, `violet`, `purple`, `fuchsia`, `pink`, `rose`. |
+| `--base-color <name>` | the theme's | `neutral`, `stone`, `zinc`, `mauve`, `olive`, `mist` or `taupe`. |
+| `--font <name>` | the theme's | `system` or a font name, for example `inter`. |
+| `--font-heading <name>` | the theme's | `inherit` (same as `--font`) or a font name. |
+| `--radius <name>` | the theme's | `default`, `none`, `small`, `medium` or `large`. |
+| `--icon-library <name>` | the theme's | `lucide`, `tabler`, `phosphor`, `hugeicons` or `remix`. |
+| `--chart-color <name>` | the theme's | `accent` (follow `--accent`), `base` (the base color's greys) or an accent name. |
+| `--menu-accent <name>` | the theme's | `subtle` or `bold` (menu highlights in the primary color). |
 | `--force` | off | Run again over an existing setup. |
 | `-y`, `--yes` | off | No prompts. |
 | `--skip-install` | off | Print the install commands instead of running them. |
@@ -56,6 +56,7 @@ npx ivorie add --all
 - Rewrites `@inlaylab/ivorie/<name>` imports to the copied folders, and the prefix to yours.
 - A file you changed is skipped. Pass `--overwrite` to replace it.
 - Installs the npm packages the components need, unless `--skip-install`.
+- Meter, gauge, tracker and bar-list take their colors from your theme file. If that file predates them (an app set up with 1.5), `add` tells you to run `npx ivorie apply <theme>` first.
 
 Import the copy from its folder:
 
@@ -102,13 +103,13 @@ npx ivorie migrate icons --from lucide --to tabler src
 
 ## apply
 
-Change the look of an app that ran `init`. Pass a preset name or a code from the [playground](playground):
+Change the theme of an app that ran `init`. Pass a theme name or a code from the [playground](playground):
 
 ```bash
 npx ivorie apply ivp1_…
 ```
 
-It rewrites `theme.css`, writes the new style file, swaps the style and font `@import` lines, sets the `<body>` style class, updates `components.json` and installs new font packages. When the code picks another icon library, it copies that set to `<path>/icons-<lib>/`, adds `provideIvIcons(COMPONENT_ICONS)` to `app.config.ts`, installs `@ng-icons/<set>` and tells you the `migrate icons` command for your own icons. Run it again with the same code and nothing changes. The old style file stays; delete it if you did not change it.
+It rewrites `theme.css`, writes the new theme file, swaps the theme and font `@import` lines, sets the `<body>` theme class, updates `components.json` and installs new font packages. When the code picks another icon library, it copies that set to `<path>/icons-<lib>/`, adds `provideIvIcons(COMPONENT_ICONS)` to `app.config.ts`, installs `@ng-icons/<set>` and tells you the `migrate icons` command for your own icons. Run it again with the same code and nothing changes. The old theme file stays; delete it if you did not change it. Only Ivorie's own theme classes and imports change: your `theme-dark` class or `theme-overrides.css` import stay. `apply <theme>` keeps the dials saved in `components.json`.
 
 | Flag | Default | Description |
 |---|---|---|
@@ -123,18 +124,33 @@ It rewrites `theme.css`, writes the new style file, swaps the style and font `@i
 | `$schema` | The JSON schema, also at `/schema/components.json` on this site. |
 | `path` | Where components go. |
 | `prefix` | Selector and class prefix. Lowercase letters and digits, starting with a letter. |
-| `style` | The component style. |
+| `theme` | The theme. |
+| `accent` | Optional. The accent color. Left out: none. |
+| `chartColor` | Optional. Where chart colors come from. Left out: the accent. |
+| `menuAccent` | Optional. `bold` paints menu highlights in the primary color. Left out: `subtle`. |
 | `tailwind.css` | Your styles file. |
 | `tailwind.baseColor` | The base color of the theme. |
 | `font` | `system` or a font name. |
 | `fontHeading` | Optional. The heading font. Left out: same as `font`. |
 | `radius` | `default`, `none`, `small`, `medium` or `large`. |
 | `iconLibrary` | `lucide`, `tabler`, `phosphor`, `hugeicons` or `remix`. Set by `init` and `apply`. |
+| `preset` | Optional. The whole look as an `ivp1_` code, written when you set a dial. `apply <theme>` keeps those dials. |
 | `registry` | Optional. A registry dir or URL for `add`. |
 
-## Presets
+## Themes and codes
 
-A preset names a style, a base color, a font, a heading font, a radius and an icon library. Make one in the [playground](playground) and copy its code (`ivp1_…`). `--preset default` is nova, neutral, the system font, the default radius and lucide icons. Before 1.3 the default style was maia; old codes keep their style.
+A theme comes with its own accent, base color, fonts, radius, icon library and dials. Change any of them with the flags above, or in the [playground](playground), which gives a code (`ivp1_…`) for the whole setup. `default` is the slate theme with the blue accent. From 1.3 to 1.5 the default was nova; before 1.3 it was maia. Old codes still work. A legacy theme (vega, maia, rhea, lyra) still works, with a note that it leaves in 2.0. A dial the theme does not take is dropped, with a note. See [Theming](docs/theming).
+
+### Names before 1.6
+
+1.6 calls everything a theme. The old names work until 2.0, each with a note:
+
+- `--theme graphite` and `theme-graphite` are slate, its 1.5 name. They work until 2.0.
+- `--preset <name|code>` is `--theme`.
+- `--style <name>` swaps only the theme file and keeps the other settings.
+- `--theme <accent>` (an accent name, like `blue`) is `--accent`.
+- `styles/style-<name>.css` and `class="style-<name>"` still work. `apply` moves an app to `theme-<name>`.
+- A `components.json` with `style` and `theme` (the accent) is read as `theme` and `accent`. `apply` rewrites it.
 
 ## Registry
 

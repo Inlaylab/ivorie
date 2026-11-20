@@ -60,3 +60,6 @@ Thumbs.db
 # Working plans: local only
 /docs/PROGRESS.md
 /docs/superpowers/*
+# taste-skill runs: local only
+/.taste-skill/
+/shots/

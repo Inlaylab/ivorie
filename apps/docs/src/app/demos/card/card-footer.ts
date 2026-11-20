@@ -12,9 +12,9 @@ import { IvButton } from '@inlaylab/ivorie/button';
         <iv-card-title>Delete account</iv-card-title>
         <iv-card-description>This action cannot be undone.</iv-card-description>
       </iv-card-header>
-      <iv-card-footer class="gap-2">
+      <iv-card-footer class="justify-end gap-2">
         <button ivButton variant="outline">Cancel</button>
-        <button ivButton variant="destructive" class="ml-auto">Delete</button>
+        <button ivButton variant="destructive">Delete</button>
       </iv-card-footer>
     </iv-card>
   `,

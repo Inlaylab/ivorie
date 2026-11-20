@@ -1,13 +1,13 @@
-// ivorie init: components.json, theme + style CSS, core, styles.css imports, body class, Tailwind PostCSS.
+// ivorie init: components.json, theme CSS, core, styles.css imports, body class, Tailwind PostCSS.
 import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { createInterface } from 'node:readline/promises';
 import { CONFIG_FILE, SCHEMA_URL, validateConfig, type ComponentsJson } from '../config.ts';
-import { ensureCssImports, setBodyStyleClass } from '../edit.ts';
+import { ensureCssImports, setBodyThemeClass } from '../edit.ts';
 import { installCommand, runInstall } from '../install.ts';
-import { checkPreset, resolvePreset } from '../preset.ts';
+import { THEME_ALIASES, checkPreset, knownThemes, resolvePreset, savedLook } from '../preset.ts';
 import { detectProject } from '../project.ts';
-import { bundledRegistry, openRegistry, packageName } from '../registry.ts';
+import { bundledRegistry, openRegistry, packageName, type RegistryIndex } from '../registry.ts';
 import { renderLook } from '../look.ts';
 import { runAdd, writeFile } from './add.ts';
 import { setIconLibrary } from './apply.ts';
@@ -18,14 +18,18 @@ export interface InitOptions extends CommonOptions {
   project?: string;
   path?: string;
   prefix?: string;
+  /** A theme name or an ivp1_ code. */
+  theme?: string;
+  /** Deprecated (1.5): the same as `theme`. */
   preset?: string;
+  /** Deprecated (1.5): swaps only the theme CSS, keeping the other defaults. */
   style?: string;
   baseColor?: string;
   font?: string;
   fontHeading?: string;
   radius?: string;
   iconLibrary?: string;
-  theme?: string;
+  accent?: string;
   chartColor?: string;
   menuAccent?: string;
   force?: boolean;
@@ -54,6 +58,26 @@ function hasTailwindPostcss(root: string): boolean {
     .some((f) => readFileSync(join(root, f), 'utf8').includes('@tailwindcss/postcss'));
 }
 
+/**
+ * 1.5 flags, kept until 2.0: `--preset` is `--theme`; `--theme <accent>` (an accent, not a theme) is `--accent`.
+ * Accent and theme names do not overlap, so the old meaning is read from the value.
+ */
+export function legacyFlags(o: InitOptions, index: RegistryIndex, report: Report): { theme?: string; accent?: string } {
+  let { theme, accent } = o;
+  if (o.preset !== undefined) {
+    report.notes.push('--preset is now --theme; --preset leaves in 2.0');
+    theme ??= o.preset;
+  }
+  if (o.style !== undefined) report.notes.push('--style leaves in 2.0; use --theme');
+  const isTheme = (t: string) => t.startsWith('ivp1_') || t in index.presets || index.themes.includes(t);
+  if (o.theme !== undefined && !isTheme(o.theme) && ['base', ...(index.accents ?? [])].includes(o.theme)) {
+    report.notes.push(`--theme ${o.theme} is an accent: use --accent ${o.theme}; the old meaning leaves in 2.0`);
+    accent ??= o.theme;
+    theme = o.preset;
+  }
+  return { theme, accent };
+}
+
 export async function runInit(o: InitOptions): Promise<Report> {
   const report = emptyReport();
   const project = detectProject(o.cwd, { project: o.project });
@@ -61,14 +85,15 @@ export async function runInit(o: InitOptions): Promise<Report> {
 
   const reg = openRegistry(o.registry ?? bundledRegistry());
   const index = await reg.index();
-  const preset = { ...resolvePreset(o.preset, index) };
-  if (o.style) preset.style = o.style;
+  const { theme, accent } = legacyFlags(o, index, report);
+  const preset = { ...resolvePreset(theme, index) };
+  if (o.style) preset.theme = THEME_ALIASES[o.style] ?? o.style;
   if (o.baseColor) preset.baseColor = o.baseColor;
   if (o.font) preset.font = o.font;
   if (o.fontHeading) preset.fontHeading = o.fontHeading;
   if (o.radius) preset.radius = o.radius;
   if (o.iconLibrary) preset.iconLibrary = o.iconLibrary;
-  if (o.theme) preset.theme = o.theme;
+  if (accent) preset.accent = accent;
   if (o.chartColor) preset.chartColor = o.chartColor;
   if (o.menuAccent) preset.menuAccent = o.menuAccent;
   checkPreset(preset, index);
@@ -81,15 +106,16 @@ export async function runInit(o: InitOptions): Promise<Report> {
     $schema: SCHEMA_URL,
     path,
     prefix,
-    style: preset.style,
+    theme: preset.theme,
     tailwind: { css: project.stylesFile, baseColor: preset.baseColor },
     font: preset.font,
     ...(preset.fontHeading !== 'inherit' && { fontHeading: preset.fontHeading }),
     radius: preset.radius,
     iconLibrary: preset.iconLibrary as IconLibrary,
-    ...(preset.theme !== 'base' && { theme: preset.theme }),
-    ...(preset.chartColor !== 'theme' && { chartColor: preset.chartColor }),
+    ...(preset.accent !== 'base' && { accent: preset.accent }),
+    ...(preset.chartColor !== 'accent' && { chartColor: preset.chartColor }),
     ...(preset.menuAccent !== 'subtle' && { menuAccent: preset.menuAccent }),
+    ...(savedLook(preset, index) && { preset: savedLook(preset, index) }),
   });
   const write = (file: string, content: string) =>
     writeFile(report, o.cwd, join(o.cwd, file), content, { overwrite: o.force, dryRun: o.dryRun });
@@ -97,8 +123,9 @@ export async function runInit(o: InitOptions): Promise<Report> {
   write(CONFIG_FILE, JSON.stringify(config, null, 2) + '\n');
 
   const look = await renderLook(preset, reg, path, project.stylesFile);
+  report.notes.push(...look.notes);
   write(`${path}/styles/theme.css`, look.themeCss);
-  write(`${path}/styles/${look.styleFile}`, look.styleCss);
+  write(`${path}/styles/${look.themeFile}`, look.themeFileCss);
 
   await runAdd(['core'], { ...o, config, deps: false, overwrite: o.force }, report);
   const core = await reg.item('core');
@@ -113,8 +140,8 @@ export async function runInit(o: InitOptions): Promise<Report> {
     if (!o.dryRun) writeFileSync(full, next);
   };
   edit(project.stylesFile, (css) => ensureCssImports(css, look.imports));
-  if (existsSync(join(o.cwd, project.indexHtml))) edit(project.indexHtml, (html) => setBodyStyleClass(html, preset.style));
-  else report.notes.push(`add class="style-${preset.style}" to <body> (no ${project.indexHtml})`);
+  if (existsSync(join(o.cwd, project.indexHtml))) edit(project.indexHtml, (html) => setBodyThemeClass(html, preset.theme, knownThemes(index)));
+  else report.notes.push(`add class="theme-${preset.theme}" to <body> (no ${project.indexHtml})`);
 
   const iconDeps = await setIconLibrary(config.iconLibrary, o, config, project, report, edit);
 

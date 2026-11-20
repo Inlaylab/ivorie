@@ -35,6 +35,12 @@ import { IV_CARD_IMPORTS } from '@inlaylab/ivorie/card';
 
 <!-- demo: card-small -->
 
+### Hero
+
+The lead card on a page. Ivorie themes give it a stronger look; Classic themes show a normal card.
+
+<!-- demo: card-hero -->
+
 ### Image
 
 <!-- demo: card-image -->
@@ -52,6 +58,7 @@ Every part also accepts `class`.
 | Name | Type | Default | Description |
 |---|---|---|---|
 | `size` | `'default' \| 'sm'` | `'default'` | `sm` reduces gap, padding and font size in all child parts. Set it only on the card. |
+| `emphasis` | `'default' \| 'hero'` | `'default'` | `hero` marks the lead card (`data-emphasis="hero"`). |
 
 ### Other parts
 

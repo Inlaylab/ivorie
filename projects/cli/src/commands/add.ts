@@ -35,7 +35,7 @@ function checkNames(names: string[], index: RegistryIndex): void {
   for (const name of names) {
     const item = index.items.find((i) => i.name === name);
     if (item && copyable.includes(item)) continue;
-    if (item) throw new Error(`"${name}" is not a component — styles come from "ivorie init"`);
+    if (item) throw new Error(`"${name}" is not a component — themes come from "ivorie init"`);
     const near = copyable.map((i) => i.name).filter((n) => distance(n, name) <= 2);
     throw new Error(`unknown component "${name}"${near.length ? ` — did you mean "${near.join('", "')}"?` : ''}`);
   }
@@ -63,6 +63,27 @@ function blockImports(content: string, file: string, uiDir: string): string {
   });
 }
 
+// Parts whose colors live only in the theme CSS (tools/styles/parts.css): each needs this rule.
+const THEMED_PARTS: Record<string, string> = {
+  meter: '.cn-meter-tick',
+  gauge: '.cn-gauge-segment',
+  tracker: '.cn-tracker-bar',
+  'bar-list': '.cn-bar-list-bar',
+};
+
+/** A theme file from before these parts (a 1.5 app) has no rules for them, so they show transparent. Notes it. */
+function checkThemedParts(names: string[], cwd: string, config: ComponentsJson, report: Report): void {
+  const parts = names.filter((n) => n in THEMED_PARTS);
+  if (!parts.length) return;
+  const apply = `run \`npx ivorie apply ${config.theme}\``;
+  const dir = join(cwd, config.path, 'styles');
+  const file = [`theme-${config.theme}.css`, `style-${config.theme}.css`].find((f) => existsSync(join(dir, f)));
+  if (!file) return void report.notes.push(`no theme file for ${config.theme} in ${config.path}/styles: ${apply} to style ${parts.join(', ')}`);
+  const css = readFileSync(join(dir, file), 'utf8');
+  const missing = parts.filter((p) => !css.includes(THEMED_PARTS[p]));
+  if (missing.length) report.notes.push(`styles/${file} has no rules for ${missing.join(', ')}: ${apply} first`);
+}
+
 export async function runAdd(names: string[], o: AddOptions, report: Report = emptyReport()): Promise<Report> {
   const config = o.config ?? readConfig(o.cwd);
   const reg = openRegistry(o.registry ?? config.registry ?? bundledRegistry());
@@ -88,6 +109,8 @@ export async function runAdd(names: string[], o: AddOptions, report: Report = em
       writeFile(report, o.cwd, target, rewritePrefix(content, config.prefix), o);
     }
   }
+
+  checkThemedParts(items.map((i) => i.name), o.cwd, config, report);
 
   if (o.deps === false) return report;
   const project = detectProject(o.cwd);

@@ -22,6 +22,7 @@ const KINDS: { label: string; slugs: string[] }[] = [
     slugs: ['accordion', 'aspect-ratio', 'breadcrumb', 'card', 'carousel', 'collapsible', 'item', 'navigation-menu', 'pagination', 'resizable', 'scroll-area', 'separator', 'sidebar', 'tabs'],
   },
   { label: 'Data display', slugs: ['avatar', 'badge', 'chart', 'data-table', 'empty', 'icon', 'kbd', 'table'] },
+  { label: 'Metrics', slugs: ['bar-list', 'delta', 'gauge', 'meter', 'sparkline', 'stat', 'tracker'] },
   { label: 'Feedback', slugs: ['alert', 'progress', 'skeleton', 'spinner'] },
 ];
 const components = PAGES.filter((p) => p.section === 'component');
@@ -34,13 +35,19 @@ const ICONS: Record<string, string> = {
   cli: 'm5 8 4 4-4 4m7 0h7M4 4h16v16H4z',
   mcp: 'M9 2v6m6-6v6M6 8h12v4a6 6 0 0 1-12 0V8Zm6 10v4',
   components: 'M4 4h7v7H4zm9 0h7v7h-7zM4 13h7v7H4zm9 0h7v7h-7z',
+  // Lucide (ISC) shapes: book-open, square-check, server, accessibility.
+  introduction: 'M12 7v14M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z',
+  forms: 'M4 4h16v16H4zm5 8 2 2 4-4',
+  'server-rendering': 'M4 3h16v8H4zm0 10h16v8H4zM8 7h.01M8 17h.01',
+  accessibility: 'M12 4h.01M7 9h10m-5 0v4l-3 7m3-7 3 7',
 };
 
 export const GROUPS: { label: string; pages: { slug: string; title: string; soon?: boolean }[] }[] = [
   {
-    label: 'Getting started',
-    pages: [...PAGES.filter((p) => p.section === 'guide'), { slug: 'components', title: 'All components', soon: false }],
+    label: 'Get started',
+    pages: [...PAGES.filter((p) => p.section === 'guide' && p.group === 'start'), { slug: 'components', title: 'All components', soon: false }],
   },
+  { label: 'Guides', pages: PAGES.filter((p) => p.section === 'guide' && p.group !== 'start') },
   ...KINDS.map((k) => ({ label: k.label, pages: components.filter((p) => k.slugs.includes(p.slug)) })),
   { label: 'More', pages: components.filter((p) => !kinded.has(p.slug)) },
   { label: 'Charts', pages: PAGES.filter((p) => p.section === 'charts') },
@@ -83,7 +90,7 @@ export const GROUPS: { label: string; pages: { slug: string; title: string; soon
                       <svg class="size-4 shrink-0 opacity-80 group-[.docs-nav-active]:text-(--brand) group-[.docs-nav-active]:opacity-100" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path [attr.d]="d" /></svg>
                     } @else {
                       <!-- The brand dot marks the open page. -->
-                      <span class="docs-brand-gradient hidden size-1.5 shrink-0 rounded-full group-[.docs-nav-active]:block" aria-hidden="true"></span>
+                      <span class="bg-(--brand) hidden size-1.5 shrink-0 rounded-full group-[.docs-nav-active]:block" aria-hidden="true"></span>
                     }
                     {{ page.title }}
                     @if (page.soon) {

@@ -1,8 +1,8 @@
 
-import { Component, ChangeDetectionStrategy, computed, input, output } from '@angular/core'
+import { Component, ChangeDetectionStrategy, computed, inject, input, output } from '@angular/core'
 import { IconName, IvIcon } from '@inlaylab/ivorie/icon'
 
-import { ToastItem, ToastVariant } from './toast.service'
+import { IvToastService, ToastItem, ToastVariant, ToastAction } from './toast.service'
 import { cn } from '@inlaylab/ivorie/core'
 
 const VARIANT_CLASSES: Record<ToastVariant, string> = {
@@ -38,9 +38,23 @@ const VARIANT_FALLBACK_ICON: Record<ToastVariant, IconName> = {
       [attr.role]="assertive() ? 'alert' : 'status'"
       [attr.aria-live]="assertive() ? 'assertive' : 'polite'"
       [class]="containerClass()"
+      (pointerenter)="hold('pointer', true)"
+      (pointerleave)="hold('pointer', false)"
+      (focusin)="hold('focus', true)"
+      (focusout)="onFocusOut($event)"
     >
       <svg [ivIcon]="resolvedIcon()" [size]="16" class="shrink-0"></svg>
-      <div class="min-w-0 flex-1 text-sm leading-snug" [innerHTML]="toast().message"></div>
+      <div class="min-w-0 flex-1">
+        <div class="text-sm leading-snug" [innerHTML]="toast().message"></div>
+        @if (toast().description; as description) {
+          <p data-slot="toast-description" class="mt-0.5 text-xs leading-snug opacity-80">{{ description }}</p>
+        }
+      </div>
+      @if (toast().action; as action) {
+        <button type="button" data-slot="toast-action" class="shrink-0 rounded-sm px-2 py-1 text-xs font-medium underline-offset-4 hover:underline" (click)="runAction(action)">
+          {{ action.label }}
+        </button>
+      }
       <button
         type="button"
         class="shrink-0 opacity-70 hover:opacity-100 transition-opacity"
@@ -55,6 +69,27 @@ const VARIANT_FALLBACK_ICON: Record<ToastVariant, IconName> = {
 export class IvToast {
   readonly toast = input.required<ToastItem>();
   readonly close = output<void>();
+
+  private readonly service = inject(IvToastService);
+  private readonly held = { pointer: false, focus: false };
+
+  /** The timer waits while the pointer or focus is on the toast (WCAG 2.2.1). */
+  protected hold(by: 'pointer' | 'focus', on: boolean): void {
+    this.held[by] = on;
+    if (this.held.pointer || this.held.focus) this.service.pause(this.toast().id);
+    else this.service.resume(this.toast().id);
+  }
+
+  protected onFocusOut(event: FocusEvent): void {
+    // Focus moving between the action and the close button stays inside.
+    if (!(event.currentTarget as HTMLElement).contains(event.relatedTarget as Node | null)) this.hold('focus', false);
+  }
+
+  protected runAction(action: ToastAction): void {
+    // Close first: if onClick throws, the toast must not stay open for a second click.
+    this.close.emit()
+    action.onClick()
+  }
 
 
   // Errors interrupt the screen reader; everything else waits its turn.

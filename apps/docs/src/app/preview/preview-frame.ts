@@ -37,7 +37,7 @@ export const PREVIEW_WIDTHS: { value: PreviewWidth; label: string; css: string }
   template: `
     <iframe
       #frame
-      class="bg-background h-full min-h-[40rem] max-w-full rounded-xl border shadow-xs transition-[width] duration-200 motion-reduce:transition-none"
+      class="bg-background h-full max-w-full rounded-xl border shadow-xs transition-[width] duration-200 motion-reduce:transition-none"
       [src]="src()"
       [title]="label()"
       [style.width]="css()"

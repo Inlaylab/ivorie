@@ -1,0 +1,32 @@
+/*
+ * Mira, Ivorie layer: dense data. Numbers line up, table rows sit tight with a clear hover,
+ * shortcuts are easy to see. Appended to the synced shadcn rules by tools/styles/sync.ts. Keep it thin.
+ */
+
+& .cn-table-cell,
+& .cn-calendar-day-button,
+& .cn-pagination-link,
+& .cn-chart-tooltip,
+& .cn-progress {
+  @apply tabular-nums;
+}
+
+& .cn-table-head {
+  @apply h-8;
+}
+
+& .cn-table-cell {
+  @apply py-1.5;
+}
+
+& .cn-table-row {
+  @apply hover:bg-muted;
+}
+
+& .cn-kbd {
+  @apply bg-background ring-1 ring-border;
+}
+
+& .cn-breadcrumb-page {
+  @apply font-medium;
+}

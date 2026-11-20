@@ -1,6 +1,6 @@
 // CLI end-to-end smoke (network): fresh `ng new --ssr` apps. One set up with `ivorie init + add` and one
 // with the npm package must build and render the same button classes and CSS rules. A third, made with
-// `ivorie init --preset <playground code>`, must get that look, and `ivorie apply default` must undo it.
+// `ivorie init --theme <playground code>`, must get that look, and `ivorie apply default` must switch it to the frost look.
 // Usage: npm run smoke:cli
 import { execSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
@@ -119,17 +119,17 @@ try {
   writeApp(cliApp, './ui');
   withBlock(cliApp, 'login-01', 'Login01');
 
-  // 2. npm package, following installation.md.
+  // 2. npm package, following installation.md, on the theme `init --yes` picks (glass).
   const npmApp = newApp('npm-app', cliMajor);
   run(`npm i "${uiTgz}" @angular/cdk@^${cliMajor}`, npmApp);
   run('npm i -D tailwindcss @tailwindcss/postcss tw-animate-css', npmApp);
   writeFileSync(join(npmApp, '.postcssrc.json'), '{ "plugins": { "@tailwindcss/postcss": {} } }\n');
   writeFileSync(
     join(npmApp, 'src/styles.css'),
-    '@import "@inlaylab/ivorie/styles/theme.css";\n@import "@inlaylab/ivorie/styles/style-nova.css";\n',
+    '@import "@inlaylab/ivorie/styles/theme.css";\n@import "@inlaylab/ivorie/styles/theme-glass.css";\n',
   );
   const index = join(npmApp, 'src/index.html');
-  writeFileSync(index, readFileSync(index, 'utf8').replace('<body>', '<body class="style-nova">'));
+  writeFileSync(index, readFileSync(index, 'utf8').replace('<body>', '<body class="theme-glass">'));
   writeApp(npmApp, '@inlaylab/ivorie');
 
   run('npx ng build', cliApp);
@@ -146,7 +146,7 @@ try {
   // 3. A playground preset in a fresh app gives that look; apply changes it back.
   const presetApp = newApp('preset-app', cliMajor);
   run(`npm i -D "${cliTgz}"`, presetApp);
-  run(`npx ivorie init --yes --preset ${PRESET_GOLDEN.code}`, presetApp);
+  run(`npx ivorie init --yes --theme ${PRESET_GOLDEN.code}`, presetApp);
   run('npx ivorie add button dialog', presetApp);
   writeApp(presetApp, './ui');
   run('npx ng build', presetApp);
@@ -164,26 +164,27 @@ try {
       radius: /--radius:\s*\.875rem/,
       font: /Inter Variable/,
       heading: /Lora Variable/,
-      style: /\.style-nova/,
-      body: /<body[^>]*class="[^"]*style-nova/,
+      style: /\.theme-nova/,
+      body: /<body[^>]*class="[^"]*theme-nova/,
     },
-    'init --preset',
+    'init --theme <code>',
   );
+  // The default look is frost: glass, violet (light --primary oklch(0.491 0.27 292.581)).
   run('npx ivorie apply default', presetApp);
   run('npx ng build', presetApp);
-  look({ primary: /--primary:\s*oklch\(0?\.205 0 0\)/, style: /\.style-nova/, body: /<body[^>]*class="[^"]*style-nova/ }, 'apply default');
+  look({ primary: /--primary:\s*oklch\(0?\.491 0?\.27 292\.581\)/, style: /\.theme-glass/, body: /<body[^>]*class="[^"]*theme-glass/ }, 'apply default');
   // An accent preset: blue primary, emerald charts, bold menu accent (= primary), on sera.
-  run('npx ivorie init --yes --force --theme blue --chart-color emerald --menu-accent bold --style sera', presetApp);
+  run('npx ivorie init --yes --force --theme sera --accent blue --chart-color emerald --menu-accent bold', presetApp);
   run('npx ng build', presetApp);
   look(
     {
       primary: /--primary:\s*oklch\(0?\.488 0?\.243 264\.376\)/,
       chart: /--chart-1:\s*oklch\(0?\.845 0?\.143 164\.978\)/,
       accent: /--accent:\s*oklch\(0?\.488 0?\.243 264\.376\)/,
-      style: /\.style-sera/,
-      body: /<body[^>]*class="[^"]*style-sera/,
+      style: /\.theme-sera/,
+      body: /<body[^>]*class="[^"]*theme-sera/,
     },
-    'init --theme',
+    'init --theme --accent',
   );
 
   // 4. A tabler app: the set is copied, wired into app.config.ts and the app builds with @ng-icons installed.

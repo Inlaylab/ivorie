@@ -21,13 +21,16 @@ export function ensureCssImports(css: string, imports: string[]): string {
   return bom + lines.join(eol);
 }
 
-/** Sets one `style-<name>` class on `<body>`, replacing any other style-* class. */
-export function setBodyStyleClass(html: string, style: string): string {
+/**
+ * Sets one `theme-<name>` class on `<body>`, replacing any other Ivorie theme class and a 1.5 `style-<name>` class.
+ * Only names in `known` are replaced: an app's own `theme-dark` stays.
+ */
+export function setBodyThemeClass(html: string, theme: string, known: readonly string[]): string {
   return html.replace(/<body\b([^>]*)>/i, (_tag, attrs: string) => {
-    const want = `style-${style}`;
+    const want = `theme-${theme}`;
     const cls = /\sclass\s*=\s*"([^"]*)"/i.exec(attrs);
     if (!cls) return `<body${attrs} class="${want}">`;
-    const kept = cls[1].split(/\s+/).filter((c) => c && !/^style-[a-z0-9-]+$/.test(c));
+    const kept = cls[1].split(/\s+/).filter((c) => c && !known.some((n) => c === `theme-${n}` || c === `style-${n}`));
     return `<body${attrs.replace(cls[0], ` class="${[...kept, want].join(' ')}"`)}>`;
   });
 }

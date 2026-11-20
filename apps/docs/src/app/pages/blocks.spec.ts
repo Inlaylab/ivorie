@@ -40,7 +40,7 @@ describe('BlocksPage', () => {
   it('each block has a toolbar: view, open, reload and its add command', async () => {
     const { el, harness } = await render();
     const first = el.querySelector('docs-block-showcase')!;
-    expect(first.querySelector('[data-testid="command"]')!.textContent!.trim()).toBe('npx ivorie add login-01');
+    expect(first.querySelector('[data-testid="command"]')!.textContent!.trim()).toBe('npx ivorie@1.6 add login-01');
     expect(first.querySelector('[data-testid="open"]')!.getAttribute('href')).toMatch(/^preview\/block\/login-01\?preset=ivp1_/);
     expect(first.querySelector('[data-testid="reload"]')).not.toBeNull();
     first.querySelector<HTMLInputElement>('input[name="login-01-view"][value="code"]')!.click();

@@ -16,6 +16,10 @@
         <main class="w-full" [class]="docs() ? 'mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-10 lg:py-10' : ''">
           <router-outlet />
         </main>
+        <!-- The playground fills the screen and scrolls inside its panes; a footer would add a second page scroll. -->
+        @if (!playground()) {
+          <docs-site-footer />
+        }
       </div>
     </div>
   </iv-sidebar-provider>

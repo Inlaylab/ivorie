@@ -5,11 +5,12 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { IV_TABS_IMPORTS } from '@inlaylab/ivorie/tabs';
 import { map } from 'rxjs';
 import { BLOCKS } from '../../generated/blocks';
-import { LookControls } from '../playground/look-controls';
+import { ThemeControls } from '../playground/theme-controls';
 import { PREVIEW_ICONS, PlaygroundLook } from '../playground/playground-look';
 import { PREVIEW_WIDTHS, PreviewFrame, type PreviewWidth } from '../preview/preview-frame';
 import { CopyButton } from '../ui/copy-button';
 import { BlockCode } from './block-code';
+import { IVORIE } from '../../generated/cli';
 
 /** What the login and sign-up blocks take and give. */
 const AUTH_API = [
@@ -22,7 +23,7 @@ const AUTH_API = [
 /** `/blocks/:name`: the block live in a frame, in the look you pick, its files and the install command. */
 @Component({
   selector: 'docs-block',
-  imports: [RouterLink, IV_TABS_IMPORTS, LookControls, PreviewFrame, CopyButton, BlockCode],
+  imports: [RouterLink, IV_TABS_IMPORTS, ThemeControls, PreviewFrame, CopyButton, BlockCode],
   providers: [PlaygroundLook, PREVIEW_ICONS],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'block' },
@@ -69,8 +70,8 @@ const AUTH_API = [
             </iv-tabs-content>
           </iv-tabs>
 
-          <aside aria-label="Look" class="flex flex-col gap-6">
-            <docs-look-controls compact [look]="look" name="block" class="gap-5" />
+          <aside aria-label="Theme" class="flex min-w-0 flex-col gap-6">
+            <docs-theme-controls compact [look]="look" name="block" class="gap-5" />
             @if (auth()) {
               <section data-testid="api" class="flex flex-col gap-2 border-t pt-5" aria-labelledby="block-api">
                 <h2 id="block-api" class="text-foreground text-sm font-medium">Inputs and outputs</h2>
@@ -99,7 +100,7 @@ export default class BlockPage {
   protected readonly look = inject(PlaygroundLook);
   private readonly name = toSignal(inject(ActivatedRoute).paramMap.pipe(map((p) => p.get('name'))));
   protected readonly entry = computed(() => BLOCKS.find((b) => b.name === this.name()));
-  protected readonly command = computed(() => `npx ivorie add ${this.entry()?.name}`);
+  protected readonly command = computed(() => `${IVORIE} add ${this.entry()?.name}`);
   protected readonly auth = computed(() => /^(login|signup)-/.test(this.entry()?.name ?? ''));
   protected readonly api = AUTH_API;
   protected readonly widths = PREVIEW_WIDTHS;

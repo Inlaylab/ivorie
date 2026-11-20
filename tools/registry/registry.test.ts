@@ -5,6 +5,8 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { registryItemSchema, registrySchema } from 'shadcn/schema';
 import { build } from './build.ts';
+import { THEME_ORDER } from './themes.ts';
+import { DIALS, checkPreset, type DialKey } from '../../projects/cli/src/preset.ts';
 
 const dirA = mkdtempSync(join(tmpdir(), 'ivorie-reg-a-'));
 const dirB = mkdtempSync(join(tmpdir(), 'ivorie-reg-b-'));
@@ -50,9 +52,9 @@ test('every registry dependency exists and there are no cycles', () => {
 test('index.json lists every item and the preset axes', () => {
   const index = JSON.parse(readFileSync(join(dirA, 'index.json'), 'utf8'));
   assert.equal(index.items.length, items.length);
-  assert.ok(index.styles.includes('maia'));
+  assert.ok(index.themes.includes('maia'));
   assert.deepEqual(index.baseColors, ['mauve', 'mist', 'neutral', 'olive', 'stone', 'taupe', 'zinc']);
-  assert.equal(index.presets.default.style, 'nova');
+  assert.equal(index.presets.default.theme, 'slate');
   assert.equal(index.fonts.length, 27);
   assert.equal(index.fonts[0], 'system');
   assert.deepEqual(index.radii, ['default', 'none', 'small', 'medium', 'large']);
@@ -84,4 +86,44 @@ test('chart and the blocks that reach it list the d3 @types as devDependencies',
 test('a block lists the npm deps of the components it reaches, transitively', () => {
   const login = items.find((i) => i.name === 'login-01');
   assert.ok(login.dependencies.some((d: string) => d.startsWith('class-variance-authority@')), login.dependencies.join());
+});
+
+test('themeDials matches the dial table; legacy themes listed', () => {
+  const index = JSON.parse(readFileSync(join(dirA, 'index.json'), 'utf8'));
+  assert.deepEqual(Object.keys(index.themeDials).sort(), [...index.themes].sort());
+  assert.deepEqual(index.themeDials.glass, ['density', 'contrast', 'motion', 'panels', 'rim', 'shadow', 'blur', 'ambient']);
+  assert.deepEqual(index.themeDials.bento, ['density', 'contrast', 'motion', 'panels', 'rim', 'shadow']);
+  assert.deepEqual(index.themeDials.slate, ['density', 'contrast', 'motion', 'rim', 'shadow']);
+  assert.deepEqual(index.themeDials.tint, ['density', 'contrast', 'motion', 'panels', 'shadow']);
+  assert.deepEqual(index.themeDials.mono, ['density', 'contrast', 'motion']);
+  assert.deepEqual(index.themeDials.clay, ['density', 'contrast', 'motion', 'panels', 'rim', 'shadow']);
+  assert.equal(index.presets.clay.theme, 'clay');
+  assert.deepEqual(index.themeDials.midnight, ['density', 'contrast', 'motion', 'panels', 'rim', 'shadow', 'blur']);
+  assert.deepEqual(index.themeDials.nova, ['density', 'contrast', 'motion']);
+  assert.deepEqual(index.legacyThemes, ['vega', 'maia', 'rhea', 'lyra']);
+});
+
+test('themes: one per theme file, default is slate, each resolves and only sets dials its theme takes', () => {
+  const index = JSON.parse(readFileSync(join(dirA, 'index.json'), 'utf8'));
+  assert.deepEqual([...THEME_ORDER], ['slate', 'glass', 'bento', 'midnight', 'clay', 'mono', 'tint', 'nova', 'luma', 'mira', 'sera']);
+  assert.deepEqual(Object.keys(index.presets).sort(), ['default', 'graphite', ...THEME_ORDER].sort());
+  assert.deepEqual(index.presets.default, index.presets.slate);
+  // graphite: the 1.5 name, kept for 1.5 CLIs until 2.0.
+  assert.deepEqual(index.presets.graphite, index.presets.slate);
+  for (const name of THEME_ORDER) {
+    const theme = index.presets[name];
+    assert.equal(theme.theme, name);
+    assert.doesNotThrow(() => checkPreset(theme, index), name);
+    for (const dial of Object.keys(DIALS) as DialKey[]) {
+      if (theme[dial] !== DIALS[dial][0]) assert.ok(index.themeDials[theme.theme].includes(dial), `${name}: ${dial}`);
+    }
+  }
+  const pick = (p: Record<string, string>) => [p.baseColor, p.accent, p.font, p.fontHeading, p.radius];
+  assert.deepEqual(pick(index.presets.slate), ['zinc', 'blue', 'geist', 'inherit', 'small']);
+  assert.deepEqual(pick(index.presets.glass), ['neutral', 'violet', 'inter', 'inherit', 'large']);
+  assert.deepEqual(pick(index.presets.nova), ['zinc', 'indigo', 'dm-sans', 'inherit', 'default']);
+  assert.deepEqual(pick(index.presets.luma), ['mist', 'cyan', 'nunito-sans', 'inherit', 'large']);
+  assert.deepEqual(pick(index.presets.mira), ['neutral', 'emerald', 'ibm-plex-sans', 'inherit', 'small']);
+  assert.deepEqual(pick(index.presets.sera), ['taupe', 'red', 'source-sans-3', 'playfair-display', 'none']);
+  assert.equal(index.presets.mira.density, 'compact');
 });

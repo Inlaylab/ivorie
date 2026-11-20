@@ -1,6 +1,6 @@
 import { after, before, test } from 'node:test';
 import assert from 'node:assert/strict';
-import { cpSync, existsSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
+import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { createServer, type Server } from 'node:http';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -26,7 +26,7 @@ const config = (over: Partial<ComponentsJson> = {}): ComponentsJson => ({
   $schema: 'https://ivorie.dev/schema/components.json',
   path: 'src/app/ui',
   prefix: 'iv',
-  style: 'maia',
+  theme: 'maia',
   tailwind: { css: 'src/styles.css', baseColor: 'neutral' },
   font: 'system',
   radius: 'default',
@@ -103,7 +103,7 @@ test('unknown and non-component names fail clearly', async () => {
     message: 'unknown component "buton" — did you mean "button"?',
   });
   await assert.rejects(runAdd(['style-maia'], { cwd, registry }), {
-    message: '"style-maia" is not a component — styles come from "ivorie init"',
+    message: '"style-maia" is not a component — themes come from "ivorie init"',
   });
   await assert.rejects(runAdd([], { cwd, registry }), /name at least one component/);
 });
@@ -155,4 +155,37 @@ test('chart installs the d3 types as dev deps, skipping ones the project has', a
   const dev2 = again.notes.find((n) => n.startsWith('npm install -D '))!;
   assert.match(dev2, /@types\/d3-shape@/);
   assert.doesNotMatch(dev2, /@types\/d3-scale@/);
+});
+
+// A 1.5 app: its theme file predates the rich parts, whose colors live in the theme CSS only.
+const themeFile = (cwd: string, name: string, css: string) => {
+  const dir = join(cwd, 'src/app/ui/styles');
+  mkdirSync(dir, { recursive: true });
+  writeFileSync(join(dir, name), css);
+};
+
+test('add meter on a 1.5 theme file warns to run apply', async () => {
+  const cwd = app({ theme: 'nova' });
+  themeFile(cwd, 'style-nova.css', '.theme-nova { .cn-button { color: red } }\n');
+  const report = await runAdd(['meter'], { cwd, registry, skipInstall: true });
+  assert.ok(report.notes.includes('styles/style-nova.css has no rules for meter: run `npx ivorie apply nova` first'), report.notes.join('\n'));
+});
+
+test('add meter with a current theme file: no warning', async () => {
+  const cwd = app({ theme: 'nova' });
+  themeFile(cwd, 'theme-nova.css', '.cn-meter-tick { background: red }\n');
+  const report = await runAdd(['meter'], { cwd, registry, skipInstall: true });
+  assert.ok(!report.notes.some((n) => n.includes('has no rules for')), report.notes.join('\n'));
+});
+
+test('add a block that uses meter, with no theme file at all: one warning, no crash', async () => {
+  const cwd = app({ theme: 'nova' });
+  const report = await runAdd(['usage-01'], { cwd, registry, skipInstall: true });
+  assert.equal(report.notes.filter((n) => n.includes('no theme file')).length, 1, report.notes.join('\n'));
+});
+
+test('add button: no theme check', async () => {
+  const cwd = app({ theme: 'nova' });
+  const report = await runAdd(['button'], { cwd, registry, skipInstall: true });
+  assert.ok(!report.notes.some((n) => n.includes('theme file') || n.includes('has no rules for')));
 });

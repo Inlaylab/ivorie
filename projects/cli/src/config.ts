@@ -7,7 +7,7 @@ export interface ComponentsJson {
   $schema: string;
   path: string;
   prefix: string;
-  style: string;
+  theme: string;
   tailwind: { css: string; baseColor: string };
   font: string;
   /** Left out when the heading font is the body font. */
@@ -15,11 +15,13 @@ export interface ComponentsJson {
   radius: string;
   iconLibrary: IconLibrary;
   /** Accent color; left out when 'base' (none). */
-  theme?: string;
-  /** Chart color source; left out when 'theme'. */
+  accent?: string;
+  /** Chart color source; left out when 'accent'. */
   chartColor?: string;
   /** Left out when 'subtle'. */
   menuAccent?: string;
+  /** The whole look as an `ivp1_` code, written when a dial is off its default, so `apply <theme>` keeps the dials. */
+  preset?: string;
   /** Where blocks go. Default: next to `path` (`src/app/ui` → `src/app/blocks`). */
   blocksPath?: string;
   registry?: string;
@@ -42,16 +44,31 @@ export function readConfig(root: string): ComponentsJson {
   return validateConfig(value);
 }
 
+/**
+ * A 1.5 file names the theme `style` and the accent `theme` (chartColor 'theme' = follow the accent).
+ * Read it in today's names; `ivorie apply` writes them back. shortcut: drop in 2.0 with the other aliases.
+ */
+export function migrateConfig(value: Record<string, unknown>): Record<string, unknown> {
+  if (value['style'] === undefined) return value;
+  const { style, theme, ...rest } = value;
+  return {
+    ...rest,
+    theme: style,
+    ...(theme !== undefined && { accent: theme }),
+    ...(rest['chartColor'] !== undefined && { chartColor: rest['chartColor'] === 'theme' ? 'accent' : rest['chartColor'] }),
+  };
+}
+
 export function validateConfig(value: unknown): ComponentsJson {
   if (!value || typeof value !== 'object') throw new Error('components.json: expected an object');
-  const v = value as Record<string, unknown>;
+  const v = migrateConfig(value as Record<string, unknown>);
   const str = (obj: Record<string, unknown>, key: string, name = key) => {
     if (typeof obj[key] !== 'string' || obj[key] === '') {
       throw new Error(`components.json: "${name}" must be a non-empty string`);
     }
     return obj[key] as string;
   };
-  for (const key of ['path', 'style', 'font', 'radius']) str(v, key);
+  for (const key of ['path', 'theme', 'font', 'radius']) str(v, key);
   if (!PREFIX.test(str(v, 'prefix'))) {
     throw new Error(`components.json: "prefix" must match ${PREFIX.source}`);
   }
@@ -63,6 +80,6 @@ export function validateConfig(value: unknown): ComponentsJson {
     throw new Error(`components.json: "iconLibrary" must be one of ${ICON_LIBRARIES.join(', ')}`);
   }
   if (v['registry'] !== undefined) str(v, 'registry');
-  for (const key of ['fontHeading', 'theme', 'chartColor', 'menuAccent']) if (v[key] !== undefined) str(v, key);
+  for (const key of ['fontHeading', 'accent', 'chartColor', 'menuAccent', 'preset']) if (v[key] !== undefined) str(v, key);
   return v as unknown as ComponentsJson;
 }

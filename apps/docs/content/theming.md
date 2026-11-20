@@ -1,11 +1,67 @@
 ---
 title: Theming
-description: Change colors, radius and dark mode with CSS variables.
+description: Pick a theme, tune it, set its dials, change colors with CSS variables.
 section: guide
 order: 2
 ---
 
 Ivorie colors are CSS variables set in `theme.css`. Change a variable and every component follows.
+
+## Themes and dials
+
+A theme is what you pick. Each comes with its own accent, base color, font and radius. Change any of them, and set the dials.
+
+```
+Theme   slate, glass, bento …   the look of every component, plus its own defaults
+Change  accent, base color, chart color, menu highlight, font, heading font, radius, icons
+Dials   density, contrast, motion …   tune the theme inside its signature
+```
+
+`npx ivorie init` gives the slate theme with the blue accent. Slate was called graphite in 1.5; `graphite` still works until 2.0. Pass another with `--theme <name>`, or switch later with `npx ivorie apply <name>`.
+
+| Theme | Base color, accent | Font | Radius | Dials |
+|---|---|---|---|---|
+| `slate` | zinc, blue | Geist | small | none |
+| `glass` | neutral, violet | Inter | large | none |
+| `bento` | neutral, lime | Outfit | large | none |
+| `midnight` | zinc, sky | Geist | medium | none |
+| `clay` | taupe, rose, accent menus | Figtree | medium | none |
+| `mono` | neutral, amber | Geist Mono | none | motion snappy |
+| `tint` | mauve, fuchsia | Figtree | default | none |
+| `nova` | zinc, indigo | DM Sans | default | none |
+| `luma` | mist, cyan | Nunito Sans | large | none |
+| `mira` | neutral, emerald | IBM Plex Sans | small | density compact |
+| `sera` | taupe, red | Source Sans 3, Playfair Display headings | none | none |
+
+Each theme has a signature that no dial removes, and takes only the dials that fit it:
+
+| Theme | Signature | Dials |
+|---|---|---|
+| Glass | Translucent panes. Edges drawn with light. Page light from the accent and its chart colors. | density, contrast, motion, panels, rim, shadow, blur, ambient |
+| Bento | Tonal tiles, no outlines. The chosen item is an ink pill. The hero card is filled. | density, contrast, motion, panels, rim, shadow |
+| Clay | Warm tiles with a fine inner rim and light titles. The chosen item takes the accent. The hero card is a well. | density, contrast, motion, panels, rim, shadow |
+| Midnight | Deep panes and hairlines. The accent shows as light under the hero card, the primary button and chart bars. | density, contrast, motion, panels, rim, shadow, blur |
+| Slate | Matte and solid. A lit top edge, pressed-in fields. | density, contrast, motion, rim, shadow |
+| Tint | Every surface takes a wash of `--primary`. | density, contrast, motion, panels, shadow |
+| Mono | A terminal. Flat hairlines, a block caret. | density, contrast, motion |
+| Classic | shadcn/ui's own looks: nova, luma, mira, sera. | density, contrast, motion |
+
+| Dial | Values (default first) | What it does |
+|---|---|---|
+| `density` | `default`, `compact`, `roomy` | Sets `--spacing` to 0.8 or 1.2 times Tailwind's. |
+| `contrast` | `default`, `soft`, `high` | Remixes `--border` and `--input` toward the background (soft) or the text (high). High also darkens muted text. |
+| `motion` | `calm`, `snappy`, `off` | Snappy: shorter, springy transitions. Off: no transitions or animations. |
+| `panels` | `default`, `solid`, `translucent` | Solid or see-through panes (`--iv-panel-solid`). |
+| `rim` | `default`, `none`, `subtle`, `strong` | Scales the edge light (`--iv-rim`). |
+| `shadow` | `default`, `none`, `soft`, `deep` | Scales the shadows (`--iv-shadow`). |
+| `blur` | `default`, `low`, `high` | Scales the backdrop blur (`--iv-blur`). |
+| `ambient` | `default`, `off`, `soft`, `vivid` | Scales the light on the page behind the panes (`--iv-ambient`). Light mode only; a dark Glass page stays unlit. |
+
+Density sets `--spacing` on `:root`, so it scales every Tailwind spacing value in your app, your own `p-*` and `gap-*` too, not only Ivorie parts. That is what a compact mode means in most apps. The default theme leaves it at `default`.
+
+A dial a theme does not take is greyed out in the [playground](playground). The CLI drops it and says so.
+
+`IvCard` takes `emphasis="hero"` for the lead card. Each Ivorie theme gives it its own treatment; Classic themes show a normal card.
 
 ## Tokens
 
@@ -54,37 +110,41 @@ Add the class `dark` to `<html>`.
 <html class="dark">
 ```
 
-## Style class
+## Theme class
 
-A style class on `<body>` selects the component look: spacing, radius, borders and shadows. Ivorie ships the eight shadcn/ui styles, copied rule for rule, and three of its own:
+A theme class on `<body>` (or any element) turns the theme on: spacing, radius, borders and shadows. Ivorie ships seven themes of its own and shadcn/ui's, copied rule for rule. Vega, Maia, Rhea and Lyra are legacy: they still work, are hidden from pickers, and leave in 2.0.
 
-| Style | Class | Look |
+| Theme | Class | Signature |
 |---|---|---|
-| Vega | `style-vega` | Clean, neutral and familiar. |
-| Nova | `style-nova` | Reduced padding and margins. |
-| Maia | `style-maia` | Rounded, with generous spacing. |
-| Luma | `style-luma` | Fluid, luminous and soft. |
-| Rhea | `style-rhea` | Like Luma, but compact. |
-| Lyra | `style-lyra` | Boxy and sharp. For mono fonts. |
-| Mira | `style-mira` | Made for compact interfaces. |
-| Sera | `style-sera` | Editorial and typographic. |
-| Glass | `style-glass` | Thick panes of neutral glass. Edges drawn with light: a rim on top, a hairline, a shadow below. The faint light under the glass follows `--primary`. Solid when the browser has no backdrop blur or the user asks for less transparency. |
-| Bento | `style-bento` | Tonal tiles on a toned page, no outlines, big type. |
-| Mono | `style-mono` | A terminal: flat, with hairlines, a block caret, inverted selection and spaced capital labels. Font and radius follow the preset like every style; it is made for a mono font (the playground picks Geist Mono). |
-| Graphite | `style-graphite` | Matte solid panes, no blur. A fine line of light on the top edge, a hairline round, a short shadow below. Fields and tracks are pressed in. |
-| Tint | `style-tint` | Page, panes, lines and states take a light wash of `--primary`. Pick an accent and the whole UI carries its hue. |
+| Glass | `theme-glass` | Thick panes of neutral glass. Edges drawn with light: a rim on top, a hairline, a shadow below. The faint light under the glass follows `--primary`. Solid when the browser has no backdrop blur or the user asks for less transparency. |
+| Bento | `theme-bento` | Tonal tiles on a toned page, no outlines, big type. The chosen tab, toggle and page are ink pills. |
+| Clay | `theme-clay` | Bento's tiles and wells, with a fine inner rim, light titles, accent pills for the chosen item and a hero card sunk into a well. |
+| Midnight | `theme-midnight` | Deep neutral panes and hairlines. The accent shows as light: it pools under the hero card, glows under the primary button, lights the top of chart bars. Made for dark; light mode is a calm dusk. |
+| Slate | `theme-slate` | Matte solid panes, no blur. A fine line of light on the top edge, a hairline round, a short shadow below. Fields and tracks are pressed in. |
+| Tint | `theme-tint` | Page, panes, lines and states take a light wash of `--primary`. Pick an accent and the whole UI carries its hue. |
+| Mono | `theme-mono` | A terminal: flat, with hairlines, a block caret, inverted selection and spaced capital labels. Made for a mono font (the playground picks Geist Mono). |
+| Nova | `theme-nova` | Reduced padding and margins. |
+| Luma | `theme-luma` | Fluid, luminous and soft. |
+| Mira | `theme-mira` | Made for compact interfaces. |
+| Sera | `theme-sera` | Editorial and typographic. |
+| Vega (legacy) | `theme-vega` | Clean, neutral and familiar. |
+| Maia (legacy) | `theme-maia` | Rounded, with generous spacing. |
+| Rhea (legacy) | `theme-rhea` | Like Luma, but compact. |
+| Lyra (legacy) | `theme-lyra` | Boxy and sharp. For mono fonts. |
 
-Import the file for each style you use, then set its class:
+Import the file for each theme you use, then set its class:
 
 ```css
-@import "@inlaylab/ivorie/styles/style-nova.css";
+@import "@inlaylab/ivorie/styles/theme-nova.css";
 ```
 
 ```html
-<body class="style-nova">
+<body class="theme-nova">
 ```
 
-Try each style, with your colors and radius, in the [playground](playground).
+Before 1.6 these were called styles: `style-nova.css` and `class="style-nova"`. Both still work until 2.0.
+
+Try each theme, with your colors and radius, in the [playground](playground).
 
 ## Override a token
 
@@ -92,7 +152,7 @@ Declare your values after the imports. Use `:root` for light and `.dark` for dar
 
 ```css
 @import "@inlaylab/ivorie/styles/theme.css";
-@import "@inlaylab/ivorie/styles/style-nova.css";
+@import "@inlaylab/ivorie/styles/theme-nova.css";
 
 :root {
   --primary: oklch(0.55 0.2 260);
@@ -133,12 +193,12 @@ The base colors are near-gray, so charts are gray too. An accent adds color: it 
 - **Menu accent** `bold` paints menu and list highlights (`--accent`) in the primary color. `subtle` keeps the base color's.
 
 ```bash
-npx ivorie init --theme blue --chart-color emerald --menu-accent bold
+npx ivorie init --accent blue --chart-color emerald --menu-accent bold
 ```
 
-## Presets
+## Share codes
 
-Base color, accent, chart color, menu accent, font, heading font and radius are preset choices. Pick them in the [playground](playground), then run `npx ivorie init --preset ivp1_…` in a new app or `npx ivorie apply ivp1_…` in an existing one.
+The [playground](playground) turns your theme and every change you made into one code (`ivp1_…`). Run `npx ivorie init --theme ivp1_…` in a new app or `npx ivorie apply ivp1_…` in an existing one.
 
 | Radius | `--radius` |
 |---|---|

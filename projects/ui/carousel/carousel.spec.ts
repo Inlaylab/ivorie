@@ -54,6 +54,16 @@ describe('IvCarousel', () => {
     expect(next.classList).toContain('cn-button-variant-outline')
   })
 
+  it('the gutter sits before each slide (-ml-4 / pl-4), as in 1.5: moving it is a 2.0 change', async () => {
+    const { el } = await setup()
+    const content = el.querySelector('[data-slot="carousel-content"]')!
+    expect(content.classList).toContain('-ml-4')
+    expect(content.classList).not.toContain('-mr-4')
+    const item = el.querySelector('[aria-roledescription="slide"]')!
+    expect(item.classList).toContain('pl-4')
+    expect(item.classList).not.toContain('pr-4')
+  })
+
   it('buttons enable by scroll position and scroll one viewport', async () => {
     const { prev, next, viewport, scrollTo } = await setup()
     await scrollTo(0)

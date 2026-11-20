@@ -10,7 +10,7 @@ const blocks = buildItems().filter((i) => i.meta.ivorie.kind === 'block');
 const byName = (n: string) => blocks.find((b) => b.name === n)!;
 
 test('every block is a registry item', () => {
-  assert.equal(blocks.length, 22);
+  assert.equal(blocks.length, 25);
   for (const b of blocks) {
     assert.ok(b.files!.length > 1, b.name);
     for (const f of b.files!) {

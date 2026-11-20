@@ -5,12 +5,13 @@ import { filter, map } from 'rxjs';
 // Single parts, not IV_SIDEBAR_IMPORTS: the menu button pulls the tooltip overlay into the first load.
 import { IvSidebar, IvSidebarContent, IvSidebarInset, IvSidebarProvider } from '@inlaylab/ivorie/sidebar';
 import { Appearance } from './shell/appearance';
+import { SiteFooter } from './shell/site-footer';
 import { SiteHeader } from './shell/site-header';
 import { SiteNav } from './shell/site-nav';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, IvSidebar, IvSidebarContent, IvSidebarInset, IvSidebarProvider, SiteHeader, SiteNav],
+  imports: [RouterOutlet, IvSidebar, IvSidebarContent, IvSidebarInset, IvSidebarProvider, SiteFooter, SiteHeader, SiteNav],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './app.html',
 })
@@ -28,6 +29,9 @@ export class App {
   protected readonly docs = computed(() => /(^|\/)docs(\/|$)/.test(this.url().split(/[?#]/)[0]));
   /** /preview pages fill an iframe: no header, no sidebar. Server and client both read it from the URL. */
   protected readonly preview = computed(() => /(^|\/)preview\//.test(this.url().split(/[?#]/)[0]));
+
+  /** The playground is a full-height tool: no footer below it. */
+  protected readonly playground = computed(() => /(^|\/)playground(\/|$)/.test(this.url().split(/[?#]/)[0]));
 
   constructor() {
     // Start syncing the saved light/dark mode with <html>.

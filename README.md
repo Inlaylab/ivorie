@@ -4,8 +4,8 @@
 
 # Ivorie
 
-**Angular components with the [shadcn/ui](https://github.com/shadcn-ui/ui) look and behavior.**
-Use them as an npm package, or copy the source into your app and own it.
+**Angular components with [shadcn/ui](https://github.com/shadcn-ui/ui)'s behavior, and themes of their own.**
+Install the npm package, or copy the source into your app and own it.
 
 [![npm](https://img.shields.io/npm/v/@inlaylab/ivorie?label=%40inlaylab%2Fivorie&color=7c3aed)](https://www.npmjs.com/package/@inlaylab/ivorie)
 [![CLI](https://img.shields.io/npm/v/ivorie?label=ivorie%20CLI&color=7c3aed)](https://www.npmjs.com/package/ivorie)
@@ -18,14 +18,14 @@ Use them as an npm package, or copy the source into your app and own it.
 
 </div>
 
-## Features
+## What's in it
 
-- 🧩 **54 components**, one entry point each (`@inlaylab/ivorie/button`). You ship only what you import.
-- 🧱 **22 blocks**: login, sign-up, sidebar and dashboard pages, wired with forms and typed outputs.
-- 📊 **Charts**: line, area, bar, pie, radar and radial. SVG, server-rendered, keyboard support.
-- 🎨 **13 styles**, 7 base colors, 17 accents, 5 icon libraries. Pick a look in the playground, install it with one command.
-- ⚡ **Modern Angular**: signals, zoneless, OnPush, SSR without hydration warnings. Standalone and NgModule apps.
-- ♿ **Accessible**: keyboard and ARIA patterns follow [Radix UI](https://github.com/radix-ui/primitives). Every spec runs axe.
+- 60 components and data parts, each with its own entry point (`@inlaylab/ivorie/button`). Your bundle gets only what you import.
+- 25 blocks: login, sign-up, sidebar, dashboard, stats, usage and status pages, wired to forms with typed outputs.
+- Charts: line, area, bar, pie, radar and radial. SVG, rendered on the server, usable with the keyboard.
+- 11 themes: 7 of Ivorie's own (slate, glass, bento, midnight, clay, mono, tint) and shadcn/ui's nova, luma, mira and sera. Dials tune density, contrast, motion and more. Pick a look in the playground and install it with one command.
+- Modern Angular: signals, zoneless, OnPush, SSR with no hydration warnings. Works in standalone and NgModule apps.
+- Accessible: keyboard and ARIA follow [Radix UI](https://github.com/radix-ui/primitives), and every spec runs axe.
 
 ## Quick start
 
@@ -41,10 +41,10 @@ npm i -D tailwindcss @tailwindcss/postcss tw-animate-css
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "@inlaylab/ivorie/styles/theme.css";
-@import "@inlaylab/ivorie/styles/style-nova.css";
+@import "@inlaylab/ivorie/styles/theme-slate.css";
 ```
 
-Add `class="style-nova"` to `<body>`, then import what you need:
+Add `class="theme-slate"` to `<body>`, then import what you need:
 
 ```ts
 import { IvButton } from '@inlaylab/ivorie/button';
@@ -55,7 +55,7 @@ Full steps: [Installation](https://inlaylab.github.io/ivorie/docs/installation).
 ### Option 2: copy the source
 
 ```bash
-npx ivorie init                 # theme, style, components.json
+npx ivorie init                 # slate theme: theme.css, theme-slate.css, components.json
 npx ivorie add button dialog    # components land in src/app/ui/
 npx ivorie add login-01         # blocks land in src/app/blocks/
 ```
@@ -85,17 +85,17 @@ npm run check -- --only test-blocks,test-docs   # some gates only
 
 | Script | What it does |
 |---|---|
-| `npm run check` | Builds the library, CLI, registry and docs. Runs all tests and the SSR smoke. No network. |
+| `npm run check` | Builds the library, CLI, registry and docs, runs every test and the SSR smoke. No network. |
 | `npm run smoke:pack` | Builds the docs and the NgModule app against the `npm pack` tarball. |
-| `npm run smoke:cli` | Two fresh `ng new --ssr` apps: CLI copy and npm package must match. Needs network. |
+| `npm run smoke:cli` | Sets up two fresh `ng new --ssr` apps, one with the CLI and one with the package, and checks they match. Needs network. |
 | `npm run docs:build` | Static docs in `dist/docs/browser`. See [DEPLOY](docs/DEPLOY.md). |
 
 Read [CONTRIBUTING](CONTRIBUTING.md) before you open a PR.
 
 ## Roadmap
 
-- **1.6** More theme dials: density, glass thickness.
-- **1.7** AI-ready: AGENTS.md, llms.txt, MCP server.
+- **1.7** AI-ready: AGENTS.md, llms.txt and an MCP server.
+- **2.0** New themes. Legacy themes and the 1.5 aliases are removed.
 
 Past releases: [CHANGELOG](CHANGELOG.md). Plan and status: [ROADMAP](ROADMAP.md).
 
@@ -103,16 +103,16 @@ Past releases: [CHANGELOG](CHANGELOG.md). Plan and status: [ROADMAP](ROADMAP.md)
 
 | Doc | About |
 |---|---|
-| [ARCHITECTURE](docs/ARCHITECTURE.md) | Repo layout, entry points, theme |
+| [ARCHITECTURE](docs/ARCHITECTURE.md) | Repo layout, entry points, themes |
 | [CONVENTIONS](docs/CONVENTIONS.md) | Component rules and the "add a component" checklist |
-| [DECISIONS](docs/DECISIONS.md) | One line per design choice |
+| [DECISIONS](docs/DECISIONS.md) | The rules the project follows, and why |
 | [DEPLOY](docs/DEPLOY.md) | Docs hosting and npm publishing |
 | [SECURITY](SECURITY.md) | Report a vulnerability |
 | [NOTICE](NOTICE.md) | Credits |
 
 ## Support
 
-Ivorie is free and MIT licensed. If it saves you time, you can [buy me a coffee ☕](https://buymeacoffee.com/bhavikbhensajaliya).
+Ivorie is free and MIT licensed. If it saves you time, you can [buy me a coffee](https://buymeacoffee.com/bhavikbhensajaliya).
 
 ## License
 

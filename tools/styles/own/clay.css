@@ -1,0 +1,406 @@
+/* @base maia */
+/* @dials density contrast motion panels rim shadow */
+/*
+ * Clay: warm, hand-thrown tiles. Bento's tiles and wells, with its own signature:
+ *   1. Every tile has a fine inner hairline, like a glazed rim.
+ *   2. The chosen item is filled with the accent (--primary), not ink.
+ *   3. The hero card is a well sunk into the page, not a fill: the numbers sit in the clay.
+ *   4. Titles are light and large.
+ * Dials: --iv-panel-solid (1 = solid tiles, the default; 0 = --clay-alpha), --iv-rim scales the
+ * top light, --iv-shadow the contact and float shadows.
+ * Maia gives the round, roomy layout; these blocks only add to it.
+ */
+
+& {
+  /* Tracker: ok follows the accent, but this accent reads as a warning or an error, so ok stays green. */
+  --clay-page: color-mix(in oklab, var(--muted), var(--foreground) 4%);
+  --clay-muted-mix: 0.62;
+  --clay-tile: var(--card);
+  --clay-well: color-mix(in oklab, var(--muted) 85%, var(--card));
+  --clay-well-hover: color-mix(in oklab, var(--muted), var(--foreground) 7%);
+  --clay-float-shadow: color-mix(in oklab, black min(100%, calc(16% * var(--iv-shadow, 1))), transparent);
+  /* Tiles after the panels dial: solid by default, --clay-alpha when translucent. */
+  --clay-alpha: 0.72;
+  --clay-pane-alpha: calc(var(--iv-panel-solid, 1) + (1 - var(--iv-panel-solid, 1)) * var(--clay-alpha));
+  --clay-tile-pane: color-mix(in oklab, var(--clay-tile) calc(var(--clay-pane-alpha) * 100%), transparent);
+  --clay-rim: color-mix(in oklab, white min(100%, calc(70% * var(--iv-rim, 1))), transparent);
+  --clay-shade: color-mix(in oklab, black min(100%, calc(5% * var(--iv-shadow, 1))), transparent);
+  --clay-line: color-mix(in oklab, var(--foreground) 8%, transparent);
+  --clay-tile-shadow: inset 0 0 0 1px var(--clay-line), inset 0 1px 0 var(--clay-rim), 0 1px 3px var(--clay-shade);
+  --clay-chosen: var(--primary);
+  --clay-chosen-foreground: var(--primary-foreground);
+  /* The hero card is a well: solid, whatever the panels dial says. */
+  --clay-hero: var(--clay-well);
+  --clay-hero-foreground: var(--foreground);
+  --clay-hero-alpha: 1;
+}
+
+/* The page ground. Not on the CDK overlay container: it covers the whole screen, so a ground there hides the page. */
+&:not(.cdk-overlay-container) {
+  background-color: var(--clay-page);
+}
+
+.dark & {
+  --clay-page: var(--background);
+  --clay-muted-mix: 0.7;
+  --clay-tile: color-mix(in oklab, var(--card), white 3%);
+  --clay-well: color-mix(in oklab, var(--muted), white 4%);
+  --clay-well-hover: color-mix(in oklab, var(--muted), white 10%);
+  --clay-float-shadow: color-mix(in oklab, black min(100%, calc(60% * var(--iv-shadow, 1))), transparent);
+  --clay-rim: color-mix(in oklab, white min(100%, calc(6% * var(--iv-rim, 1))), transparent);
+  --clay-shade: color-mix(in oklab, black min(100%, calc(30% * var(--iv-shadow, 1))), transparent);
+}
+
+/* Muted text sits on the toned page too: mixed a little darker. On every element, not the root,
+   because the playground sets the base colors inline on the root. */
+& :where(*) {
+  --muted-foreground: color-mix(in oklab, var(--foreground) calc((1 - var(--iv-muted-keep, 1) * (1 - var(--clay-muted-mix))) * 100%), var(--background));
+}
+
+/* Tiles: tone, with a fine inner hairline. */
+.cn-stat,
+.cn-card,
+.cn-alert,
+.cn-item-variant-outline {
+  @apply rounded-3xl border-0 bg-(--clay-tile-pane) ring-0 shadow-(--clay-tile-shadow);
+}
+
+/* The hero card is a well sunk into the page, rimmed by the hairline. */
+& .cn-card[data-emphasis='hero'] {
+  @apply bg-(--clay-hero) text-(--clay-hero-foreground) shadow-[inset_0_0_0_1px_var(--clay-line),inset_0_2px_4px_var(--clay-shade)];
+}
+
+.cn-card-title,
+.cn-dialog-title,
+.cn-sheet-title {
+  @apply text-xl font-light tracking-tight;
+}
+
+& .cn-empty {
+  @apply rounded-3xl border-0 bg-(--clay-well);
+}
+
+/* Floating tiles: a soft lift instead of a ring. */
+.cn-popover-content,
+.cn-hover-card-content,
+.cn-dialog-content,
+.cn-alert-dialog-content,
+.cn-dropdown-menu-content,
+.cn-select-content,
+.cn-combobox-content,
+.cn-command,
+.cn-navigation-menu-viewport,
+.cn-chart-tooltip,
+.cn-toast {
+  @apply rounded-3xl ring-0 shadow-[0_16px_48px_-12px_var(--clay-float-shadow)];
+}
+
+& .cn-dialog-content .cn-command {
+  @apply rounded-none shadow-none;
+}
+
+/* A tooltip is small: a smaller radius than a menu, the same lift. */
+& .cn-chart-tooltip {
+  @apply rounded-2xl border-0;
+}
+
+& .cn-sheet-content {
+  @apply border-0 data-[side=bottom]:rounded-t-3xl data-[side=left]:rounded-r-3xl data-[side=right]:rounded-l-3xl data-[side=top]:rounded-b-3xl;
+}
+
+& .cn-drawer-content {
+  @apply border-0;
+}
+
+/* The sidebar sits on the page tone; its floating variant is a tile. */
+& .cn-sidebar-inner {
+  @apply bg-transparent group-data-[variant=floating]:rounded-3xl group-data-[variant=floating]:bg-(--clay-tile-pane) group-data-[variant=floating]:ring-0 group-data-[variant=floating]:shadow-(--clay-tile-shadow);
+}
+
+& .cn-tooltip-content {
+  @apply rounded-xl;
+}
+
+.cn-dialog-overlay,
+.cn-sheet-overlay {
+  @apply bg-[color-mix(in_oklab,black_22%,transparent)] backdrop-blur-[2px];
+}
+
+/* Wells: fields and tracks are a darker tone, no border; focus brings a soft ring. */
+.cn-input,
+.cn-textarea,
+.cn-input-group,
+.cn-select-trigger,
+.cn-native-select {
+  @apply rounded-2xl border-transparent bg-(--clay-well) shadow-none focus-visible:border-transparent focus-visible:ring-2 focus-visible:ring-ring/25 dark:bg-(--clay-well) dark:hover:bg-(--clay-well-hover);
+}
+
+& .cn-input-group-input {
+  @apply bg-transparent shadow-none backdrop-blur-none inset-shadow-none dark:bg-transparent;
+}
+
+& .cn-input-group {
+  @apply has-[[data-slot=input-group-control]:focus-visible]:border-transparent has-[[data-slot=input-group-control]:focus-visible]:ring-2 has-[[data-slot=input-group-control]:focus-visible]:ring-ring/25;
+}
+
+& .cn-input-otp-slot {
+  @apply border-transparent bg-(--clay-well) first:rounded-l-2xl last:rounded-r-2xl data-[active=true]:ring-2 data-[active=true]:ring-ring/25 dark:bg-(--clay-well);
+}
+
+/* Unchecked only: data-checked is a :where() variant, so a plain fill here would cover nova's checked primary. */
+.cn-checkbox,
+.cn-radio-group-item {
+  @apply data-unchecked:border-transparent data-unchecked:bg-(--clay-well-hover) dark:data-unchecked:bg-(--clay-well-hover);
+}
+
+/* Buttons: tonal, pill-shaped (from maia); only the primary is filled with color. */
+.cn-button-variant-outline,
+.cn-button-variant-secondary {
+  @apply border-transparent bg-(--clay-well) shadow-none hover:bg-(--clay-well-hover) aria-expanded:bg-(--clay-well-hover) dark:bg-(--clay-well) dark:hover:bg-(--clay-well-hover);
+}
+
+& .cn-button-variant-secondary {
+  @apply bg-clip-border bg-[color-mix(in_oklab,var(--primary)_12%,transparent)] text-primary hover:bg-[color-mix(in_oklab,var(--primary)_18%,transparent)] aria-expanded:bg-[color-mix(in_oklab,var(--primary)_18%,transparent)] dark:bg-[color-mix(in_oklab,var(--primary)_20%,transparent)] dark:hover:bg-[color-mix(in_oklab,var(--primary)_26%,transparent)];
+}
+
+& .cn-button-variant-outline {
+  @apply border-border dark:border-input;
+}
+
+& .cn-button-variant-ghost {
+  @apply hover:bg-(--clay-well) aria-expanded:bg-(--clay-well) dark:hover:bg-(--clay-well);
+}
+
+& .cn-button-variant-default {
+  @apply shadow-none;
+}
+
+& .cn-pagination-link {
+  @apply rounded-xl;
+}
+
+& .cn-switch {
+  @apply border-transparent data-unchecked:bg-(--clay-well-hover) dark:data-unchecked:bg-(--clay-well-hover);
+}
+
+& .cn-switch-thumb {
+  @apply shadow-sm;
+}
+
+& .cn-slider-track,
+& .cn-progress {
+  @apply bg-(--clay-well-hover);
+}
+
+& .cn-slider-range,
+& .cn-progress-indicator {
+  @apply rounded-full;
+}
+
+& .cn-slider-thumb {
+  @apply size-5 border-0 bg-background shadow-md;
+}
+
+.cn-toggle,
+.cn-toggle-group-item {
+  @apply hover:bg-(--clay-well) aria-pressed:bg-(--clay-well-hover) data-[state=on]:bg-(--clay-well-hover);
+}
+
+/* The chosen item in a group is an accent pill. */
+& .cn-toggle-group-item {
+  @apply data-[state=on]:bg-(--clay-chosen) data-[state=on]:text-(--clay-chosen-foreground) data-[state=on]:hover:bg-(--clay-chosen);
+}
+
+/* Lists and menus: a tonal highlight, rounded like a tile. */
+.cn-dropdown-menu-item,
+.cn-select-item {
+  @apply rounded-xl focus:bg-(--clay-well);
+}
+
+& .cn-combobox-item {
+  @apply rounded-xl data-highlighted:bg-(--clay-well);
+}
+
+& .cn-command-item {
+  @apply rounded-xl data-selected:bg-(--clay-well);
+}
+
+/* The active page is an accent pill. */
+& .cn-sidebar-menu-button {
+  @apply rounded-xl hover:bg-(--clay-well) data-active:bg-(--clay-chosen) data-active:font-medium data-active:text-(--clay-chosen-foreground) data-active:hover:bg-(--clay-chosen) data-active:hover:text-(--clay-chosen-foreground);
+}
+
+& .cn-navigation-menu-link {
+  @apply data-[active=true]:bg-(--clay-chosen) data-[active=true]:text-(--clay-chosen-foreground) data-[active=true]:hover:bg-(--clay-chosen) data-[active=true]:focus:bg-(--clay-chosen);
+}
+
+.cn-navigation-menu-trigger,
+.cn-menubar-trigger {
+  @apply rounded-xl hover:bg-(--clay-well) focus:bg-(--clay-well) aria-expanded:bg-(--clay-well) data-open:bg-(--clay-well) data-open:hover:bg-(--clay-well);
+}
+
+& .cn-tabs-list {
+  @apply rounded-2xl bg-(--clay-well) data-[variant=line]:bg-transparent;
+}
+
+/* The active tab is an accent pill. Important: the trigger's own active colors are utilities. */
+& .cn-tabs-trigger {
+  @apply rounded-xl data-active:bg-(--clay-chosen)! data-active:text-(--clay-chosen-foreground)! data-active:shadow-none group-data-[variant=line]/tabs-list:data-active:bg-transparent! group-data-[variant=line]/tabs-list:data-active:text-foreground!;
+}
+
+& .cn-calendar-day-button {
+  @apply rounded-xl hover:bg-(--clay-well);
+}
+
+/* Data: no row lines; quiet stripes carry the rows. */
+& .cn-table-head {
+  @apply text-muted-foreground font-medium;
+}
+
+& .cn-table-header {
+  @apply [&_tr]:border-b-0;
+}
+
+& .cn-table-row {
+  @apply border-0 even:bg-[color-mix(in_oklab,var(--clay-well)_55%,transparent)] hover:bg-(--clay-well) data-[state=selected]:bg-(--clay-well-hover);
+}
+
+/* Accordion items are tiles of their own: no frame around them. */
+& .cn-accordion {
+  @apply overflow-visible rounded-none border-0;
+}
+
+& .cn-accordion-item {
+  @apply mb-2 rounded-2xl border-0 bg-(--clay-well) px-4 not-last:border-b-0;
+}
+
+& .cn-badge {
+  @apply border-0;
+}
+
+.cn-badge-variant-secondary,
+.cn-badge-variant-outline {
+  @apply bg-(--clay-well-hover);
+}
+
+& .cn-avatar {
+  @apply ring-0;
+}
+
+& .cn-kbd {
+  @apply rounded-md bg-(--clay-well-hover);
+}
+
+& .cn-skeleton {
+  @apply rounded-xl bg-(--clay-well-hover);
+}
+
+/* The field separator label masks its line with --background, which is not the tile tone. */
+& .cn-field-separator {
+  @apply flex items-center gap-2 before:h-px before:flex-1 before:bg-(--clay-well-hover) after:h-px after:flex-1 after:bg-(--clay-well-hover) [&>div]:hidden;
+}
+
+& .cn-field-separator-content {
+  @apply bg-transparent px-0;
+}
+
+/* Destructive text sits on a toned surface here: mixed toward the foreground, so it keeps 4.5:1. */
+.cn-badge-variant-destructive,
+.cn-button-variant-destructive {
+  @apply text-[color-mix(in_oklab,var(--destructive),var(--foreground)_28%)];
+}
+
+/* Less transparency asked for: tiles turn solid. */
+@media (prefers-reduced-transparency: reduce) {
+  &,
+  .dark & {
+    --iv-panel-solid: 1;
+  }
+}
+
+/* Shape: rounded, hand-thrown controls. */
+& .cn-button,
+& .cn-button-size-xs,
+& .cn-button-size-sm,
+& .cn-button-size-icon-xs,
+& .cn-button-size-icon-sm,
+& .cn-tabs-trigger,
+& .cn-toggle,
+& .cn-toggle-size-sm {
+  @apply rounded-xl;
+}
+
+/* A rounded box with a rim; radios stay round. */
+& .cn-checkbox {
+  @apply rounded-md;
+}
+
+/* Navigation and grouping: the current item is an accent tile with a fine rim; groups sit in a pressed tray. */
+& .cn-breadcrumb-page {
+  @apply font-medium;
+}
+
+& .cn-breadcrumb-link {
+  @apply hover:text-(--clay-chosen);
+}
+
+& .cn-pagination-link[data-active] {
+  @apply border-transparent bg-(--clay-chosen) text-(--clay-chosen-foreground) shadow-[inset_0_1px_0_var(--clay-rim)] hover:bg-(--clay-chosen) hover:text-(--clay-chosen-foreground);
+}
+
+& .cn-calendar-day-button[data-selected-single='true'],
+& .cn-calendar-day-button[data-range-start='true'],
+& .cn-calendar-day-button[data-range-end='true'] {
+  @apply shadow-[inset_0_1px_0_var(--clay-rim)];
+}
+
+/* The calendar reads its day colours from these vars (calendar.ts). */
+& .cn-calendar {
+  --calendar-range: var(--clay-well-hover);
+}
+
+& .cn-button-group-text {
+  @apply border-transparent bg-(--clay-well) shadow-[inset_0_1px_2px_var(--clay-shade)];
+}
+
+& .cn-button-group-separator {
+  @apply bg-(--clay-line);
+}
+
+& .cn-resizable-handle {
+  @apply bg-(--clay-line);
+}
+
+& .cn-resizable-handle-icon {
+  @apply h-8 w-1.5 rounded-full bg-(--clay-well-hover) shadow-[inset_0_1px_1px_var(--clay-shade)];
+}
+
+& .cn-label {
+  @apply font-normal;
+}
+
+/* Rich parts: the icon chip takes the accent with a fine rim; tracks are pressed wells. */
+& .cn-stat-icon {
+  @apply rounded-xl bg-(--clay-chosen) text-(--clay-chosen-foreground) shadow-[inset_0_1px_0_var(--clay-rim)];
+}
+
+/* Filled marks are raised: a fine light edge on top. */
+& .cn-meter-tick[data-filled],
+& span.cn-gauge-segment[data-filled],
+& .cn-tracker-bar:not([data-status='none']) {
+  @apply shadow-[inset_0_1px_0_var(--clay-rim)];
+}
+
+& .cn-meter-tick:not([data-filled]),
+& span.cn-gauge-segment:not([data-filled]),
+& .cn-tracker-bar[data-status='none'] {
+  @apply bg-(--clay-well-hover) shadow-[inset_0_1px_1px_var(--clay-shade)];
+}
+
+& path.cn-gauge-segment:not([data-filled]) {
+  @apply stroke-(--clay-well-hover);
+}
+
+& .cn-bar-list-bar {
+  @apply rounded-lg bg-[color-mix(in_oklab,var(--primary)_16%,var(--clay-well-hover))];
+}

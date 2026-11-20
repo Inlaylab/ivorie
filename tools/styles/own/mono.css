@@ -1,12 +1,29 @@
 /* @base nova */
+/* @dials density contrast motion */
 /*
  * Mono: a terminal. Flat surfaces with hairlines, a block caret, inverted selection, spaced capital labels.
  * Nova gives the compact layout; these blocks only add to it.
  * Font and radius come from the theme like every style: pair it with a mono font and radius none
  * (the playground picks Geist Mono when you switch to it).
+ * No own dials: no shadow, no blur, no translucency. The hero card is inverted.
  */
 
+& {
+  /* Tracker: ok follows the accent, but this accent reads as a warning or an error, so ok stays green. */
+  --mono-hero: var(--foreground);
+  --mono-hero-foreground: var(--background);
+}
+
+& .cn-card[data-emphasis='hero'] {
+  @apply bg-(--mono-hero) text-(--mono-hero-foreground) ring-(--mono-hero);
+}
+
+& .cn-card[data-emphasis='hero'] :where(*) {
+  --muted-foreground: var(--mono-hero-foreground);
+}
+
 /* Flat: hairline frames, no shadows. */
+.cn-stat,
 .cn-card,
 .cn-dialog-content,
 .cn-alert-dialog-content,
@@ -71,4 +88,179 @@
 
 & .cn-kbd {
   @apply bg-transparent ring-1 ring-border;
+}
+
+/* Controls are square whatever the radius: a terminal has no curves. The radio dot is a square too. */
+& .cn-button,
+& .cn-button-size-xs,
+& .cn-button-size-sm,
+& .cn-button-size-icon-xs,
+& .cn-button-size-icon-sm,
+& .cn-checkbox,
+& .cn-radio-group-item,
+& .cn-radio-group-indicator-icon,
+& .cn-switch,
+& .cn-switch-thumb,
+& .cn-slider-track,
+& .cn-slider-range,
+& .cn-slider-thumb,
+& .cn-progress,
+& .cn-tabs-list,
+& .cn-tabs-trigger,
+& .cn-input,
+& .cn-textarea,
+& .cn-input-group,
+& .cn-select-trigger,
+& .cn-badge,
+& .cn-toggle,
+& .cn-toggle-size-sm,
+& .cn-toggle-group-item,
+& .cn-kbd {
+  @apply rounded-none;
+}
+
+/* The rest of the kit in the terminal's language: square, hairlines, inverted selection, spaced capitals. */
+& .cn-accordion-trigger,
+& .cn-alert,
+& .cn-avatar,
+& .cn-avatar-image,
+& .cn-avatar-fallback,
+& .cn-avatar-badge,
+& .cn-avatar-group-count,
+& .cn-button-group-text,
+& .cn-command,
+& .cn-command-input-group,
+& .cn-command-item,
+& .cn-drawer-content,
+& .cn-empty,
+& .cn-empty-media-icon,
+& .cn-input-otp-slot,
+& .cn-item,
+& .cn-item-media-variant-icon,
+& .cn-item-media-variant-image,
+& .cn-menubar,
+& .cn-menubar-trigger,
+& .cn-navigation-menu-trigger,
+& .cn-navigation-menu-link,
+& .cn-navigation-menu-viewport,
+& .cn-native-select,
+& .cn-resizable-handle-icon,
+& .cn-skeleton,
+& .cn-toast {
+  @apply rounded-none;
+}
+
+/* Flat: hairline frames, no shadows. */
+.cn-sheet-content,
+.cn-drawer-content,
+.cn-toast,
+.cn-navigation-menu-viewport,
+.cn-command {
+  @apply shadow-none ring-1 ring-border;
+}
+
+/* The chosen item is inverted, like a terminal cursor. */
+& .cn-command-item,
+& .cn-menubar-trigger,
+& .cn-navigation-menu-trigger,
+& .cn-navigation-menu-link {
+  @apply data-selected:bg-foreground data-selected:text-background aria-expanded:bg-foreground aria-expanded:text-background data-active:bg-foreground data-active:text-background data-open:bg-foreground data-open:text-background;
+}
+
+& .cn-pagination-link[data-active] {
+  @apply border-transparent bg-foreground text-background hover:bg-foreground hover:text-background;
+}
+
+& .cn-calendar {
+  @apply [--cell-radius:0];
+  --calendar-selected: var(--foreground);
+  --calendar-selected-foreground: var(--background);
+}
+
+& .cn-breadcrumb-page {
+  @apply bg-foreground px-1 text-background;
+}
+
+/* Labels and captions are small spaced capitals. */
+& .cn-label,
+& .cn-field-legend,
+& .cn-field-title,
+& .cn-calendar-caption,
+& .cn-alert-title {
+  @apply text-xs tracking-widest uppercase;
+}
+
+/* Rules are dashed, like a terminal box. */
+& .cn-accordion-item,
+& .cn-item-separator,
+& .cn-command-separator,
+& .cn-field-separator {
+  @apply border-dashed;
+}
+
+& .cn-empty {
+  @apply border-dashed;
+}
+
+& .cn-alert {
+  @apply ring-1 ring-border;
+}
+
+/* The OTP slot is a cell with a block caret. */
+& .cn-input-otp-slot {
+  @apply first:rounded-none last:rounded-none;
+}
+
+& .cn-input-otp-caret-line {
+  @apply h-4 w-2 bg-primary;
+}
+
+/* Loading is a row of blocks, not a soft pulse. */
+& .cn-skeleton {
+  @apply bg-[repeating-linear-gradient(90deg,var(--muted)_0_0.5rem,transparent_0.5rem_0.625rem)];
+}
+
+& .cn-progress-indicator {
+  @apply bg-[repeating-linear-gradient(90deg,var(--primary)_0_0.375rem,transparent_0.375rem_0.5rem)];
+}
+
+& .cn-resizable-handle-icon {
+  @apply h-6 w-1 bg-foreground;
+}
+
+& .cn-drawer-handle {
+  @apply rounded-none;
+}
+
+& .cn-sheet-content {
+  @apply border-0;
+}
+
+/* Rich parts: blocks, not curves; the icon chip is a framed cell. */
+& .cn-stat,
+& .cn-stat-icon,
+& .cn-delta,
+& .cn-meter-track,
+& .cn-meter-tick,
+& .cn-meter-fill,
+& span.cn-gauge-segment,
+& .cn-tracker-bar,
+& .cn-bar-list-bar {
+  @apply rounded-none;
+}
+
+& .cn-stat {
+  @apply shadow-none ring-1 ring-border;
+}
+
+& .cn-stat-icon {
+  @apply bg-transparent ring-1 ring-border;
+}
+
+& .cn-stat-label {
+  @apply text-xs tracking-widest uppercase;
+}
+
+& .cn-bar-list-bar {
+  @apply bg-foreground/10;
 }

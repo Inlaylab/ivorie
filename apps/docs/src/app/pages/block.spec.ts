@@ -20,7 +20,7 @@ describe('BlockPage', () => {
     const { el, fixture } = await render();
     expect(el.querySelector('h1')!.textContent).toContain('Login 01');
     expect(el.querySelector('iframe')!.getAttribute('src')).toMatch(/^preview\/block\/login-01\?preset=/);
-    expect(el.querySelector('[data-testid="command"]')!.textContent!.trim()).toBe('npx ivorie add login-01');
+    expect(el.querySelector('[data-testid="command"]')!.textContent!.trim()).toBe('npx ivorie@1.6 add login-01');
     [...el.querySelectorAll<HTMLElement>('[role="tab"]')].find((t) => t.textContent!.trim() === 'Code')!.click();
     await fixture.whenStable();
     await new Promise((r) => setTimeout(r, 50));
@@ -35,11 +35,11 @@ describe('BlockPage', () => {
     for (const name of ['pending', 'error', 'submitted', 'provider']) expect(api).toContain(name);
   });
 
-  it('the style picker reaches the frame', async () => {
+  it('the theme picker reaches the frame', async () => {
     const { el, fixture } = await render();
     const frame = el.querySelector('iframe')!;
     const post = vi.spyOn(frame.contentWindow!, 'postMessage');
-    el.querySelector<HTMLInputElement>('input[name="block-style"][value="nova"]')!.click();
+    el.querySelector<HTMLInputElement>('input[name="block-theme"][value="bento"]')!.click();
     await fixture.whenStable();
     expect(post).toHaveBeenCalledWith({ type: 'ivorie-look', preset: expect.stringMatching(/^ivp1_/) }, location.origin);
   });

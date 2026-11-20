@@ -24,6 +24,13 @@ import { IV_NATIVE_SELECT_IMPORTS } from '@inlaylab/ivorie/native-select';
 import { IV_PAGINATION_IMPORTS } from '@inlaylab/ivorie/pagination';
 import { IV_POPOVER_IMPORTS } from '@inlaylab/ivorie/popover';
 import { IvProgress } from '@inlaylab/ivorie/progress';
+import { IvBarList } from '@inlaylab/ivorie/bar-list';
+import { IvDelta } from '@inlaylab/ivorie/delta';
+import { IvGauge } from '@inlaylab/ivorie/gauge';
+import { IvMeter } from '@inlaylab/ivorie/meter';
+import { IvSparkline } from '@inlaylab/ivorie/sparkline';
+import { IV_STAT_IMPORTS } from '@inlaylab/ivorie/stat';
+import { IvTracker, type IvTrackerItem, type IvTrackerStatus } from '@inlaylab/ivorie/tracker';
 import { IV_RADIO_GROUP_IMPORTS } from '@inlaylab/ivorie/radio-group';
 import { IV_SELECT_IMPORTS } from '@inlaylab/ivorie/select';
 import { IvSeparator } from '@inlaylab/ivorie/separator';
@@ -34,8 +41,20 @@ import { IvSwitch } from '@inlaylab/ivorie/switch';
 import { IV_TABLE_IMPORTS } from '@inlaylab/ivorie/table';
 import { IV_TABS_IMPORTS } from '@inlaylab/ivorie/tabs';
 import { IV_TOGGLE_GROUP_IMPORTS } from '@inlaylab/ivorie/toggle-group';
+import { IvAspectRatio } from '@inlaylab/ivorie/aspect-ratio';
+import { IV_BUTTON_GROUP_IMPORTS } from '@inlaylab/ivorie/button-group';
+import { IV_COLLAPSIBLE_IMPORTS } from '@inlaylab/ivorie/collapsible';
+import { IV_COMBOBOX_IMPORTS } from '@inlaylab/ivorie/combobox';
+import { IV_CONTEXT_MENU_IMPORTS } from '@inlaylab/ivorie/context-menu';
+import { IV_HOVER_CARD_IMPORTS } from '@inlaylab/ivorie/hover-card';
+import { IV_MENUBAR_IMPORTS } from '@inlaylab/ivorie/menubar';
+import { IV_NAVIGATION_MENU_IMPORTS, navigationMenuTriggerStyle } from '@inlaylab/ivorie/navigation-menu';
+import { IV_SCROLL_AREA_IMPORTS } from '@inlaylab/ivorie/scroll-area';
+import { IvSkeleton } from '@inlaylab/ivorie/skeleton';
+import { IvToggle } from '@inlaylab/ivorie/toggle';
+import { IV_TOOLTIP_IMPORTS } from '@inlaylab/ivorie/tooltip';
 import { FONTS } from '../../../generated/looks';
-import { STYLES } from '../../shell/appearance-options';
+import { THEME_LIST } from '../../shell/appearance-options';
 import { PlaygroundLook } from '../playground-look';
 
 const fontTitle = (name: string) => FONTS.find((f) => f.name === name)?.title ?? 'System';
@@ -51,6 +70,16 @@ const MEMBERS = [
 ].map((m) => ({ ...m, initials: m.name.split(' ').map((w) => w[0]).join('') }));
 const PAGE_SIZE = 3;
 
+/** 60 tracker bars ending Nov 23; `issues` maps a day index to its status. */
+function days(issues: Record<number, IvTrackerStatus>): IvTrackerItem[] {
+  const words = { ok: 'operational', warn: 'degraded', error: 'outage', none: 'no data' };
+  return Array.from({ length: 60 }, (_, i) => {
+    const label = new Date(Date.UTC(2026, 8, 25 + i)).toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' });
+    const status = issues[i] ?? 'ok';
+    return { status, tooltip: `${label}: ${words[status]}` };
+  });
+}
+
 /**
  * Every component worth previewing, as a wall of small working cards: the home page shows it, and it
  * is the playground's preview. Dialogs, popovers, menus and the sheet open in the overlay container.
@@ -61,6 +90,18 @@ const PAGE_SIZE = 3;
   selector: 'docs-scene-wall',
   imports: [
     IV_ACCORDION_IMPORTS,
+    IvAspectRatio,
+    IV_BUTTON_GROUP_IMPORTS,
+    IV_COLLAPSIBLE_IMPORTS,
+    IV_COMBOBOX_IMPORTS,
+    IV_CONTEXT_MENU_IMPORTS,
+    IV_HOVER_CARD_IMPORTS,
+    IV_MENUBAR_IMPORTS,
+    IV_NAVIGATION_MENU_IMPORTS,
+    IV_SCROLL_AREA_IMPORTS,
+    IvSkeleton,
+    IvToggle,
+    IV_TOOLTIP_IMPORTS,
     IV_ALERT_IMPORTS,
     IV_ALERT_DIALOG_IMPORTS,
     IV_AVATAR_IMPORTS,
@@ -85,6 +126,13 @@ const PAGE_SIZE = 3;
     IV_PAGINATION_IMPORTS,
     IV_POPOVER_IMPORTS,
     IvProgress,
+    IvBarList,
+    IvDelta,
+    IvGauge,
+    IvMeter,
+    IvSparkline,
+    IV_STAT_IMPORTS,
+    IvTracker,
     IV_RADIO_GROUP_IMPORTS,
     IV_SELECT_IMPORTS,
     IvSeparator,
@@ -97,12 +145,16 @@ const PAGE_SIZE = 3;
     IV_TOGGLE_GROUP_IMPORTS,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  host: { class: 'block columns-1 gap-4 md:columns-2 lg:columns-3 xl:columns-4 *:mb-4 *:break-inside-avoid' },
+  host: { class: 'relative block' },
   template: `
+    <!-- Soft color behind the cards, so glass, blur, rims and ambient light read. Its own sticky layer, outside
+         the columns, faded out on every side; it stays in view while the wall scrolls. -->
+    <div class="docs-backdrop" aria-hidden="true"></div>
+    <div class="relative columns-1 gap-4 md:columns-2 lg:columns-3 xl:columns-4 *:mb-4 *:break-inside-avoid">
     <!-- The look itself first: its fonts and its colors. -->
     <iv-card data-testid="wall-specimen">
       <iv-card-header>
-        <iv-card-title class="text-2xl">{{ styleTitle() }}, {{ fontTitle() }}</iv-card-title>
+        <iv-card-title class="text-2xl">{{ themeTitle() }}, {{ fontTitle() }}</iv-card-title>
         <iv-card-description>Designers love packing quirky glyphs into test phrases. This one previews the type.</iv-card-description>
       </iv-card-header>
       <iv-card-content>
@@ -142,6 +194,89 @@ const PAGE_SIZE = 3;
       </iv-card-content>
     </iv-card>
 
+    <!-- Overview: stat tiles with a change and a trend line. -->
+    <iv-card data-testid="wall-overview">
+      <iv-card-header>
+        <iv-card-title>Acme Cloud</iv-card-title>
+        <iv-card-description>Production, this week.</iv-card-description>
+        <iv-card-action>
+          <iv-toggle-group type="single" variant="outline" size="sm" [spacing]="0" value="week" aria-label="Period">
+            <button ivToggleGroupItem value="day">Day</button>
+            <button ivToggleGroupItem value="week">Week</button>
+          </iv-toggle-group>
+        </iv-card-action>
+      </iv-card-header>
+      <iv-card-content class="grid grid-cols-2 gap-4">
+        @for (s of stats; track s.label) {
+          <iv-stat>
+            <iv-stat-header><iv-stat-label>{{ s.label }}</iv-stat-label></iv-stat-header>
+            <iv-stat-value>{{ s.value }} <iv-delta [value]="s.delta" [invert]="s.invert" /></iv-stat-value>
+            <svg ivSparkline [data]="s.trend" type="area" class="w-full"></svg>
+          </iv-stat>
+        }
+      </iv-card-content>
+      <iv-card-footer>
+        <button ivButton class="w-full" [ivDialogTrigger]="deploy"><svg [ivIcon]="icons().cloudUpload"></svg>Deploy</button>
+      </iv-card-footer>
+    </iv-card>
+
+    <!-- Status: overall uptime on a gauge, then a bar per day for each service. -->
+    <iv-card data-testid="wall-status">
+      <iv-card-header>
+        <iv-card-title>Status</iv-card-title>
+        <iv-card-description>Builds were slow on Nov 12. All good since.</iv-card-description>
+      </iv-card-header>
+      <iv-card-content class="flex flex-col gap-4">
+        <iv-gauge [value]="99.9" [min]="99" minLabel="99%" maxLabel="100%" valueText="99.9%" caption="Uptime" label="Uptime, last 60 days" class="mx-auto w-36" />
+        @for (s of services; track s.name) {
+          <div class="flex flex-col gap-1.5">
+            <div class="flex justify-between text-sm"><span class="font-medium">{{ s.name }}</span><span class="text-muted-foreground tabular-nums">{{ s.uptime }}</span></div>
+            <iv-tracker [data]="s.days" [label]="s.name + ' uptime, last 60 days'" class="h-7" />
+          </div>
+        }
+        <div class="text-muted-foreground -mt-2 flex justify-between text-xs" aria-hidden="true"><span>60 days ago</span><span>Today</span></div>
+      </iv-card-content>
+    </iv-card>
+
+    <!-- Usage: a tick meter per plan limit; the actions open a sheet, a popover and a confirm. -->
+    <iv-card data-testid="wall-usage">
+      <iv-card-header>
+        <iv-card-title class="flex items-center gap-2"><svg [ivIcon]="icons().database" class="text-muted-foreground size-4"></svg>Usage</iv-card-title>
+        <iv-card-description>Pro plan. Resets on December 1.</iv-card-description>
+      </iv-card-header>
+      <iv-card-content class="flex flex-col gap-4">
+        @for (q of quotas; track q.label) {
+          <iv-meter [label]="q.label" [value]="q.used" [max]="q.limit" [high]="q.limit * 0.8" [optimum]="0" [valueText]="q.text" [ticks]="16" />
+        }
+        <!-- Two safe actions side by side; the destructive one has its own full row and says what it deletes. -->
+        <div class="grid grid-cols-2 gap-2">
+          <button ivButton variant="outline" size="sm" class="w-full" [ivSheetTrigger]="filters"><svg [ivIcon]="icons().settings"></svg>Filters</button>
+          <iv-popover class="contents">
+            <button ivButton ivPopoverTrigger variant="outline" size="sm" class="w-full"><svg [ivIcon]="icons().share"></svg>Share</button>
+            <iv-popover-content class="w-64">
+              <iv-popover-header>
+                <iv-popover-title>Share link</iv-popover-title>
+                <iv-popover-description>Anyone with the link can view.</iv-popover-description>
+              </iv-popover-header>
+              <input ivInput aria-label="Share link" value="acme.dev/s/9f2k" readonly />
+            </iv-popover-content>
+          </iv-popover>
+          <button ivButton variant="destructive" size="sm" class="col-span-2 w-full" [ivAlertDialogTrigger]="remove"><svg [ivIcon]="icons().trash"></svg>Delete old builds</button>
+        </div>
+      </iv-card-content>
+    </iv-card>
+
+    <!-- Top pages: ranked bars. -->
+    <iv-card data-testid="wall-top-pages">
+      <iv-card-header>
+        <iv-card-title>Top pages</iv-card-title>
+        <iv-card-description>Visitors this week.</iv-card-description>
+      </iv-card-header>
+      <iv-card-content>
+        <iv-bar-list [data]="topPages" />
+      </iv-card-content>
+    </iv-card>
+
     <iv-card>
       <iv-card-header>
         <iv-card-description>Heading {{ headingTitle() }}, body {{ fontTitle() }}</iv-card-description>
@@ -156,33 +291,81 @@ const PAGE_SIZE = 3;
       </iv-card-footer>
     </iv-card>
 
-    <!-- Dashboard -->
+    <!-- A site header: a navigation menu with two panels and a plain link. -->
     <iv-card>
-      <iv-card-header>
-        <iv-card-title>Acme Cloud</iv-card-title>
-        <iv-card-description>Production. Last deploy 4 minutes ago.</iv-card-description>
-      </iv-card-header>
-      <iv-card-content class="flex flex-col gap-4">
-        <iv-toggle-group type="single" variant="outline" [spacing]="0" value="week" aria-label="Period" class="self-start">
-          <button ivToggleGroupItem value="day">Day</button>
-          <button ivToggleGroupItem value="week">Week</button>
-          <button ivToggleGroupItem value="month">Month</button>
-        </iv-toggle-group>
-        <div class="grid grid-cols-2 gap-3">
-          @for (s of stats; track s.label) {
-            <div class="flex flex-col gap-1 rounded-[var(--radius)] border p-3">
-              <span class="text-muted-foreground text-xs">{{ s.label }}</span>
-              <span class="text-xl font-semibold tabular-nums">{{ s.value }}</span>
-              <iv-badge [variant]="s.good ? 'secondary' : 'destructive'" class="self-start"
-                ><svg [ivIcon]="s.up ? icons().trendingUp : icons().trendingDown"></svg>{{ s.delta }}</iv-badge
-              >
-            </div>
-          }
-        </div>
+      <iv-card-content class="flex items-center gap-3">
+        <span class="text-foreground font-semibold">Acme</span>
+        <iv-navigation-menu>
+          <ul ivNavigationMenuList>
+            <li ivNavigationMenuItem>
+              <button ivNavigationMenuTrigger>Product</button>
+              <iv-navigation-menu-content>
+                <ul class="grid w-64 gap-1">
+                  @for (l of productLinks; track l.title) {
+                    <li>
+                      <a ivNavigationMenuLink href="#" class="flex-col items-start gap-0.5">
+                        <span class="font-medium">{{ l.title }}</span>
+                        <span class="text-muted-foreground">{{ l.text }}</span>
+                      </a>
+                    </li>
+                  }
+                </ul>
+              </iv-navigation-menu-content>
+            </li>
+            <li ivNavigationMenuItem>
+              <a ivNavigationMenuLink href="#" [class]="navLink">Pricing</a>
+            </li>
+          </ul>
+        </iv-navigation-menu>
       </iv-card-content>
-      <iv-card-footer>
-        <button ivButton class="w-full" [ivDialogTrigger]="deploy"><svg [ivIcon]="icons().cloudUpload"></svg>Deploy</button>
-      </iv-card-footer>
+    </iv-card>
+
+    <!-- An editor: menubar, formatting toggles with tooltips, an alignment group. -->
+    <iv-card data-testid="wall-editor">
+      <iv-card-header class="gap-3">
+        <iv-menubar class="w-fit">
+          <iv-menubar-menu>
+            <button ivMenubarTrigger>File</button>
+            <iv-dropdown-menu-content>
+              <iv-dropdown-menu-item>New page<iv-dropdown-menu-shortcut>⌘N</iv-dropdown-menu-shortcut></iv-dropdown-menu-item>
+              <iv-dropdown-menu-item>Duplicate<iv-dropdown-menu-shortcut>⌘D</iv-dropdown-menu-shortcut></iv-dropdown-menu-item>
+              <iv-dropdown-menu-separator />
+              <iv-dropdown-menu-item>Export as PDF</iv-dropdown-menu-item>
+            </iv-dropdown-menu-content>
+          </iv-menubar-menu>
+          <iv-menubar-menu>
+            <button ivMenubarTrigger>Edit</button>
+            <iv-dropdown-menu-content>
+              <iv-dropdown-menu-item>Undo<iv-dropdown-menu-shortcut>⌘Z</iv-dropdown-menu-shortcut></iv-dropdown-menu-item>
+              <iv-dropdown-menu-item>Redo<iv-dropdown-menu-shortcut>⇧⌘Z</iv-dropdown-menu-shortcut></iv-dropdown-menu-item>
+            </iv-dropdown-menu-content>
+          </iv-menubar-menu>
+          <iv-menubar-menu>
+            <button ivMenubarTrigger>View</button>
+            <iv-dropdown-menu-content>
+              <iv-dropdown-menu-checkbox-item [checked]="true">Show outline</iv-dropdown-menu-checkbox-item>
+              <iv-dropdown-menu-checkbox-item>Focus mode</iv-dropdown-menu-checkbox-item>
+            </iv-dropdown-menu-content>
+          </iv-menubar-menu>
+        </iv-menubar>
+        <div class="flex flex-wrap items-center gap-2">
+          @for (f of formats; track f.label) {
+            <iv-tooltip>
+              <button ivToggle ivTooltipTrigger size="sm" [attr.aria-label]="f.label" [pressed]="f.on" class="w-8 font-serif">{{ f.glyph }}</button>
+              <iv-tooltip-content>{{ f.label }} <kbd ivKbd>{{ f.key }}</kbd></iv-tooltip-content>
+            </iv-tooltip>
+          }
+          <span class="flex-1"></span>
+          <iv-button-group aria-label="Alignment">
+            <button ivButton size="sm" variant="outline">Left</button>
+            <button ivButton size="sm" variant="outline">Center</button>
+            <button ivButton size="sm" variant="outline">Right</button>
+          </iv-button-group>
+        </div>
+      </iv-card-header>
+      <iv-card-content class="text-sm leading-relaxed">
+        <p><strong>Launch notes.</strong> Ship the pricing page on Thursday, then send the changelog to everyone on the beta list.</p>
+      </iv-card-content>
     </iv-card>
 
     <!-- A command menu: type to filter, arrows to move. -->
@@ -203,6 +386,35 @@ const PAGE_SIZE = 3;
         </iv-command-group>
       </iv-command-list>
     </iv-command>
+
+    <!-- Files: a scrolling list; right-click for actions. -->
+    <iv-card>
+      <iv-card-header>
+        <iv-card-title>Files</iv-card-title>
+        <iv-card-description>Right-click a file for actions.</iv-card-description>
+      </iv-card-header>
+      <iv-card-content>
+        <iv-context-menu>
+          <div ivContextMenuTrigger>
+            <iv-scroll-area maxHeight="11rem" class="rounded-md border">
+              @for (f of files; track f.name) {
+                <div class="flex items-center justify-between gap-3 border-b px-3 py-2 text-sm last:border-b-0">
+                  <span class="truncate font-mono text-xs">{{ f.name }}</span>
+                  <span class="text-muted-foreground shrink-0 text-xs tabular-nums">{{ f.size }}</span>
+                </div>
+              }
+            </iv-scroll-area>
+          </div>
+          <iv-dropdown-menu-content class="w-48">
+            <iv-dropdown-menu-item>Open</iv-dropdown-menu-item>
+            <iv-dropdown-menu-item>Rename<iv-dropdown-menu-shortcut>F2</iv-dropdown-menu-shortcut></iv-dropdown-menu-item>
+            <iv-dropdown-menu-item>Copy link</iv-dropdown-menu-item>
+            <iv-dropdown-menu-separator />
+            <iv-dropdown-menu-item variant="destructive">Delete</iv-dropdown-menu-item>
+          </iv-dropdown-menu-content>
+        </iv-context-menu>
+      </iv-card-content>
+    </iv-card>
 
     <!-- Builds: where you are, then running and finished builds in tabs. -->
     <iv-card>
@@ -272,6 +484,53 @@ const PAGE_SIZE = 3;
         <button ivButton variant="ghost" size="sm" (click)="done.set(0)">Reset</button>
         <button ivButton size="sm" [disabled]="done() < gates.length">Publish</button>
       </iv-card-footer>
+    </iv-card>
+
+    <!-- An issue: author on hover, an assignee to pick, details that fold. -->
+    <iv-card>
+      <iv-card-header>
+        <iv-card-description>ACME-142 · opened by
+          <iv-hover-card>
+            <button type="button" ivHoverCardTrigger class="text-foreground font-medium underline underline-offset-4">Grace Hopper</button>
+            <iv-hover-card-content class="w-64">
+              <div class="flex gap-3">
+                <iv-avatar><iv-avatar-fallback>GH</iv-avatar-fallback></iv-avatar>
+                <div class="flex flex-col gap-0.5 text-sm">
+                  <span class="font-medium">Grace Hopper</span>
+                  <span class="text-muted-foreground">Compiler team. Joined March 2021.</span>
+                </div>
+              </div>
+            </iv-hover-card-content>
+          </iv-hover-card>
+        </iv-card-description>
+        <iv-card-title>Checkout fails on Safari 17</iv-card-title>
+      </iv-card-header>
+      <iv-card-content class="flex flex-col gap-4">
+        <iv-combobox [(value)]="assignee" placeholder="Unassigned" class="w-full">
+          <iv-combobox-input label="Assignee" aria-label="Assignee" />
+          <iv-combobox-content>
+            <iv-combobox-list>
+              @for (m of members; track m.email) {
+                <iv-combobox-item [value]="m.email" [label]="m.name">{{ m.name }}</iv-combobox-item>
+              }
+              <iv-combobox-empty>No one found.</iv-combobox-empty>
+            </iv-combobox-list>
+          </iv-combobox-content>
+        </iv-combobox>
+        <iv-collapsible>
+          <button ivCollapsibleTrigger class="group flex items-center gap-2 text-sm font-medium">
+            <span class="inline-block transition-transform group-data-[state=open]:rotate-90" aria-hidden="true">›</span>
+            Steps to reproduce
+          </button>
+          <iv-collapsible-content>
+            <ol class="text-muted-foreground list-decimal pt-2 pl-5 text-sm">
+              <li>Add any item to the cart.</li>
+              <li>Pay with Apple Pay.</li>
+              <li>The page reloads and the order is lost.</li>
+            </ol>
+          </iv-collapsible-content>
+        </iv-collapsible>
+      </iv-card-content>
     </iv-card>
 
     <!-- Sign in -->
@@ -386,6 +645,21 @@ const PAGE_SIZE = 3;
       </iv-card-content>
       <iv-card-footer>
         <button ivButton class="w-full">Continue</button>
+      </iv-card-footer>
+    </iv-card>
+
+    <!-- A product: media at a fixed ratio, then the details. -->
+    <iv-card class="overflow-hidden pt-0">
+      <iv-aspect-ratio [ratio]="4 / 3">
+        <div class="size-full bg-[radial-gradient(120%_90%_at_20%_10%,var(--chart-2),transparent_60%),radial-gradient(100%_80%_at_90%_90%,var(--primary),transparent_65%)] bg-muted" role="img" aria-label="Product photo"></div>
+      </iv-aspect-ratio>
+      <iv-card-header>
+        <iv-card-title>Field Notes, Dot Grid</iv-card-title>
+        <iv-card-description>Pack of three, 48 pages each.</iv-card-description>
+      </iv-card-header>
+      <iv-card-footer class="justify-between">
+        <span class="text-lg font-semibold tabular-nums">$14.00</span>
+        <button ivButton size="sm">Add to cart</button>
       </iv-card-footer>
     </iv-card>
 
@@ -546,30 +820,6 @@ const PAGE_SIZE = 3;
 
     <iv-card>
       <iv-card-header>
-        <iv-card-title class="flex items-center gap-2"><svg [ivIcon]="icons().database" class="text-muted-foreground size-4"></svg>Storage</iv-card-title>
-        <iv-card-description>68 GB of 100 GB used.</iv-card-description>
-      </iv-card-header>
-      <iv-card-content class="flex flex-col gap-4">
-        <iv-progress [value]="68" aria-label="Storage used" />
-        <div class="flex flex-wrap gap-2">
-          <button ivButton variant="outline" size="sm" [ivSheetTrigger]="filters"><svg [ivIcon]="icons().settings"></svg>Filters</button>
-          <iv-popover>
-            <button ivButton ivPopoverTrigger variant="outline" size="sm"><svg [ivIcon]="icons().share"></svg>Share</button>
-            <iv-popover-content class="w-64">
-              <iv-popover-header>
-                <iv-popover-title>Share link</iv-popover-title>
-                <iv-popover-description>Anyone with the link can view.</iv-popover-description>
-              </iv-popover-header>
-              <input ivInput aria-label="Share link" value="acme.dev/s/9f2k" readonly />
-            </iv-popover-content>
-          </iv-popover>
-          <button ivButton variant="destructive" size="sm" [ivAlertDialogTrigger]="remove"><svg [ivIcon]="icons().trash"></svg>Delete</button>
-        </div>
-      </iv-card-content>
-    </iv-card>
-
-    <iv-card>
-      <iv-card-header>
         <iv-card-title>Spending limit</iv-card-title>
         <iv-card-description>We pause builds when you reach it.</iv-card-description>
       </iv-card-header>
@@ -584,7 +834,7 @@ const PAGE_SIZE = 3;
 
     <!-- Real charts: they take the accent's chart colors. -->
     @if (charts()) {
-      @defer (on viewport) {
+      @defer (on viewport; on idle) {
         <iv-card>
           <iv-card-header>
             <iv-card-title>Visitors</iv-card-title>
@@ -621,7 +871,7 @@ const PAGE_SIZE = 3;
     }
 
     @if (charts()) {
-      @defer (on viewport) {
+      @defer (on viewport; on idle) {
         <iv-card>
           <iv-card-header class="items-center text-center">
             <iv-card-title>Browsers</iv-card-title>
@@ -659,37 +909,7 @@ const PAGE_SIZE = 3;
     </iv-alert>
 
     @if (charts()) {
-      @defer (on viewport) {
-        <iv-card>
-          <iv-card-header class="items-center text-center">
-            <iv-card-title>Uptime</iv-card-title>
-            <iv-card-description>Last 30 days.</iv-card-description>
-          </iv-card-header>
-          <iv-card-content>
-            <iv-chart [config]="uptimeConfig" class="mx-auto aspect-square max-h-48">
-              <svg ivRadialChart [data]="uptime" [startAngle]="90" [endAngle]="-266" [outerRadius]="80" [innerRadius]="68" aria-label="Uptime 99.2 percent">
-                <g ivPolarGrid gridType="circle" [radialLines]="false" stroke="none" class="first:fill-muted last:fill-card" [polarRadius]="[80, 68]" />
-                <g ivRadialBar dataKey="uptime" background [cornerRadius]="10" />
-                <g ivPolarRadiusAxis>
-                  <ng-template ivChartLabel let-cx="cx" let-cy="cy">
-                    <svg:text [attr.x]="cx" [attr.y]="cy" text-anchor="middle" dominant-baseline="middle">
-                      <svg:tspan [attr.x]="cx" [attr.y]="cy" class="fill-foreground text-3xl font-bold">99.2%</svg:tspan>
-                      <svg:tspan [attr.x]="cx" [attr.y]="cy + 22" class="fill-muted-foreground text-xs">Up</svg:tspan>
-                    </svg:text>
-                  </ng-template>
-                </g>
-              </svg>
-            </iv-chart>
-          </iv-card-content>
-          <iv-card-footer class="text-muted-foreground justify-center text-sm">Last incident 12 days ago.</iv-card-footer>
-        </iv-card>
-      } @placeholder {
-        <div class="bg-card h-80 rounded-xl border" aria-hidden="true"></div>
-      }
-    }
-
-    @if (charts()) {
-      @defer (on viewport) {
+      @defer (on viewport; on idle) {
         <iv-card>
           <iv-card-header>
             <iv-card-title class="flex items-center gap-2"><svg [ivIcon]="icons().chartLine" class="text-muted-foreground size-4"></svg>Response time</iv-card-title>
@@ -724,6 +944,24 @@ const PAGE_SIZE = 3;
         <button ivButton size="sm"><svg [ivIcon]="icons().plus"></svg>Add a webhook</button>
       </iv-empty-content>
     </iv-empty>
+
+    <!-- A report still loading: skeletons hold the shape. -->
+    <iv-card aria-busy="true">
+      <iv-card-header>
+        <iv-card-title>Weekly report</iv-card-title>
+        <iv-card-description>Crunching last week's numbers…</iv-card-description>
+      </iv-card-header>
+      <iv-card-content class="flex flex-col gap-3">
+        <div class="flex items-center gap-3">
+          <iv-skeleton class="size-10 rounded-full" />
+          <div class="flex flex-1 flex-col gap-2">
+            <iv-skeleton class="h-3.5 w-2/3" />
+            <iv-skeleton class="h-3.5 w-1/3" />
+          </div>
+        </div>
+        <iv-skeleton class="h-24 w-full" />
+      </iv-card-content>
+    </iv-card>
 
     <!-- Questions: one open at a time. -->
     <iv-card>
@@ -815,6 +1053,7 @@ const PAGE_SIZE = 3;
         <button ivAlertDialogAction>Place order</button>
       </iv-alert-dialog-footer>
     </ng-template>
+    </div>
   `,
 })
 export class SceneWall {
@@ -830,15 +1069,31 @@ export class SceneWall {
     '--background', '--foreground', '--primary', '--secondary', '--muted', '--accent',
     '--border', '--chart-1', '--chart-2', '--chart-3', '--chart-4', '--chart-5',
   ];
-  protected readonly styleTitle = computed(() => STYLES.find((s) => s.name === this.preset().style)?.label ?? this.preset().style);
+  protected readonly themeTitle = computed(() => THEME_LIST.find((t) => t.name === this.preset().theme)?.label ?? this.preset().theme);
   protected readonly fontTitle = computed(() => fontTitle(this.preset().font));
   protected readonly headingTitle = computed(() =>
     this.preset().fontHeading === 'inherit' ? this.fontTitle() : fontTitle(this.preset().fontHeading),
   );
 
   protected readonly stats = [
-    { label: 'Deploys today', value: '128', delta: '+12%', good: true, up: true },
-    { label: 'Open incidents', value: '2', delta: '1 urgent', good: false, up: true },
+    { label: 'Deploys', value: '128', delta: 12, invert: false, trend: [82, 90, 88, 101, 97, 115, 128] },
+    { label: 'Error rate', value: '0.4%', delta: -18, invert: true, trend: [0.7, 0.6, 0.65, 0.5, 0.52, 0.45, 0.4] },
+  ];
+  /** A bar per day for 30 days; one slow day. */
+  protected readonly services = [
+    { name: 'API', uptime: '99.98%', days: days({}) },
+    { name: 'Builds', uptime: '99.71%', days: days({ 47: 'error', 48: 'warn' }) },
+  ];
+  protected readonly quotas = [
+    { label: 'Storage', used: 68, limit: 100, text: '68 of 100 GB' },
+    { label: 'Seats', used: 9, limit: 10, text: '9 of 10' },
+  ];
+  protected readonly topPages = [
+    { name: '/pricing', value: 4820 },
+    { name: '/docs/install', value: 3105 },
+    { name: '/', value: 2960 },
+    { name: '/blog/ivorie-1-6', value: 1214 },
+    { name: '/changelog', value: 648 },
   ];
   protected readonly builds = [
     {
@@ -856,8 +1111,6 @@ export class SceneWall {
       ],
     },
   ];
-  protected readonly uptime = [{ name: 'web', uptime: 99.2, fill: 'var(--color-uptime)' }];
-  protected readonly uptimeConfig: IvChartConfig = { uptime: { label: 'Uptime', color: 'var(--chart-1)' } };
   protected readonly latency = [
     { day: 'Mon', p50: 82, p95: 210 },
     { day: 'Tue', p50: 78, p95: 190 },
@@ -909,6 +1162,28 @@ export class SceneWall {
   ];
 
   protected readonly members = MEMBERS;
+  protected readonly assignee = signal<string | null>('grace@acme.dev');
+  protected readonly navLink = navigationMenuTriggerStyle;
+  protected readonly productLinks = [
+    { title: 'Deploys', text: 'Ship from every push.' },
+    { title: 'Analytics', text: 'See who uses what.' },
+    { title: 'Edge config', text: 'Change flags without a deploy.' },
+  ];
+  protected readonly formats = [
+    { glyph: 'B', label: 'Bold', key: '⌘B', on: true },
+    { glyph: 'I', label: 'Italic', key: '⌘I', on: false },
+    { glyph: 'U', label: 'Underline', key: '⌘U', on: false },
+  ];
+  protected readonly files = [
+    { name: 'README.md', size: '4 KB' },
+    { name: 'package.json', size: '2 KB' },
+    { name: 'src/app/app.config.ts', size: '1 KB' },
+    { name: 'src/app/pricing/pricing.ts', size: '9 KB' },
+    { name: 'src/app/pricing/pricing.spec.ts', size: '6 KB' },
+    { name: 'src/styles.css', size: '3 KB' },
+    { name: 'public/og-image.png', size: '212 KB' },
+    { name: 'angular.json', size: '5 KB' },
+  ];
   protected readonly query = signal('');
   protected readonly page = signal(1);
   private readonly matches = computed(() => {

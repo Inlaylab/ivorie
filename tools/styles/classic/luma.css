@@ -1,0 +1,35 @@
+/*
+ * Luma, Ivorie layer: fluid and soft. Pills where Luma left corners, soft shadows tinted by the accent,
+ * a slower ease. Appended to the synced shadcn rules by tools/styles/sync.ts. Keep it thin.
+ */
+
+& .cn-pagination-link,
+& .cn-pagination-previous,
+& .cn-pagination-next,
+& .cn-button-group-text {
+  @apply rounded-full;
+}
+
+& .cn-calendar {
+  @apply [--cell-radius:9999px];
+}
+
+& .cn-breadcrumb-page {
+  @apply rounded-full bg-muted px-2.5 py-0.5;
+}
+
+& .cn-card {
+  @apply shadow-[0_10px_30px_-18px_color-mix(in_oklab,var(--primary)_35%,transparent)];
+}
+
+& .cn-resizable-handle-icon {
+  @apply h-8 w-1.5 rounded-full;
+}
+
+& .cn-button,
+& .cn-toggle,
+& .cn-toggle-group-item,
+& .cn-tabs-trigger,
+& .cn-switch-thumb {
+  @apply duration-300 ease-out;
+}

@@ -193,9 +193,11 @@ export class IvSelect implements ControlValueAccessor {
       (keydown)="parent.onKeydown($event)"
       (blur)="parent.onTriggerBlur()"
     >
+      <!-- Leading content: a color chip, an icon. Outside the value text, so the label stays clean. -->
+      <ng-content />
       <span
         data-slot="select-value"
-        class="min-w-0 gap-1.5"
+        class="mr-auto min-w-0 gap-1.5"
         [ivTruncateTooltip]="text()"
         [ivTruncateTooltipMeasure]="valueText"
       >

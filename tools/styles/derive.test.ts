@@ -3,11 +3,11 @@ import assert from 'node:assert/strict';
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { OWN, deriveStyle, parseOwn } from './derive.ts';
-import { STYLES, uiHooks } from './hooks.ts';
+import { STYLES, uiHooks, withAliasClasses } from './hooks.ts';
 import { parse } from './sync.ts';
 
 const base = `@layer components {
-  .style-nova {
+  :is(.theme-nova, .style-nova) {
     /* MARK: Badge */
     .cn-badge {
       @apply h-5 rounded-4xl;
@@ -23,7 +23,7 @@ const base = `@layer components {
 const hooks = new Set(['cn-badge', 'cn-card', 'cn-button']);
 
 test('parse reads a generated style at indent 4', () => {
-  const rules = parse(readFileSync(join(STYLES, 'style-nova.css'), 'utf8'), 4);
+  const rules = parse(readFileSync(join(STYLES, 'theme-nova.css'), 'utf8'), 4);
   assert.ok(rules.length > 50);
   for (const r of rules) assert.match(r.lines[0], /^ {2}\.cn-/);
 });
@@ -33,7 +33,7 @@ test('an own rule replaces the base rule, others stay', () => {
   assert.ok(css.includes('    /* MARK: Card */\n    .cn-card {\n      @apply bg-red-500;\n    }\n'));
   assert.ok(css.includes('      @apply h-5 rounded-4xl;'));
   assert.ok(!css.includes('rounded-xl border'));
-  assert.ok(css.includes('@layer components {\n  .style-glass {\n'));
+  assert.ok(css.includes('@layer components {\n  :is(.theme-glass, .style-glass) {\n'));
   assert.ok(css.includes('    /* MARK: No rule in glass */\n    .cn-button {}\n'));
 });
 
@@ -67,9 +67,9 @@ test('every own style file is up to date', () => {
   for (const file of (existsSync(OWN) ? readdirSync(OWN) : []).filter((f) => f.endsWith('.css'))) {
     const name = file.slice(0, -4);
     const own = readFileSync(join(OWN, file), 'utf8').replaceAll('\r\n', '\n');
-    const baseCss = readFileSync(join(STYLES, `style-${parseOwn(own).base}.css`), 'utf8').replaceAll('\r\n', '\n');
-    const onDisk = readFileSync(join(STYLES, `style-${name}.css`), 'utf8').replaceAll('\r\n', '\n');
-    assert.equal(onDisk, deriveStyle(name, own, baseCss, ui), `run: node tools/styles/derive.ts ${name}`);
+    const baseCss = readFileSync(join(STYLES, `theme-${parseOwn(own).base}.css`), 'utf8').replaceAll('\r\n', '\n');
+    const onDisk = readFileSync(join(STYLES, `theme-${name}.css`), 'utf8').replaceAll('\r\n', '\n');
+    assert.equal(onDisk, withAliasClasses(name, deriveStyle(name, own, baseCss, ui)), `run: node tools/styles/derive.ts ${name}`);
   }
 });
 
@@ -87,7 +87,7 @@ function block(css: string, start: string): string {
 
 // Every glass tint is a token, so the fallbacks only change tokens; in dark mode too.
 test('glass has solid fallbacks, light and dark', () => {
-  const css = readFileSync(join(STYLES, 'style-glass.css'), 'utf8');
+  const css = readFileSync(join(STYLES, 'theme-glass.css'), 'utf8');
   for (const start of ['@supports not (backdrop-filter', '@media (prefers-reduced-transparency: reduce)']) {
     const fallback = block(css, start);
     assert.match(fallback, /&,\s*\.dark & \{/, start);
@@ -110,7 +110,7 @@ test('own styles have no accidental replace rules', () => {
 });
 
 test('mono takes font and radius from the theme like every style (the user picks them)', () => {
-  const css = readFileSync(join(STYLES, 'style-mono.css'), 'utf8');
+  const css = readFileSync(join(STYLES, 'theme-mono.css'), 'utf8');
   assert.doesNotMatch(css, /--radius:\s*0/);
   assert.doesNotMatch(css, /font-family:\s*var\(--font-mono\)/);
 });
@@ -156,4 +156,16 @@ test('own styles fill checkboxes and radios only under a state variant', () => {
       assert.deepEqual(plain, [], `${file}: ${selectors.trim()}`);
     }
   }
+});
+
+test("an own theme leaves out its base's Ivorie layer: it builds on pure shadcn", () => {
+  const base = readFileSync(join(STYLES, 'theme-nova.css'), 'utf8').replaceAll('\r\n', '\n');
+  const own = readFileSync(join(OWN, 'glass.css'), 'utf8').replaceAll('\r\n', '\n');
+  const marker = '    /* MARK: Style extras */';
+  const withLayer = base.includes(marker) ? base : base.replace('    /* MARK: No rule in nova */', `${marker}\n    .cn-badge {\n      @apply tracking-[9em];\n    }\n\n    /* MARK: No rule in nova */`);
+  assert.ok(!deriveStyle('glass', own, withLayer, uiHooks()).includes('tracking-[9em]'));
+});
+
+test('slate chips sit raised on its pressed-in fields, not muted on muted', () => {
+  assert.match(readFileSync('projects/ui/styles/theme-slate.css', 'utf8'), /& \.cn-combobox-chip \{\s*@apply bg-card inset-ring-1 inset-ring-\(--graphite-line-strong\);/);
 });

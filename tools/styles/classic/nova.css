@@ -1,0 +1,28 @@
+/*
+ * Nova, Ivorie layer: precision. Numbers line up, titles sit tight, the current item is plain and exact.
+ * Appended to the synced shadcn rules by tools/styles/sync.ts. Keep it thin: Nova stays shadcn's.
+ */
+
+& .cn-table-cell,
+& .cn-calendar-day-button,
+& .cn-pagination-link,
+& .cn-chart-tooltip,
+& .cn-progress {
+  @apply tabular-nums;
+}
+
+& .cn-card-title,
+& .cn-dialog-title,
+& .cn-alert-dialog-title,
+& .cn-sheet-title,
+& .cn-drawer-title {
+  @apply tracking-tight;
+}
+
+& .cn-breadcrumb-page {
+  @apply font-medium;
+}
+
+& .cn-calendar-caption {
+  @apply tracking-tight;
+}

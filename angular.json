@@ -81,63 +81,73 @@
             "styles": [
               "apps/docs/src/styles.css",
               {
-                "input": "apps/docs/src/styles/style-vega.css",
-                "bundleName": "style-vega",
+                "input": "apps/docs/src/styles/theme-vega.css",
+                "bundleName": "theme-vega",
                 "inject": false
               },
               {
-                "input": "apps/docs/src/styles/style-maia.css",
-                "bundleName": "style-maia",
+                "input": "apps/docs/src/styles/theme-maia.css",
+                "bundleName": "theme-maia",
                 "inject": false
               },
               {
-                "input": "apps/docs/src/styles/style-luma.css",
-                "bundleName": "style-luma",
+                "input": "apps/docs/src/styles/theme-luma.css",
+                "bundleName": "theme-luma",
                 "inject": false
               },
               {
-                "input": "apps/docs/src/styles/style-rhea.css",
-                "bundleName": "style-rhea",
+                "input": "apps/docs/src/styles/theme-rhea.css",
+                "bundleName": "theme-rhea",
                 "inject": false
               },
               {
-                "input": "apps/docs/src/styles/style-nova.css",
-                "bundleName": "style-nova",
+                "input": "apps/docs/src/styles/theme-nova.css",
+                "bundleName": "theme-nova",
                 "inject": false
               },
               {
-                "input": "apps/docs/src/styles/style-lyra.css",
-                "bundleName": "style-lyra",
+                "input": "apps/docs/src/styles/theme-lyra.css",
+                "bundleName": "theme-lyra",
                 "inject": false
               },
               {
-                "input": "apps/docs/src/styles/style-mira.css",
-                "bundleName": "style-mira",
+                "input": "apps/docs/src/styles/theme-mira.css",
+                "bundleName": "theme-mira",
                 "inject": false
               },
               {
-                "input": "apps/docs/src/styles/style-sera.css",
-                "bundleName": "style-sera",
+                "input": "apps/docs/src/styles/theme-sera.css",
+                "bundleName": "theme-sera",
                 "inject": false
               },
               {
-                "input": "apps/docs/src/styles/style-bento.css",
-                "bundleName": "style-bento",
+                "input": "apps/docs/src/styles/theme-bento.css",
+                "bundleName": "theme-bento",
                 "inject": false
               },
               {
-                "input": "apps/docs/src/styles/style-mono.css",
-                "bundleName": "style-mono",
+                "input": "apps/docs/src/styles/theme-mono.css",
+                "bundleName": "theme-mono",
                 "inject": false
               },
               {
-                "input": "apps/docs/src/styles/style-graphite.css",
-                "bundleName": "style-graphite",
+                "input": "apps/docs/src/styles/theme-glass.css",
+                "bundleName": "theme-glass",
                 "inject": false
               },
               {
-                "input": "apps/docs/src/styles/style-tint.css",
-                "bundleName": "style-tint",
+                "input": "apps/docs/src/styles/theme-tint.css",
+                "bundleName": "theme-tint",
+                "inject": false
+              },
+              {
+                "input": "apps/docs/src/styles/theme-midnight.css",
+                "bundleName": "theme-midnight",
+                "inject": false
+              },
+              {
+                "input": "apps/docs/src/styles/theme-clay.css",
+                "bundleName": "theme-clay",
                 "inject": false
               }
             ],
@@ -175,66 +185,88 @@
             },
             "pack": {
               "tsConfig": "apps/docs/tsconfig.pack.json",
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "1MB",
+                  "maximumError": "1.2MB"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "4kB",
+                  "maximumError": "8kB"
+                }
+              ],
               "styles": [
                 "apps/docs/src/styles.pack.css",
                 {
-                  "input": "apps/docs/src/styles/style-vega.css",
-                  "bundleName": "style-vega",
+                  "input": "apps/docs/src/styles/theme-vega.css",
+                  "bundleName": "theme-vega",
                   "inject": false
                 },
                 {
-                  "input": "apps/docs/src/styles/style-maia.css",
-                  "bundleName": "style-maia",
+                  "input": "apps/docs/src/styles/theme-maia.css",
+                  "bundleName": "theme-maia",
                   "inject": false
                 },
                 {
-                  "input": "apps/docs/src/styles/style-luma.css",
-                  "bundleName": "style-luma",
+                  "input": "apps/docs/src/styles/theme-luma.css",
+                  "bundleName": "theme-luma",
                   "inject": false
                 },
                 {
-                  "input": "apps/docs/src/styles/style-rhea.css",
-                  "bundleName": "style-rhea",
+                  "input": "apps/docs/src/styles/theme-rhea.css",
+                  "bundleName": "theme-rhea",
                   "inject": false
                 },
                 {
-                  "input": "apps/docs/src/styles/style-nova.css",
-                  "bundleName": "style-nova",
+                  "input": "apps/docs/src/styles/theme-nova.css",
+                  "bundleName": "theme-nova",
                   "inject": false
                 },
                 {
-                  "input": "apps/docs/src/styles/style-lyra.css",
-                  "bundleName": "style-lyra",
+                  "input": "apps/docs/src/styles/theme-lyra.css",
+                  "bundleName": "theme-lyra",
                   "inject": false
                 },
                 {
-                  "input": "apps/docs/src/styles/style-mira.css",
-                  "bundleName": "style-mira",
+                  "input": "apps/docs/src/styles/theme-mira.css",
+                  "bundleName": "theme-mira",
                   "inject": false
                 },
                 {
-                  "input": "apps/docs/src/styles/style-sera.css",
-                  "bundleName": "style-sera",
+                  "input": "apps/docs/src/styles/theme-sera.css",
+                  "bundleName": "theme-sera",
                   "inject": false
                 },
                 {
-                  "input": "apps/docs/src/styles/style-bento.css",
-                  "bundleName": "style-bento",
+                  "input": "apps/docs/src/styles/theme-bento.css",
+                  "bundleName": "theme-bento",
                   "inject": false
                 },
                 {
-                  "input": "apps/docs/src/styles/style-mono.css",
-                  "bundleName": "style-mono",
+                  "input": "apps/docs/src/styles/theme-mono.css",
+                  "bundleName": "theme-mono",
                   "inject": false
                 },
                 {
-                  "input": "apps/docs/src/styles/style-graphite.css",
-                  "bundleName": "style-graphite",
+                  "input": "apps/docs/src/styles/theme-glass.css",
+                  "bundleName": "theme-glass",
                   "inject": false
                 },
                 {
-                  "input": "apps/docs/src/styles/style-tint.css",
-                  "bundleName": "style-tint",
+                  "input": "apps/docs/src/styles/theme-tint.css",
+                  "bundleName": "theme-tint",
+                  "inject": false
+                },
+                {
+                  "input": "apps/docs/src/styles/theme-midnight.css",
+                  "bundleName": "theme-midnight",
+                  "inject": false
+                },
+                {
+                  "input": "apps/docs/src/styles/theme-clay.css",
+                  "bundleName": "theme-clay",
                   "inject": false
                 }
               ]

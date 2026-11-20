@@ -3,12 +3,12 @@
   "$id": "https://ivorie.dev/schema/components.json",
   "title": "Ivorie components.json",
   "type": "object",
-  "required": ["path", "prefix", "style", "tailwind", "font", "radius", "iconLibrary"],
+  "required": ["path", "prefix", "theme", "tailwind", "font", "radius", "iconLibrary"],
   "properties": {
     "$schema": { "type": "string" },
     "path": { "type": "string", "description": "Where components are copied, e.g. src/app/ui." },
     "prefix": { "type": "string", "pattern": "^[a-z][a-z0-9]*$", "description": "Selector and class prefix." },
-    "style": { "type": "string" },
+    "theme": { "type": "string", "description": "The theme: slate, glass, bento, midnight, clay, mono, tint (graphite: the 1.5 name of slate), nova, luma, mira, sera." },
     "tailwind": {
       "type": "object",
       "required": ["css", "baseColor"],
@@ -20,6 +20,10 @@
     "font": { "type": "string" },
     "fontHeading": { "type": "string", "description": "Heading font. Left out: same as font." },
     "radius": { "type": "string" },
+    "accent": { "type": "string", "description": "Accent color over the base color. Left out: none." },
+    "chartColor": { "type": "string", "description": "Chart colors: base, an accent, or left out to follow the accent." },
+    "menuAccent": { "enum": ["subtle", "bold"], "description": "Left out: subtle." },
+    "preset": { "type": "string", "pattern": "^ivp1_[A-Za-z0-9_-]+$", "description": "The whole look as an ivp1_ code, written when a dial is off its default. `ivorie apply <theme>` keeps its dials. Left out: every dial at its default." },
     "iconLibrary": { "enum": ["lucide", "tabler", "phosphor", "hugeicons", "remix"] },
     "registry": { "type": "string", "description": "Registry dir or URL. Default: the bundled one." }
   }

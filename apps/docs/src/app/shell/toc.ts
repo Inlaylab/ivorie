@@ -8,8 +8,10 @@ import type { TocItem } from '../content/types';
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (items().length) {
-      <nav aria-labelledby="toc-title" class="text-[0.8125rem]">
-        <p id="toc-title" class="text-muted-foreground mb-2 text-xs font-medium">On this page</p>
+      <nav [attr.aria-labelledby]="titled() ? 'toc-title' : null" [attr.aria-label]="titled() ? null : 'On this page'" class="text-[0.8125rem]">
+        @if (titled()) {
+          <p id="toc-title" class="text-muted-foreground mb-2 text-xs font-medium">On this page</p>
+        }
         <ul class="flex flex-col">
           @for (item of items(); track item.id) {
             <li>
@@ -30,4 +32,6 @@ import type { TocItem } from '../content/types';
 })
 export class Toc {
   readonly items = input.required<TocItem[]>();
+  /** False where a wrapper already names the list (the folded copy on small screens): one id per page. */
+  readonly titled = input(true);
 }

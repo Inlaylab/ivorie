@@ -3,10 +3,10 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { STYLES, uiHooks } from './hooks.ts';
+import { STYLES, uiHooks, themeNames } from './hooks.ts';
 
 const hooks = uiHooks();
-const styleFiles = readdirSync(STYLES).filter((name) => /^style-[a-z]+\.css$/.test(name));
+const styleFiles = themeNames().map((n) => `theme-${n}.css`);
 
 test('at least one style file exists', () => {
   assert.ok(styleFiles.length > 0);
@@ -24,8 +24,9 @@ for (const name of styleFiles) {
     assert.deepEqual([...rules].filter((r) => !hooks.has(r)).sort(), []);
   });
 
-  test(`${name} is scoped to @layer components and .${name.slice(0, -4)}`, () => {
-    assert.match(css, /@layer components\s*\{\s*\.style-[a-z]+\s*\{/);
-    assert.ok(css.includes(`.${name.slice(0, -4)} {`));
+  test(`${name} is scoped to @layer components and .${name.slice(0, -4)} (or its 1.5 class)`, () => {
+    const theme = name.slice(6, -4);
+    // A renamed theme also lists its old classes (slate: .theme-graphite, .style-graphite).
+    assert.match(css, new RegExp(`@layer components\\s*\\{\\s*:is\\(\\.theme-${theme}, \\.style-${theme}(, \\.(theme|style)-[a-z]+)*\\) \\{`));
   });
 }

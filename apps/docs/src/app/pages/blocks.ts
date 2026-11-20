@@ -15,6 +15,7 @@ const CATEGORIES = [
   { value: 'signup', label: 'Sign up', group: 'Sign up' },
   { value: 'sidebar', label: 'Sidebar', group: 'Sidebar' },
   { value: 'dashboard', label: 'Dashboard', group: 'Dashboard' },
+  { value: 'data', label: 'Data', group: 'Data' },
 ] as const;
 
 /** `/blocks`: one category at a time, each block full width with its own toolbar. */
@@ -29,7 +30,7 @@ const CATEGORIES = [
         <div class="max-w-2xl">
           <h1 class="font-display text-foreground text-[clamp(2.25rem,5vw,3.5rem)] leading-none font-semibold tracking-[-0.025em]">Blocks</h1>
           <p class="text-muted-foreground mt-4 text-lg text-pretty">
-            Whole pages built from Ivorie components: sign in, sign up, app shells and dashboards. Forms validate, buttons emit, the
+            Whole pages built from Ivorie components: sign in, sign up, app shells, dashboards and data views. Forms validate, buttons emit, the
             sidebar follows your routes. Add one with a single command, then make it yours.
           </p>
         </div>
@@ -66,6 +67,6 @@ export default class BlocksPage {
   });
 
   constructor() {
-    inject(Meta).updateTag({ name: 'description', content: 'Ready-made login, sign-up, sidebar and dashboard pages for Ivorie.' });
+    inject(Meta).updateTag({ name: 'description', content: 'Ready-made login, sign-up, sidebar, dashboard and data pages for Ivorie.' });
   }
 }

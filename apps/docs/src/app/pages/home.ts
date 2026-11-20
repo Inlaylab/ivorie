@@ -1,143 +1,164 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  ElementRef,
-  afterNextRender,
-  inject,
-  viewChild,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, afterNextRender, computed, inject, viewChild } from '@angular/core';
 import { OverlayContainer } from '@angular/cdk/overlay';
 import { RouterLink } from '@angular/router';
 import { IvButton } from '@inlaylab/ivorie/button';
-import { IV_TOOLTIP_IMPORTS } from '@inlaylab/ivorie/tooltip';
+import { IvSwitch } from '@inlaylab/ivorie/switch';
+import { THEMES, THEME_INFO, THEME_ORDER, type ThemeName } from '../../generated/looks';
 import { PAGES } from '../../generated/pages';
-import { PlaygroundLook } from '../playground/playground-look';
+import { PlaygroundLook, previewVars } from '../playground/playground-look';
 import { SceneWall } from '../playground/scenes/wall';
-import { STYLES } from '../shell/appearance-options';
-import { STYLE_NOTES } from '../playground/look-controls';
+import { ThemePicker } from '../playground/theme-picker';
+import { Appearance } from '../shell/appearance';
+import { DEFAULT_THEME } from '../shell/appearance-options';
+import { GROUPS } from '../shell/site-nav';
 import { CopyButton } from '../ui/copy-button';
-import { LucideAccessibility, LucidePackage, LucideServer, LucideTerminal, LucideZap } from '@lucide/angular';
+import { IVORIE } from '../../generated/cli';
+
+/** The hero specimen: one button and one switch, set in five themes that differ most. */
+const SPECIMEN: ThemeName[] = ['slate', 'clay', 'bento', 'luma', 'mono'];
+
+/** Component families for "What it does": a nav group, a sentence, and where to start reading. */
+const FAMILIES: { group: string; title: string; text: string; link: string }[] = [
+  { group: 'Forms and inputs', title: 'Forms', text: 'Fields, selects, date pickers and switches that work with reactive and signal forms.', link: '/docs/field' },
+  { group: 'Overlays and menus', title: 'Overlays', text: 'Dialogs, sheets, menus, popovers and toasts, with focus that goes where it should.', link: '/docs/dialog' },
+  { group: 'Data display', title: 'Data', text: 'Tables, charts and badges for the screens people read every day.', link: '/docs/data-table' },
+  { group: 'Metrics', title: 'Metrics', text: 'Meters, gauges, stat tiles and trackers for dashboards.', link: '/docs/stat' },
+  { group: 'Layout and navigation', title: 'Layout', text: 'Sidebars, tabs, breadcrumbs and cards that hold an app together.', link: '/docs/sidebar' },
+];
 
 @Component({
   selector: 'docs-home',
-  imports: [RouterLink, IvButton, IV_TOOLTIP_IMPORTS, CopyButton, SceneWall, LucideZap, LucideServer, LucideAccessibility, LucidePackage, LucideTerminal],
+  imports: [RouterLink, IvButton, IvSwitch, ThemePicker, CopyButton, SceneWall],
   providers: [PlaygroundLook],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'block' },
   template: `
-    <!-- Hero: the pitch under a soft beam of light. The components follow right below. -->
-    <section aria-labelledby="hero-title" class="relative isolate overflow-hidden">
-      <div class="docs-beam pointer-events-none absolute inset-x-0 top-0 -z-10 mx-auto h-[40rem] max-w-5xl" aria-hidden="true"></div>
-      <div class="mx-auto flex max-w-4xl flex-col items-center px-4 pt-16 pb-16 text-center sm:px-6 sm:pt-24 sm:pb-20">
-        <a
-          href="https://github.com/Inlaylab/ivorie"
-          target="_blank"
-          rel="noreferrer"
-          class="docs-pane text-muted-foreground hover:text-foreground mb-8 inline-flex items-center gap-2 rounded-full py-1 pr-3 pl-1 text-sm transition-colors duration-(--docs-dur)"
-        >
-          <span class="bg-(--brand-soft) text-(--brand-ink) rounded-full px-2 py-0.5 text-xs font-medium tabular-nums">v{{ release.version }}</span>
-          {{ release.text }}
-        </a>
-        <h1
-          id="hero-title"
-          class="font-display text-foreground text-[clamp(2.75rem,7.4vw,5.75rem)] leading-[1.02] font-semibold tracking-[-0.02em] text-balance"
-        >
-          <span class="block">{{ styles.length }} styles. </span>
-          <span class="block">One codebase. </span>
-          <span class="text-muted-foreground block">Built for Angular.</span>
-        </h1>
-        <p class="text-muted-foreground mt-6 max-w-[38rem] text-lg leading-relaxed text-pretty">
-          Accessible, signal-based components for Angular 22. Pick a look, keep your code: install the package or copy the source.
-        </p>
-        <div class="mt-9 flex flex-wrap justify-center gap-3">
-          <a ivButton size="lg" class="rounded-full px-6" routerLink="/docs/installation">Get started</a>
-          <a ivButton size="lg" variant="outline" class="docs-pane rounded-full px-6" routerLink="/playground">Open the playground</a>
+    <!-- Hero: what Ivorie is, the counts, two ways forward. The specimen shows the pitch: one component, many themes. -->
+    <section aria-labelledby="hero-title" class="border-b">
+      <div class="mx-auto grid max-w-7xl items-center gap-12 px-4 py-16 sm:px-6 lg:min-h-[calc(100svh-var(--header-height))] lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] lg:py-20">
+        <div class="flex min-w-0 flex-col items-start" data-enter>
+          <a
+            href="https://github.com/Inlaylab/ivorie"
+            target="_blank"
+            rel="noreferrer"
+            class="text-muted-foreground hover:text-foreground mb-8 inline-flex min-h-11 items-center gap-2 text-sm"
+          >
+            <span class="text-foreground font-medium tabular-nums">v{{ release.version }}</span>
+            {{ release.text }}
+          </a>
+          <h1
+            id="hero-title"
+            class="font-display text-foreground max-w-[14ch] text-[clamp(2.75rem,6.4vw,5.25rem)] leading-[0.98] font-medium tracking-[-0.04em] text-balance"
+          >
+            Angular components, set in any theme.
+          </h1>
+          <p class="text-muted-foreground mt-6 max-w-[34rem] text-lg leading-relaxed text-pretty" data-testid="hero-sub">
+            shadcn/ui behavior for Angular 22. {{ componentCount }} components, {{ themeCount }} themes, one codebase. Install the package or copy the source.
+          </p>
+          <div class="mt-9 flex flex-wrap gap-3">
+            <a ivButton size="lg" routerLink="/docs/installation">Get started</a>
+            <a ivButton size="lg" variant="outline" routerLink="/playground">Open the playground</a>
+          </div>
+          <div class="bg-muted mt-6 flex w-full max-w-xs items-center gap-3 rounded-md border py-1 pr-1 pl-4 text-left font-mono text-[0.8125rem]">
+            <span class="min-w-0 flex-1 truncate" data-testid="hero-command"><span class="text-muted-foreground select-none">$ </span>{{ install }}</span>
+            <docs-copy-button [text]="install" [label]="'Copy ' + install" />
+          </div>
         </div>
-        <div class="docs-pane mt-6 flex w-full max-w-xs items-center gap-3 rounded-full py-1 pr-1 pl-5 text-left font-mono text-[0.8125rem]">
-          <span class="min-w-0 flex-1 truncate" data-testid="hero-command"><span class="text-muted-foreground select-none">$ </span>{{ install }}</span>
-          <docs-copy-button [text]="install" [label]="'Copy ' + install" />
-        </div>
-      </div>
 
-    </section>
-
-    <!-- The showcase: real components in the picked style, on a horizon of light. Only the stage changes. -->
-    <section aria-labelledby="wall-title" class="mx-auto max-w-[88rem] px-4 pb-20 sm:px-6">
-      <h2 id="wall-title" class="sr-only">Live components</h2>
-      <div class="mb-5 flex flex-col items-center">
-        <div role="radiogroup" aria-label="Style" class="docs-pane no-scrollbar relative flex max-w-full gap-0.5 overflow-x-auto rounded-full p-1 max-lg:[mask-image:linear-gradient(to_right,black_calc(100%-2.5rem),transparent)]">
-          @for (s of styles; track s.name) {
-            <iv-tooltip class="shrink-0" [delayDuration]="150">
-              <label
-                ivTooltipTrigger
-                class="has-checked:bg-primary has-checked:text-primary-foreground text-muted-foreground hover:text-foreground has-focus-visible:outline-ring block cursor-pointer rounded-full px-3 py-1 text-sm font-medium transition-colors duration-(--docs-dur) has-focus-visible:outline-2"
-              >
-                <input
-                  type="radio"
-                  class="sr-only"
-                  name="home-style"
-                  [value]="s.name"
-                  [attr.aria-description]="notes[s.name]"
-                  [checked]="look.preset().style === s.name"
-                  (change)="look.set({ style: s.name })"
-                />
-                {{ s.label }}
-              </label>
-              <iv-tooltip-content side="bottom">{{ notes[s.name] }}</iv-tooltip-content>
-            </iv-tooltip>
+        <!-- The specimen: the same live button and switch, set in five themes. Each row is a preview in its own theme. -->
+        <!-- A picture of five themes, not five more actions: inert, so it takes no focus and no clicks. -->
+        <div data-testid="specimen" class="docs-specimen min-w-0 border-t" inert>
+          @for (s of specimen(); track s.name) {
+            <div
+              [attr.data-theme]="s.name"
+              class="docs-preview grid grid-cols-[6.5rem_minmax(0,1fr)] items-center gap-4 border-b px-1 py-4 sm:grid-cols-[8rem_minmax(0,1fr)]"
+              [class]="'theme-' + s.name + (s.name === siteTheme ? '' : ' docs-other')"
+              [style]="s.vars"
+            >
+              <!-- The site's muted ink, resolved at the root: the theme around it cannot pull it under contrast. -->
+              <span class="text-(--docs-ink-muted) text-sm">{{ s.label }}</span>
+              <div class="flex items-center justify-end gap-4">
+                <iv-switch [checked]="true" [aria-label]="'Notify the team, ' + s.label" />
+                <button ivButton type="button">Save changes</button>
+              </div>
+            </div>
           }
         </div>
-        <!-- The proof: the look changes, this code does not. Kept outside the stage so it never restyles. -->
+      </div>
+    </section>
+
+    <!-- What it does: the families, set as a list. Each names its parts and where to start. -->
+    <section aria-labelledby="does-title" class="mx-auto max-w-7xl px-4 py-24 sm:px-6">
+      <div class="grid gap-10 lg:grid-cols-[minmax(0,22rem)_minmax(0,1fr)]">
+        <div class="flex flex-col gap-4">
+          <h2 id="does-title" class="font-display text-foreground text-3xl font-medium tracking-[-0.03em] text-balance sm:text-4xl">Components for every screen</h2>
+          <p class="text-muted-foreground text-pretty">Every part an app needs, ported from shadcn/ui with its classes, variants and keyboard behavior.</p>
+          <a routerLink="/docs/components" class="text-foreground mt-2 inline-flex min-h-11 items-center text-sm font-medium underline-offset-4 hover:underline">Browse all {{ componentCount }} components</a>
+        </div>
+        <ul class="border-t">
+          @for (f of families; track f.title) {
+            <li class="grid gap-x-8 gap-y-1 border-b py-5 sm:grid-cols-[10rem_minmax(0,1fr)_auto] sm:items-baseline">
+              <a [routerLink]="f.link" class="font-display text-foreground text-2xl font-medium tracking-[-0.02em] hover:underline underline-offset-4">{{ f.title }}</a>
+              <p class="text-muted-foreground text-sm text-pretty">{{ f.text }}</p>
+              <span class="text-muted-foreground text-sm tabular-nums">{{ f.count }} parts</span>
+            </li>
+          }
+        </ul>
+      </div>
+    </section>
+
+    <!-- Why it helps: plain claims a reader can check in the docs. -->
+    <section aria-labelledby="why-title" class="bg-muted/40 border-y">
+      <div class="mx-auto max-w-7xl px-4 py-24 sm:px-6">
+        <h2 id="why-title" class="font-display text-foreground max-w-xl text-3xl font-medium tracking-[-0.03em] text-balance sm:text-4xl">Signals, SSR and accessibility built in</h2>
+        <dl class="mt-12 grid gap-x-12 gap-y-8 sm:grid-cols-2 lg:grid-cols-3">
+          @for (b of benefits; track b.title) {
+            <div class="flex flex-col gap-1.5 border-t pt-4">
+              <dt class="text-foreground font-medium">{{ b.title }}</dt>
+              <dd class="text-muted-foreground text-sm text-pretty">{{ b.text }}</dd>
+            </div>
+          }
+        </dl>
+      </div>
+    </section>
+
+    <!-- Themes: real components in the picked theme. Only the stage changes; the code under the picker never does. -->
+    <section aria-labelledby="themes-title" class="mx-auto max-w-[88rem] px-4 py-24 sm:px-6">
+      <div class="mb-8 flex flex-col items-center gap-3 text-center">
+        <h2 id="themes-title" class="font-display text-foreground text-3xl font-medium tracking-[-0.03em] text-balance sm:text-4xl">One code, {{ themeCount }} themes</h2>
+        <p class="text-muted-foreground max-w-xl text-pretty">Pick a theme. The components below change their surfaces, edges and controls. Your markup stays the same.</p>
+      </div>
+      <div class="mb-5 flex flex-col items-center">
+        <docs-theme-picker class="w-full" [look]="look" name="home" />
         <p data-testid="same-code" class="text-muted-foreground mt-4 flex flex-wrap items-center justify-center gap-2 text-sm">
-          Same code in every style
-          <code class="docs-pane text-foreground rounded-full px-3 py-1 font-mono text-[0.8125rem]">{{ sameCode }}</code>
+          Same code in every theme
+          <code class="bg-muted text-foreground rounded-md border px-3 py-1 font-mono text-[0.8125rem]">{{ sameCode }}</code>
         </p>
       </div>
 
       <!-- The cards sit on the page itself. The stage only carries the picked look. -->
-      <div #stage class="docs-stage relative max-h-[60rem] overflow-hidden px-2 pt-2 !bg-transparent">
+      <!-- The first cards of the wall, as many as fit the width (docs-wall-short); the full set is in the playground. -->
+      <div #stage class="docs-stage docs-wall-short relative rounded-lg p-2">
         <docs-scene-wall prefix="home" [charts]="false" />
-        <!-- The wall runs on; the fade ends it and leads to the full list. -->
-        <div class="absolute inset-x-0 bottom-0 flex h-48 items-end justify-center bg-linear-to-t from-(--docs-ground) via-(--docs-ground)/90 to-transparent pb-6">
-          <a ivButton variant="outline" class="docs-pane rounded-full" routerLink="/docs/components">Browse all {{ componentCount }} components</a>
-        </div>
       </div>
-
-      <ul data-testid="facts" class="mx-auto mt-12 grid max-w-4xl gap-6 text-center sm:grid-cols-3 sm:gap-0 sm:divide-x">
-        @for (f of facts; track f.title) {
-          <li class="flex flex-col items-center gap-1 sm:px-6">
-            <span class="bg-(--brand-soft) text-(--brand-ink) mb-2 grid size-9 place-items-center rounded-full" aria-hidden="true">
-              @switch (f.icon) {
-                @case ('zap') { <svg lucideZap class="size-4"></svg> }
-                @case ('server') { <svg lucideServer class="size-4"></svg> }
-                @case ('a11y') { <svg lucideAccessibility class="size-4"></svg> }
-              }
-            </span>
-            <span class="text-foreground text-sm font-semibold">{{ f.title }}</span>
-            <span class="text-muted-foreground text-sm text-pretty">{{ f.text }}</span>
-          </li>
-        }
-      </ul>
+      <div class="mt-6 flex justify-center">
+        <a ivButton variant="outline" routerLink="/docs/components">Browse all {{ componentCount }} components</a>
+      </div>
     </section>
 
     <section aria-labelledby="ways-title" class="mx-auto max-w-7xl px-4 pb-24 sm:px-6">
-      <h2 id="ways-title" class="font-display text-foreground max-w-xl text-2xl font-semibold tracking-[-0.015em] text-balance sm:text-3xl">
-        A package when you want updates. The source when you want control.
+      <h2 id="ways-title" class="font-display text-foreground max-w-xl text-3xl font-medium tracking-[-0.03em] text-balance sm:text-4xl">
+        Install the package or copy the source
       </h2>
-      <div class="mt-8 grid gap-4 md:grid-cols-2">
+      <div class="mt-10 grid gap-4 md:grid-cols-2">
         @for (w of ways; track w.title) {
-          <article class="docs-pane flex min-w-0 flex-col gap-5 rounded-3xl p-6 sm:p-8">
+          <article class="docs-pane flex min-w-0 flex-col gap-5 rounded-lg p-6 sm:p-8">
             <div class="flex flex-col gap-1.5">
-              <span class="bg-(--brand-soft) text-(--brand-ink) mb-2 grid size-10 place-items-center rounded-xl" aria-hidden="true">
-                @if (w.icon === 'package') { <svg lucidePackage class="size-5"></svg> } @else { <svg lucideTerminal class="size-5"></svg> }
-              </span>
               <h3 class="text-foreground text-lg font-semibold tracking-tight">{{ w.title }}</h3>
               <p class="text-muted-foreground text-sm text-pretty">{{ w.text }}</p>
             </div>
-            <pre
-              class="bg-background/60 overflow-x-auto rounded-2xl border p-4 font-mono text-[0.8125rem] leading-relaxed"
-            ><code>{{ w.code }}</code></pre>
-            <a [routerLink]="w.link" class="text-foreground mt-auto self-start text-sm font-medium underline-offset-4 hover:underline">{{
+            <pre class="bg-background rounded-md border p-4 font-mono text-[0.8125rem] leading-relaxed break-all whitespace-pre-wrap"><code>{{ w.code }}</code></pre>
+            <a [routerLink]="w.link" class="text-foreground mt-auto inline-flex min-h-11 items-center self-start text-sm font-medium underline-offset-4 hover:underline">{{
               w.linkLabel
             }}</a>
           </article>
@@ -145,49 +166,46 @@ import { LucideAccessibility, LucidePackage, LucideServer, LucideTerminal, Lucid
       </div>
     </section>
 
-    <footer class="border-t">
-      <div class="text-muted-foreground mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-4 py-8 text-sm sm:px-6">
-        <span class="flex items-center gap-2">
-          <span class="docs-brand-gradient size-1.5 rounded-full" aria-hidden="true"></span>
-          <!-- Credit the work this stands on, the way shadcn/ui ports do. -->
-          <span
-            >By
-            <a href="https://github.com/Inlaylab" target="_blank" rel="noreferrer" class="text-foreground font-medium underline underline-offset-4 hover:no-underline">Inlaylab</a>.
-            Built on
-            <a href="https://ui.shadcn.com" target="_blank" rel="noreferrer" class="text-foreground underline underline-offset-4 hover:no-underline">shadcn/ui</a>
-            and
-            <a href="https://www.radix-ui.com/primitives" target="_blank" rel="noreferrer" class="text-foreground underline underline-offset-4 hover:no-underline">Radix UI</a>
-            patterns. MIT license.</span
-          >
-        </span>
-        <nav aria-label="Footer" class="flex flex-wrap gap-x-5 gap-y-2">
-          <a routerLink="/docs/components" class="hover:text-foreground">Components</a>
-          <a routerLink="/blocks" class="hover:text-foreground">Blocks</a>
-          <a routerLink="/roadmap" class="hover:text-foreground">Roadmap</a>
-          <a href="https://github.com/Inlaylab/ivorie" target="_blank" rel="noreferrer" class="hover:text-foreground">Source on GitHub</a>
-        </nav>
+    <!-- Close: one line, one command, one action. -->
+    <section aria-labelledby="close-title" class="border-t">
+      <div class="mx-auto flex max-w-7xl flex-col items-start gap-6 px-4 py-24 sm:px-6 lg:flex-row lg:items-end lg:justify-between">
+        <h2 id="close-title" class="font-display text-foreground max-w-[18ch] text-3xl font-medium tracking-[-0.03em] text-balance sm:text-4xl">Install Ivorie with one command</h2>
+        <div class="flex flex-col items-start gap-3">
+          <div class="bg-muted flex w-full max-w-xs items-center gap-3 rounded-md border py-1 pr-1 pl-4 font-mono text-[0.8125rem]">
+            <span class="min-w-0 flex-1 truncate"><span class="text-muted-foreground select-none">$ </span>{{ install }}</span>
+            <docs-copy-button [text]="install" [label]="'Copy ' + install" />
+          </div>
+          <a ivButton routerLink="/docs/installation">Read the installation guide</a>
+        </div>
       </div>
-    </footer>
+    </section>
   `,
 })
 export default class HomePage {
   protected readonly look = inject(PlaygroundLook);
+  private readonly appearance = inject(Appearance);
   private readonly stage = viewChild.required<ElementRef<HTMLElement>>('stage');
-  protected readonly install = 'npx ivorie init';
+  protected readonly install = `${IVORIE} init`;
   protected readonly sameCode = '<button ivButton>Save</button>';
   protected readonly componentCount = PAGES.filter((p) => p.section === 'component').length;
-  /** The pill over the hero: the current version, and that the code is open. Bump the version with each release. */
-  protected readonly release = { version: '1.5.2', text: 'Free and open source on GitHub' };
-  protected readonly styles = STYLES;
-  protected readonly notes = STYLE_NOTES;
-  protected readonly facts = [
-    { icon: 'zap', title: 'Signals and zoneless', text: 'Signal inputs and models, OnPush, no zone.js.' },
-    { icon: 'server', title: 'Server rendering', text: 'Renders on the server, hydrates without warnings.' },
-    { icon: 'a11y', title: 'Accessible', text: 'ARIA patterns, keyboard support, tested with axe.' },
+  protected readonly themeCount = THEME_ORDER.length;
+  protected readonly siteTheme = DEFAULT_THEME;
+  /** The line over the hero: the current version, and that the code is open. Bump the version with each release. */
+  protected readonly release = { version: '1.6.0', text: 'Free and open source on GitHub' };
+  protected readonly specimen = computed(() =>
+    SPECIMEN.map((name) => ({ name, label: THEME_INFO[name].label, vars: previewVars(THEMES[name], this.appearance.dark()) })),
+  );
+  protected readonly families = FAMILIES.map((f) => ({ ...f, count: GROUPS.find((g) => g.label === f.group)?.pages.length ?? 0 }));
+  protected readonly benefits = [
+    { title: 'Signals and zoneless', text: 'Signal inputs and models, OnPush everywhere, no zone.js.' },
+    { title: 'Server rendering', text: 'Renders on the server and hydrates without warnings.' },
+    { title: 'Accessible', text: 'ARIA patterns and keyboard support, tested with axe.' },
+    { title: 'Import only what you use', text: 'Every component is its own entry point: @inlaylab/ivorie/button.' },
+    { title: 'Own the code', text: 'The CLI copies the source into your app. Change it like your own.' },
+    { title: 'Themes without rewrites', text: 'Switch theme, accent, font or density. The component code stays the same.' },
   ];
   protected readonly ways = [
     {
-      icon: 'package',
       title: 'Install the package',
       text: 'Updates come with npm. Import only what you use: every component is its own entry point.',
       code: 'import { IvButton } from \'@inlaylab/ivorie/button\';\n\n<button ivButton variant="outline">Save</button>',
@@ -195,7 +213,6 @@ export default class HomePage {
       linkLabel: 'Installation guide',
     },
     {
-      icon: 'terminal',
       title: 'Copy the source',
       text: 'The CLI writes the component files into your app. Read them, change them, keep them.',
       code: '$ npx ivorie add button\n\nsrc/app/ui/button/button.ts\nsrc/app/ui/button/public-api.ts',
@@ -208,6 +225,7 @@ export default class HomePage {
     // The wall's dialogs, menus and popovers open in the overlay container: they get the look too.
     const overlays = inject(OverlayContainer);
     afterNextRender(() => {
+      this.look.loadThemes(SPECIMEN);
       this.look.attach(this.stage().nativeElement);
       this.look.attach(overlays.getContainerElement());
     });

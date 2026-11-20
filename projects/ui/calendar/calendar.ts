@@ -184,7 +184,7 @@ const KEY_STEP: Record<string, number> = { ArrowLeft: -1, ArrowRight: 1, ArrowUp
                         [attr.tabindex]="!cell.outside && cell.key === tabbableKey() ? 0 : -1"
                         [attr.aria-label]="dayLabel(cell)"
                         [disabled]="cell.disabled || cell.hidden || isDisabled()"
-                        class="cn-calendar-day-button relative isolate z-10 flex aspect-square size-auto w-full min-w-(--cell-size) flex-col gap-1 border-0 leading-none font-normal data-[range-end=true]:rounded-(--cell-radius) data-[range-end=true]:rounded-r-(--cell-radius) data-[range-end=true]:bg-primary data-[range-end=true]:text-primary-foreground data-[range-middle=true]:rounded-none data-[range-middle=true]:bg-muted data-[range-middle=true]:text-foreground data-[range-start=true]:rounded-(--cell-radius) data-[range-start=true]:rounded-l-(--cell-radius) data-[range-start=true]:bg-primary data-[range-start=true]:text-primary-foreground data-[selected-single=true]:bg-primary data-[selected-single=true]:text-primary-foreground dark:hover:text-foreground [&>span]:text-xs [&>span]:opacity-70"
+                        class="cn-calendar-day-button relative isolate z-10 flex aspect-square size-auto w-full min-w-(--cell-size) flex-col gap-1 border-0 leading-none font-normal data-[range-end=true]:rounded-(--cell-radius) data-[range-end=true]:rounded-r-(--cell-radius) data-[range-end=true]:bg-(--calendar-selected,var(--primary)) data-[range-end=true]:text-(--calendar-selected-foreground,var(--primary-foreground)) data-[range-middle=true]:rounded-none data-[range-middle=true]:bg-(--calendar-range,var(--muted)) data-[range-middle=true]:text-foreground data-[range-start=true]:rounded-(--cell-radius) data-[range-start=true]:rounded-l-(--cell-radius) data-[range-start=true]:bg-(--calendar-selected,var(--primary)) data-[range-start=true]:text-(--calendar-selected-foreground,var(--primary-foreground)) data-[selected-single=true]:bg-(--calendar-selected,var(--primary)) data-[selected-single=true]:text-(--calendar-selected-foreground,var(--primary-foreground)) dark:hover:text-foreground [&>span]:text-xs [&>span]:opacity-70"
                         (click)="selectDay(cell)"
                         (focus)="_active.set(cell.date)"
                       >
@@ -462,12 +462,12 @@ export class IvCalendar implements ControlValueAccessor {
   dayCellClass(cell: DayCell): string {
     return cn(
       'group/day relative aspect-square h-full w-full rounded-(--cell-radius) p-0 text-center select-none [&:last-child[data-selected=true]_button]:rounded-r-(--cell-radius) [&:first-child[data-selected=true]_button]:rounded-l-(--cell-radius)',
-      cell.today && 'rounded-(--cell-radius) bg-muted text-foreground data-[selected=true]:rounded-none',
+      cell.today && 'rounded-(--cell-radius) bg-(--calendar-today,var(--muted)) text-foreground data-[selected=true]:rounded-none',
       cell.outside && 'text-muted-foreground aria-selected:text-muted-foreground',
       cell.disabled && 'text-muted-foreground opacity-50',
-      cell.rangeStart && 'relative isolate z-0 rounded-l-(--cell-radius) bg-muted after:absolute after:inset-y-0 after:right-0 after:w-4 after:bg-muted',
+      cell.rangeStart && 'relative isolate z-0 rounded-l-(--cell-radius) bg-(--calendar-range,var(--muted)) after:absolute after:inset-y-0 after:right-0 after:w-4 after:bg-(--calendar-range,var(--muted))',
       cell.rangeMiddle && 'rounded-none',
-      cell.rangeEnd && 'relative isolate z-0 rounded-r-(--cell-radius) bg-muted after:absolute after:inset-y-0 after:left-0 after:w-4 after:bg-muted',
+      cell.rangeEnd && 'relative isolate z-0 rounded-r-(--cell-radius) bg-(--calendar-range,var(--muted)) after:absolute after:inset-y-0 after:left-0 after:w-4 after:bg-(--calendar-range,var(--muted))',
       cell.hidden && 'invisible',
     )
   }

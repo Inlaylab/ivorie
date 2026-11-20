@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { DEFAULT_PRESET, decodePreset, encodePreset } from './preset-code';
+import { FILL_PRESET, decodePreset, encodePreset } from './preset-code';
 
 // Made by the 1.1 CLI, before fontHeading.
 const CODE_1_1 =
@@ -7,7 +7,7 @@ const CODE_1_1 =
 
 describe('preset code', () => {
   it('the 1.1 default (maia) still gives the 1.1 code', () => {
-    const maia = { ...DEFAULT_PRESET, style: 'maia' };
+    const maia = { ...FILL_PRESET, theme: 'maia' };
     expect(encodePreset(maia)).toBe(CODE_1_1);
     expect(decodePreset(CODE_1_1)).toEqual(maia);
   });
@@ -17,7 +17,7 @@ describe('preset code', () => {
   });
 
   it('iconLibrary is left out at lucide and kept otherwise', () => {
-    const tabler = { ...DEFAULT_PRESET, iconLibrary: 'tabler' };
+    const tabler = { ...FILL_PRESET, iconLibrary: 'tabler' };
     expect(encodePreset(tabler)).not.toBe(CODE_1_1);
     expect(decodePreset(encodePreset(tabler))).toEqual(tabler);
   });

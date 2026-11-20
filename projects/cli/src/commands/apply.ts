@@ -1,12 +1,12 @@
-// ivorie apply: change the look of an app that ran `ivorie init`.
+// ivorie apply: change the theme of an app that ran `ivorie init`.
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { CONFIG_FILE, readConfig, type ComponentsJson } from '../config.ts';
-import { ensureCssImports, relativeImport, setBodyStyleClass, setIconProvider } from '../edit.ts';
+import { ensureCssImports, relativeImport, setBodyThemeClass, setIconProvider } from '../edit.ts';
 import { ICON_PACKAGES, type IconLibrary } from '../icons.ts';
 import { installCommand, runInstall } from '../install.ts';
 import { renderLook } from '../look.ts';
-import { resolvePreset } from '../preset.ts';
+import { knownThemes, resolvePreset, savedLook, withSavedDials } from '../preset.ts';
 import { detectProject, type Project } from '../project.ts';
 import { bundledRegistry, openRegistry, packageName } from '../registry.ts';
 import { runAdd, writeFile } from './add.ts';
@@ -17,18 +17,19 @@ export interface ApplyOptions extends CommonOptions {
 }
 
 const importTarget = (line: string) => /^\s*@import\s+["']([^"']+)["']/.exec(line)?.[1];
-const STYLE_IMPORT = /\/styles\/style-[a-z]+\.css$/;
+// An Ivorie theme import, or a 1.5 style import it replaces. Known names only: an app's own theme-overrides.css stays.
+const themeImportRe = (known: readonly string[]) => new RegExp(`/styles/(theme|style)-(${known.join('|')})\\.css$`);
 const FONT_IMPORT = /^@fontsource-variable\//;
 
-/** Drops the style and font imports a new look replaces. */
-function dropLookImports(css: string, keep: string[]): string {
+/** Drops the theme and font imports a new theme replaces. */
+function dropLookImports(css: string, keep: string[], theme: RegExp): string {
   const eol = css.includes('\r\n') ? '\r\n' : '\n';
   const wanted = new Set(keep.map(importTarget));
   return css
     .split(/\r?\n/)
     .filter((l) => {
       const t = importTarget(l);
-      return !t || wanted.has(t) || !(STYLE_IMPORT.test(t) || FONT_IMPORT.test(t));
+      return !t || wanted.has(t) || !(theme.test(t) || FONT_IMPORT.test(t));
     })
     .join(eol);
 }
@@ -63,13 +64,24 @@ export async function setIconLibrary(
 }
 
 export async function runApply(input: string | undefined, o: ApplyOptions): Promise<Report> {
-  if (!input) throw new Error('apply needs a preset name or an ivp1_ code');
+  if (!input) throw new Error('apply needs a theme name or an ivp1_ code');
   const report = emptyReport();
   const config = readConfig(o.cwd);
   const project = detectProject(o.cwd, { project: o.project });
   const reg = openRegistry(o.registry ?? config.registry ?? bundledRegistry());
-  const preset = resolvePreset(input, await reg.index());
+  const index = await reg.index();
+  // A theme picked by name keeps the dials saved in components.json; a code brings its own.
+  const named = resolvePreset(input, index);
+  let preset = named;
+  if (!input.startsWith('ivp1_')) {
+    try {
+      preset = withSavedDials(named, config.preset, index);
+    } catch {
+      report.notes.push('components.json "preset" is not a valid ivp1_ code: saved dials were not kept');
+    }
+  }
   const look = await renderLook(preset, reg, config.path, config.tailwind.css);
+  report.notes.push(...look.notes);
 
   const edit = (file: string, change: (text: string) => string) => {
     const full = join(o.cwd, file);
@@ -82,35 +94,41 @@ export async function runApply(input: string | undefined, o: ApplyOptions): Prom
   const write = (file: string, content: string) =>
     writeFile(report, o.cwd, join(o.cwd, file), content, { overwrite: true, dryRun: o.dryRun });
 
-  const { fontHeading: _, theme: _t, chartColor: _c, menuAccent: _m, ...rest } = config;
+  const { fontHeading: _, accent: _a, chartColor: _c, menuAccent: _m, preset: _p, ...rest } = config;
+  const saved = savedLook(preset, index);
   const next: ComponentsJson = {
     ...rest,
-    style: preset.style,
+    theme: preset.theme,
     tailwind: { ...config.tailwind, baseColor: preset.baseColor },
     font: preset.font,
     ...(preset.fontHeading !== 'inherit' && { fontHeading: preset.fontHeading }),
     radius: preset.radius,
     iconLibrary: preset.iconLibrary as IconLibrary,
-    ...(preset.theme !== 'base' && { theme: preset.theme }),
-    ...(preset.chartColor !== 'theme' && { chartColor: preset.chartColor }),
+    ...(preset.accent !== 'base' && { accent: preset.accent }),
+    ...(preset.chartColor !== 'accent' && { chartColor: preset.chartColor }),
     ...(preset.menuAccent !== 'subtle' && { menuAccent: preset.menuAccent }),
+    ...(saved && { preset: saved }),
   };
   edit(CONFIG_FILE, (text) => (JSON.stringify(JSON.parse(text), null, 2) === JSON.stringify(next, null, 2) ? text : JSON.stringify(next, null, 2) + '\n'));
   write(`${config.path}/styles/theme.css`, look.themeCss);
-  write(`${config.path}/styles/${look.styleFile}`, look.styleCss);
+  write(`${config.path}/styles/${look.themeFile}`, look.themeFileCss);
 
-  const styleImport = look.imports.at(-1)!;
+  const themeImport = look.imports.at(-1)!;
+  const themeRe = themeImportRe(knownThemes(index));
   edit(config.tailwind.css, (css) => {
-    if (!css.split(/\r?\n/).some((l) => STYLE_IMPORT.test(importTarget(l) ?? ''))) {
-      report.notes.push(`no style import found in ${config.tailwind.css}; added ${styleImport}`);
+    if (!css.split(/\r?\n/).some((l) => themeRe.test(importTarget(l) ?? ''))) {
+      report.notes.push(`no theme import found in ${config.tailwind.css}; added ${themeImport}`);
     }
-    return ensureCssImports(dropLookImports(css, look.imports), look.imports);
+    return ensureCssImports(dropLookImports(css, look.imports, themeRe), look.imports);
   });
-  if (existsSync(join(o.cwd, project.indexHtml))) edit(project.indexHtml, (html) => setBodyStyleClass(html, preset.style));
-  else report.notes.push(`set class="style-${preset.style}" on <body> (no ${project.indexHtml})`);
+  if (existsSync(join(o.cwd, project.indexHtml))) edit(project.indexHtml, (html) => setBodyThemeClass(html, preset.theme, knownThemes(index)));
+  else report.notes.push(`set class="theme-${preset.theme}" on <body> (no ${project.indexHtml})`);
 
-  if (config.style !== preset.style) {
-    report.notes.push(`style-${config.style}.css is no longer used; delete it if you did not change it`);
+  // A 1.5 app has style-<name>.css; a theme switch leaves theme-<old>.css behind.
+  for (const old of [`style-${config.theme}.css`, `theme-${config.theme}.css`]) {
+    if (old !== look.themeFile && existsSync(join(o.cwd, config.path, 'styles', old))) {
+      report.notes.push(`${old} is no longer used; delete it if you did not change it`);
+    }
   }
 
   const iconDeps = await setIconLibrary(next.iconLibrary, o, next, project, report, edit);

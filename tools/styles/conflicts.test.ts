@@ -7,7 +7,7 @@ import { join } from 'node:path';
 import { twMerge } from 'tailwind-merge';
 import { STYLES, UI } from './hooks.ts';
 
-const css = readFileSync(join(STYLES, 'style-maia.css'), 'utf8');
+const css = readFileSync(join(STYLES, 'theme-maia.css'), 'utf8');
 const rules = new Map(
   [...css.matchAll(/\.(cn-[a-z0-9-]+) \{\s*@apply ([^;]+);/g)].map((m) => [m[1], m[2].split(/\s+/)]),
 );

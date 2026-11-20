@@ -34,6 +34,8 @@ try {
   run('npx ng build docs -c production,pack');
   run('npx ng build module-smoke -c production,pack');
   if (!docsCss().includes(PROBE)) throw new Error(`pack docs CSS lacks ${PROBE}: theme @source misses the package`);
+  // The site theme comes from the tarball in the pack build (styles.pack.css): a missing or empty file shows here.
+  if (!docsCss().includes('.theme-slate')) throw new Error('pack docs CSS lacks .theme-slate: theme-slate.css missing from the package');
 
   run('node tools/smoke/ssr.ts');
   ok = true;

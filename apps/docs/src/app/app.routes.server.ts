@@ -8,6 +8,7 @@ export const serverRoutes: ServerRoute[] = [
   { path: 'docs/components', renderMode: RenderMode.Prerender },
   { path: 'playground', renderMode: RenderMode.Prerender },
   { path: 'blocks', renderMode: RenderMode.Prerender },
+  { path: 'changelog', renderMode: RenderMode.Prerender },
   { path: 'roadmap', renderMode: RenderMode.Prerender },
   {
     path: 'docs/:slug',

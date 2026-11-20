@@ -119,6 +119,16 @@
 
   <iv-progress [value]="40" />
 
+  <iv-meter [value]="68" label="Storage" valueText="68 of 100 GB" />
+  <iv-gauge [value]="72" label="Uptime" />
+  <iv-stat>
+    <iv-stat-header><iv-stat-label>Revenue</iv-stat-label></iv-stat-header>
+    <iv-stat-value>$48,200 <iv-delta [value]="12" /></iv-stat-value>
+    <svg ivSparkline [data]="[3, 5, 4, 8]"></svg>
+  </iv-stat>
+  <iv-tracker [data]="[{ status: 'ok', tooltip: 'Nov 1: up' }]" label="Uptime" />
+  <iv-bar-list [data]="[{ name: '/', value: 10 }]" aria-label="Top pages" />
+
   <iv-radio-group [(ngModel)]="plan">
     <iv-radio-group-item value="starter" aria-label="Starter" />
     <iv-radio-group-item value="pro" aria-label="Pro" />

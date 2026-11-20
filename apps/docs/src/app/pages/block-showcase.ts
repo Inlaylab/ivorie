@@ -6,6 +6,7 @@ import type { BlockEntry } from '../content/types';
 import { PREVIEW_WIDTHS, PreviewFrame, type PreviewWidth } from '../preview/preview-frame';
 import { CopyButton } from '../ui/copy-button';
 import { BlockCode } from './block-code';
+import { IVORIE } from '../../generated/cli';
 
 type View = 'preview' | 'code';
 
@@ -94,7 +95,7 @@ export class BlockShowcase {
   protected readonly width = signal<PreviewWidth>('desktop');
   /** Forms are small: a shorter frame, less empty page around them. App shells get the full height. */
   protected readonly height = computed(() => (['Login', 'Sign up'].includes(this.entry().group) ? 'h-[36rem]' : 'h-[42rem]'));
-  protected readonly command = computed(() => `npx ivorie add ${this.entry().name}`);
+  protected readonly command = computed(() => `${IVORIE} add ${this.entry().name}`);
   protected readonly openHref = computed(() => `preview/block/${this.entry().name}?preset=${this.code()}`);
   protected readonly pill =
     'has-checked:bg-primary has-checked:text-primary-foreground text-muted-foreground hover:text-foreground has-focus-visible:outline-ring cursor-pointer rounded-full px-3 py-1 text-sm font-medium transition-colors duration-(--docs-dur) has-focus-visible:outline-2';

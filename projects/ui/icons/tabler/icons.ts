@@ -4,6 +4,7 @@
 import type { IconData, IconSet, IconSvg } from '@inlaylab/ivorie/icon'
 
 const SVG: IconSvg = { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', 'stroke-width': '2', 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }
+const ArrowDownIcon: IconData = { svg: SVG, nodes: [['path', { d: 'M12 5l0 14' }], ['path', { d: 'M18 13l-6 6' }], ['path', { d: 'M6 13l6 6' }]] }
 const ArrowLeftIcon: IconData = { svg: SVG, nodes: [['path', { d: 'M5 12l14 0' }], ['path', { d: 'M5 12l6 6' }], ['path', { d: 'M5 12l6 -6' }]] }
 const ArrowRightIcon: IconData = { svg: SVG, nodes: [['path', { d: 'M5 12l14 0' }], ['path', { d: 'M13 18l6 -6' }], ['path', { d: 'M13 6l6 6' }]] }
 const CheckIcon: IconData = { svg: SVG, nodes: [['path', { d: 'M5 12l5 5l10 -10' }]] }
@@ -16,6 +17,7 @@ const ChevronsLeftIcon: IconData = { svg: SVG, nodes: [['path', { d: 'M11 7l-5 5
 const ChevronsRightIcon: IconData = { svg: SVG, nodes: [['path', { d: 'M7 7l5 5l-5 5' }], ['path', { d: 'M13 7l5 5l-5 5' }]] }
 const CircleAlertIcon: IconData = { svg: SVG, nodes: [['path', { d: 'M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0' }], ['path', { d: 'M12 9v4' }], ['path', { d: 'M12 16v.01' }]] }
 const CircleCheckIcon: IconData = { svg: SVG, nodes: [['path', { d: 'M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0' }], ['path', { d: 'M9 12l2 2l4 -4' }]] }
+const CopyIcon: IconData = { svg: SVG, nodes: [['path', { d: 'M7 9.667a2.667 2.667 0 0 1 2.667 -2.667h8.666a2.667 2.667 0 0 1 2.667 2.667v8.666a2.667 2.667 0 0 1 -2.667 2.667h-8.666a2.667 2.667 0 0 1 -2.667 -2.667l0 -8.666' }], ['path', { d: 'M4.012 16.737a2.005 2.005 0 0 1 -1.012 -1.737v-10c0 -1.1 .9 -2 2 -2h10c.75 0 1.158 .385 1.5 1' }]] }
 const EllipsisIcon: IconData = { svg: SVG, nodes: [['path', { d: 'M4 12a1 1 0 1 0 2 0a1 1 0 1 0 -2 0' }], ['path', { d: 'M11 12a1 1 0 1 0 2 0a1 1 0 1 0 -2 0' }], ['path', { d: 'M18 12a1 1 0 1 0 2 0a1 1 0 1 0 -2 0' }]] }
 const GripVerticalIcon: IconData = { svg: SVG, nodes: [['path', { d: 'M8 5a1 1 0 1 0 2 0a1 1 0 1 0 -2 0' }], ['path', { d: 'M8 12a1 1 0 1 0 2 0a1 1 0 1 0 -2 0' }], ['path', { d: 'M8 19a1 1 0 1 0 2 0a1 1 0 1 0 -2 0' }], ['path', { d: 'M14 5a1 1 0 1 0 2 0a1 1 0 1 0 -2 0' }], ['path', { d: 'M14 12a1 1 0 1 0 2 0a1 1 0 1 0 -2 0' }], ['path', { d: 'M14 19a1 1 0 1 0 2 0a1 1 0 1 0 -2 0' }]] }
 const InfoIcon: IconData = { svg: SVG, nodes: [['path', { d: 'M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0' }], ['path', { d: 'M12 9h.01' }], ['path', { d: 'M11 12h1v4h1' }]] }
@@ -28,6 +30,7 @@ const XIcon: IconData = { svg: SVG, nodes: [['path', { d: 'M18 6l-12 12' }], ['p
 
 /** The icons the components draw. Use with provideIvIcons(COMPONENT_ICONS). */
 export const COMPONENT_ICONS: IconSet = {
+  'arrow-down': ArrowDownIcon,
   'arrow-left': ArrowLeftIcon,
   'arrow-right': ArrowRightIcon,
   check: CheckIcon,
@@ -40,6 +43,7 @@ export const COMPONENT_ICONS: IconSet = {
   'chevrons-up-down': ChevronsUpDownIcon,
   'circle-alert': CircleAlertIcon,
   'circle-check': CircleCheckIcon,
+  copy: CopyIcon,
   ellipsis: EllipsisIcon,
   'grip-vertical': GripVerticalIcon,
   info: InfoIcon,

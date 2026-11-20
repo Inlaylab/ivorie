@@ -9,8 +9,8 @@ const html = readFileSync('apps/docs/src/index.html', 'utf8');
 const script = /<body[^>]*>[\s\S]*?<script>([\s\S]*?)<\/script>/.exec(html)![1];
 
 function run(storage: { getItem(key: string): string | null }, prefersDark = false) {
-  // index.html ships <html class="dark">: the script only removes it.
-  const classes = new Set<string>(['dark']);
+  // index.html ships light markup: the script adds dark when the saved mode or the OS asks for it.
+  const classes = new Set<string>();
   const head: unknown[] = [];
   const document = {
     documentElement: {
@@ -32,9 +32,13 @@ function run(storage: { getItem(key: string): string | null }, prefersDark = fal
   return { dark: classes.has('dark'), body: document.body.className, links: head.length };
 }
 
-test('no saved state: dark, whatever the OS prefers', () => {
-  assert.deepEqual(run({ getItem: () => null }), { dark: true, body: 'style-maia', links: 0 });
+test('no saved state: follows the OS', () => {
+  assert.deepEqual(run({ getItem: () => null }), { dark: false, body: 'style-maia', links: 0 });
   assert.equal(run({ getItem: () => null }, true).dark, true);
+});
+
+test('saved dark adds dark on a light OS', () => {
+  assert.equal(run({ getItem: () => '{"mode":"dark"}' }, false).dark, true);
 });
 
 test('saved light removes dark; saved system follows the media query', () => {
@@ -44,7 +48,7 @@ test('saved light removes dark; saved system follows the media query', () => {
 });
 
 test('corrupt JSON: defaults, no throw', () => {
-  assert.deepEqual(run({ getItem: () => '{bad' }), { dark: true, body: 'style-maia', links: 0 });
+  assert.deepEqual(run({ getItem: () => '{bad' }), { dark: false, body: 'style-maia', links: 0 });
 });
 
 test('getItem throws: defaults, no throw', () => {
@@ -53,7 +57,7 @@ test('getItem throws: defaults, no throw', () => {
       throw new Error('SecurityError');
     },
   });
-  assert.deepEqual(r, { dark: true, body: 'style-maia', links: 0 });
+  assert.deepEqual(r, { dark: false, body: 'style-maia', links: 0 });
 });
 
 test('localStorage getter throws: no throw', () => {

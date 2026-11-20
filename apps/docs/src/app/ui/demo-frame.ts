@@ -14,11 +14,11 @@ const COLLAPSED_LINES = 10;
   selector: 'docs-demo-frame',
   imports: [NgComponentOutlet, IvButton, CopyButton, TrustedHtmlPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  host: { class: 'docs-pane not-prose my-6 block overflow-hidden rounded-2xl' },
+  host: { class: 'docs-pane not-prose my-6 block overflow-hidden rounded-lg' },
   template: `
     <!-- The demo host fills the frame and centers its children, so a w-full child gets real width and wide ones shrink on phones. -->
     <div
-      class="docs-preview bg-background flex min-h-[320px] w-full items-center justify-center overflow-x-auto p-4 sm:p-8 *:grid *:w-full *:grid-cols-1 *:justify-items-center"
+      class="docs-preview docs-demo bg-background flex min-h-[320px] w-full items-center justify-center overflow-x-auto p-4 sm:p-8 *:grid *:w-full *:grid-cols-1 *:justify-items-center"
     >
       <ng-container [ngComponentOutlet]="demo()" />
     </div>

@@ -161,7 +161,8 @@ export class IvDataTableBody {
         {{ s.selected().size }} row(s) selected.
       }
     </div>
-    <div class="flex items-center gap-6 lg:gap-8">
+    <div class="flex flex-wrap items-center gap-x-6 gap-y-2 lg:gap-x-8">
+      <!-- Phones keep the page size: the row wraps under the page buttons instead of hiding it. -->
       <div class="flex items-center gap-2">
         <span class="text-sm font-medium" [id]="labelId">Rows per page</span>
         <iv-select size="sm" [value]="'' + pagination().pagination().pageSize" (valueChange)="setPageSize($event)">

@@ -135,6 +135,12 @@ describe('IvSelect', () => {
     expect(trigger.hasAttribute('data-placeholder')).toBe(true)
   })
 
+  it('leading content (a color chip): the value follows it and the chevron stays at the end', async () => {
+    const { trigger } = await render(ModelHost)
+    // justify-between would center the value between a chip and the chevron; mr-auto keeps it left.
+    expect(trigger.querySelector('[data-slot="select-value"]')!.classList).toContain('mr-auto')
+  })
+
   it('content carries hooks; listbox, options and parts are wired', async () => {
     const { trigger, key, listbox, option } = await render(ModelHost)
     await key('Enter')
@@ -332,5 +338,27 @@ describe('IvSelect', () => {
   it('has no axe violations', async () => {
     const { fixture } = await render(ModelHost)
     await expect(fixture.nativeElement).toHaveNoViolations()
+  })
+})
+
+@Component({
+  imports: [IV_SELECT_IMPORTS],
+  template: `
+    <iv-select value="red">
+      <iv-select-trigger aria-label="Color"><span class="chip" aria-hidden="true"></span></iv-select-trigger>
+      <iv-select-content><iv-select-item value="red">Red</iv-select-item></iv-select-content>
+    </iv-select>
+  `,
+})
+class LeadingHost {}
+
+describe('IvSelectTrigger leading content', () => {
+  it('renders projected content inside the trigger button, before the value', async () => {
+    const fixture = TestBed.createComponent(LeadingHost)
+    await fixture.whenStable()
+    const button = (fixture.nativeElement as HTMLElement).querySelector('[data-slot="select-trigger"]')!
+    const chip = button.querySelector('.chip')!
+    expect(chip).not.toBeNull()
+    expect(chip.compareDocumentPosition(button.querySelector('[data-slot="select-value"]')!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
   })
 })

@@ -37,6 +37,8 @@ export interface PageEntry {
   order: number;
   /** A placeholder page: the nav shows a "Soon" badge. */
   soon?: boolean;
+  /** A guide in "Get started" (frontmatter `group: start`); other guides list under "Guides". */
+  group?: 'start';
   load: () => Promise<DocPage>;
 }
 export type DemoLoader = () => Promise<Type<unknown>>;
@@ -46,7 +48,7 @@ export interface BlockEntry {
   name: string;
   title: string;
   description: string;
-  group: 'Login' | 'Sign up' | 'Sidebar' | 'Dashboard';
+  group: 'Login' | 'Sign up' | 'Sidebar' | 'Dashboard' | 'Data';
   load: () => Promise<Type<unknown>>;
   files: () => Promise<{ path: string; code: string; html: string }[]>;
 }

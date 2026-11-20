@@ -1,4 +1,4 @@
-import { ApplicationRef, Component, EnvironmentInjector, PLATFORM_ID, createEnvironmentInjector } from '@angular/core'
+import { ApplicationRef, Component, EnvironmentInjector, ErrorHandler, PLATFORM_ID, createEnvironmentInjector } from '@angular/core'
 import { TestBed } from '@angular/core/testing'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { IvToastContainer, provideIvToast } from './toast-container'
@@ -111,11 +111,100 @@ describe('IvToastService + IvToastContainer', () => {
     expect(new Set(ids).size).toBe(100)
   })
 
+  it('description renders under the message', async () => {
+    const { service, flush, toasts } = await render()
+    service.show('Event created', 'success', { description: 'Friday, Nov 28 at 9:00' })
+    await flush()
+    expect(toasts()[0].querySelector('[data-slot="toast-description"]')!.textContent).toBe('Friday, Nov 28 at 9:00')
+  })
+
+  it('action closes the toast, then runs its callback', async () => {
+    const { service, flush, toasts } = await render()
+    const undo = vi.fn()
+    service.show('Message archived', 'info', { action: { label: 'Undo', onClick: undo } })
+    await flush()
+    const button = toasts()[0].querySelector<HTMLButtonElement>('[data-slot="toast-action"]')!
+    expect(button.textContent!.trim()).toBe('Undo')
+    button.click()
+    await flush()
+    expect(undo).toHaveBeenCalledOnce()
+    expect(toasts()).toEqual([])
+  })
+
+  it('the toast still closes when the action callback throws', async () => {
+    const handled: unknown[] = []
+    TestBed.configureTestingModule({ rethrowApplicationErrors: false, providers: [{ provide: ErrorHandler, useValue: { handleError: (e: unknown) => handled.push(e) } }] })
+    const { service, flush, toasts } = await render()
+    service.show('Message archived', 'info', {
+      action: {
+        label: 'Undo',
+        onClick: () => {
+          throw new Error('boom')
+        },
+      },
+    })
+    await flush()
+    const button = toasts()[0].querySelector<HTMLButtonElement>('[data-slot="toast-action"]')!
+    button.click()
+    await flush()
+    expect(handled).toHaveLength(1)
+    expect(toasts()).toEqual([])
+  })
+
+  it('a toast with an action stays at least 10 s; an explicit duration wins', async () => {
+    const { service } = await render()
+    const action = { label: 'Undo', onClick: () => {} }
+    service.show('Saved', 'success', { action })
+    service.show('Quick', 'success', { action, duration: 1000 })
+    vi.advanceTimersByTime(9000)
+    expect(service.toasts().map((t) => t.message)).toEqual(['Saved'])
+    vi.advanceTimersByTime(1000)
+    expect(service.toasts()).toEqual([])
+  })
+
+  it('pause() holds the timer, resume() runs the rest; unknown ids and duration 0 do nothing', async () => {
+    const { service } = await render()
+    const id = service.show('Saved', 'success', { action: { label: 'Undo', onClick: () => {} } })
+    vi.advanceTimersByTime(4000)
+    service.pause(id)
+    vi.advanceTimersByTime(20000)
+    expect(service.toasts().map((t) => t.id)).toEqual([id])
+    service.resume(id)
+    vi.advanceTimersByTime(5900)
+    expect(service.toasts().map((t) => t.id)).toEqual([id])
+    vi.advanceTimersByTime(100)
+    expect(service.toasts()).toEqual([])
+    const stay = service.show('Stay', 'info', { duration: 0 })
+    service.pause('nope')
+    service.resume('nope')
+    service.resume(stay)
+    vi.advanceTimersByTime(60000)
+    expect(service.toasts().map((t) => t.id)).toEqual([stay])
+  })
+
+  it('hover or focus inside a toast pauses it (WCAG 2.2.1); leaving resumes', async () => {
+    const { service, flush, toasts } = await render()
+    service.show('Saved', 'success', { action: { label: 'Undo', onClick: () => {} } })
+    await flush()
+    const el = toasts()[0]
+    el.dispatchEvent(new PointerEvent('pointerenter'))
+    await flush(30000)
+    expect(toasts().length).toBe(1)
+    const undo = el.querySelector<HTMLButtonElement>('[data-slot="toast-action"]')!
+    undo.dispatchEvent(new FocusEvent('focusin', { bubbles: true }))
+    el.dispatchEvent(new PointerEvent('pointerleave'))
+    await flush(30000)
+    expect(toasts().length).toBe(1)
+    undo.dispatchEvent(new FocusEvent('focusout', { bubbles: true, relatedTarget: null }))
+    await flush(10000)
+    expect(toasts().length).toBe(0)
+  })
+
   it('close button dismisses', async () => {
     const { service, flush, toasts } = await render()
     service.show('A', 'info')
     await flush()
-    toasts()[0].querySelector('button')!.click()
+    toasts()[0].querySelector<HTMLButtonElement>('button[aria-label="Dismiss"]')!.click()
     await flush()
     expect(toasts()).toEqual([])
   })

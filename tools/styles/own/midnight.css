@@ -1,0 +1,389 @@
+/* @base nova */
+/* @dials density contrast motion panels rim shadow blur */
+/*
+ * Midnight: deep neutral panes, hairlines, and the accent as light.
+ *   1. Panes are the base color's card on a deeper page. Edges are hairlines of --foreground.
+ *   2. The accent is light, not paint: it pools at the bottom of the hero card, glows under the
+ *      primary button and what is checked or filled, and lights the top of chart bars.
+ *   3. Made for dark. Light mode is a calm dusk: white panes on a page a step darker, the light at half strength.
+ * Dials: --iv-panel-solid (1 = solid, the default; 0 = --midnight-alpha with blur), --iv-rim scales the
+ * top light, --iv-shadow the shade and the glow, --iv-blur the blur.
+ * Nova gives the layout; these blocks only add to it, so a nova re-sync keeps working.
+ * Contrast is checked by tools/styles/contrast.test.ts against --midnight-alpha, --midnight-page,
+ * --midnight-muted-mix and --midnight-hero (the brightest point of the pool).
+ */
+
+& {
+  --midnight-muted-mix: 0.6;
+  /* How strong the accent light is: half in light mode, full in dark. */
+  --midnight-light: 0.5;
+  --midnight-page: color-mix(in oklab, var(--background) 93%, var(--foreground));
+  --midnight-pane: var(--card);
+  --midnight-raise: var(--popover);
+  --midnight-well: var(--midnight-page);
+  --midnight-alpha: 0.72;
+  /* Panes after the panels dial: solid by default; blur only when they let the page through. */
+  --midnight-pane-alpha: calc(var(--iv-panel-solid, 1) + (1 - var(--iv-panel-solid, 1)) * var(--midnight-alpha));
+  --midnight-pane-fill: color-mix(in oklab, var(--midnight-pane) calc(var(--midnight-pane-alpha) * 100%), transparent);
+  --midnight-blur: calc(20px * var(--iv-blur, 1) * (1 - var(--iv-panel-solid, 1)));
+  --midnight-hover: color-mix(in oklab, var(--foreground) 5%, transparent);
+  --midnight-active: color-mix(in oklab, var(--foreground) 9%, transparent);
+  --midnight-line: color-mix(in oklab, var(--foreground) 10%, transparent);
+  --midnight-line-strong: color-mix(in oklab, var(--foreground) 16%, transparent);
+  --midnight-rim: color-mix(in oklab, white min(100%, calc(70% * var(--iv-rim, 1))), transparent);
+  --midnight-shade: color-mix(in oklab, black min(100%, calc(10% * var(--iv-shadow, 1))), transparent);
+  --midnight-glow: color-mix(in oklab, var(--primary) min(100%, calc(var(--midnight-light) * 70% * var(--iv-shadow, 1))), transparent);
+  --midnight-button-rim: color-mix(in oklab, white min(100%, calc(35% * var(--iv-rim, 1))), transparent);
+  --midnight-bar-light: color-mix(in oklab, white min(100%, calc(var(--midnight-light) * 70% * var(--iv-rim, 1))), transparent);
+  /* The hero card: a pool of accent light rising from its bottom edge. This is its brightest point. */
+  --midnight-hero: color-mix(in oklab, var(--midnight-pane) 85%, var(--primary));
+  --midnight-pane-shadow: inset 0 1px 0 var(--midnight-rim), 0 0 0 1px var(--midnight-line), 0 8px 24px -12px var(--midnight-shade);
+  --midnight-float:
+    inset 0 1px 0 var(--midnight-rim), 0 0 0 1px var(--midnight-line-strong), 0 24px 56px -20px var(--midnight-shade);
+  --midnight-lit: 0 0 14px -2px var(--midnight-glow);
+}
+
+/* The page ground. Not on the CDK overlay container: it covers the whole screen, so a ground there hides the page. */
+&:not(.cdk-overlay-container) {
+  background-color: var(--midnight-page);
+}
+
+.dark & {
+  --midnight-muted-mix: 0.7;
+  --midnight-light: 1;
+  --midnight-page: color-mix(in oklab, var(--background) 65%, black);
+  --midnight-raise: color-mix(in oklab, var(--popover) 94%, white);
+  --midnight-hover: color-mix(in oklab, var(--foreground) 6%, transparent);
+  --midnight-active: color-mix(in oklab, var(--foreground) 11%, transparent);
+  --midnight-line: color-mix(in oklab, var(--foreground) 9%, transparent);
+  --midnight-line-strong: color-mix(in oklab, var(--foreground) 14%, transparent);
+  --midnight-rim: color-mix(in oklab, white min(100%, calc(6% * var(--iv-rim, 1))), transparent);
+  --midnight-shade: color-mix(in oklab, black min(100%, calc(55% * var(--iv-shadow, 1))), transparent);
+  --midnight-button-rim: color-mix(in oklab, white min(100%, calc(30% * var(--iv-rim, 1))), transparent);
+  --midnight-hero: color-mix(in oklab, var(--midnight-pane) 70%, var(--primary));
+}
+
+/* On every element, not the root: the playground sets the base colors inline on the root. */
+& :where(*) {
+  --muted-foreground: color-mix(in oklab, var(--foreground) calc((1 - var(--iv-muted-keep, 1) * (1 - var(--midnight-muted-mix))) * 100%), var(--background));
+}
+
+/* Panes: hairline edge, a faint top light, a deep shade. */
+.cn-stat,
+.cn-card,
+.cn-alert,
+.cn-item-variant-outline {
+  @apply border-transparent bg-(--midnight-pane-fill) ring-0 shadow-(--midnight-pane-shadow) backdrop-blur-(--midnight-blur);
+}
+
+& .cn-card[data-emphasis='hero'] {
+  @apply bg-[radial-gradient(120%_80%_at_50%_100%,var(--midnight-hero),var(--midnight-pane-fill)_70%)];
+}
+
+& .cn-card-title {
+  @apply tracking-tight;
+}
+
+& .cn-empty {
+  @apply border-(--midnight-line-strong) bg-(--midnight-well);
+}
+
+/* A sidebar is part of the page: one hairline on the side facing the content. */
+& .cn-sidebar-inner {
+  @apply bg-(--midnight-page) shadow-[inset_-1px_0_0_var(--midnight-line)] group-data-[variant=floating]:bg-(--midnight-pane-fill) group-data-[variant=floating]:ring-0 group-data-[variant=floating]:shadow-(--midnight-pane-shadow);
+}
+
+/* Floating panes: a step lighter, a stronger hairline, a deep shade. */
+.cn-popover-content,
+.cn-hover-card-content,
+.cn-dialog-content,
+.cn-alert-dialog-content,
+.cn-sheet-content,
+.cn-drawer-content,
+.cn-dropdown-menu-content,
+.cn-select-content,
+.cn-combobox-content,
+.cn-command,
+.cn-navigation-menu-viewport,
+.cn-chart-tooltip,
+.cn-toast {
+  @apply border-transparent bg-(--midnight-raise) ring-0 shadow-(--midnight-float);
+}
+
+/* A command list inside a dialog is part of that pane. */
+& .cn-dialog-content .cn-command {
+  @apply bg-transparent shadow-none;
+}
+
+.cn-dialog-overlay,
+.cn-sheet-overlay {
+  @apply bg-[color-mix(in_oklab,black_55%,transparent)];
+}
+
+& .cn-tooltip-content {
+  @apply shadow-[0_0_0_1px_var(--midnight-line),0_8px_20px_-8px_var(--midnight-shade)];
+}
+
+/* Wells: fields sink to the page tone, edged with a hairline. */
+.cn-input,
+.cn-textarea,
+.cn-input-group,
+.cn-select-trigger,
+.cn-native-select,
+.cn-input-otp-slot {
+  @apply border-(--midnight-line-strong) bg-(--midnight-well) shadow-none dark:border-(--midnight-line-strong) dark:bg-(--midnight-well);
+}
+
+& .cn-input-group-input {
+  @apply bg-transparent shadow-none dark:bg-transparent;
+}
+
+.cn-select-trigger,
+.cn-native-select {
+  @apply hover:bg-(--midnight-well) dark:hover:bg-(--midnight-well);
+}
+
+/* Unchecked: a well. Checked keeps nova's primary and glows. Every fill is under a state (data-checked is :where()). */
+.cn-checkbox,
+.cn-radio-group-item {
+  @apply shadow-none data-unchecked:border-(--midnight-line-strong) data-unchecked:bg-(--midnight-well) dark:data-unchecked:border-(--midnight-line-strong) dark:data-unchecked:bg-(--midnight-well) data-checked:shadow-(--midnight-lit);
+}
+
+/* Controls: hairline keys, no fill until hover. */
+.cn-button-variant-outline,
+.cn-button-variant-secondary {
+  @apply border-(--midnight-line-strong) bg-transparent shadow-none hover:bg-(--midnight-hover) aria-expanded:bg-(--midnight-hover) dark:border-(--midnight-line-strong) dark:bg-transparent dark:hover:bg-(--midnight-hover);
+}
+
+& .cn-button-variant-secondary {
+  @apply border-transparent bg-(--midnight-active) dark:border-transparent dark:bg-(--midnight-active);
+}
+
+& .cn-button-variant-ghost {
+  @apply hover:bg-(--midnight-hover) aria-expanded:bg-(--midnight-hover) dark:hover:bg-(--midnight-hover);
+}
+
+/* The primary button is lit: a bright top edge and a glow of the accent below. */
+& .cn-button-variant-default {
+  @apply shadow-[inset_0_1px_0_var(--midnight-button-rim),0_6px_20px_-6px_var(--midnight-glow)];
+}
+
+& .cn-switch {
+  @apply border-(--midnight-line) data-unchecked:bg-(--midnight-active) dark:data-unchecked:bg-(--midnight-active) data-checked:shadow-(--midnight-lit);
+}
+
+& .cn-switch-thumb {
+  @apply shadow-[0_1px_3px_var(--midnight-shade)];
+}
+
+/* Tracks are wells; the filled part glows. */
+.cn-slider-track,
+.cn-progress {
+  @apply bg-(--midnight-active);
+}
+
+.cn-slider-range,
+.cn-progress-indicator {
+  @apply shadow-(--midnight-lit);
+}
+
+& .cn-slider-thumb {
+  @apply shadow-[0_0_0_1px_var(--midnight-line-strong),0_1px_3px_var(--midnight-shade)];
+}
+
+/* One tint for hover, a stronger one for chosen. */
+.cn-toggle,
+.cn-toggle-group-item {
+  @apply hover:bg-(--midnight-hover) aria-pressed:bg-(--midnight-active) data-[state=on]:bg-(--midnight-active);
+}
+
+.cn-dropdown-menu-item,
+.cn-select-item {
+  @apply focus:bg-(--midnight-active);
+}
+
+& .cn-combobox-item {
+  @apply data-highlighted:bg-(--midnight-active);
+}
+
+& .cn-command-item {
+  @apply data-selected:bg-(--midnight-active);
+}
+
+/* The active page is lit from its edge by the accent. */
+& .cn-sidebar-menu-button {
+  @apply hover:bg-(--midnight-hover) active:bg-(--midnight-hover) data-active:bg-(--midnight-active) data-active:shadow-[inset_2px_0_0_var(--primary)] data-open:hover:bg-(--midnight-hover);
+}
+
+.cn-navigation-menu-trigger,
+.cn-menubar-trigger {
+  @apply hover:bg-(--midnight-hover) focus:bg-(--midnight-hover) aria-expanded:bg-(--midnight-active) data-open:bg-(--midnight-active) data-open:hover:bg-(--midnight-active);
+}
+
+/* The tab track is a well; the active tab is a pane in it. */
+& .cn-tabs-list {
+  @apply bg-(--midnight-well) shadow-[inset_0_0_0_1px_var(--midnight-line)] data-[variant=line]:bg-transparent data-[variant=line]:shadow-none;
+}
+
+& .cn-tabs-trigger {
+  @apply data-active:shadow-[inset_0_1px_0_var(--midnight-rim),0_0_0_1px_var(--midnight-line-strong)];
+}
+
+& .cn-calendar-day-button {
+  @apply hover:bg-(--midnight-hover);
+}
+
+& .cn-pagination-link {
+  @apply hover:bg-(--midnight-hover);
+}
+
+/* Data. */
+& .cn-table-head {
+  @apply text-muted-foreground text-xs font-medium;
+}
+
+& .cn-table-row {
+  @apply border-(--midnight-line) hover:bg-(--midnight-hover) data-[state=selected]:bg-(--midnight-active);
+}
+
+& .cn-accordion-item {
+  @apply border-(--midnight-line);
+}
+
+.cn-badge-variant-secondary,
+.cn-badge-variant-outline {
+  @apply border-transparent bg-(--midnight-active) shadow-[inset_0_0_0_1px_var(--midnight-line)];
+}
+
+& .cn-badge {
+  @apply font-medium;
+}
+
+& .cn-avatar {
+  @apply ring-1 ring-(--midnight-line);
+}
+
+& .cn-kbd {
+  @apply bg-(--midnight-active) shadow-[inset_0_0_0_1px_var(--midnight-line)];
+}
+
+& .cn-skeleton {
+  @apply bg-(--midnight-active);
+}
+
+/* A field separator masks its line with a solid label; the pane differs from the page, so the line is two halves. */
+& .cn-field-separator {
+  @apply flex items-center gap-2 before:h-px before:flex-1 before:bg-(--midnight-line-strong) after:h-px after:flex-1 after:bg-(--midnight-line-strong) [&>div]:hidden;
+}
+
+& .cn-field-separator-content {
+  @apply bg-transparent px-0;
+}
+
+/* Chart bars catch the light on their top edge. */
+& .cn-chart [data-slot='chart-bar'] {
+  filter: drop-shadow(0 -1px 0 var(--midnight-bar-light));
+}
+
+/* No backdrop-filter, or the user asked for less transparency: panes turn solid. */
+@supports not (backdrop-filter: blur(1px)) {
+  &,
+  .dark & {
+    --iv-panel-solid: 1;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  &,
+  .dark & {
+    --iv-panel-solid: 1;
+  }
+}
+
+/* Destructive text sits on a toned surface here: mixed toward the foreground, so it keeps 4.5:1. */
+.cn-badge-variant-destructive,
+.cn-button-variant-destructive {
+  @apply text-[color-mix(in_oklab,var(--destructive),var(--foreground)_28%)];
+}
+
+/* Shape: medium corners, hairline edges. */
+& .cn-button,
+& .cn-button-size-xs,
+& .cn-button-size-sm,
+& .cn-button-size-icon-xs,
+& .cn-button-size-icon-sm,
+& .cn-tabs-trigger,
+& .cn-toggle,
+& .cn-toggle-size-sm {
+  @apply rounded-md;
+}
+
+/* A small-radius box that glows when checked; radios stay round. */
+& .cn-checkbox {
+  @apply rounded-sm;
+}
+
+/* Navigation and grouping: the current item glows; everything else is a hairline. */
+& .cn-breadcrumb-page {
+  @apply font-medium [text-shadow:0_0_12px_var(--midnight-glow)];
+}
+
+& .cn-pagination-link[data-active] {
+  @apply border-(--midnight-line-strong) shadow-(--midnight-lit);
+}
+
+& .cn-calendar-day-button[data-selected-single='true'],
+& .cn-calendar-day-button[data-range-start='true'],
+& .cn-calendar-day-button[data-range-end='true'] {
+  @apply shadow-(--midnight-lit);
+}
+
+& .cn-button-group-text {
+  @apply border-(--midnight-line) bg-(--midnight-well);
+}
+
+& .cn-button-group-separator {
+  @apply bg-(--midnight-line-strong);
+}
+
+& .cn-resizable-handle {
+  @apply bg-(--midnight-line) focus-visible:shadow-(--midnight-lit);
+}
+
+& .cn-resizable-handle-icon {
+  @apply h-8 w-1 rounded-full bg-(--midnight-line-strong);
+}
+
+/* Rich parts: hairline wells; what is filled glows. */
+& .cn-stat-icon {
+  @apply bg-(--midnight-well) shadow-[inset_0_0_0_1px_var(--midnight-line-strong)];
+}
+
+& .cn-stat-value,
+& .cn-gauge-value {
+  @apply [text-shadow:0_0_18px_var(--midnight-glow)];
+}
+
+& .cn-meter-tick[data-filled],
+& span.cn-gauge-segment[data-filled],
+& .cn-tracker-bar[data-status='ok'] {
+  @apply shadow-[0_0_8px_-1px_var(--midnight-glow)];
+}
+
+& path.cn-gauge-segment[data-filled] {
+  @apply [filter:drop-shadow(0_0_3px_var(--midnight-glow))];
+}
+
+& .cn-meter-tick:not([data-filled]),
+& span.cn-gauge-segment:not([data-filled]),
+& .cn-tracker-bar[data-status='none'] {
+  @apply bg-(--midnight-active);
+}
+
+& path.cn-gauge-segment:not([data-filled]) {
+  @apply stroke-(--midnight-active);
+}
+
+& .cn-bar-list-bar {
+  @apply bg-[color-mix(in_oklab,var(--primary)_14%,transparent)] shadow-[inset_0_0_0_1px_var(--midnight-line)];
+}

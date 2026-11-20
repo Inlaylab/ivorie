@@ -24,9 +24,11 @@ test('theme has the shadcn no-scrollbar utility (maia combobox uses it)', () => 
   assert.ok(theme.includes('@utility no-scrollbar {'));
 });
 
-test('package exports ./styles/style-maia.css', () => {
+test('package exports ./styles/theme-maia.css and its 1.5 alias style-maia.css', () => {
   const pkg = JSON.parse(readFileSync('dist/ui/package.json', 'utf8'));
+  assert.equal(pkg.exports['./styles/theme-maia.css']?.default, './styles/theme-maia.css');
   assert.equal(pkg.exports['./styles/style-maia.css']?.default, './styles/style-maia.css');
+  assert.ok(existsSync('dist/ui/styles/theme-maia.css'));
   assert.ok(existsSync('dist/ui/styles/style-maia.css'));
 });
 
@@ -42,8 +44,8 @@ test('theme has the shadcn base layer (border and outline colors, body)', () => 
   assert.ok(theme.includes('@apply bg-background text-foreground;'));
 });
 
-test('every style root re-declares the radius scale, so a --radius set there reaches var(--radius-*)', () => {
-  const rule = theme.match(/:where\(\[class\*="style-"\]\) \{([^}]*)\}/)?.[1] ?? '';
+test('every theme root re-declares the radius scale, so a --radius set there reaches var(--radius-*)', () => {
+  const rule = theme.match(/:where\(\[class\^="theme-"\], \[class\*=" theme-"\], \[class\^="style-"\], \[class\*=" style-"\]\) \{([^}]*)\}/)?.[1] ?? '';
   for (const size of ['sm', 'md', 'lg', 'xl', '2xl', '3xl', '4xl']) {
     assert.match(rule, new RegExp(`--radius-${size}:`), size);
   }
@@ -59,19 +61,23 @@ const SHADCN_STYLES = ['vega', 'nova', 'maia', 'luma', 'rhea', 'lyra', 'mira', '
 test('every shadcn style has a source file and a package export', () => {
   const pkg = JSON.parse(readFileSync('projects/ui/package.json', 'utf8'));
   for (const name of SHADCN_STYLES) {
-    assert.ok(existsSync(`projects/ui/styles/style-${name}.css`), name);
+    assert.ok(existsSync(`projects/ui/styles/theme-${name}.css`), name);
+    assert.equal(pkg.exports[`./styles/theme-${name}.css`]?.default, `./styles/theme-${name}.css`, name);
     assert.equal(pkg.exports[`./styles/style-${name}.css`]?.default, `./styles/style-${name}.css`, name);
   }
+  // graphite: the 1.5 name of slate. Its files stay exported until 2.0.
+  for (const f of ['theme-graphite.css', 'style-graphite.css']) assert.equal(pkg.exports[`./styles/${f}`]?.default, `./styles/${f}`, f);
 });
 
 // Hand-made styles: tools/styles/own/<name>.css, derived over a synced style by tools/styles/derive.ts.
-const OWN_STYLES = ['glass', 'bento', 'mono', 'graphite', 'tint'];
+const OWN_STYLES = ['glass', 'bento', 'mono', 'slate', 'tint', 'midnight', 'clay'];
 
 test('every own style has a source file and a package export', () => {
   const pkg = JSON.parse(readFileSync('projects/ui/package.json', 'utf8'));
   for (const name of OWN_STYLES) {
     assert.ok(existsSync(`tools/styles/own/${name}.css`), name);
-    assert.ok(existsSync(`projects/ui/styles/style-${name}.css`), name);
+    assert.ok(existsSync(`projects/ui/styles/theme-${name}.css`), name);
+    assert.equal(pkg.exports[`./styles/theme-${name}.css`]?.default, `./styles/theme-${name}.css`, name);
     assert.equal(pkg.exports[`./styles/style-${name}.css`]?.default, `./styles/style-${name}.css`, name);
   }
 });
@@ -94,4 +100,11 @@ test('every radius token follows --radius (shadcn scale), so a preset radius rea
   for (const [size, value] of Object.entries(scale)) {
     assert.ok(theme.includes(`--radius-${size}: ${value};`), `--radius-${size}`);
   }
+});
+
+// The radius re-declare matches a class that starts with theme- / style-, not any class containing it (my-theme-x).
+test('theme.css: the radius scale re-declares on theme classes only', () => {
+  const css = readFileSync('projects/ui/styles/theme.css', 'utf8');
+  assert.doesNotMatch(css, /\[class\*="(theme|style)-"\]/);
+  assert.match(css, /:where\(\[class\^="theme-"\], \[class\*=" theme-"\], \[class\^="style-"\], \[class\*=" style-"\]\)/);
 });

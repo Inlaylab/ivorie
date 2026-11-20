@@ -1,10 +1,10 @@
 # @inlaylab/ivorie
 
-Angular components with the [shadcn/ui](https://github.com/shadcn-ui/ui) look and behavior. Signals, zoneless, OnPush and server rendering. One entry point per component.
+Angular components with the [shadcn/ui](https://github.com/shadcn-ui/ui) look and behavior. Signals, zoneless, OnPush and server rendering, with one entry point per component.
 
-**Docs:** https://inlaylab.github.io/ivorie/ · **Source:** https://github.com/Inlaylab/ivorie
+Docs: https://inlaylab.github.io/ivorie/ · Source: https://github.com/Inlaylab/ivorie
 
-## Needs
+## Requirements
 
 - Angular 22 (`>=22.0.0 <23.0.0`): `core`, `common`, `forms` and `@angular/cdk`
 - Tailwind CSS 4 and `tw-animate-css`
@@ -23,10 +23,10 @@ npm i -D tailwindcss @tailwindcss/postcss tw-animate-css
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "@inlaylab/ivorie/styles/theme.css";
-@import "@inlaylab/ivorie/styles/style-nova.css";
+@import "@inlaylab/ivorie/styles/theme-slate.css";
 ```
 
-Turn the style on for the page: `<body class="style-nova">`. Without it, components have no look.
+Put the theme class on the page: `<body class="theme-slate">`. Components have no look without it.
 
 ```ts
 import { IvButton } from '@inlaylab/ivorie/button';

@@ -16,13 +16,29 @@ async function render(slug: string) {
 }
 
 describe('DocPage', () => {
+  it('keeps prose to a readable measure, near 70 characters', async () => {
+    const { el } = await render('installation');
+    const prose = el.querySelectorAll('.docs-prose');
+    expect(prose.length).toBeGreaterThan(0);
+    for (const p of prose) expect(p.className).toContain('max-w-[70ch]');
+  });
+
+  it('below xl the table of contents folds into a details element at the top', async () => {
+    const { el, data } = await render('installation');
+    const folded = el.querySelector<HTMLDetailsElement>('details[data-toc]')!;
+    expect(folded).not.toBeNull();
+    expect(folded.className).toContain('xl:hidden');
+    expect(folded.querySelector('summary')!.textContent).toContain('On this page');
+    expect(folded.querySelectorAll('a').length).toBe(data.page.toc.length);
+  });
+
   it('renders title, entry chip, demo frames and toc links', async () => {
     const { el, data } = await render('tabs');
     expect(el.querySelector('h1')?.textContent).toContain('Tabs');
     expect(el.querySelector('[data-entry]')?.textContent).toContain("from '@inlaylab/ivorie/tabs'");
     const demoSegments = data.page.segments.filter((s) => s.kind === 'demo').length;
     expect(el.querySelectorAll('docs-demo-frame').length).toBe(demoSegments);
-    expect(el.querySelector('docs-install')?.textContent).toContain('npx ivorie add tabs');
+    expect(el.querySelector('docs-install')?.textContent).toContain('npx ivorie@1.6 add tabs');
     for (const item of data.page.toc) {
       expect(el.querySelector(`a[href$="#${item.id}"]`), item.id).not.toBeNull();
     }

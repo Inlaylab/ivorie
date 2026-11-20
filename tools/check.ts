@@ -34,7 +34,7 @@ export const steps: Step[] = [
   // Angular packages are ESM-only. The styles are CSS exports, not JS entries.
   {
     name: 'attw',
-    cmd: 'npx attw --pack dist/ui --profile esm-only --exclude-entrypoints ./styles/theme.css ./styles/style-vega.css ./styles/style-nova.css ./styles/style-maia.css ./styles/style-luma.css ./styles/style-rhea.css ./styles/style-glass.css ./styles/style-lyra.css ./styles/style-mira.css ./styles/style-sera.css ./styles/style-bento.css ./styles/style-mono.css ./styles/style-graphite.css ./styles/style-tint.css',
+    cmd: 'npx attw --pack dist/ui --profile esm-only --exclude-entrypoints ./styles/theme.css ./styles/theme-vega.css ./styles/theme-nova.css ./styles/theme-maia.css ./styles/theme-luma.css ./styles/theme-rhea.css ./styles/theme-glass.css ./styles/theme-lyra.css ./styles/theme-mira.css ./styles/theme-sera.css ./styles/theme-bento.css ./styles/theme-mono.css ./styles/theme-slate.css ./styles/style-slate.css ./styles/theme-graphite.css ./styles/theme-tint.css ./styles/theme-midnight.css ./styles/theme-clay.css ./styles/style-vega.css ./styles/style-nova.css ./styles/style-maia.css ./styles/style-luma.css ./styles/style-rhea.css ./styles/style-glass.css ./styles/style-lyra.css ./styles/style-mira.css ./styles/style-sera.css ./styles/style-bento.css ./styles/style-mono.css ./styles/style-graphite.css ./styles/style-tint.css ./styles/style-midnight.css ./styles/style-clay.css',
   },
   { name: 'test-ui', cmd: 'npx ng test ui --watch=false' },
   { name: 'test-blocks', cmd: 'npx ng test blocks --watch=false' },

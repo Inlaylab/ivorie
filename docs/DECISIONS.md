@@ -1,77 +1,111 @@
 # Decisions
 
-One line per decision. Newest at the bottom. Format: `date — decision — why`.
+The rules this project follows and why. Each rule states what is true now. When a rule changes, edit it in place; git history keeps the old version.
 
-- 2026-10-23 — Name **Ivorie**: npm `@ivorie/ui` + `ivorie`, GitHub org `ivorie-ui` — names are free (`ivorie` GitHub user is taken). Still to check by hand: npm org `@ivorie`, trademark.
-- 2026-10-23 — Ship both npm package and copy-in CLI from one source — users choose.
-- 2026-10-23 — Signals API (`input()`, `model()`, `output()`) in v1.0 — modern Angular; no breaking change later.
-- 2026-10-23 — Tailwind v4 required — components use v4 syntax (`data-[state]`, `rounded-4xl`).
-- 2026-10-23 — Build for latest: Angular 22 (`>=22.0.0 <23.0.0`), Tailwind `^4.0.0` (dev on 4.3). Raise range per new Angular major after CI green. Details: [COMPAT.md](COMPAT.md).
-- 2026-10-23 — Workspace upgrades 20 → 21 → 22 in Phase 1 (`ng update`, one major at a time).
-- 2026-10-23 — Icons: `@lucide/angular` instead of `lucide-angular` — old package allows Angular ≤21 only.
-- 2026-10-23 — Zoneless by default (Angular 21+). No `@angular/animations` (deprecated) — CSS animations via `tw-animate-css`.
-- 2026-10-23 — Docs app (`apps/docs`) is also the playground, SSR on from Phase 1 — find SSR bugs early, no throwaway app.
-- 2026-10-23 — Class names drop `Component`/`Directive` suffix (`UiButtonComponent` → `IvButton`) — Angular style guide (v20+).
-- 2026-10-23 — Services: `UiDialogService` → `IvDialog`, `UiAlertDialogService` → `IvAlertDialog`. `UiSidebarService` → `IvSidebarService`, `UiToastService` → `IvToastService` (keep suffix: else they clash with `IvSidebar`/`IvToast`).
-- 2026-10-23 — Import arrays get `_IMPORTS` (`UI_CARD` → `IV_CARD_IMPORTS`). Injection tokens do not (`UI_DIALOG_DATA` → `IV_DIALOG_DATA`).
-- 2026-10-23 — All attribute selectors become camelCase in Phase 2 (`tr[ui-table-row]` → `tr[ivTableRow]`) — one rename, one codemod map.
-- 2026-10-23 — File names: drop `ui-` and `.component`/`.directive` (`ui-button/ui-button.component.ts` → `button/button.ts`). Keep `.service`, `.model`, `.spec`.
-- 2026-10-23 — Rename script uses plain word-boundary replace with an explicit map (no ts-morph) — names are unique and prefixed; simple is enough. The map is reused by the codemod.
-- 2026-10-23 — Test runner: Vitest (`@angular/build:unit-test`, Angular 21+ default). Karma removed in Phase 1.
-- 2026-10-23 — shadcn/ui repo (`github.com/shadcn-ui/ui`, `new-york-v4` style) is the reference for classes, variants, a11y and the registry format. Local sparse clone in `.ref/shadcn` (gitignored) — fast grep, no web fetch per file.
-- 2026-10-23 — Node 24 runs `tools/*.ts` scripts directly (type stripping). No `tsx`/`ts-node`.
-- 2026-10-27 — Specs that measure layout stay on jsdom. They mock sizes (`offsetWidth`/`scrollWidth`, `ResizeObserver`). No Vitest browser mode, no Playwright. The 7 skipped specs are fixed in Batches C (truncate-tooltip) and E (select-picker).
-- 2026-10-27 — Phase 6 registry = shadcn registry JSON, universal items (`type: registry:item`, files `type: registry:file` + `target`) — works with `npx shadcn add` and our own `ivorie add`. Registry build rewrites `@inlaylab/ivorie/<name>` imports to `../<name>/public-api`: shadcn CLI does not rewrite imports for universal items.
-- 2026-10-28 — Theming = shadcn base + style split. Components carry shadcn's `cn-*` hook classes verbatim. Each look is `projects/ui/styles/style-<name>.css` (rules copied from shadcn `registry/styles/`), in `@layer components` under `.style-<name>`, so user classes win. Maia first; 5–8 styles later. Replaces `new-york-v4` as the reference.
-- 2026-10-28 — Docs content is markdown compiled at build time (marked + shiki) into lazy page modules. HTML is trusted (`bypassSecurityTrustHtml`) because it is build output from repo files.
-- 2026-10-28 — Docs demos are one-file default-export components. The same demos feed the docs pages and the SSR route `/all`.
-- 2026-10-28 — Docs deploy is a static prerender. `/all` renders on the Node server, only for the SSR smoke test.
-- 2026-10-28 — The SSR smoke test uses `playwright-core` with system Chrome (`SMOKE_BROWSER`), with no browser download. Unit specs stay on jsdom.
-- 2026-10-28 — Dependabot, not Renovate: it is built into GitHub. Angular majors are ignored there and done with `ng update`.
-- 2026-10-28 — Docs initial bundle budget errors at 500 kB.
-- 2026-10-28 — The CLI has no runtime deps. Tests run the TS source on Node 24; npm gets JS from `tsc`.
-- 2026-10-28 — The CLI prefix rewrite is 4 regexes (`iv-x`, `ivX`, `IvX`, `IV_`), not a map: the `iv` prefix is unique.
-- 2026-10-28 — The CLI uses its bundled registry by default. `--registry <url>` points at the hosted copy (`/r/` on the docs site).
-- 2026-10-28 — Presets are data: `{ style, baseColor, font, radius }`. The share code is `ivp1_<base64url JSON>`, and `components.json` stores the fields. Only one value each exists until v1.x.
-- 2026-10-29 — Ivorie ships the shadcn styles vega, nova, maia, luma and rhea, generated by `tools/styles/sync.ts`. `theme.css` carries shadcn's `tailwind.css` verbatim plus its base layer and the neutral base color. Fonts and icon sets per style are not copied (theme sets no font).
-- 2026-10-29 — `IV_*_IMPORTS` stay `as const`: the Angular compiler reads their tuple type from `.d.ts` across entries (NG1010 without it). NgModule `imports` rejects readonly arrays (TS2322), so NgModule apps spread them: `...IV_X_IMPORTS`.
-- 2026-10-29 — `shadcn add` of a registry item is checked by the ubuntu `cli-e2e` CI job only. On Windows the shadcn CLI reads a local `D:\` path as a URL scheme and fails.
-- 2026-10-30 — Org **Inlaylab** owns the project: npm `@inlaylab/ivorie` (was `@ivorie/ui`) + unscoped CLI `ivorie`, repo `github.com/Inlaylab/ivorie`. The brand and `iv` prefix stay Ivorie.
-- 2026-10-31 — v1.0.0 has no Changesets. A hand-written CHANGELOG.md is enough for one release. Add Changesets in 1.1.
-- 2026-11-02 — Carousel uses CSS scroll-snap, not embla-carousel. No new dep, touch and wheel come from the browser, SSR renders slides as-is. No loop or autoplay.
-- 2026-11-02 — Changesets finds the two packages through `lerna.json` `packages` (Lerna itself is not used). npm `workspaces` would link `node_modules/@inlaylab/ivorie` to the source folder (breaks `smoke:pack`) and clash with the root package name `ivorie`.
-- 2026-11-02 — Components draw their icons with `IvIcon` (`@inlaylab/ivorie/icon`): Lucide shapes copied into `icons.ts`. `@lucide/angular` is one 10.7 MB file with no per-icon entry; `ng serve` does not tree-shake deps, so every dev reload of a blank app loaded ~14.5 MB of JS. The peer dependency is dropped. Phase 11 adds other icon libraries on top.
-- 2026-11-02 — Branches and versions: SemVer 2.0, one shared version; branches `feat/` `fix/` `chore/` + short name (no version, no phase number); Conventional Commits; tag `vX.Y.Z` on `main` after each release. Replaces `phase-N-short-name` from Phase 10 on.
-- 2026-11-02 — Radius options follow shadcn: `default` (theme value), `none`, `small`, `medium`, `large`. No `full`: every radius token scales from `--radius` (`sm` 0.6x to `4xl` 2.6x, as in shadcn), so a pill value would round cards and inputs into pills too.
-- 2026-11-02 — Preset fonts are `@fontsource-variable/<name>` packages. The CLI installs and imports them; the playground loads the same CSS from jsdelivr in the browser only, so `npm run check` stays offline.
-- 2026-11-02 — The preset gains `fontHeading` (`inherit` = same as font). It is left out of the share code when `inherit`, so 1.1 codes and the default code do not change.
-- 2026-11-02 — The docs site is always style maia; the header has one light/dark button. The playground and the home preview show a look only on their preview box and its overlays (vars + style class on those elements), never on the site.
-- 2026-11-02 — Menus are solid. shadcn's `.cn-menu-translucent` is an opt-in look (translucent menu color); the style sync keeps it empty.
-- 2026-11-03 — Phase order after 1.2: Blocks, icon libraries, data table, more themes, AI-ready (AGENTS.md + MCP server), charts. Blocks and icons help every user first; charts are the largest new surface, so they go last.
-- 2026-11-04 — Phase order: icon libraries (1.3) before Blocks (1.4).
-- 2026-11-04 — Icons: every icon draws with `IvIcon`. Five vendored sets (`@inlaylab/ivorie/icons/<lib>`) export the same names; an app switches with one re-export file. Data is generated from `@ng-icons/*` dev deps. No runtime deps (zardui and ng-primitives ship `@ng-icons` at runtime; we only read its data).
-- 2026-11-04 — `IvIcon` renders shapes with static attribute bindings, no effects: faster render, same markup on server and client.
-- 2026-11-04 — The preset gains `iconLibrary`. It is left out of the share code when `lucide`, so older codes do not change.
-- 2026-11-04 — Icons, simpler (replaces the first icon line above): each `icons/<lib>` entry holds only the 18 component icons, copied once, no generator. Apps draw their own icons with `<ng-icon>` (`@ng-icons/*`). Components keep `<svg ivIcon>`: `ng-icon` host styles are unlayered and beat Tailwind `size-*` and shadcn `[&_svg]` rules. `ivorie migrate icons` renames `@ng-icons` names between libraries via `names.json`.
-- 2026-11-04 — Default style is nova, not maia: CLI default preset, docs site and playground. Share codes always carry the style, so old codes do not change.
-- 2026-11-04 — 1.4.0 bundles styles, data table and blocks (were 1.4, 1.5, 1.6): one branch `feat/v1.4.0`, one commit per feature. AI-ready becomes 1.5, charts 1.6.
-- 2026-11-04 — Own styles are derived: `tools/styles/own/<name>.css` names a synced base (`/* @base nova */`); its rules replace the base rule per hook, other blocks are copied as extras. `tools/styles/derive.ts` writes the full `style-<name>.css`. A base re-sync needs a re-derive (a test checks).
-- 2026-11-04 — The playground preview is a same-origin iframe (`/preview/:kind/:name`) with its own look, so no site style leaks in. Look changes arrive by `postMessage`, dark mode by the `storage` event.
-- 2026-11-04 — Glass makes menus and select lists glass too (the user found solid menus half done). The blur sits on the menu box itself, not a pseudo layer, so it follows a scrolled list. Every glass tint is a token; the no-blur and reduced-transparency fallbacks set the tokens solid.
-- 2026-11-05 — Data table is five standalone features (`ivFilter`, `ivSort`, `ivPagination`, `ivRowSelection`, `ivColumnVisibility`): rows in, rows out, `manual` for server mode. `ivDataTable` is an optional bundle. Parts take only the feature they need. One `tbody[ivDataTableBody]` renders loading, empty and data rows.
-- 2026-11-05 — Blocks are self-contained app source in projects/blocks (no shared code between blocks). `add` rewrites each `@inlaylab/ivorie/x` import relative to the file and renames icons to the app's library. Sidebar nav urls are relative, so a block works under any route.
-- 2026-11-06 — Minimum is Angular 22. Support for 21 and 20 is parked: the code, CLI (`MIN_ANGULAR`, cdk pin) and tests assume 22. Min versions are documented in the install page, READMEs and [COMPAT.md](COMPAT.md).
-- 2026-11-09 — One release = one commit (`<type>: release X.Y.Z — <summary>`); no per-task commits, no separate release commit. Order: 1.4.1 look-token fix, 1.4.2 docs redesign (docs only, so a patch), 1.5.0 glass material and dials (features, so a minor), 1.6.0 charts, 1.7.0 AI-ready.
-- 2026-11-09 — The radius scale (`--radius-sm`…`--radius-4xl`) is re-declared on every `style-*` element, so a `--radius` set below `:root` reaches the style files. Mono no longer forces radius 0 and `--font-mono`: like every style it takes `--radius`, `--font-sans` and `--font-heading` from the theme. The playground picks Geist Mono when you switch to Mono. A third font slot is parked.
-- 2026-11-11 — Charts engine: SVG parts on `d3-scale` + `d3-shape`, shadcn/Recharts model (container with series config, then axes, grid, series, tooltip, legend as small parts). Examples port line by line. Wrapping ECharts (300 kB+, styled in JS) and Chart.js (canvas, empty SSR) were dropped.
-- 2026-11-11 — Features come first: charts and dashboard blocks are 1.5.0, glass material and dials move to 1.6.0 (its chart-color dial then has charts to act on).
-- 2026-11-11 — Chart config `icon` is any Angular component (shadcn passes a React component), so the chart entry has no icon dependency. The chart gallery ports all 70 shadcn examples.
-- 2026-11-12 — The docs redesign (Phase 17) ships in 1.4.1 with the look-token fix, as one commit. No 1.4.2.
-- 2026-11-12 — Chart size budget: 45 kB gzipped for `@inlaylab/ivorie/chart` with d3 (the design said 30; all six chart types, tooltip, legend and keyboard come to ~41 kB). User confirmed.
-- 2026-11-13 — Aurora and brutal removed in 1.5.0 (user call, though 1.4.0 shipped them): fixed hues, ink borders and offset shadows broke the shared principles (hairlines, the radius scale, color from the base color and accent). shadcn's lyra, mira and sera replace them: 8 synced + 3 own styles.
-- 2026-11-13 — Accents come from shadcn (17, `tools/registry/accent-colors`), merged in shadcn's order: base color, accent, chart colors, menu accent, radius (`lookVars`). Preset fields `theme`, `chartColor`, `menuAccent` are optional keys in `ivp1_`, so old codes stay valid; no `ivp2_`. `menuColor` (translucent menus) is not ported: menus stay solid.
-- 2026-11-13 — Glass reworked in 1.5.0 (was 1.6.0), ideas from solid-glass (MIT; reference clone in `.ref/solid-glass`): no border, edges drawn with light, thickness by depth, neutral panes, ambient light from `--primary`, unlit dark page. Glass sets no chart colors: gray by default, the accent ramp when one is picked.
-- 2026-11-16 — 1.5.1 carries two new styles (Graphite, Tint) in a patch, on the fix branch, in one commit: user call, against the feature = minor rule.
-- 2026-11-16 — Glass is the docs default and first in the style lists; `ivorie init` keeps nova, so CLI behaviour and old share codes do not change. The playground has two defaults: its start look (glass, no `?preset=`) and the CLI default (nova, no `--preset`).
-- 2026-11-16 — Each style has a base color and accent in the docs only (`STYLE_COLORS`), not in the style CSS: shipped styles keep their look for existing apps. Glass takes violet, the site's brand, so the site and its demos are one look.
-- 2026-11-16 — New own styles are original, picked from what users ask for (dense pro-tool look, hue-led themes), not ports of another project's theme.
+To add one: put it under its topic as `Rule. Why. (since YYYY-MM-DD)`.
+
+## Product
+
+- Ship two ways from one source: the npm package `@inlaylab/ivorie` and the copy-in CLI `ivorie`. Users choose. (since 2026-10-23)
+- The org Inlaylab owns the project (npm scope, repo `github.com/Inlaylab/ivorie`). The brand and the `iv` prefix are Ivorie. (since 2026-10-30)
+- Look and behavior follow shadcn/ui (`github.com/shadcn-ui/ui`), read from a local sparse clone in `.ref/shadcn`. Keyboard and ARIA follow Radix. Where we differ, a rule here says so. (since 2026-10-23)
+- New own themes are original, picked from what users ask for, never ports of another project's theme. (since 2026-11-16)
+
+## Versions
+
+- Build for the latest only: Angular 22 (`>=22.0.0 <23.0.0`), Tailwind `^4.0.0` (dev on 4.3), Vitest, zoneless. Raise the range per Angular major once CI is green. Details: [COMPAT.md](COMPAT.md). (since 2026-10-23)
+- Angular 22 is the minimum. Code, CLI (`MIN_ANGULAR`, cdk pin) and tests assume it. Support for 21 and 20 is parked. (since 2026-11-06)
+- Signals API only (`input()`, `model()`, `output()`), so there is no breaking change later. (since 2026-10-23)
+- No `@angular/animations`: it is deprecated. Animations are CSS from `tw-animate-css`. (since 2026-10-23)
+- Node 24 runs `tools/*.ts` directly with type stripping. No `tsx` or `ts-node`. (since 2026-10-23)
+
+## Naming
+
+- Selector `iv-x` or `[ivX]`, class `IvX` with no `Component`/`Directive` suffix, per the Angular style guide. (since 2026-10-23)
+- Services keep a suffix only when the bare name clashes: `IvDialog`, `IvAlertDialog`, but `IvSidebarService`, `IvToastService`. (since 2026-10-23)
+- Import arrays end in `_IMPORTS` (`IV_CARD_IMPORTS`); injection tokens do not (`IV_DIALOG_DATA`). (since 2026-10-23)
+- Files drop `ui-`, `.component` and `.directive` (`button/button.ts`); `.service`, `.model` and `.spec` stay. (since 2026-10-23)
+- `IV_*_IMPORTS` stay `as const`: the compiler needs the tuple type across entries (NG1010). NgModule apps spread them (`...IV_X_IMPORTS`). (since 2026-10-29)
+- Renames go through one explicit word-boundary map, which `ivorie migrate` reuses. No ts-morph: names are unique and prefixed. (since 2026-10-23)
+
+## Components
+
+- Components carry shadcn's `cn-*` hook classes verbatim and layout only. Their look lives in theme CSS in `@layer components`, so user classes win. (since 2026-10-28)
+- Data parts (meter, gauge, stat, delta, tracker, bar list, sparkline) take their plain look from `tools/styles/parts.css`, so every theme can restyle them. (since 2026-11-23)
+- Status colors are fixed: tracker ok/warn/error are green, orange and red in every theme, delta good is green, meter warn is amber. `--tracker-ok` is an opt-in override. (since 2026-11-25)
+- Menus are solid. shadcn's `.cn-menu-translucent` stays empty. Glass is the exception: its menus are glass, with the blur on the menu box. (since 2026-11-04)
+- Carousel uses CSS scroll-snap, not embla: no dependency, native touch and wheel, plain SSR. No loop or autoplay. The gutter stays before each slide until 2.0, because moving it breaks custom gutters. (since 2026-11-02, gutter 2026-11-26)
+- Data table is five standalone features (`ivFilter`, `ivSort`, `ivPagination`, `ivRowSelection`, `ivColumnVisibility`), rows in and rows out, with `manual` for server mode. `ivDataTable` is an optional bundle. (since 2026-11-05)
+- Charts are SVG parts on `d3-scale` + `d3-shape`, on the shadcn/Recharts model. The chart entry stays under 45 kB gzipped (about 41 kB today). A chart config `icon` is any Angular component, so the entry has no icon dependency. (since 2026-11-11)
+- AI parts and Typography are in the backlog, not in a release. (since 2026-11-23)
+
+## Icons
+
+- Components draw icons with `<svg ivIcon>` and Lucide shapes copied into the library. `@lucide/angular` is one 10.7 MB file that `ng serve` loads whole. (since 2026-11-02)
+- `IvIcon` uses static attribute bindings and no effects: faster, and the same markup on server and client. (since 2026-11-04)
+- Each `icons/<lib>` entry holds only the component icons. Apps draw their own icons with `<ng-icon>`; `ivorie migrate icons` renames them between libraries. Components keep `<svg ivIcon>` because `ng-icon` host styles beat Tailwind `size-*`. (since 2026-11-04)
+- The docs app uses `@lucide/angular`, not `lucide-angular`, which stops at Angular 21. (since 2026-10-23)
+
+## Themes
+
+- One concept: theme. A theme is a CSS file (`theme-<name>.css`, `.theme-<name>`) plus its own defaults: accent, base color, fonts, radius and dials. Users change any default. (since 2026-11-23)
+- The 1.5 names alias until 2.0: `style-<name>.css`, `.style-<name>`, `graphite` (now `slate`), `--preset`, `--style`, `--theme <accent>`, old `components.json` keys. (since 2026-11-23)
+- The default theme is Slate with the blue accent, for `ivorie init` and the docs site. Glass keeps violet as its own default. (since 2026-11-24)
+- Seven own themes (slate, glass, bento, midnight, clay, mono, tint) and four Classic (nova, luma, mira, sera). Vega, maia, rhea and lyra are legacy: they work, stay out of pickers, and leave in 2.0. (since 2026-11-19)
+- Every theme differs from every other in at least two of surface, edge, chosen item, hero, data marks and type. Color does not count. (since 2026-11-20)
+- Classic themes are synced from shadcn by `tools/styles/sync.ts`, plus a thin Ivorie layer in `tools/styles/classic/<name>.css`. Own themes derive from pure shadcn nova with `tools/styles/derive.ts`. Generated theme files are never edited by hand. (since 2026-11-23)
+- Every radius token scales from `--radius`, and the scale is re-declared on every theme element so a `--radius` set below `:root` reaches it. Radius options follow shadcn: `default`, `none`, `small`, `medium`, `large`; no `full`, which would round cards into pills. (since 2026-11-09)
+- Theme colors that vary go through CSS variables (`--calendar-*`, `--tracker-ok`), so themes recolor without `!important`. (since 2026-11-23)
+- Accents are shadcn's 17, merged in shadcn's order: base color, accent, chart colors, menu accent, radius. (since 2026-11-13)
+
+## Dials
+
+- Dials tune a theme inside its signature. Every theme takes density, contrast and motion; own themes may also take panels, rim, shadow, blur and ambient. A dial a theme does not take is dropped with a note. (since 2026-11-19)
+- Density sets `--spacing` on `:root`, so it scales all of the app's Tailwind spacing. The default theme leaves it at `default`. (since 2026-11-26)
+- High contrast reaches muted text in own themes through `--iv-muted-keep`, because they declare `--muted-foreground` on every element. (since 2026-11-26)
+- The switch track is sized in spacing units, so density scales track and thumb together. (since 2026-11-23)
+
+## Presets and share codes
+
+- A look is data, shared as `ivp1_<base64url JSON>`. There is no `ivp2_`: new fields are optional keys left out at their default, so every old code stays valid. (since 2026-10-28)
+- The `ivp1_` JSON keys never change; only the codec maps them (wire `style` is the theme, wire `theme` the accent). (since 2026-11-23)
+- `components.json` keeps the whole look as `preset` when the user set a dial. `apply <theme>` carries those dials; a theme's own dial defaults are not saved. (since 2026-11-26)
+- Preset fonts are `@fontsource-variable/<name>` packages. The CLI installs them. The playground loads them from jsdelivr in the browser only, except fonts the site self-hosts (Geist, Geist Mono). `npm run check` stays offline. (since 2026-11-02)
+
+## CLI and registry
+
+- The registry is shadcn registry JSON with universal items, so `npx shadcn add` also works. The build rewrites `@inlaylab/ivorie/<name>` imports to `../<name>/public-api`. (since 2026-10-27)
+- The CLI has no runtime dependencies. Tests run the TS source on Node 24; npm gets JS from `tsc`. (since 2026-10-28)
+- The CLI uses its bundled registry. `--registry <url>` points at the hosted copy (`/r/`). (since 2026-10-28)
+- The prefix rewrite is four regexes (`iv-x`, `ivX`, `IvX`, `IV_`); the `iv` prefix is unique. (since 2026-10-28)
+- Blocks are self-contained app source with no code shared between blocks. `add` rewrites imports per file and renames icons to the app's library. (since 2026-11-05)
+- `init` and `apply` change only Ivorie's own theme names (registry themes and aliases). An app's `theme-dark` class or `theme-overrides.css` import stays. (since 2026-11-26)
+- `add` warns when the app's theme file lacks the rules a data part needs, instead of shipping fallback colors in the component. (since 2026-11-26)
+- `shadcn add` is checked only by the ubuntu `cli-e2e` CI job: on Windows the shadcn CLI reads `D:\` as a URL scheme. (since 2026-10-29)
+
+## Docs site
+
+- `apps/docs` is the docs and the playground, with SSR from day one, to find SSR bugs early. (since 2026-10-23)
+- Content is markdown compiled at build time (marked + shiki). Its HTML is trusted because it is build output from repo files. (since 2026-10-28)
+- Demos are one-file default-export components. They feed the docs pages and the SSR route `/all`. (since 2026-10-28)
+- The site deploys as a static prerender. `/all` renders only on the Node server, for the SSR smoke. (since 2026-10-28)
+- The site runs on the default theme, with colors generated from the default preset, so it shows the theme as installed. No glow, blur or gradients in the chrome; appearance follows the OS. Funnel Display is the display face. (since 2026-11-24)
+- The playground preview is a same-origin iframe (`/preview/:kind/:name`) with its own look. Look changes arrive by `postMessage`, dark mode by the `storage` event. (since 2026-11-04)
+- Copied commands pin the CLI minor (`npx ivorie@1.6`), or the exact version for a prerelease. The site deploys on every push to `main`, which can come before the npm release. (since 2026-11-26)
+- `styles.pack.css` is generated from `styles.css`, so the pack smoke builds the real site. (since 2026-11-26)
+
+## Testing
+
+- Unit specs run on jsdom with Vitest and mock layout sizes. No Vitest browser mode, no Playwright for unit specs. (since 2026-10-27)
+- The SSR smoke uses `playwright-core` with system Chrome (`SMOKE_BROWSER`), with no browser download. (since 2026-10-28)
+- `npm run check` runs every gate offline and prints pass or fail per gate. (since 2026-10-28)
+- The docs initial bundle fails above 900 kB (`angular.json`). (since 1.6.0)
+
+## Process and release
+
+- SemVer with one shared version. A feature is a minor, a fix a patch, a break a major. (since 2026-11-02)
+- Branches `feat/`, `fix/`, `chore/` plus a short name. Conventional Commits. Tag `vX.Y.Z` on `main` after each release. (since 2026-11-02)
+- One release is one commit: `<type>: release X.Y.Z — <summary>`. No commits between tasks. (since 2026-11-09)
+- Changesets bumps both packages and writes the CHANGELOGs. It finds them through `lerna.json`; npm workspaces would link `@inlaylab/ivorie` to the source and break `smoke:pack`. (since 2026-11-02)
+- Releases follow user benefit: features first, small releases sooner. A user call can override the semver rule (1.5.1 shipped two themes in a patch). (since 2026-11-03)
+- Dependabot, not Renovate: it is built into GitHub. Angular majors are ignored there and done with `ng update`. (since 2026-10-28)

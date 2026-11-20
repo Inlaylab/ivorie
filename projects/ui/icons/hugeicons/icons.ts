@@ -4,6 +4,7 @@
 import type { IconData, IconSet, IconSvg } from '@inlaylab/ivorie/icon'
 
 const SVG: IconSvg = { viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor' }
+const ArrowDownIcon: IconData = { svg: SVG, nodes: [['path', { d: 'M18 9.00005C18 9.00005 13.5811 15 12 15C10.4188 15 6 9 6 9', 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-width': '1.5' }]] }
 const ArrowLeftIcon: IconData = { svg: SVG, nodes: [['path', { d: 'M15 6C15 6 9.00001 10.4189 9 12C8.99999 13.5812 15 18 15 18', 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-width': '1.5' }]] }
 const ArrowRightIcon: IconData = { svg: SVG, nodes: [['path', { d: 'M20 12L4 12', 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-width': '1.5' }], ['path', { d: 'M15 17C15 17 20 13.3176 20 12C20 10.6824 15 7 15 7', 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-width': '1.5' }]] }
 const CheckIcon: IconData = { svg: SVG, nodes: [['path', { d: 'M5 14L8.5 17.5L19 6.5', 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-width': '1.5' }]] }
@@ -16,6 +17,7 @@ const ChevronsLeftIcon: IconData = { svg: SVG, nodes: [['path', { d: 'M11.5 18C1
 const ChevronsRightIcon: IconData = { svg: SVG, nodes: [['path', { d: 'M12.5 18C12.5 18 18.5 13.5811 18.5 12C18.5 10.4188 12.5 6 12.5 6', 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-width': '1.5' }], ['path', { d: 'M5.50005 18C5.50005 18 11.5 13.5811 11.5 12C11.5 10.4188 5.5 6 5.5 6', 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-width': '1.5' }]] }
 const CircleAlertIcon: IconData = { svg: SVG, nodes: [['circle', { cx: '12', cy: '12', r: '10', 'stroke-width': '1.5' }], ['path', { d: 'M11.992 15H12.001', 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-width': '2' }], ['path', { d: 'M12 12L12 8', 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-width': '1.5' }]] }
 const CircleCheckIcon: IconData = { svg: SVG, nodes: [['path', { d: 'M22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22C17.5228 22 22 17.5228 22 12Z', 'stroke-width': '1.5' }], ['path', { d: 'M8 12.5L10.5 15L16 9', 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-width': '1.5' }]] }
+const CopyIcon: IconData = { svg: SVG, nodes: [['path', { d: 'M9 15C9 12.1716 9 10.7574 9.87868 9.87868C10.7574 9 12.1716 9 15 9L16 9C18.8284 9 20.2426 9 21.1213 9.87868C22 10.7574 22 12.1716 22 15V16C22 18.8284 22 20.2426 21.1213 21.1213C20.2426 22 18.8284 22 16 22H15C12.1716 22 10.7574 22 9.87868 21.1213C9 20.2426 9 18.8284 9 16L9 15Z', 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-width': '1.5' }], ['path', { d: 'M16.9999 9C16.9975 6.04291 16.9528 4.51121 16.092 3.46243C15.9258 3.25989 15.7401 3.07418 15.5376 2.90796C14.4312 2 12.7875 2 9.5 2C6.21252 2 4.56878 2 3.46243 2.90796C3.25989 3.07417 3.07418 3.25989 2.90796 3.46243C2 4.56878 2 6.21252 2 9.5C2 12.7875 2 14.4312 2.90796 15.5376C3.07417 15.7401 3.25989 15.9258 3.46243 16.092C4.51121 16.9528 6.04291 16.9975 9 16.9999', 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-width': '1.5' }]] }
 const EllipsisIcon: IconData = { svg: SVG, nodes: [['path', { d: 'M21 12C21 11.1716 20.3284 10.5 19.5 10.5C18.6716 10.5 18 11.1716 18 12C18 12.8284 18.6716 13.5 19.5 13.5C20.3284 13.5 21 12.8284 21 12Z', 'stroke-width': '1.5' }], ['path', { d: 'M13.5 12C13.5 11.1716 12.8284 10.5 12 10.5C11.1716 10.5 10.5 11.1716 10.5 12C10.5 12.8284 11.1716 13.5 12 13.5C12.8284 13.5 13.5 12.8284 13.5 12Z', 'stroke-width': '1.5' }], ['path', { d: 'M6 12C6 11.1716 5.32843 10.5 4.5 10.5C3.67157 10.5 3 11.1716 3 12C3 12.8284 3.67157 13.5 4.5 13.5C5.32843 13.5 6 12.8284 6 12Z', 'stroke-width': '1.5' }]] }
 const GripVerticalIcon: IconData = { svg: SVG, nodes: [['path', { d: 'M8 6H8.00635M8 12H8.00635M8 18H8.00635M15.9937 6H16M15.9937 12H16M15.9937 18H16', 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-width': '2.5' }]] }
 const InfoIcon: IconData = { svg: SVG, nodes: [['circle', { cx: '12', cy: '12', r: '10', 'stroke-width': '1.5' }], ['path', { d: 'M11.992 15H12.001', 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-width': '2' }], ['path', { d: 'M12 12L12 8', 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'stroke-width': '1.5' }]] }
@@ -28,6 +30,7 @@ const XIcon: IconData = { svg: SVG, nodes: [['path', { d: 'M19.0005 4.99988L5.00
 
 /** The icons the components draw. Use with provideIvIcons(COMPONENT_ICONS). */
 export const COMPONENT_ICONS: IconSet = {
+  'arrow-down': ArrowDownIcon,
   'arrow-left': ArrowLeftIcon,
   'arrow-right': ArrowRightIcon,
   check: CheckIcon,
@@ -40,6 +43,7 @@ export const COMPONENT_ICONS: IconSet = {
   'chevrons-up-down': ChevronsUpDownIcon,
   'circle-alert': CircleAlertIcon,
   'circle-check': CircleCheckIcon,
+  copy: CopyIcon,
   ellipsis: EllipsisIcon,
   'grip-vertical': GripVerticalIcon,
   info: InfoIcon,

@@ -12,9 +12,9 @@ import { printReport, red } from './log.ts';
 const HELP = `Usage: ivorie <command> [options]
 
 Commands:
-  init               Set up theme, style and components.json in an Angular 22 app
+  init               Set up the theme and components.json in an Angular 22 app
   add <names...>     Copy components into your app (add --all for every one)
-  apply <preset>     Change the look: a preset name or an ivp1_ code from the playground
+  apply <theme>      Change the theme: a theme name (glass, bento, …) or an ivp1_ code from the playground
   migrate [paths...] Update code written for the old ui-* components (default: src)
   migrate icons --from <lib> --to <lib> [paths...]
                      Rename your @ng-icons icons to another library (default: src)
@@ -30,15 +30,16 @@ init options:
   --project <name>      App in angular.json (needed when there are several)
   --path <dir>          Where components go (default: src/app/ui)
   --prefix <prefix>     Selector prefix (default: iv)
-  --preset <name|code>  Theme preset (default: default)
-  --style <name>        Override the preset style
-  --base-color <name>   Override the preset base color
-  --font <name>         Override the preset font
-  --font-heading <name> Override the preset heading font (inherit = same as font)
-  --radius <name>       Override the preset radius (default, none, small, medium, large)
-  --icon-library <name> Override the preset icons (lucide, tabler, phosphor, hugeicons, remix)
-  --theme <name>        Accent color over the base color (base = none; blue, rose, emerald, …)
-  --chart-color <name>  Chart colors (theme = follow --theme, base = greys, or an accent)
+  --theme <name|code>   A theme or an ivp1_ code (default: slate). Themes: slate, glass,
+                        bento, midnight, clay, mono, tint, nova, luma, mira, sera.
+                        Each brings its own defaults; the options below change them.
+  --accent <name>       Accent color over the base color (base = none; blue, rose, emerald, …)
+  --base-color <name>   Base color (neutral, zinc, stone, …)
+  --font <name>         Font
+  --font-heading <name> Heading font (inherit = same as font)
+  --radius <name>       Radius (default, none, small, medium, large)
+  --icon-library <name> Icons (lucide, tabler, phosphor, hugeicons, remix)
+  --chart-color <name>  Chart colors (accent = follow --accent, base = greys, or an accent)
   --menu-accent <name>  Menu highlight (subtle, bold = primary color)
   --force               Run again over an existing setup
   -y, --yes             No prompts, use the defaults
@@ -68,6 +69,9 @@ const OPTIONS = {
     project: { type: 'string' },
     path: { type: 'string' },
     prefix: { type: 'string' },
+    theme: { type: 'string' },
+    accent: { type: 'string' },
+    // 1.5 names, kept until 2.0: --preset is --theme, --style swaps only the theme CSS.
     preset: { type: 'string' },
     style: { type: 'string' },
     'base-color': { type: 'string' },
@@ -75,7 +79,6 @@ const OPTIONS = {
     'font-heading': { type: 'string' },
     radius: { type: 'string' },
     'icon-library': { type: 'string' },
-    theme: { type: 'string' },
     'chart-color': { type: 'string' },
     'menu-accent': { type: 'string' },
     force: { type: 'boolean' },
@@ -131,6 +134,8 @@ async function main(argv: string[]): Promise<number> {
       project: v['project'] as string | undefined,
       path: v['path'] as string | undefined,
       prefix: v['prefix'] as string | undefined,
+      theme: v['theme'] as string | undefined,
+      accent: v['accent'] as string | undefined,
       preset: v['preset'] as string | undefined,
       style: v['style'] as string | undefined,
       baseColor: v['base-color'] as string | undefined,
@@ -138,7 +143,6 @@ async function main(argv: string[]): Promise<number> {
       fontHeading: v['font-heading'] as string | undefined,
       radius: v['radius'] as string | undefined,
       iconLibrary: v['icon-library'] as string | undefined,
-      theme: v['theme'] as string | undefined,
       chartColor: v['chart-color'] as string | undefined,
       menuAccent: v['menu-accent'] as string | undefined,
       force: v['force'] === true,

@@ -39,8 +39,8 @@ test('add without components.json fails with a hint', () => {
   }
 });
 
-test('apply without a preset fails with a hint', () => {
+test('apply without a theme fails with a hint', () => {
   const r = run(['apply']);
   assert.equal(r.status, 1);
-  assert.match(r.stderr, /error: apply needs a preset name or an ivp1_ code/);
+  assert.match(r.stderr, /error: apply needs a theme name or an ivp1_ code/);
 });

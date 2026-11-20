@@ -2,20 +2,25 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import type { Preset } from './preset.ts';
+import type { DialKey, Preset } from './preset.ts';
 
-export type ItemKind = 'component' | 'lib' | 'style' | 'base-color' | 'theme-base' | 'font' | 'block' | 'accent';
+export type ItemKind = 'component' | 'lib' | 'theme' | 'base-color' | 'theme-base' | 'font' | 'block' | 'accent';
 
 export interface RegistryIndex {
   version: string;
   items: { name: string; kind: ItemKind; registryDependencies: string[] }[];
-  styles: string[];
+  /** Theme names (CSS files `theme-<name>.css`). Legacy themes included. */
+  themes: string[];
   baseColors: string[];
   /** Accent colors (from 1.5.0; older registries have none). */
   accents?: string[];
   fonts: string[];
   radii: string[];
   presets: Record<string, Preset>;
+  /** Dials each theme takes (from 1.6.0; older registries have none). */
+  themeDials?: Record<string, DialKey[]>;
+  /** Themes that still work but leave in 2.0 (from 1.6.0). */
+  legacyThemes?: string[];
 }
 
 export interface RegistryFile {
@@ -50,6 +55,26 @@ const TIMEOUT_MS = 10_000;
 /** The registry shipped next to the compiled CLI (dist/cli/registry/). */
 export const bundledRegistry = () => fileURLToPath(new URL('./registry/', import.meta.url));
 
+type LegacyPreset = Omit<Preset, 'theme' | 'accent'> & { style: string; theme?: string };
+
+/**
+ * A 1.5 registry (a components.json "registry") lists `styles`, not `themes`, and keeps its named presets in
+ * the share-code shape: `style` is the theme, `theme` the accent, chartColor 'theme' means 'accent'.
+ */
+export function upgradeIndex(raw: RegistryIndex & { styles?: string[] }): RegistryIndex {
+  const { styles, ...rest } = raw;
+  const preset = (p: Preset | LegacyPreset): Preset => {
+    if (!('style' in p)) return p;
+    const { style, theme, ...other } = p;
+    return { ...other, theme: style, accent: theme ?? 'base', chartColor: other.chartColor === 'theme' ? 'accent' : other.chartColor } as Preset;
+  };
+  return {
+    ...rest,
+    themes: raw.themes ?? styles ?? [],
+    presets: Object.fromEntries(Object.entries(raw.presets ?? {}).map(([n, p]) => [n, preset(p)])),
+  };
+}
+
 /** A directory path, or an http(s) URL of a hosted copy. */
 export function openRegistry(source: string): Registry {
   const remote = /^https?:\/\//.test(source);
@@ -73,7 +98,7 @@ export function openRegistry(source: string): Registry {
   let index: Promise<RegistryIndex> | undefined;
   const items = new Map<string, Promise<RegistryItem>>();
   return {
-    index: () => (index ??= read('index.json')),
+    index: () => (index ??= read('index.json').then(upgradeIndex)),
     item: (name) => {
       if (!items.has(name)) items.set(name, read(`r/${name}.json`));
       return items.get(name)!;

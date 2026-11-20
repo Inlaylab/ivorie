@@ -1,7 +1,7 @@
 {
   "name": "@inlaylab/ivorie",
-  "version": "1.5.2",
-  "description": "Angular components with the shadcn/ui look and behavior.",
+  "version": "1.6.0",
+  "description": "Angular components with shadcn/ui's behavior, and looks of their own.",
   "license": "MIT",
   "homepage": "https://github.com/Inlaylab/ivorie#readme",
   "bugs": "https://github.com/Inlaylab/ivorie/issues",
@@ -43,44 +43,101 @@
     "./styles/theme.css": {
       "default": "./styles/theme.css"
     },
+    "./styles/theme-vega.css": {
+      "default": "./styles/theme-vega.css"
+    },
     "./styles/style-vega.css": {
       "default": "./styles/style-vega.css"
+    },
+    "./styles/theme-nova.css": {
+      "default": "./styles/theme-nova.css"
     },
     "./styles/style-nova.css": {
       "default": "./styles/style-nova.css"
     },
+    "./styles/theme-maia.css": {
+      "default": "./styles/theme-maia.css"
+    },
     "./styles/style-maia.css": {
       "default": "./styles/style-maia.css"
+    },
+    "./styles/theme-luma.css": {
+      "default": "./styles/theme-luma.css"
     },
     "./styles/style-luma.css": {
       "default": "./styles/style-luma.css"
     },
+    "./styles/theme-rhea.css": {
+      "default": "./styles/theme-rhea.css"
+    },
     "./styles/style-rhea.css": {
       "default": "./styles/style-rhea.css"
+    },
+    "./styles/theme-glass.css": {
+      "default": "./styles/theme-glass.css"
     },
     "./styles/style-glass.css": {
       "default": "./styles/style-glass.css"
     },
+    "./styles/theme-lyra.css": {
+      "default": "./styles/theme-lyra.css"
+    },
     "./styles/style-lyra.css": {
       "default": "./styles/style-lyra.css"
+    },
+    "./styles/theme-mira.css": {
+      "default": "./styles/theme-mira.css"
     },
     "./styles/style-mira.css": {
       "default": "./styles/style-mira.css"
     },
+    "./styles/theme-sera.css": {
+      "default": "./styles/theme-sera.css"
+    },
     "./styles/style-sera.css": {
       "default": "./styles/style-sera.css"
+    },
+    "./styles/theme-bento.css": {
+      "default": "./styles/theme-bento.css"
     },
     "./styles/style-bento.css": {
       "default": "./styles/style-bento.css"
     },
+    "./styles/theme-mono.css": {
+      "default": "./styles/theme-mono.css"
+    },
     "./styles/style-mono.css": {
       "default": "./styles/style-mono.css"
+    },
+    "./styles/theme-slate.css": {
+      "default": "./styles/theme-slate.css"
+    },
+    "./styles/style-slate.css": {
+      "default": "./styles/style-slate.css"
+    },
+    "./styles/theme-graphite.css": {
+      "default": "./styles/theme-graphite.css"
     },
     "./styles/style-graphite.css": {
       "default": "./styles/style-graphite.css"
     },
+    "./styles/theme-tint.css": {
+      "default": "./styles/theme-tint.css"
+    },
     "./styles/style-tint.css": {
       "default": "./styles/style-tint.css"
+    },
+    "./styles/theme-midnight.css": {
+      "default": "./styles/theme-midnight.css"
+    },
+    "./styles/style-midnight.css": {
+      "default": "./styles/style-midnight.css"
+    },
+    "./styles/theme-clay.css": {
+      "default": "./styles/theme-clay.css"
+    },
+    "./styles/style-clay.css": {
+      "default": "./styles/style-clay.css"
     }
   },
   "sideEffects": [

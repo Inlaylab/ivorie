@@ -1,4 +1,5 @@
 /* @base nova */
+/* @dials density contrast motion panels shadow */
 /*
  * Tint: the whole UI carries the accent hue. Page, panes, lines and states take a light wash of
  * --primary instead of grey, so one accent pick colors everything.
@@ -6,10 +7,13 @@
  *   2. Lines are tinted, not grey. Shadows are soft and take the hue too.
  *   3. States deepen the wash: hover < chosen. Text stays the base foreground, for contrast.
  * Nova gives the compact layout; these blocks only add to it, so a nova re-sync keeps working.
+ * Dials: --iv-panel-solid (1 = solid panes, the default; 0 = --tint-alpha), --iv-shadow scales the shade.
+ * The hero card takes a stronger wash.
  * Contrast is checked by tools/styles/contrast.test.ts against --tint-page and --tint-muted-mix.
  */
 
 & {
+  /* Tracker: ok follows the accent, but this accent reads as a warning or an error, so ok stays green. */
   --tint-muted-mix: 0.62;
   /* The hue every wash is made from. Dark lifts it, so a deep accent still shows on dark panes. */
   --tint-hue: var(--primary);
@@ -23,7 +27,13 @@
   --tint-active: color-mix(in oklab, var(--tint-hue) 14%, transparent);
   --tint-line: color-mix(in oklab, var(--tint-hue) 16%, transparent);
   --tint-line-strong: color-mix(in oklab, var(--tint-hue) 26%, transparent);
-  --tint-shade: color-mix(in oklab, var(--primary) 22%, transparent);
+  --tint-shade: color-mix(in oklab, var(--primary) min(100%, calc(22% * var(--iv-shadow, 1))), transparent);
+  /* Panes after the panels dial: solid by default, --tint-alpha when translucent. */
+  --tint-alpha: 0.8;
+  --tint-pane-alpha: calc(var(--iv-panel-solid, 1) + (1 - var(--iv-panel-solid, 1)) * var(--tint-alpha));
+  --tint-pane-fill: color-mix(in oklab, var(--tint-pane) calc(var(--tint-pane-alpha) * 100%), transparent);
+  --tint-hero: color-mix(in oklab, var(--card) 88%, var(--primary));
+  --tint-hero-fill: color-mix(in oklab, var(--tint-hero) calc(var(--tint-pane-alpha) * 100%), transparent);
   --tint-card: 0 0 0 1px var(--tint-line), 0 1px 2px var(--tint-hover), 0 10px 28px -16px var(--tint-shade);
   --tint-float: 0 0 0 1px var(--tint-line-strong), 0 6px 14px -6px var(--tint-hover), 0 22px 48px -18px var(--tint-shade);
 }
@@ -46,19 +56,25 @@
   --tint-active: color-mix(in oklab, var(--tint-hue) 16%, transparent);
   --tint-line: color-mix(in oklab, var(--tint-hue) 18%, transparent);
   --tint-line-strong: color-mix(in oklab, var(--tint-hue) 30%, transparent);
-  --tint-shade: color-mix(in oklab, black 55%, transparent);
+  --tint-shade: color-mix(in oklab, black min(100%, calc(55% * var(--iv-shadow, 1))), transparent);
+  --tint-hero: color-mix(in oklab, var(--card) 80%, var(--primary));
 }
 
 /* On every element, not the root: the playground sets the base colors inline on the root. */
 & :where(*) {
-  --muted-foreground: color-mix(in oklab, var(--foreground) calc(var(--tint-muted-mix) * 100%), var(--background));
+  --muted-foreground: color-mix(in oklab, var(--foreground) calc((1 - var(--iv-muted-keep, 1) * (1 - var(--tint-muted-mix))) * 100%), var(--background));
 }
 
 /* Panes: a tinted hairline and a soft shadow in the hue. */
+.cn-stat,
 .cn-card,
 .cn-alert,
 .cn-item-variant-outline {
-  @apply border-transparent bg-(--tint-pane) ring-0 shadow-(--tint-card);
+  @apply border-transparent bg-(--tint-pane-fill) ring-0 shadow-(--tint-card);
+}
+
+& .cn-card[data-emphasis='hero'] {
+  @apply bg-(--tint-hero-fill);
 }
 
 & .cn-card-title {
@@ -70,7 +86,7 @@
 }
 
 & .cn-sidebar-inner {
-  @apply bg-(--tint-page) group-data-[variant=floating]:bg-(--tint-pane) group-data-[variant=floating]:ring-0 group-data-[variant=floating]:shadow-(--tint-card);
+  @apply bg-(--tint-page) group-data-[variant=floating]:bg-(--tint-pane-fill) group-data-[variant=floating]:ring-0 group-data-[variant=floating]:shadow-(--tint-card);
 }
 
 .cn-popover-content,
@@ -266,4 +282,65 @@
 .cn-badge-variant-destructive,
 .cn-button-variant-destructive {
   @apply text-[color-mix(in_oklab,var(--destructive),var(--foreground)_28%)];
+}
+
+/* Less transparency asked for: panes turn solid. */
+@media (prefers-reduced-transparency: reduce) {
+  &,
+  .dark & {
+    --iv-panel-solid: 1;
+  }
+}
+
+/* Navigation and grouping: the current item is solid primary; rests and rules carry the accent's wash. */
+& .cn-breadcrumb-separator {
+  @apply text-(--tint-line-strong);
+}
+
+& .cn-breadcrumb-page {
+  @apply font-medium;
+}
+
+& .cn-pagination-link[data-active] {
+  @apply border-transparent bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground;
+}
+
+/* The calendar reads its day colours from these vars (calendar.ts). */
+& .cn-calendar {
+  --calendar-range: var(--tint-soft);
+}
+
+& .cn-button-group-text {
+  @apply border-(--tint-line) bg-(--tint-soft);
+}
+
+& .cn-button-group-separator {
+  @apply bg-(--tint-line-strong);
+}
+
+& .cn-resizable-handle {
+  @apply bg-(--tint-line);
+}
+
+& .cn-resizable-handle-icon {
+  @apply h-8 w-1 rounded-full bg-(--tint-line-strong);
+}
+
+/* Rich parts: rests carry the accent's wash. */
+& .cn-stat-icon {
+  @apply bg-(--tint-soft) text-primary;
+}
+
+& .cn-meter-tick:not([data-filled]),
+& span.cn-gauge-segment:not([data-filled]),
+& .cn-tracker-bar[data-status='none'] {
+  @apply bg-(--tint-soft);
+}
+
+& path.cn-gauge-segment:not([data-filled]) {
+  @apply stroke-(--tint-soft);
+}
+
+& .cn-bar-list-bar {
+  @apply bg-(--tint-soft-hover);
 }

@@ -6,10 +6,10 @@ import PlaygroundPage from './playground';
 import { PlaygroundLook } from './playground-look';
 import { DEFAULT_PRESET, encodePreset } from './preset-code';
 import { DOCS_PRESET } from './playground-look';
+import { THEME_ORDER } from '../../generated/looks';
 
-// The playground starts on the site's style (glass); `ivorie init` alone gives the CLI default (nova).
+// The playground starts on the glass theme, which is also what `ivorie init` gives on its own.
 const START = encodePreset(DOCS_PRESET);
-import { STYLES } from '../shell/appearance-options';
 
 @Component({ template: '' })
 class Empty {}
@@ -49,6 +49,24 @@ async function openCode(el: HTMLElement, fixture: { whenStable(): Promise<unknow
 const command = () => document.querySelector('[data-testid="command"]')!.textContent!.trim();
 const existing = () => document.querySelector<HTMLInputElement>('input[name="code-target"][value="existing"]')!;
 
+/** The rail's theme dropdown: open it, pick by value. */
+const themeTrigger = (el: HTMLElement) => el.querySelector<HTMLButtonElement>('aside [data-testid="theme-select"] [data-slot="select-trigger"]')!;
+async function pickRailTheme(el: HTMLElement, fixture: { whenStable(): Promise<unknown> }, name: string) {
+  themeTrigger(el).click();
+  await fixture.whenStable();
+  option(name[0].toUpperCase() + name.slice(1)).click();
+  await fixture.whenStable();
+}
+const option = (label: string) => [...document.querySelectorAll<HTMLElement>('[role="option"]')].find((o) => o.textContent!.trim() === label)!;
+/** A color dropdown in the rail (accent, base, chart): open it, pick by label. */
+async function pickColor(el: HTMLElement, fixture: { whenStable(): Promise<unknown> }, key: string, label: string) {
+  el.querySelector<HTMLButtonElement>(`aside [data-testid="color-${key}"] [data-slot="select-trigger"]`)!.click();
+  await fixture.whenStable();
+  option(label).click();
+  await fixture.whenStable();
+}
+const themeOptions = () => [...document.querySelectorAll<HTMLElement>('[role="option"]')].map((o) => o.textContent!.trim());
+
 describe('PlaygroundPage', () => {
   afterEach(() => {
     TestBed.resetTestingModule();
@@ -59,53 +77,69 @@ describe('PlaygroundPage', () => {
     document.querySelectorAll('.cdk-overlay-container').forEach((c) => (c.innerHTML = ''));
   });
 
-  it('the panel has one row per axis, label over value', async () => {
+  it('the rail: theme first, then color, type and shape, dials last; no "look" anywhere', async () => {
     const { el } = await render();
     expect(rail(el).querySelector('h1')!.textContent!.trim()).toBe('Customize');
-    const rows = [...rail(el).querySelectorAll('span[id$="-label"]')].map((s) => s.textContent!.trim());
-    expect(rows).toEqual(['Mode', 'Style', 'Base color', 'Accent', 'Chart color', 'Menu accent', 'Radius', 'Icons', 'Heading font', 'Font']);
-    expect(rail(el).querySelectorAll('[data-slot="select-trigger"]').length).toBe(10);
-    expect(rail(el).querySelector('[data-testid="panel-command"]')!.textContent!.trim()).toBe(`npx ivorie init --preset ${START}`);
+    themeTrigger(el).click();
+    await new Promise((r) => setTimeout(r));
+    expect(themeOptions()).toEqual(['Slate', 'Glass', 'Bento', 'Midnight', 'Clay', 'Mono', 'Tint', 'Nova', 'Luma', 'Mira', 'Sera']);
+    document.body.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    const titles = [...rail(el).querySelectorAll('.docs-rail-title')].map((t) => t.textContent!.trim());
+    expect(titles).toEqual(['Theme', 'Color', 'Type and shape', 'Dials']);
+    expect([...rail(el).querySelectorAll('[data-dial]')].map((d) => d.getAttribute('data-dial'))).toEqual([
+      'density', 'contrast', 'motion', 'panels', 'rim', 'shadow', 'blur', 'ambient',
+    ]);
+    expect(rail(el).textContent).not.toMatch(/\blooks?\b/i);
+    expect(rail(el).querySelector('[data-testid="panel-command"]')!.textContent!.trim()).toBe('npx ivorie@1.6 init');
   });
 
-  it('rows change the look and the mode; the width sits on the preview; style options explain themselves', async () => {
+  it('tiles, swatches and segments change the preset; mode and width sit on the preview', async () => {
     const { el, fixture } = await render();
     const look = fixture.debugElement.injector.get(PlaygroundLook);
-    const open = async (label: string) => {
-      rail(el).querySelector<HTMLElement>(`[aria-labelledby="rail-${label}-label"]`)!.click();
+    const click = async (sel: string) => {
+      el.querySelector<HTMLInputElement>(sel)!.click();
       await fixture.whenStable();
     };
-    const pick = async (label: string, text: string) => {
-      await open(label);
-      [...document.querySelectorAll<HTMLElement>('[role="option"]')].find((o) => o.textContent!.trim() === text)!.click();
-      await fixture.whenStable();
-    };
-    await open('style');
-    expect(document.querySelectorAll('[role="option"] .docs-style-icon').length).toBe(STYLES.length);
-    [...document.querySelectorAll<HTMLElement>('[role="option"]')].find((o) => o.textContent!.trim() === 'Glass')!.click();
-    await fixture.whenStable();
-    await pick('radius', 'Large');
-    await pick('iconLibrary', 'Phosphor');
-    expect(look.preset()).toMatchObject({ style: 'glass', radius: 'large', iconLibrary: 'phosphor' });
-    await pick('mode', 'Light');
+    await pickRailTheme(el, fixture, 'bento');
+    expect(look.preset()).toMatchObject({ theme: 'bento', accent: 'lime', font: 'outfit' });
+    await pickColor(el, fixture, 'accent', 'Red');
+    await pickColor(el, fixture, 'base', 'Olive');
+    await click('input[name="rail-radius"][value="small"]');
+    await click('input[name="rail-density"][value="compact"]');
+    expect(look.preset()).toMatchObject({ theme: 'bento', accent: 'red', baseColor: 'olive', radius: 'small', density: 'compact' });
+    expect(look.themeName()).toBe('bento');
+    await click('input[name="pg-mode"][value="light"]');
     expect(document.documentElement.classList.contains('dark')).toBe(false);
-    stage(el).querySelector<HTMLInputElement>('input[name="pg-width"][value="mobile"]')!.click();
-    await fixture.whenStable();
+    await click('input[name="pg-width"][value="mobile"]');
     fixture.detectChanges();
     expect(frame(el).style.width).toBe('390px');
   });
 
-  it('the start look (glass) names its preset; the CLI default (nova) gives the plain commands', async () => {
+  it('the start theme is slate: the plain commands', async () => {
     const { el, fixture } = await render();
     await openCode(el, fixture);
-    expect(command()).toBe(`npx ivorie init --preset ${START}`);
-    fixture.debugElement.injector.get(PlaygroundLook).load(encodePreset(DEFAULT_PRESET));
-    await fixture.whenStable();
-    fixture.detectChanges();
-    expect(command()).toBe('npx ivorie init');
+    expect(command()).toBe('npx ivorie@1.6 init');
     existing().click();
     await fixture.whenStable();
-    expect(command()).toBe('npx ivorie apply default');
+    expect(command()).toBe('npx ivorie@1.6 apply default');
+  });
+
+  it('picking the slate theme disables the dials slate keeps fixed', async () => {
+    const { el, fixture } = await render();
+    await pickRailTheme(el, fixture, 'slate');
+    fixture.detectChanges();
+    const row = (dial: string) => rail(el).querySelector<HTMLFieldSetElement>(`[data-dial="${dial}"]`)!;
+    for (const dial of ['panels', 'blur', 'ambient']) expect(row(dial).disabled).toBe(true);
+    expect(row('blur').textContent).toContain('Slate keeps blur fixed');
+    expect(row('rim').disabled).toBe(false);
+  });
+
+  it('a legacy theme in the URL loads: the dropdown names it, its note shows', async () => {
+    const code = encodePreset({ ...DEFAULT_PRESET, theme: 'maia' });
+    const { el, fixture } = await render(`/playground?preset=${code}`);
+    fixture.detectChanges();
+    expect(themeTrigger(el).textContent).not.toContain('Slate');
+    expect(rail(el).querySelector('[data-testid="theme-note"]')!.textContent).toContain('Rounded, with generous spacing.');
   });
 
   it('picking Olive puts its code in the commands and the URL', async () => {
@@ -113,27 +147,20 @@ describe('PlaygroundPage', () => {
     fixture.debugElement.injector.get(PlaygroundLook).set({ baseColor: 'olive' });
     await fixture.whenStable();
     fixture.detectChanges();
-    const code = encodePreset({
-      ...DOCS_PRESET,
-      baseColor: 'olive',
-      font: 'system',
-      fontHeading: 'inherit',
-      radius: 'default',
-      iconLibrary: 'lucide',
-    });
+    const code = encodePreset({ ...DOCS_PRESET, baseColor: 'olive' });
     await openCode(el, fixture);
-    expect(command()).toBe(`npx ivorie init --preset ${code}`);
+    expect(command()).toBe(`npx ivorie@1.6 init --theme ${code}`);
     expect(document.querySelector('[data-testid="preset-code"]')!.textContent!.trim()).toBe(code);
     existing().click();
     await fixture.whenStable();
-    expect(command()).toBe(`npx ivorie apply ${code}`);
+    expect(command()).toBe(`npx ivorie@1.6 apply ${code}`);
     expect(router.url).toBe(`/playground?preset=${code}`);
   });
 
   it('a preset in the URL is applied; a bad one gives the defaults', async () => {
     const code = encodePreset({
       ...DEFAULT_PRESET,
-      style: 'nova',
+      theme: 'nova',
       baseColor: 'olive',
       font: 'inter',
       fontHeading: 'lora',
@@ -168,6 +195,54 @@ describe('PlaygroundPage', () => {
     expect(look.code()).not.toBe(before);
     expect(look.preset().iconLibrary).toBe('tabler');
     expect(router.url).toBe(`/playground?preset=${look.code()}`);
+  });
+
+  it('the rail picks a theme from one dropdown: the trigger names the theme, items show dots and a word', async () => {
+    const { el, fixture } = await render();
+    expect(themeTrigger(el).textContent!.trim()).toBe('Slate');
+    themeTrigger(el).click();
+    await fixture.whenStable();
+    const item = option('Bento');
+    expect(item.querySelectorAll('.docs-theme-dot').length).toBe(3);
+    expect(item.querySelector('.docs-glyph')!.getAttribute('data-glyph')).toBe('Tiles');
+    expect(rail(el).querySelector('[data-testid="theme-row"], [data-testid="theme-preview"]')).toBeNull();
+    item.click();
+    await fixture.whenStable();
+    expect(themeTrigger(el).textContent!.trim()).toBe('Bento');
+  });
+
+  it('accent, base and chart colors are picked the same way: a dropdown each, a color chip left of every item', async () => {
+    const { el, fixture } = await render();
+    const look = fixture.debugElement.injector.get(PlaygroundLook);
+    for (const key of ['accent', 'base', 'chart']) {
+      const trigger = el.querySelector<HTMLButtonElement>(`aside [data-testid="color-${key}"] [data-slot="select-trigger"]`)!;
+      expect(trigger, key).not.toBeNull();
+      expect(trigger.querySelector('.docs-color-chip'), key).not.toBeNull();
+    }
+    expect(rail(el).querySelector('.docs-swatch')).toBeNull();
+    el.querySelector<HTMLButtonElement>('aside [data-testid="color-chart"] [data-slot="select-trigger"]')!.click();
+    await fixture.whenStable();
+    expect(option('Gray').querySelector('.docs-color-chip')).not.toBeNull();
+    option('Gray').click();
+    await fixture.whenStable();
+    expect(look.preset().chartColor).toBe('base');
+    // A color pick keeps the theme selected.
+    expect(look.themeName()).toBe('slate');
+    expect(themeTrigger(el).textContent!.trim()).toBe('Slate');
+  });
+
+  it('the primary action copies the init command', async () => {
+    const { el, fixture } = await render();
+    let copied = '';
+    Object.defineProperty(navigator, 'clipboard', { configurable: true, value: { writeText: async (t: string) => void (copied = t) } });
+    const look = fixture.debugElement.injector.get(PlaygroundLook);
+    look.pickTheme('bento');
+    await fixture.whenStable();
+    const button = rail(el).querySelector<HTMLButtonElement>('[data-testid="copy-init"]')!;
+    expect(button.textContent!.trim()).toBe('Copy init command');
+    button.click();
+    await fixture.whenStable();
+    expect(copied).toBe(`npx ivorie@1.6 init --theme ${look.code()}`);
   });
 
   it('Copy link copies the page URL', async () => {

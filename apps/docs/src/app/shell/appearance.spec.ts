@@ -34,14 +34,21 @@ describe('Appearance', () => {
     document.head.querySelector('link#docs-style')?.remove();
   });
 
-  it('defaults to dark with no storage, even on a light OS', () => {
+  it('defaults to system with no storage: light on a light OS', () => {
     mockMatchMedia(false);
     const { appearance, doc } = create();
-    expect(appearance.state()).toEqual({ mode: 'dark' });
+    expect(appearance.state()).toEqual({ mode: 'system' });
+    expect(doc.documentElement.classList.contains('dark')).toBe(false);
+  });
+
+  it('defaults to system with no storage: dark on a dark OS', () => {
+    mockMatchMedia(true);
+    const { appearance, doc } = create();
+    expect(appearance.dark()).toBe(true);
     expect(doc.documentElement.classList.contains('dark')).toBe(true);
   });
 
-  it('a saved light choice wins over the dark default', () => {
+  it('a saved light choice wins over a dark OS', () => {
     mockMatchMedia(true);
     localStorage.setItem(APPEARANCE_KEY, '{"mode":"light"}');
     const { appearance, doc } = create();
@@ -53,7 +60,7 @@ describe('Appearance', () => {
     mockMatchMedia(false);
     localStorage.setItem(APPEARANCE_KEY, '{nope');
     const { appearance } = create();
-    expect(appearance.state()).toEqual({ mode: 'dark' });
+    expect(appearance.state()).toEqual({ mode: 'system' });
   });
 
   it('falls back to defaults when getItem throws', () => {
@@ -62,7 +69,7 @@ describe('Appearance', () => {
       throw new Error('blocked');
     });
     const { appearance } = create();
-    expect(appearance.state()).toEqual({ mode: 'dark' });
+    expect(appearance.state()).toEqual({ mode: 'system' });
   });
 
   it('setMode(dark) sets the class and keeps unknown keys in storage', () => {

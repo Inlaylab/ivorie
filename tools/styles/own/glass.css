@@ -1,4 +1,5 @@
 /* @base nova */
+/* @dials density contrast motion panels rim shadow blur ambient */
 /*
  * Glass: thick panes of neutral glass. Ideas from solid-glass (MIT, github.com/deeplethe/solid-glass).
  * Four rules keep it one material:
@@ -11,6 +12,8 @@
  * Dark is an even, unlit page: no ambient light.
  * Nova gives the layout; these blocks only add to it, so a nova re-sync keeps working.
  * Every tint is a token, so the fallbacks at the end turn the whole look solid by changing tokens.
+ * Dials: --iv-panel-solid (0 = own alpha, 1 = solid panes), --iv-rim and --iv-shadow scale the edge
+ * light and the shade, --iv-blur scales the blur, --iv-ambient the page light. Unset, each is its default (0, 1, 1, 1, 1).
  * Contrast is checked by tools/styles/contrast.test.ts against --glass-alpha, --glass-float-alpha,
  * --glass-page and --glass-muted-mix. Charts take --chart-* as they are: grey unless an accent is picked.
  */
@@ -18,26 +21,28 @@
 & {
   --glass-alpha: 0.6;
   --glass-float-alpha: 0.94;
-  --glass-blur: 26px;
+  --glass-blur: calc(26px * var(--iv-blur, 1));
   --glass-saturate: 1.8;
-  --glass-control-blur: 14px;
+  --glass-control-blur: calc(14px * var(--iv-blur, 1));
   --glass-muted-mix: 0.62;
   /* The page is a step darker than the panes, so a white pane stands off it. */
   --glass-page: color-mix(in oklab, var(--background) 94%, var(--foreground));
-  --glass-light-1: color-mix(in oklch, var(--primary) 9%, transparent);
-  --glass-light-2: color-mix(in oklch, var(--foreground) 5%, transparent);
-  --glass-light-3: color-mix(in oklch, var(--primary) 5%, transparent);
+  /* Page light under the glass, from the accent and its chart ramp. The ambient dial scales it; the dark page stays unlit. */
+  --glass-light-1: color-mix(in oklch, var(--primary) min(100%, calc(9% * var(--iv-ambient, 1))), transparent);
+  --glass-light-2: color-mix(in oklch, var(--chart-2) min(100%, calc(6% * var(--iv-ambient, 1))), transparent);
+  --glass-light-3: color-mix(in oklch, var(--chart-4) min(100%, calc(6% * var(--iv-ambient, 1))), transparent);
   /* The finish: rim (light on the top edge), inner (a faint second line), edge (hairline outside),
      contact (the shadow it touches with), shade (the shadow below), lift (floating panes). */
-  --glass-rim: color-mix(in oklab, white 90%, transparent);
-  --glass-inner: color-mix(in oklab, white 35%, transparent);
+  /* Below full white, so the rim dial has room both ways. */
+  --glass-rim: color-mix(in oklab, white min(100%, calc(55% * var(--iv-rim, 1))), transparent);
+  --glass-inner: color-mix(in oklab, white min(100%, calc(30% * var(--iv-rim, 1))), transparent);
   --glass-edge: color-mix(in oklab, var(--foreground) 10%, transparent);
   --glass-field-line: color-mix(in oklab, var(--foreground) 22%, transparent);
   --glass-float-edge: color-mix(in oklab, var(--foreground) 18%, transparent);
   --glass-under: color-mix(in oklab, var(--foreground) 12%, transparent);
-  --glass-contact: color-mix(in oklab, black 6%, transparent);
-  --glass-shade: color-mix(in oklab, black 22%, transparent);
-  --glass-lift: color-mix(in oklab, black 12%, transparent);
+  --glass-contact: color-mix(in oklab, black min(100%, calc(6% * var(--iv-shadow, 1))), transparent);
+  --glass-shade: color-mix(in oklab, black min(100%, calc(22% * var(--iv-shadow, 1))), transparent);
+  --glass-lift: color-mix(in oklab, black min(100%, calc(12% * var(--iv-shadow, 1))), transparent);
   /* Clear glass: small things and the one state. On white panes it is the smoked kind. */
   --glass-control: color-mix(in oklab, white 55%, transparent);
   --glass-control-hover: color-mix(in oklab, var(--foreground) 9%, transparent);
@@ -51,9 +56,15 @@
   /* The ink pane is solid colour, lit only faintly on top: a strong rim reads as gloss. */
   --glass-primary-rim: color-mix(in oklab, white 16%, transparent);
   --glass-primary-under: color-mix(in oklab, black 20%, transparent);
-  --glass-card: color-mix(in oklab, var(--card) calc(var(--glass-alpha) * 100%), transparent);
-  --glass-popover: color-mix(in oklab, var(--popover) calc(var(--glass-float-alpha) * 100%), transparent);
-  --glass-sidebar: color-mix(in oklab, var(--sidebar) calc(var(--glass-alpha) * 75%), transparent);
+  /* Pane alphas after the panels dial: 1 when solid, the own alpha when translucent. */
+  --glass-pane-alpha: calc(var(--iv-panel-solid, 0) + (1 - var(--iv-panel-solid, 0)) * var(--glass-alpha));
+  --glass-float-pane-alpha: calc(var(--iv-panel-solid, 0) + (1 - var(--iv-panel-solid, 0)) * var(--glass-float-alpha));
+  --glass-card: color-mix(in oklab, var(--card) calc(var(--glass-pane-alpha) * 100%), transparent);
+  --glass-popover: color-mix(in oklab, var(--popover) calc(var(--glass-float-pane-alpha) * 100%), transparent);
+  --glass-sidebar: color-mix(in oklab, var(--sidebar) calc(var(--glass-pane-alpha) * 75%), transparent);
+  /* The hero card: the pane tinted with the accent. */
+  --glass-hero: color-mix(in oklab, var(--primary) 10%, var(--card));
+  --glass-hero-pane: color-mix(in oklab, var(--glass-hero) calc(var(--glass-pane-alpha) * 100%), transparent);
   --glass-pane:
     inset 0 1px 0 var(--glass-rim), inset 0 0 0 1px var(--glass-inner), 0 0 0 1px var(--glass-edge),
     0 1px 2px var(--glass-contact), 0 12px 32px -14px var(--glass-shade);
@@ -83,15 +94,15 @@
   --glass-light-1: transparent;
   --glass-light-2: transparent;
   --glass-light-3: transparent;
-  --glass-rim: color-mix(in oklab, white 16%, transparent);
-  --glass-inner: color-mix(in oklab, white 4%, transparent);
+  --glass-rim: color-mix(in oklab, white min(100%, calc(22% * var(--iv-rim, 1))), transparent);
+  --glass-inner: color-mix(in oklab, white min(100%, calc(6% * var(--iv-rim, 1))), transparent);
   --glass-edge: color-mix(in oklab, white 7%, transparent);
   --glass-field-line: color-mix(in oklab, white 16%, transparent);
   --glass-float-edge: color-mix(in oklab, white 9%, transparent);
   --glass-under: transparent;
-  --glass-contact: color-mix(in oklab, black 10%, transparent);
-  --glass-shade: color-mix(in oklab, black 60%, transparent);
-  --glass-lift: color-mix(in oklab, black 22%, transparent);
+  --glass-contact: color-mix(in oklab, black min(100%, calc(10% * var(--iv-shadow, 1))), transparent);
+  --glass-shade: color-mix(in oklab, black min(100%, calc(60% * var(--iv-shadow, 1))), transparent);
+  --glass-lift: color-mix(in oklab, black min(100%, calc(22% * var(--iv-shadow, 1))), transparent);
   --glass-control: color-mix(in oklab, white 7%, transparent);
   --glass-control-hover: color-mix(in oklab, white 11%, transparent);
   --glass-hover: color-mix(in oklab, white 8%, transparent);
@@ -107,14 +118,19 @@
 
 /* On every element, not the root: the playground sets the base colors inline on the root. */
 & :where(*) {
-  --muted-foreground: color-mix(in oklab, var(--foreground) calc(var(--glass-muted-mix) * 100%), var(--background));
+  --muted-foreground: color-mix(in oklab, var(--foreground) calc((1 - var(--iv-muted-keep, 1) * (1 - var(--glass-muted-mix))) * 100%), var(--background));
 }
 
 /* Panes: cards and docked surfaces. No border; the edge is drawn with light. */
+.cn-stat,
 .cn-card,
 .cn-alert,
 .cn-item-variant-outline {
   @apply border-transparent bg-(--glass-card) ring-0 shadow-(--glass-pane) backdrop-blur-(--glass-blur) backdrop-saturate-(--glass-saturate);
+}
+
+& .cn-card[data-emphasis='hero'] {
+  @apply bg-(--glass-hero-pane);
 }
 
 /* A sidebar is a pane on its edge: lit along the side facing the page. */
@@ -325,6 +341,7 @@
 @supports not (backdrop-filter: blur(1px)) {
   &,
   .dark & {
+    --iv-panel-solid: 1;
     --glass-alpha: 1;
     --glass-float-alpha: 1;
     --glass-control: var(--background);
@@ -340,6 +357,7 @@
 @media (prefers-reduced-transparency: reduce) {
   &,
   .dark & {
+    --iv-panel-solid: 1;
     --glass-alpha: 1;
     --glass-float-alpha: 1;
     --glass-blur: 0px;
@@ -361,4 +379,94 @@
 .cn-badge-variant-destructive,
 .cn-button-variant-destructive {
   @apply text-[color-mix(in_oklab,var(--destructive),var(--foreground)_28%)];
+}
+
+/* Shape: pill controls on soft panes. Radios and switches stay round; checkboxes keep a small soft corner. */
+& .cn-button,
+& .cn-button-size-xs,
+& .cn-button-size-sm,
+& .cn-button-size-icon-xs,
+& .cn-button-size-icon-sm,
+& .cn-tabs-list,
+& .cn-tabs-trigger,
+& .cn-toggle,
+& .cn-toggle-size-sm,
+& .cn-badge {
+  @apply rounded-full;
+}
+
+/* A vertical list is tall: a full pill would read as an ellipse, so it takes a large corner instead. */
+& .cn-tabs-list {
+  @apply group-data-vertical/tabs:rounded-2xl;
+}
+
+/* Navigation and grouping: the current item is a lit frosted chip; lines and handles are lines of light. */
+& .cn-breadcrumb-page {
+  @apply font-medium;
+}
+
+& .cn-breadcrumb-separator {
+  @apply opacity-60;
+}
+
+& .cn-pagination-link[data-active] {
+  @apply border-transparent bg-(--glass-control) shadow-(--glass-small);
+}
+
+& .cn-calendar-day-button[data-selected-single='true'],
+& .cn-calendar-day-button[data-range-start='true'],
+& .cn-calendar-day-button[data-range-end='true'] {
+  @apply shadow-[inset_0_1px_0_var(--glass-primary-rim),0_2px_8px_-2px_color-mix(in_oklab,var(--primary)_45%,transparent)];
+}
+
+& .cn-calendar-caption {
+  @apply font-semibold tracking-tight;
+}
+
+/* Pill buttons in a group: the group's ends take one corner, so the first and last button match (the base
+   forces rounded-lg on the last end; a full corner on the first would read as a half circle). */
+& .cn-button-group {
+  @apply [&>[data-slot]]:rounded-lg;
+}
+
+& .cn-button-group-text {
+  @apply border-(--glass-edge) bg-(--glass-control) shadow-(--glass-small);
+}
+
+& .cn-button-group-separator {
+  @apply bg-(--glass-edge);
+}
+
+& .cn-resizable-handle {
+  @apply bg-(--glass-edge);
+}
+
+& .cn-resizable-handle-icon {
+  @apply h-8 w-1.5 rounded-full bg-(--glass-control) shadow-(--glass-small);
+}
+
+/* Rich parts: tracks and bars are frosted wells; the icon chip and the filled marks catch the light. */
+& .cn-stat-icon {
+  @apply bg-(--glass-control) shadow-(--glass-small);
+}
+
+/* Filled marks catch the light: a fine rim on top. */
+& .cn-meter-tick[data-filled],
+& span.cn-gauge-segment[data-filled],
+& .cn-tracker-bar:not([data-status='none']) {
+  @apply shadow-[inset_0_1px_0_var(--glass-rim)];
+}
+
+& .cn-meter-tick:not([data-filled]),
+& span.cn-gauge-segment:not([data-filled]),
+& .cn-tracker-bar[data-status='none'] {
+  @apply bg-(--glass-track);
+}
+
+& path.cn-gauge-segment:not([data-filled]) {
+  @apply stroke-(--glass-track);
+}
+
+& .cn-bar-list-bar {
+  @apply bg-[color-mix(in_oklab,var(--primary)_18%,transparent)];
 }
