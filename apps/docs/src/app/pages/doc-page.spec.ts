@@ -16,6 +16,49 @@ async function render(slug: string) {
 }
 
 describe('DocPage', () => {
+  it('sets the title in the Inlay type: medium weight, tight tracking', async () => {
+    const { el } = await render('tabs');
+    const h1 = el.querySelector('h1')!;
+    expect(h1.className).toContain('font-medium');
+    expect(h1.className).toContain('tracking-[-0.03em]');
+  });
+
+  it('runs the side table of contents down a hairline rail', async () => {
+    const { el } = await render('installation');
+    const list = el.querySelector('aside docs-toc ul')!;
+    expect(list.className).toContain('border-l');
+  });
+
+  it('frames each demo as a square hairline cell with + marks at its top corners', async () => {
+    const { el } = await render('tabs');
+    const frame = el.querySelector('docs-demo-frame')!;
+    expect(frame.classList).toContain('docs-sec');
+    expect(frame.classList).toContain('docs-pane');
+    expect(frame.className).not.toMatch(/rounded|overflow-hidden/);
+  });
+
+  it('on the last page the empty pager cell is on the page ground, not a grey block', async () => {
+    const { el } = await render(PAGES.at(-1)!.slug);
+    const pager = el.querySelector('nav[aria-label="Pages"]')!;
+    const cells = [...pager.children];
+    expect(cells.length).toBe(2);
+    expect(cells[1].className).toContain('bg-(--docs-ground)');
+  });
+
+  it('pager links draw their focus ring inside, so the clipped pager never hides it', async () => {
+    const { el } = await render('tabs');
+    for (const a of el.querySelectorAll('nav[aria-label="Pages"] a')) expect(a.className).toContain('focus-visible:ring-inset');
+  });
+
+  it('shows Previous and Next as two hairline cells', async () => {
+    const { el } = await render('tabs');
+    const pager = el.querySelector('nav[aria-label="Pages"]')!;
+    expect(pager.className).toContain('gap-px');
+    expect(pager.className).toContain('bg-(--docs-line)');
+    const cells = [...pager.querySelectorAll(':scope > a')];
+    expect(cells.length).toBe(2);
+    expect(cells.map((c) => c.textContent)).toEqual([expect.stringContaining('Previous'), expect.stringContaining('Next')]);
+  });
   it('keeps prose to a readable measure, near 70 characters', async () => {
     const { el } = await render('installation');
     const prose = el.querySelectorAll('.docs-prose');

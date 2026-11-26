@@ -104,8 +104,9 @@ describe('PreviewPage', () => {
     expect(el.textContent).toContain('Unknown preview');
   });
 
+  // A light page: what is tested is the shell, and a heavy page's import (the changelog's charts) only adds minutes here.
   it('other pages keep the site shell', async () => {
-    const { el } = await open('/changelog');
+    const { el } = await open('/not-found');
     expect(el.querySelector('docs-site-header')).not.toBeNull();
   });
 

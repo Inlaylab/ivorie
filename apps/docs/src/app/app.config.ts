@@ -1,6 +1,6 @@
 import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
 import { UrlSerializer, provideRouter, withComponentInputBinding, withInMemoryScrolling } from '@angular/router';
-import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
+import { provideClientHydration, withEventReplay, withIncrementalHydration } from '@angular/platform-browser';
 import { TrailingSlashUrlSerializer, routes } from './app.routes';
 
 export const appConfig: ApplicationConfig = {
@@ -12,6 +12,7 @@ export const appConfig: ApplicationConfig = {
       withInMemoryScrolling({ anchorScrolling: 'enabled', scrollPositionRestoration: 'enabled' }),
     ),
     { provide: UrlSerializer, useClass: TrailingSlashUrlSerializer },
-    provideClientHydration(withEventReplay()),
+    // Incremental hydration: the docs sidebar renders on the server and loads its code when the browser is idle.
+    provideClientHydration(withEventReplay(), withIncrementalHydration()),
   ],
 };

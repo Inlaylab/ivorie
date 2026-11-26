@@ -47,6 +47,34 @@ import { previewVars, type PlaygroundLook } from './playground-look';
           </iv-select-content>
         </iv-select>
       </div>
+    } @else if (chips()) {
+      <!-- Home: light chips, the name and three dots in the theme's own colors. No live parts, so they load at once. -->
+      <div role="radiogroup" aria-label="Theme" class="flex flex-wrap justify-center gap-2">
+        @for (t of flat(); track t.name) {
+          <label
+            data-testid="theme-chip"
+            [attr.data-theme]="t.name"
+            [title]="t.note"
+            class="docs-pane has-checked:border-foreground has-focus-visible:outline-ring text-muted-foreground has-checked:text-foreground hover:text-foreground flex h-9 cursor-pointer items-center gap-2 rounded-full pr-3.5 pl-2.5 text-[0.8125rem] font-medium transition-colors duration-(--docs-dur) has-focus-visible:outline-2"
+          >
+            <input
+              type="radio"
+              class="sr-only"
+              [name]="name() + '-theme'"
+              [value]="t.name"
+              [attr.aria-description]="t.note"
+              [checked]="look().themeName() === t.name"
+              (change)="look().pickTheme(t.name)"
+            />
+            <span data-testid="theme-dots" class="flex shrink-0 gap-1" [style]="vars()[t.name]" aria-hidden="true">
+              <span class="docs-theme-dot" style="background: var(--background)"></span>
+              <span class="docs-theme-dot" style="background: var(--primary)"></span>
+              <span class="docs-theme-dot" style="background: var(--chart-3)"></span>
+            </span>
+            {{ t.label }}
+          </label>
+        }
+      </div>
     } @else {
       @for (group of groups(); track group.label) {
         <div role="radiogroup" aria-label="Theme" class="docs-theme-row">
@@ -96,6 +124,8 @@ export class ThemePicker {
   readonly name = input.required<string>();
   /** Ivorie and Classic as two labelled grids (rail); otherwise one row. */
   readonly grouped = input(false, { transform: booleanAttribute });
+  /** Light chips with colour dots instead of tiles with live parts (Home). */
+  readonly chips = input(false, { transform: booleanAttribute });
   /** Ivorie themes only. */
   readonly ownOnly = input(false, { transform: booleanAttribute });
 
@@ -109,6 +139,7 @@ export class ThemePicker {
     if (this.ownOnly()) return [{ label: 'Ivorie', themes: own }];
     return this.grouped() ? [{ label: 'Ivorie', themes: own }, { label: 'Classic (shadcn)', themes: classic }] : [{ label: 'All', themes: this.all }];
   });
+  protected readonly flat = computed(() => this.groups().flatMap((g) => g.themes));
   /** The dropdown's values are THEME_ORDER names, so the cast holds. */
   protected pickFromList(name: string | null): void {
     if (name) this.look().pickTheme(name as ThemeName);
@@ -116,8 +147,9 @@ export class ThemePicker {
 
   constructor() {
     // Tiles show real parts in each theme: link every theme's sheet now, not on idle, so none paints bare.
+    // Chips show only colour dots: no sheet needed until a theme is picked.
     afterNextRender(() => {
-      if (!this.grouped()) this.look().loadThemes(THEME_ORDER);
+      if (!this.grouped() && !this.chips()) this.look().loadThemes(THEME_ORDER);
     });
   }
 

@@ -1,5 +1,6 @@
+import { Component } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
+import { Router, provideRouter } from '@angular/router';
 import { describe, expect, it } from 'vitest';
 import { SiteHeader } from './site-header';
 
@@ -12,11 +13,34 @@ async function render(docs = false) {
 }
 
 describe('SiteHeader', () => {
+  it('the active section shows an accent mark, not a filled pill', async () => {
+    @Component({ template: '' })
+    class Blank {}
+    TestBed.configureTestingModule({ providers: [provideRouter([{ path: 'blocks', component: Blank }])] });
+    await TestBed.inject(Router).navigateByUrl('/blocks');
+    const fixture = TestBed.createComponent(SiteHeader);
+    await fixture.whenStable();
+    const links = [...(fixture.nativeElement as HTMLElement).querySelectorAll('nav[aria-label="Main"] a')];
+    const blocks = links.find((a) => a.getAttribute('href') === '/blocks')!;
+    expect(blocks.getAttribute('aria-current')).toBe('page');
+    expect(blocks.querySelector('[data-testid="nav-mark"]')).not.toBeNull();
+    expect(links.filter((a) => a.querySelector('[data-testid="nav-mark"]')).length).toBe(1);
+    expect(blocks.className).not.toMatch(/bg-foreground/);
+  });
 
   it('shows Changelog at every width', async () => {
     const { el } = await render();
     const changelog = el.querySelector('nav[aria-label="Main"] a[href="/changelog"]')!;
     expect(changelog.className).not.toMatch(/(^|\s)hidden(\s|$)/);
+  });
+
+  it('links Buy Me a Coffee in the bar and in the menu, from .github/funding.yml', async () => {
+    const { el } = await render();
+    const href = 'https://buymeacoffee.com/bhavikbhensajaliya';
+    const bar = el.querySelector<HTMLAnchorElement>(`:scope > div a[href="${href}"]`)!;
+    expect(bar.getAttribute('aria-label')).toBe('Buy me a coffee');
+    expect(bar.getAttribute('rel')).toBe('noreferrer');
+    expect(el.querySelector(`dialog#site-menu a[href="${href}"]`)!.textContent!.trim()).toBe('Buy me a coffee');
   });
 
   it('the menu is a native dialog: no overlay code in the first load', async () => {

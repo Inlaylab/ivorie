@@ -9,7 +9,7 @@ import { build as buildRegistry } from '../registry/build.ts';
 import { blockMeta, listBlocks } from '../registry/items.ts';
 import { looksModule } from './looks.ts';
 import { cliPin, packStyles, siteLook, siteStyle } from './site-style.ts';
-import { parseChangelog } from './changelog.ts';
+import { changelogRss, parseChangelog, splitItems } from './changelog.ts';
 import { DEFAULT_PRESET } from '../../projects/cli/src/preset.ts';
 
 const CONTENT = 'apps/docs/content';
@@ -114,19 +114,29 @@ writeFileSync(
 
 writeFileSync(join(OUT, 'looks.ts'), looksModule());
 // The changelog page: CHANGELOG.md, one entry per release, notes rendered like any docs page.
-const releases = parseChangelog(readFileSync('CHANGELOG.md', 'utf8')).map(({ body, ...r }) => ({ ...r, html: render(body).html }));
+const releases = parseChangelog(readFileSync('CHANGELOG.md', 'utf8')).map(({ sections, ...r }) => ({
+  ...r,
+  sections: sections.map(({ body, ...x }) => ({ ...x, html: render(body).html })),
+}));
+// The page gets each note on its own (search and the upgrade digest work note by note).
+const pageReleases = releases.map(({ sections, ...r }) => ({ ...r, sections: sections.map(({ html, ...s }) => ({ ...s, items: splitItems(html) })) }));
 writeFileSync(
   join(OUT, 'changelog.ts'),
-  `${HEADER}export interface ChangelogRelease {
+  `${HEADER}export type ChangelogKind = 'new' | 'changed' | 'improvements' | 'fixes';
+
+export interface ChangelogRelease {
   version: string;
   date: string;
   title: string;
-  html: string;
+  /** New, Changed, Improvements, Fixes: in that order, each only when the release has notes for it. Items are HTML. */
+  sections: { kind: ChangelogKind; label: string; items: string[] }[];
 }
 
-export const CHANGELOG: ChangelogRelease[] = ${JSON.stringify(releases, null, 2)};
+export const CHANGELOG: ChangelogRelease[] = ${JSON.stringify(pageReleases, null, 2)};
 `,
 );
+// The same releases as a feed, served at /changelog.xml (gitignored, like /r/).
+write('apps/docs/public/changelog.xml', changelogRss(releases, 'https://inlaylab.github.io/ivorie/'));
 // The site theme is the one on <body> in index.html (DEFAULT_THEME in appearance-options.ts names the same).
 const siteStyleName = /<body class="theme-([a-z]+)"/.exec(readFileSync('apps/docs/src/index.html', 'utf8'))?.[1];
 if (!siteStyleName) throw new Error('docs: no theme-<name> class on <body> in apps/docs/src/index.html');

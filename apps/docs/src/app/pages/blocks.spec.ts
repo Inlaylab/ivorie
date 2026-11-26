@@ -18,6 +18,19 @@ async function render(url = '/blocks') {
 const titles = (el: HTMLElement) => [...el.querySelectorAll('docs-block-showcase h2')].map((h) => h.textContent!.trim());
 
 describe('BlocksPage', () => {
+  it('sits on the rails; each block opens with a divider and its preview in a square hairline frame', async () => {
+    const { el } = await render();
+    expect(el.querySelector('.docs-rail')).not.toBeNull();
+    expect(el.querySelector('h1')!.className).toContain('font-medium');
+    const showcases = [...el.querySelectorAll('docs-block-showcase')];
+    expect(showcases.length).toBeGreaterThan(0);
+    for (const s of showcases) {
+      expect(s.classList).toContain('docs-sec');
+      const frame = s.querySelector('[data-testid="preview-pane"]')!;
+      expect(frame.className).toContain('docs-pane');
+      expect(frame.className).not.toMatch(/rounded/);
+    }
+  });
   it('opens on Featured: one block per kind', async () => {
     const { el } = await render();
     expect(el.querySelector('h1')!.textContent).toContain('Blocks');

@@ -14,7 +14,8 @@ const COLLAPSED_LINES = 10;
   selector: 'docs-demo-frame',
   imports: [NgComponentOutlet, IvButton, CopyButton, TrustedHtmlPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  host: { class: 'docs-pane not-prose my-6 block overflow-hidden rounded-lg' },
+  // Square, with the rails' + marks at its top corners (docs-sec); no clip, so the marks show.
+  host: { class: 'docs-pane docs-sec not-prose my-6 block' },
   template: `
     <!-- The demo host fills the frame and centers its children, so a w-full child gets real width and wide ones shrink on phones. -->
     <div

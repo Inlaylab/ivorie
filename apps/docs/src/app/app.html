@@ -8,12 +8,17 @@
       <div class="contents" [class.hidden]="!docs()">
         <iv-sidebar>
           <iv-sidebar-content class="no-scrollbar py-4">
-            <docs-site-nav />
+            <!-- Rendered on the server; the nav's code and the page list load after the first paint, which keeps
+                 them out of the first-load budget. The sidebar itself hydrates with the page, so its mobile
+                 and desktop state stays in step with the server. -->
+            @defer (hydrate on idle) {
+              <docs-site-nav />
+            }
           </iv-sidebar-content>
         </iv-sidebar>
       </div>
       <div ivSidebarInset class="min-w-0">
-        <main class="w-full" [class]="docs() ? 'mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-10 lg:py-10' : ''">
+        <main class="w-full" [class]="docs() ? 'docs-rail flex-1 md:border-l-0 px-4 py-8 sm:px-6 lg:px-10 lg:py-10' : ''">
           <router-outlet />
         </main>
         <!-- The playground fills the screen and scrolls inside its panes; a footer would add a second page scroll. -->

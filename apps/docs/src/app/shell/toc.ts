@@ -12,14 +12,14 @@ import type { TocItem } from '../content/types';
         @if (titled()) {
           <p id="toc-title" class="text-muted-foreground mb-2 text-xs font-medium">On this page</p>
         }
-        <ul class="flex flex-col">
+        <ul class="flex flex-col border-l">
           @for (item of items(); track item.id) {
             <li>
               <a
                 [routerLink]="[]"
                 [fragment]="item.id"
-                class="text-muted-foreground hover:text-foreground block truncate py-1 transition-colors"
-                [class.pl-3]="item.level === 3"
+                class="text-muted-foreground hover:text-foreground hover:border-foreground -ml-px block truncate border-l border-transparent py-1 pl-3 transition-colors"
+                [class.pl-6]="item.level === 3"
                 [attr.title]="item.text"
                 >{{ item.text }}</a
               >

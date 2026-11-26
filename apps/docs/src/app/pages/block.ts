@@ -28,12 +28,12 @@ const AUTH_API = [
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'block' },
   template: `
-    <div class="mx-auto max-w-7xl px-4 pt-10 pb-24 sm:px-6">
+    <div class="docs-rail px-4 pt-10 pb-24 sm:px-8">
       <a routerLink="/blocks" class="text-muted-foreground hover:text-foreground text-sm underline-offset-4 hover:underline">All blocks</a>
       @if (entry(); as b) {
         <header class="mt-4 flex flex-wrap items-end justify-between gap-4">
           <div class="max-w-2xl">
-            <h1 class="font-display text-foreground text-3xl font-semibold tracking-[-0.03em] sm:text-4xl">{{ b.title }}</h1>
+            <h1 class="font-display text-foreground text-3xl font-medium tracking-[-0.03em] sm:text-4xl">{{ b.title }}</h1>
             <p class="text-muted-foreground mt-2 text-pretty">{{ b.description }}</p>
           </div>
           <div class="docs-pane flex min-w-0 items-center gap-3 rounded-full py-1 pr-1 pl-5 font-mono text-[0.8125rem]">
@@ -61,7 +61,7 @@ const AUTH_API = [
               </div>
             </div>
             <iv-tabs-content value="preview" class="mt-3">
-              <div class="docs-pane rounded-[1.25rem] p-1.5">
+              <div data-testid="preview-pane" class="docs-pane p-1.5">
                 <docs-preview-frame class="h-[46rem]" [path]="'preview/block/' + b.name" [code]="look.code()" [width]="width()" [label]="b.title + ' preview'" />
               </div>
             </iv-tabs-content>
@@ -75,9 +75,9 @@ const AUTH_API = [
             @if (auth()) {
               <section data-testid="api" class="flex flex-col gap-2 border-t pt-5" aria-labelledby="block-api">
                 <h2 id="block-api" class="text-foreground text-sm font-medium">Inputs and outputs</h2>
-                <dl class="flex flex-col gap-3 text-sm">
+                <dl class="flex flex-col divide-y text-sm">
                   @for (a of api; track a.name) {
-                    <div>
+                    <div class="py-3 first:pt-0">
                       <dt class="font-mono text-xs">
                         <span class="text-foreground">{{ a.name }}</span>
                         <span class="text-muted-foreground"> {{ a.kind }} · {{ a.type }}</span>

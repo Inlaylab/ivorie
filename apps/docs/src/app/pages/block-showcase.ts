@@ -15,11 +15,12 @@ type View = 'preview' | 'code';
   selector: 'docs-block-showcase',
   imports: [RouterLink, IvButton, IvSkeleton, PreviewFrame, CopyButton, BlockCode],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  host: { class: 'flex flex-col gap-3' },
+  // Each block opens with the rails' divider and + marks.
+  host: { class: 'docs-sec flex flex-col gap-3 pt-8 pb-16' },
   template: `
     @let b = entry();
     <div class="min-w-0">
-      <h2 class="text-foreground text-lg font-semibold tracking-tight" [id]="b.name + '-title'">
+      <h2 class="font-display text-foreground text-xl font-medium tracking-[-0.02em]" [id]="b.name + '-title'">
         <a [routerLink]="['/blocks', b.name]" class="hover:underline underline-offset-4">{{ b.title }}</a>
       </h2>
       <p class="text-muted-foreground text-sm text-pretty">{{ b.description }}</p>
@@ -68,11 +69,11 @@ type View = 'preview' | 'code';
     </div>
 
     @if (view() === 'preview') {
-      <div class="docs-pane rounded-[1.25rem] p-1.5">
+      <div data-testid="preview-pane" class="docs-pane p-1.5">
         @defer (on viewport) {
           <docs-preview-frame [class]="height()" [path]="'preview/block/' + b.name" [code]="code()" [width]="width()" [label]="b.title + ' preview'" />
         } @placeholder {
-          <iv-skeleton [class]="height() + ' w-full rounded-xl'" />
+          <iv-skeleton [class]="height() + ' w-full rounded-none'" />
         }
       </div>
     } @else {

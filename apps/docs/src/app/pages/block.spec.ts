@@ -16,6 +16,14 @@ async function render(name = 'login-01') {
 }
 
 describe('BlockPage', () => {
+  it('sits on the rails with an Inlay title and a square hairline preview frame', async () => {
+    const { el } = await render();
+    expect(el.querySelector('.docs-rail')).not.toBeNull();
+    expect(el.querySelector('h1')!.className).toContain('font-medium');
+    const frame = el.querySelector('[data-testid="preview-pane"]')!;
+    expect(frame.className).toContain('docs-pane');
+    expect(frame.className).not.toMatch(/rounded/);
+  });
   it('a block page shows its frame, command and files', async () => {
     const { el, fixture } = await render();
     expect(el.querySelector('h1')!.textContent).toContain('Login 01');
@@ -33,6 +41,11 @@ describe('BlockPage', () => {
     const { el } = await render();
     const api = el.querySelector('[data-testid="api"]')!.textContent!;
     for (const name of ['pending', 'error', 'submitted', 'provider']) expect(api).toContain(name);
+  });
+
+  it('splits the inputs and outputs into hairline rows', async () => {
+    const { el } = await render();
+    expect(el.querySelector('[data-testid="api"] dl')!.className).toContain('divide-y');
   });
 
   it('the theme picker reaches the frame', async () => {
