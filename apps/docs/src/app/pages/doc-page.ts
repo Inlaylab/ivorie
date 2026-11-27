@@ -20,10 +20,10 @@ import type { DocPageData } from './doc-page.resolver';
     <div class="flex gap-12">
       <article class="min-w-0 max-w-3xl flex-1">
         <header class="mb-8">
-          <h1 class="font-display text-foreground scroll-m-24 text-3xl font-semibold tracking-tight text-balance">{{ p.title }}</h1>
+          <h1 class="font-display text-foreground scroll-m-24 text-4xl font-medium tracking-[-0.03em] text-balance">{{ p.title }}</h1>
           <p class="text-muted-foreground mt-2 max-w-[65ch] text-base text-pretty">{{ p.description }}</p>
           @if (p.entry) {
-            <div data-entry class="bg-muted/60 mt-6 inline-flex max-w-full items-center gap-1 rounded-lg border py-1 pr-1 pl-3">
+            <div data-entry class="docs-pane mt-6 inline-flex max-w-full items-center gap-1 rounded-lg py-1 pr-1 pl-3">
               <code class="text-foreground truncate font-mono text-sm">import {{ '{' }} … {{ '}' }} from '{{ p.entry }}'</code>
               <docs-copy-button [text]="p.entry" label="Copy import path" />
             </div>
@@ -51,20 +51,23 @@ import type { DocPageData } from './doc-page.resolver';
           }
         }
 
-        <nav aria-label="Pages" class="mt-16 flex items-stretch justify-between gap-4 border-t pt-6 text-sm">
+        <!-- Two cells split by a hairline: the grid's 1px gap shows the line color behind them. -->
+        <nav aria-label="Pages" class="mt-16 grid grid-cols-2 gap-px overflow-hidden rounded-lg border bg-(--docs-line) text-sm">
           @if (prev(); as prev) {
-            <a [routerLink]="['/docs', prev.slug]" class="group hover:bg-muted flex flex-col gap-1 rounded-lg p-3 -ml-3">
+            <a [routerLink]="['/docs', prev.slug]" class="hover:bg-muted focus-visible:ring-ring flex flex-col gap-1 bg-(--docs-ground) p-4 outline-none transition-colors focus-visible:ring-2 focus-visible:ring-inset">
               <span class="text-muted-foreground inline-flex items-center gap-1"><svg lucideChevronLeft class="size-4" aria-hidden="true"></svg>Previous</span>
               <span class="text-foreground font-medium">{{ prev.title }}</span>
             </a>
           } @else {
-            <span></span>
+            <span class="bg-(--docs-ground)"></span>
           }
           @if (next(); as next) {
-            <a [routerLink]="['/docs', next.slug]" class="group hover:bg-muted -mr-3 flex flex-col items-end gap-1 rounded-lg p-3">
+            <a [routerLink]="['/docs', next.slug]" class="hover:bg-muted focus-visible:ring-ring flex flex-col items-end gap-1 bg-(--docs-ground) p-4 outline-none transition-colors focus-visible:ring-2 focus-visible:ring-inset">
               <span class="text-muted-foreground inline-flex items-center gap-1">Next<svg lucideChevronRight class="size-4" aria-hidden="true"></svg></span>
               <span class="text-foreground font-medium">{{ next.title }}</span>
             </a>
+          } @else {
+            <span class="bg-(--docs-ground)"></span>
           }
         </nav>
       </article>

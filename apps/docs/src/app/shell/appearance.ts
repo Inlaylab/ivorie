@@ -75,9 +75,23 @@ export class Appearance {
     this.update({ mode });
   }
 
-  /** Light if dark is showing, else dark. Saved as an explicit choice. */
+  /** Light if dark is showing, else dark. Saved as an explicit choice. Cross-fades where the browser can,
+   *  unless the person asked for reduced motion. */
   toggle(): void {
-    this.setMode(this.dark() ? 'light' : 'dark');
+    const next = this.dark() ? 'light' : 'dark';
+    const doc = this.doc as Document & { startViewTransition?: (update: () => void) => { finished: Promise<void> } };
+    const reduce = this.win?.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    if (!doc.startViewTransition || reduce) return this.setMode(next);
+    const html = this.doc.documentElement;
+    // The page itself fades only for this switch (styles.css: .docs-mode-fade); other transitions keep the root still.
+    html.classList.add('docs-mode-fade');
+    // The transition captures the new state right after this callback: flip the class here, not in the effect.
+    const vt = doc.startViewTransition(() => {
+      this.setMode(next);
+      html.classList.toggle('dark', next === 'dark');
+      html.style.colorScheme = next;
+    });
+    vt.finished.finally(() => html.classList.remove('docs-mode-fade'));
   }
 
   private update(patch: Partial<AppearanceState>): void {

@@ -107,6 +107,65 @@ describe('Appearance', () => {
     expect(JSON.parse(localStorage.getItem(APPEARANCE_KEY)!).mode).toBe('dark');
   });
 
+  describe('toggle() cross-fade', () => {
+    function media(reduce: boolean) {
+      const mq = (matches: boolean) => ({ matches, addEventListener: () => {}, removeEventListener: () => {}, addListener: () => {}, removeListener: () => {} });
+      Object.defineProperty(document.defaultView!, 'matchMedia', {
+        configurable: true,
+        value: (q: string) => mq(q.includes('reduced-motion') ? reduce : false),
+      });
+    }
+    afterEach(() => delete (document as Partial<Document> & { startViewTransition?: unknown }).startViewTransition);
+
+    it('switches inside a view transition, with the class already flipped when it captures the new state', () => {
+      media(false);
+      const seen: boolean[] = [];
+      const start = vi.fn((cb: () => void) => {
+        cb();
+        seen.push(document.documentElement.classList.contains('dark'));
+        return { finished: Promise.resolve() };
+      });
+      Object.defineProperty(document, 'startViewTransition', { configurable: true, value: start });
+      const { appearance } = create();
+      appearance.toggle();
+      expect(start).toHaveBeenCalledTimes(1);
+      expect(seen).toEqual([true]);
+    });
+
+    it('marks <html> for the page fade only while the transition runs', async () => {
+      media(false);
+      let done!: () => void;
+      const finished = new Promise<void>((r) => (done = r));
+      const marked: boolean[] = [];
+      Object.defineProperty(document, 'startViewTransition', {
+        configurable: true,
+        value: (cb: () => void) => {
+          marked.push(document.documentElement.classList.contains('docs-mode-fade'));
+          cb();
+          return { finished };
+        },
+      });
+      const { appearance } = create();
+      appearance.toggle();
+      expect(marked).toEqual([true]);
+      done();
+      await finished;
+      await Promise.resolve();
+      expect(document.documentElement.classList.contains('docs-mode-fade')).toBe(false);
+    });
+
+    it('switches at once under reduced motion', () => {
+      media(true);
+      const start = vi.fn();
+      Object.defineProperty(document, 'startViewTransition', { configurable: true, value: start });
+      const { appearance } = create();
+      appearance.toggle();
+      TestBed.tick();
+      expect(start).not.toHaveBeenCalled();
+      expect(document.documentElement.classList.contains('dark')).toBe(true);
+    });
+  });
+
   it('does not touch the body style class', () => {
     mockMatchMedia(false);
     localStorage.setItem(APPEARANCE_KEY, JSON.stringify({ mode: 'light', style: 'rhea' }));

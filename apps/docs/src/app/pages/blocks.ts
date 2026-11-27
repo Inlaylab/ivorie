@@ -25,10 +25,10 @@ const CATEGORIES = [
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'block' },
   template: `
-    <div class="mx-auto max-w-7xl px-4 pt-14 pb-24 sm:px-6 sm:pt-20">
+    <div class="docs-rail px-4 pt-14 pb-24 sm:px-8 sm:pt-20">
       <header>
         <div class="max-w-2xl">
-          <h1 class="font-display text-foreground text-[clamp(2.25rem,5vw,3.5rem)] leading-none font-semibold tracking-[-0.025em]">Blocks</h1>
+          <h1 class="font-display text-foreground text-[clamp(2.25rem,5vw,3.5rem)] leading-none font-medium tracking-[-0.04em]">Blocks</h1>
           <p class="text-muted-foreground mt-4 text-lg text-pretty">
             Whole pages built from Ivorie components: sign in, sign up, app shells, dashboards and data views. Forms validate, buttons emit, the
             sidebar follows your routes. Add one with a single command, then make it yours.
@@ -48,7 +48,7 @@ const CATEGORIES = [
         }
       </nav>
 
-      <div class="mt-10 flex flex-col gap-16">
+      <div class="mt-12 flex flex-col">
         @for (b of blocks(); track b.name) {
           <docs-block-showcase [entry]="b" [code]="code" [attr.aria-labelledby]="b.name + '-title'" role="region" />
         }

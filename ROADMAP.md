@@ -1,30 +1,24 @@
 # Roadmap
 
-Status, next work and the plan by release. Updated 2026-11-26. The why: [PLAN](docs/PLAN.md). Rules: [CLAUDE.md](CLAUDE.md).
+Upcoming releases and work not done yet. Shipped work lives in the [CHANGELOG](CHANGELOG.md) and git history. Updated 2026-11-27. The why: [PLAN](docs/PLAN.md). Rules: [CLAUDE.md](CLAUDE.md).
 
 ## Status
 
-**Latest on npm: 1.5.2.** 1.6.0 is one commit on `release/v1.6.0` with its exit gate green (`npm run check`, `npm run smoke:pack`). It holds Phases 18 and 19 and the pre-publish review fixes.
+Latest on npm: 1.6.0. Next:
 
-Next for 1.6.0:
-
-1. Push `release/v1.6.0`. Origin has an older 1.6.0 commit, so this needs `--force-with-lease` (ask first).
-2. PR into `main`, merge, tag `v1.6.0`.
-3. Publish both packages (ask first). Publishing before the docs deploy matters less now: copied commands pin `npx ivorie@1.6`.
+1. **1.7.0:** expand Phase 14 into tasks and get an OK.
 
 Open items:
 
 - `[user]` Trademark and company legal OK for the name, if still open.
-- Post the launch drafts in [docs/LAUNCH.md](docs/LAUNCH.md) after 1.6.0 is on npm.
-- Tags: `v1.0.0` to `v1.5.1` are on GitHub. Tag `v1.5.2` and `v1.6.0` after their merges. The old tags `1.1.0` to `1.5.1` (no `v`) remain because the GitHub releases point at them: retarget each release to its `v` tag, then delete the old tags.
-- The docs initial bundle is 899 kB of its 900 kB budget. The next addition to the first load fails `build-docs`: trim it (see Backlog) or raise the budget on purpose.
+- Post the launch drafts in [docs/LAUNCH.md](docs/LAUNCH.md).
+- Tags: retarget the GitHub releases from the old tags `1.1.0` to `1.5.1` (no `v`) to their `v` tags, then delete the old tags.
+- Watch: the docs first load is 896 kB of its 900 kB budget. The next large addition to it fails `build-docs`: trim it (see Backlog) or raise the budget on purpose.
 
 ## Releases
 
 | Release | What | Status |
 |---|---|---|
-| 1.0 to 1.5 | See [CHANGELOG](CHANGELOG.md) | shipped |
-| 1.6.0 | Themes and dials, rich parts, data blocks, new site | committed, not published |
 | 1.7.0 | AI-ready: AGENTS.md, llms.txt, MCP server | planned |
 | 2.0.0 | New themes; legacy themes and 1.5 aliases removed; carousel gutter after each slide | planned |
 
@@ -59,12 +53,9 @@ Not scheduled.
 - **Docs bundle:** drop `@lucide/angular` from the docs. Blocked on `<ng-icon>` sizing: its unlayered host styles beat Tailwind `size-*`, and its `@layer ng-icon` color beats `text-*`. Needs a small CSS shim first. Then the playground scene icons follow the icon library.
 - **Mono font slot:** `--font-mono` (preset `fontMono`, CLI `--font-mono`, playground picker, more mono fonts). Mono and its titles read it.
 - **Toast:** move focus somewhere sensible after an action closes the toast (today it drops to `<body>`).
+- **Site:** the header menu's docs nav can arrive a beat late on a slow first tap; the side nav's links before hydration do a full page load.
 - **Tests:** Playwright visual regression.
 - **Docs:** search, versioned docs.
 - **CLI:** `ivorie list`, `ivorie diff`, third-party registries, an interactive picker.
 - **AI parts** from shadcn (attachment, bubble, code-block, marker, message, message-scroller, questionnaire, trace) and **Typography** directives.
 - Not needed: `direction`. `@angular/cdk/bidi` `Dir` covers it.
-
-## Done phases
-
-Task lists for shipped phases live in git history and the [CHANGELOG](CHANGELOG.md). Phase 18 (themes and dials) and Phase 19 (site redesign) ship together as 1.6.0.

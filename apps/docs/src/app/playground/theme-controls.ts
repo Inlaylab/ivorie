@@ -35,11 +35,13 @@ const cap = (s: string) => s[0].toUpperCase() + s.slice(1);
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'flex flex-col gap-4' },
   template: `
-    <fieldset class="min-w-0">
-      <legend class="docs-rail-title mb-2">Theme</legend>
-      <docs-theme-picker [look]="look()" [name]="name()" [grouped]="!compact()" [ownOnly]="compact()" />
-      <p class="text-muted-foreground mt-2.5 text-xs" data-testid="theme-note">{{ info().note }}</p>
-    </fieldset>
+    @if (withTheme()) {
+      <fieldset class="min-w-0">
+        <legend class="docs-rail-title mb-2">Theme</legend>
+        <docs-theme-picker [look]="look()" [name]="name()" [grouped]="!compact()" [ownOnly]="compact()" />
+        <p class="text-muted-foreground mt-2.5 text-xs" data-testid="theme-note">{{ info().note }}</p>
+      </fieldset>
+    }
 
     @if (!compact()) {
       <details open class="docs-rail-section">
@@ -159,6 +161,8 @@ export class ThemeControls {
   readonly name = input.required<string>();
   /** Theme tiles only (block page). */
   readonly compact = input(false, { transform: booleanAttribute });
+  /** False where the page shows the theme tiles itself (playground: above the preview). */
+  readonly withTheme = input(true, { transform: booleanAttribute });
 
   protected readonly preset = computed(() => this.look().preset());
   protected readonly dials = (Object.keys(DIALS) as DialKey[]).map((key) => ({

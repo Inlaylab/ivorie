@@ -119,17 +119,17 @@ try {
   writeApp(cliApp, './ui');
   withBlock(cliApp, 'login-01', 'Login01');
 
-  // 2. npm package, following installation.md, on the theme `init --yes` picks (glass).
+  // 2. npm package, following installation.md, on the default theme (slate), like the CLI app.
   const npmApp = newApp('npm-app', cliMajor);
   run(`npm i "${uiTgz}" @angular/cdk@^${cliMajor}`, npmApp);
   run('npm i -D tailwindcss @tailwindcss/postcss tw-animate-css', npmApp);
   writeFileSync(join(npmApp, '.postcssrc.json'), '{ "plugins": { "@tailwindcss/postcss": {} } }\n');
   writeFileSync(
     join(npmApp, 'src/styles.css'),
-    '@import "@inlaylab/ivorie/styles/theme.css";\n@import "@inlaylab/ivorie/styles/theme-glass.css";\n',
+    '@import "@inlaylab/ivorie/styles/theme.css";\n@import "@inlaylab/ivorie/styles/theme-slate.css";\n',
   );
   const index = join(npmApp, 'src/index.html');
-  writeFileSync(index, readFileSync(index, 'utf8').replace('<body>', '<body class="theme-glass">'));
+  writeFileSync(index, readFileSync(index, 'utf8').replace('<body>', '<body class="theme-slate">'));
   writeApp(npmApp, '@inlaylab/ivorie');
 
   run('npx ng build', cliApp);
@@ -169,10 +169,10 @@ try {
     },
     'init --theme <code>',
   );
-  // The default look is frost: glass, violet (light --primary oklch(0.491 0.27 292.581)).
+  // The default look is slate with the blue accent (light --primary oklch(0.488 0.243 264.376)).
   run('npx ivorie apply default', presetApp);
   run('npx ng build', presetApp);
-  look({ primary: /--primary:\s*oklch\(0?\.491 0?\.27 292\.581\)/, style: /\.theme-glass/, body: /<body[^>]*class="[^"]*theme-glass/ }, 'apply default');
+  look({ primary: /--primary:\s*oklch\(0?\.488 0?\.243 264\.376\)/, style: /\.theme-slate/, body: /<body[^>]*class="[^"]*theme-slate/ }, 'apply default');
   // An accent preset: blue primary, emerald charts, bold menu accent (= primary), on sera.
   run('npx ivorie init --yes --force --theme sera --accent blue --chart-color emerald --menu-accent bold', presetApp);
   run('npx ng build', presetApp);

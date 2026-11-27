@@ -21,7 +21,7 @@ console.log('docs: roadmap/index.html redirects to the changelog');
 if (process.argv.includes('--verify')) {
   const pages = readFileSync('apps/docs/src/generated/pages.ts', 'utf8');
   const slugs = [...pages.matchAll(/slug: "([^"]+)"/g)].map((m) => m[1]);
-  const want = ['index.html', '404.html', 'changelog/index.html', 'roadmap/index.html', ...slugs.map((s) => `docs/${s}/index.html`)];
+  const want = ['index.html', '404.html', 'changelog/index.html', 'changelog.xml', 'roadmap/index.html', ...slugs.map((s) => `docs/${s}/index.html`)];
   const missing = want.filter((f) => !existsSync(`${BROWSER}/${f}`));
   if (missing.length) {
     console.error(`FAIL docs verify: missing ${missing.join(', ')}`);

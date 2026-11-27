@@ -67,30 +67,30 @@ export const GROUPS: { label: string; pages: { slug: string; title: string; soon
           type="search"
           aria-label="Filter pages"
           placeholder="Filter pages"
-          class="bg-foreground/[0.04] placeholder:text-muted-foreground focus-visible:ring-ring/40 focus-visible:border-ring h-8 w-full rounded-full border pr-3 pl-8 text-[0.8125rem] outline-none focus-visible:ring-[3px]"
+          class="bg-(--docs-pane-solid) placeholder:text-muted-foreground focus-visible:ring-ring/40 focus-visible:border-ring h-8 w-full rounded-full border pr-3 pl-8 text-[0.8125rem] outline-none focus-visible:ring-[3px]"
           [value]="query()"
           (input)="query.set($any($event.target).value)"
         />
       </div>
       @for (group of groups(); track group.label) {
         <iv-sidebar-group class="py-1">
-          <iv-sidebar-group-label class="text-foreground/90 px-3 text-xs font-semibold">{{ group.label }}</iv-sidebar-group-label>
+          <iv-sidebar-group-label class="text-muted-foreground px-3 font-mono text-[0.6875rem] tracking-[0.08em] uppercase">{{ group.label }}</iv-sidebar-group-label>
           <iv-sidebar-group-content>
             <ul ivSidebarMenu class="gap-px">
               @for (page of group.pages; track page.slug) {
                 <li ivSidebarMenuItem>
                   <a
                     [routerLink]="['/docs', page.slug]"
-                    routerLinkActive="docs-nav-active bg-foreground/[0.07] !text-foreground"
+                    routerLinkActive="docs-nav-active !text-foreground"
                     ariaCurrentWhenActive="page"
-                    class="text-muted-foreground hover:text-foreground hover:bg-foreground/[0.05] focus-visible:ring-ring group flex h-8 items-center gap-2.5 rounded-lg px-3 text-[0.8125rem] font-medium transition-colors outline-none focus-visible:ring-2"
+                    class="text-muted-foreground hover:text-foreground hover:bg-muted focus-visible:ring-ring group flex h-8 items-center gap-2.5 rounded-lg px-3 text-[0.8125rem] font-medium transition-colors outline-none focus-visible:ring-2"
                     (click)="closeOnMobile()"
                   >
                     @if (icons[page.slug]; as d) {
                       <svg class="size-4 shrink-0 opacity-80 group-[.docs-nav-active]:text-(--brand) group-[.docs-nav-active]:opacity-100" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path [attr.d]="d" /></svg>
                     } @else {
                       <!-- The brand dot marks the open page. -->
-                      <span class="bg-(--brand) hidden size-1.5 shrink-0 rounded-full group-[.docs-nav-active]:block" aria-hidden="true"></span>
+                      <span data-testid="nav-mark" class="bg-(--brand) hidden size-1.5 shrink-0 rounded-full group-[.docs-nav-active]:block" aria-hidden="true"></span>
                     }
                     {{ page.title }}
                     @if (page.soon) {

@@ -7,9 +7,8 @@
 @import "@inlaylab/ivorie/styles/theme-slate.css";
 /* The default preset's colors and radius, as `ivorie init` writes them (tools/docs/site-style.ts siteLook). */
 @import "./generated/site-look.css";
-/* Fonts, self-hosted: the check and the SSR smoke run without network. Geist is the theme's font;
-   Funnel Display is the site's display face (headings in the chrome only). */
-@import "@fontsource-variable/funnel-display";
+/* Fonts, self-hosted: the check and the SSR smoke run without network. Geist is the only family:
+   body, headings and the chrome; Geist Mono for code and line-art labels. */
 @import "@fontsource-variable/geist";
 @import "@fontsource-variable/geist-mono";
 @plugin "@tailwindcss/typography";
@@ -24,7 +23,7 @@
 @theme {
   --font-sans: "Geist Variable", system-ui, sans-serif;
   --font-mono: "Geist Mono Variable", SFMono-Regular, Menlo, Consolas, monospace;
-  --font-display: "Funnel Display Variable", "Geist Variable", system-ui, sans-serif;
+  --font-display: "Geist Variable", system-ui, sans-serif;
 }
 
 @layer base {
@@ -252,8 +251,31 @@ body.docs-preview:where(.theme-glass, .theme-bento, .theme-clay, .theme-slate, .
   --brand: var(--primary);
   --brand-soft: color-mix(in oklab, var(--primary) 12%, transparent);
   --brand-ink: var(--primary);
+  /* The default preset's colors, kept under their own names before the site's warm palette replaces them
+     (below): stages reset to these until PlaygroundLook gives them the picked theme. */
+  --docs-default-background: var(--background);
+  --docs-default-foreground: var(--foreground);
+  --docs-default-card: var(--card);
+  --docs-default-card-foreground: var(--card-foreground);
+  --docs-default-popover: var(--popover);
+  --docs-default-popover-foreground: var(--popover-foreground);
+  --docs-default-secondary: var(--secondary);
+  --docs-default-secondary-foreground: var(--secondary-foreground);
+  --docs-default-muted: var(--muted);
+  --docs-default-muted-foreground: var(--muted-foreground);
+  --docs-default-accent: var(--accent);
+  --docs-default-accent-foreground: var(--accent-foreground);
+  --docs-default-border: var(--border);
+  --docs-default-input: var(--input);
+  --docs-default-sidebar: var(--sidebar);
+  --docs-default-sidebar-foreground: var(--sidebar-foreground);
+  --docs-default-sidebar-accent: var(--sidebar-accent);
+  --docs-default-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --docs-default-sidebar-border: var(--sidebar-border);
 }
 .docs-shell {
+  /* clip, not hidden: the rails' + marks may poke past a narrow viewport, and clip keeps the header sticky. */
+  overflow-x: clip;
   background: var(--background);
   color: var(--foreground);
 }
@@ -277,6 +299,216 @@ html {
   border: 1px solid var(--docs-line);
   background: var(--docs-pane-solid);
 }
+/* The site's own palette, warm ivory and warm charcoal, over the default preset's colors. Only where the
+   site shell renders: preview pages have no .docs-shell on the server or the client, so they keep the real
+   theme from the first paint. The chrome aliases are declared again here so they resolve to the warm tokens. */
+body:has(.docs-shell) {
+  --docs-ground: var(--background);
+  --docs-ink: var(--foreground);
+  --docs-ink-muted: var(--muted-foreground);
+  --docs-pane-solid: var(--card);
+  --docs-line: var(--border);
+  background: var(--docs-ground);
+  --background: oklch(0.985 0.004 95);
+  --foreground: oklch(0.2 0.006 80);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.2 0.006 80);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.2 0.006 80);
+  --secondary: oklch(0.955 0.006 90);
+  --secondary-foreground: oklch(0.2 0.006 80);
+  --muted: oklch(0.955 0.006 90);
+  --muted-foreground: oklch(0.48 0.012 85);
+  --accent: oklch(0.955 0.006 90);
+  --accent-foreground: oklch(0.2 0.006 80);
+  --border: oklch(0.905 0.01 90);
+  --input: oklch(0.905 0.01 90);
+  --sidebar: oklch(0.985 0.004 95);
+  --sidebar-foreground: oklch(0.2 0.006 80);
+  --sidebar-accent: oklch(0.955 0.006 90);
+  --sidebar-accent-foreground: oklch(0.2 0.006 80);
+  --sidebar-border: oklch(0.905 0.01 90);
+}
+.dark body:has(.docs-shell) {
+  --docs-ground: var(--background);
+  --docs-ink: var(--foreground);
+  --docs-ink-muted: var(--muted-foreground);
+  --docs-pane-solid: var(--card);
+  --docs-line: var(--border);
+  --background: oklch(0.17 0.004 80);
+  --foreground: oklch(0.96 0.004 90);
+  --card: oklch(0.205 0.005 80);
+  --card-foreground: oklch(0.96 0.004 90);
+  --popover: oklch(0.205 0.005 80);
+  --popover-foreground: oklch(0.96 0.004 90);
+  --secondary: oklch(0.25 0.006 80);
+  --secondary-foreground: oklch(0.96 0.004 90);
+  --muted: oklch(0.25 0.006 80);
+  --muted-foreground: oklch(0.72 0.01 85);
+  --accent: oklch(0.25 0.006 80);
+  --accent-foreground: oklch(0.96 0.004 90);
+  --border: oklch(0.3 0.007 80);
+  --input: oklch(0.32 0.007 80);
+  --sidebar: oklch(0.17 0.004 80);
+  --sidebar-foreground: oklch(0.96 0.004 90);
+  --sidebar-accent: oklch(0.25 0.006 80);
+  --sidebar-accent-foreground: oklch(0.96 0.004 90);
+  --sidebar-border: oklch(0.3 0.007 80);
+}
+
+/* Stages show the default preset until PlaygroundLook attaches the picked theme, not the warm chrome.
+   Zero specificity: a theme class or the look's inline tokens always win. */
+:where(.docs-stage) {
+  --background: var(--docs-default-background);
+  --foreground: var(--docs-default-foreground);
+  --card: var(--docs-default-card);
+  --card-foreground: var(--docs-default-card-foreground);
+  --popover: var(--docs-default-popover);
+  --popover-foreground: var(--docs-default-popover-foreground);
+  --secondary: var(--docs-default-secondary);
+  --secondary-foreground: var(--docs-default-secondary-foreground);
+  --muted: var(--docs-default-muted);
+  --muted-foreground: var(--docs-default-muted-foreground);
+  --accent: var(--docs-default-accent);
+  --accent-foreground: var(--docs-default-accent-foreground);
+  --border: var(--docs-default-border);
+  --input: var(--docs-default-input);
+  --sidebar: var(--docs-default-sidebar);
+  --sidebar-foreground: var(--docs-default-sidebar-foreground);
+  --sidebar-accent: var(--docs-default-sidebar-accent);
+  --sidebar-accent-foreground: var(--docs-default-sidebar-accent-foreground);
+  --sidebar-border: var(--docs-default-sidebar-border);
+}
+
+@layer components {
+  /* Inlay frame: the page container with a hairline rail down each side. In a layer, so utilities override it. */
+  .docs-rail {
+    max-width: 75rem;
+    margin-inline: auto;
+    border-inline: 1px solid var(--docs-line);
+    box-sizing: border-box;
+  }
+}
+/* A section divider inside the rails, with a small + where it crosses each rail. */
+.docs-sec {
+  position: relative;
+  border-top: 1px solid var(--docs-line);
+}
+.docs-sec::before,
+.docs-sec::after {
+  content: "";
+  position: absolute;
+  top: -6px;
+  width: 11px;
+  height: 11px;
+  pointer-events: none;
+  --mark: color-mix(in oklab, var(--docs-ink-muted) 60%, transparent);
+  background:
+    linear-gradient(var(--mark), var(--mark)) center / 1px 100% no-repeat,
+    linear-gradient(var(--mark), var(--mark)) center / 100% 1px no-repeat;
+}
+.docs-sec::before {
+  left: -6px;
+}
+.docs-sec::after {
+  right: -6px;
+}
+/* A 48px hairline grid that fades out from the middle: behind the hero only. */
+.docs-grid-fade {
+  background-image:
+    linear-gradient(var(--docs-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--docs-line) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: radial-gradient(ellipse 70% 80% at 70% 50%, #000 30%, transparent 75%);
+  opacity: 0.6;
+}
+/* Cells split by hairlines instead of cards: one column, two from md. */
+.docs-cells {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  & > * {
+    border-top: 1px solid var(--docs-line);
+  }
+  @media (width >= 48rem) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    & > :nth-child(odd) {
+      border-right: 1px solid var(--docs-line);
+    }
+  }
+}
+/* A small mono label over a section title. */
+.docs-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--docs-ink-muted);
+}
+/* Line-art motion. `both` keeps the finished drawing when reduced motion cuts the animation short. */
+.docs-draw {
+  stroke-dasharray: 1400;
+  animation: docs-draw 2.4s cubic-bezier(0.6, 0, 0.2, 1) var(--d, 0.2s) both;
+}
+.docs-node {
+  animation: docs-node 0.4s ease-out var(--d, 0s) both;
+}
+.docs-flow {
+  stroke-dasharray: 3 7;
+  animation: docs-flow 1.2s linear infinite;
+}
+.docs-flow-back {
+  animation-direction: reverse;
+}
+.docs-pulse {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: docs-pulse 2.4s ease-out infinite;
+}
+@keyframes docs-draw {
+  from {
+    stroke-dashoffset: 1400;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes docs-node {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes docs-flow {
+  to {
+    stroke-dashoffset: -20;
+  }
+}
+@keyframes docs-pulse {
+  from {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(2.4);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  /* Still drawings: the finished outline and nodes at once (no delay), solid connectors, nothing pulses. */
+  .docs-draw,
+  .docs-node {
+    animation: none;
+  }
+  .docs-flow {
+    stroke-dasharray: none;
+  }
+  .docs-pulse {
+    display: none;
+  }
+}
+
 /* Text drawn by CSS, so it is not part of the element's text (select labels read text). */
 .docs-glyph::before {
   content: attr(data-glyph);
@@ -298,22 +530,36 @@ html {
   }
 }
 
-/* Style switch (PlaygroundLook): only the wall changes, out then in, never two looks on top of each other. */
+/* Style switch (PlaygroundLook): only the stages change, out then in, never two looks on top of each other.
+   A page can hold two stages (home: the hero block and the wall): each gets its own name, one class styles both. */
 .docs-stage {
-  view-transition-name: docs-stage;
+  view-transition-name: match-element;
+  view-transition-class: docs-stage;
 }
 ::view-transition-group(root),
 ::view-transition-old(root),
 ::view-transition-new(root) {
   animation: none;
 }
-::view-transition-group(docs-stage) {
+/* Light / dark switch (Appearance.toggle): the whole page cross-fades, only while .docs-mode-fade is on. */
+:root.docs-mode-fade::view-transition-old(root) {
+  animation: docs-vt-out 240ms ease-out both;
+}
+:root.docs-mode-fade::view-transition-new(root) {
+  animation: docs-fade-in 240ms ease-out both;
+}
+@keyframes docs-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+::view-transition-group(*.docs-stage) {
   animation-duration: 0s;
 }
-::view-transition-old(docs-stage) {
+::view-transition-old(*.docs-stage) {
   animation: docs-vt-out 110ms ease-in both;
 }
-::view-transition-new(docs-stage) {
+::view-transition-new(*.docs-stage) {
   animation: docs-vt-in 200ms ease-out 90ms both;
 }
 @keyframes docs-vt-out {
@@ -590,4 +836,17 @@ dialog.docs-menu::backdrop {
 }
 [data-slot='select-trigger'] > .docs-color-chip {
   margin-right: 0.5rem;
+}
+
+/* Changelog sections: tight lists under each New / Changed / Improvements / Fixes label. */
+/* The notes list is the .prose element itself, so it sets its own bullets: prose only styles lists inside it. */
+.docs-changelog-notes {
+  @apply my-0 list-disc ps-5 text-[0.9375rem] leading-relaxed marker:text-(--docs-ink-muted);
+  & li {
+    @apply my-1.5 ps-1;
+  }
+  & mark {
+    @apply text-foreground rounded-[3px] px-0.5;
+    background: color-mix(in oklab, var(--primary) 18%, transparent);
+  }
 }

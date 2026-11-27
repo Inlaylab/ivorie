@@ -1,6 +1,6 @@
-import { ApplicationRef } from '@angular/core';
+import { ApplicationRef, Component } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
+import { Router, provideRouter } from '@angular/router';
 import { describe, expect, it } from 'vitest';
 import { GROUPS, SiteNav } from './site-nav';
 import { PAGES } from '../../generated/pages';
@@ -13,6 +13,26 @@ async function render() {
 }
 
 describe('SiteNav', () => {
+  it('the open page shows in ink with the accent dot, not a filled pill', async () => {
+    @Component({ template: '' })
+    class Blank {}
+    TestBed.configureTestingModule({ providers: [provideRouter([{ path: 'docs/:slug', component: Blank }])] });
+    await TestBed.inject(Router).navigateByUrl('/docs/badge');
+    const fixture = TestBed.createComponent(SiteNav);
+    await fixture.whenStable();
+    const el = fixture.nativeElement as HTMLElement;
+    const active = el.querySelector('a[aria-current="page"]')!;
+    expect(active.getAttribute('href')).toBe('/docs/badge');
+    expect(active.className).not.toMatch(/bg-foreground/);
+    expect(active.querySelector('[data-testid="nav-mark"]')).not.toBeNull();
+  });
+
+  it('labels each group in small mono type', async () => {
+    const el = await render();
+    const labels = [...el.querySelectorAll('iv-sidebar-group-label')];
+    expect(labels.length).toBeGreaterThan(0);
+    for (const l of labels) expect(l.className).toMatch(/font-mono/);
+  });
   it('links every page', async () => {
     const el = await render();
     for (const page of PAGES) {
